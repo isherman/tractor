@@ -8,7 +8,7 @@
   },
   "extends": [
     "eslint:recommended",
-    "airbnb-base",
+    "airbnb",
     "plugin:prettier/recommended"
   ]
 }

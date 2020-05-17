@@ -1,6 +1,9 @@
+import React from "react";
+import ReactDOM from "react-dom";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
+import SceneComponent from "./components/SceneComponent";
 
 let camera;
 let controls;
@@ -138,3 +141,6 @@ function animate() {
 
 init();
 animate();
+
+// eslint-disable-next-line react/jsx-filename-extension
+ReactDOM.render(<SceneComponent />, document.getElementById("scene"));
