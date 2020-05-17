@@ -1,36 +1,40 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import App from "./App.js";
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 
-ReactDOM.render(<App />, document.getElementById("root"));
+let camera;
+let controls;
+let scene;
+let renderer;
+let tractorMesh;
+let xAxis;
 
-var camera, controls, scene, renderer, tractor_mesh, x_axis;
-
-var sim_updater = {
+const simUpdater = {
   socket: null,
 
-  start: function () {
-    // var url = "ws://" + location.host + "/simsocket";
-    var url = "ws://localhost:8989/simsocket";
-    sim_updater.socket = new WebSocket(url);
-    sim_updater.socket.onmessage = function (event) {
-      sim_updater.showMessage(JSON.parse(event.data));
+  start() {
+    const url = "ws://localhost:8989/simsocket";
+    simUpdater.socket = new WebSocket(url);
+    simUpdater.socket.onmessage = (event) => {
+      simUpdater.showMessage(JSON.parse(event.data));
     };
   },
 
-  showMessage: function (message) {
-    // console.log(message);
-    var p = message.world_translation_tractor;
-    var q = message.world_quaternion_tractor;
-    tractor_mesh.position.set(p[0], p[1], p[2]);
-    tractor_mesh.quaternion.set(q[0], q[1], q[2], q[3]);
-    x_axis.position.set(p[0], p[1], p[2]);
-    x_axis.quaternion.set(q[0], q[1], q[2], q[3]);
+  showMessage(message) {
+    const p = message.world_translation_tractor;
+    const q = message.world_quaternion_tractor;
+    tractorMesh.position.set(p[0], p[1], p[2]);
+    tractorMesh.quaternion.set(q[0], q[1], q[2], q[3]);
+    xAxis.position.set(p[0], p[1], p[2]);
+    xAxis.quaternion.set(q[0], q[1], q[2], q[3]);
   }
 };
+
+function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
 
 function init() {
   scene = new THREE.Scene();
@@ -54,10 +58,10 @@ function init() {
 
   camera.updateMatrix();
 
-  var size = 400;
-  var divisions = 400;
+  const size = 400;
+  const divisions = 400;
 
-  var grid = new THREE.GridHelper(size, divisions);
+  const grid = new THREE.GridHelper(size, divisions);
   grid.geometry.rotateX(-Math.PI / 2);
   scene.add(grid);
 
@@ -77,68 +81,59 @@ function init() {
 
   // world
 
-  var loader = new STLLoader();
-  loader.load("stl/tractor.v0.stl", function (geometry) {
-    // loader.load( './static/tractor.v0.stl', function ( geometry ) {
-
-    var material = new THREE.MeshPhongMaterial({
+  const loader = new STLLoader();
+  loader.load("stl/tractor.v0.stl", (geometry) => {
+    const material = new THREE.MeshPhongMaterial({
       color: 0xff5533,
       specular: 0x111111,
       shininess: 200
     });
-    tractor_mesh = new THREE.Mesh(geometry, material);
+    tractorMesh = new THREE.Mesh(geometry, material);
 
-    tractor_mesh.position.set(0, 0, 0);
-    tractor_mesh.rotation.set(0, 0, 0);
-    tractor_mesh.scale.set(0.001, 0.001, 0.001);
+    tractorMesh.position.set(0, 0, 0);
+    tractorMesh.rotation.set(0, 0, 0);
+    tractorMesh.scale.set(0.001, 0.001, 0.001);
 
-    tractor_mesh.castShadow = true;
-    tractor_mesh.receiveShadow = true;
-    scene.add(tractor_mesh);
+    tractorMesh.castShadow = true;
+    tractorMesh.receiveShadow = true;
+    scene.add(tractorMesh);
 
-    var length = 1;
-    x_axis = new THREE.AxesHelper();
-    //var x_axis = new THREE.ArrowHelper( THREE.Vector(1,0,0), THREE.Vector3( 0, 0, 0 ), length, 0xff0000 );
-    scene.add(x_axis);
-    //var y_axis = new THREE.ArrowHelper( new THREE.Vector(0,1,0), new THREE.Vector3( 0, 0, 0 ), length, 0x00ff00 );
-    //scene.add(y_axis);
-    //var z_axis = new THREE.ArrowHelper( new THREE.Vector(0,0,1), new THREE.Vector3( 0, 0, 0 ), length, 0x0000ff );
-    //scene.add(z_axis);
+    xAxis = new THREE.AxesHelper();
+    // var x_axis = new THREE.ArrowHelper( THREE.Vector(1,0,0), THREE.Vector3( 0, 0, 0 ), length, 0xff0000 );
+    scene.add(xAxis);
+    // var y_axis = new THREE.ArrowHelper( new THREE.Vector(0,1,0), new THREE.Vector3( 0, 0, 0 ), length, 0x00ff00 );
+    // scene.add(y_axis);
+    // var z_axis = new THREE.ArrowHelper( new THREE.Vector(0,0,1), new THREE.Vector3( 0, 0, 0 ), length, 0x0000ff );
+    // scene.add(z_axis);
   });
 
   // lights
 
-  var light = new THREE.DirectionalLight(0xffffff);
-  light.position.set(1, 1, 1);
-  scene.add(light);
+  const light1 = new THREE.DirectionalLight(0xffffff);
+  light1.position.set(1, 1, 1);
+  scene.add(light1);
 
-  var light = new THREE.DirectionalLight(0x002288);
-  light.position.set(-1, -1, -1);
-  scene.add(light);
+  const light2 = new THREE.DirectionalLight(0x002288);
+  light2.position.set(-1, -1, -1);
+  scene.add(light2);
 
-  var light = new THREE.AmbientLight(0x222222);
-  scene.add(light);
+  const light3 = new THREE.AmbientLight(0x222222);
+  scene.add(light3);
 
   //
 
   window.addEventListener("resize", onWindowResize, false);
-  sim_updater.start();
+  simUpdater.start();
 }
 
-function onWindowResize() {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
+function render() {
+  renderer.render(scene, camera);
 }
 
 function animate() {
   requestAnimationFrame(animate);
   controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
   render();
-}
-
-function render() {
-  renderer.render(scene, camera);
 }
 
 init();
