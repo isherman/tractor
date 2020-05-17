@@ -49,7 +49,7 @@ repos:
     hooks:
     -   id: mypy
 -   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: 'v7.0.0'  # Use the sha / tag you want to point at
+    rev: 'v7.0.0'
     hooks:
     -   id: eslint
         files: ^app/frontend/.*\.js$
