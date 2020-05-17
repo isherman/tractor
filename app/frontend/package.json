@@ -20,7 +20,8 @@
   "dependencies": {
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-hot-loader": "^4.12.21"
+    "react-hot-loader": "^4.12.21",
+    "three": "^0.116.1"
   },
   "scripts": {
     "dev-server": "webpack-dev-server --mode development",
