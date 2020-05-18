@@ -3,7 +3,7 @@ import React from "react";
 
 function Ground(props) {
   const onClick = (event) => {
-    if (!event.shiftKey) {
+    if (!event.altKey) {
       return;
     }
     props.onClick(event);
