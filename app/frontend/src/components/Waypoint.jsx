@@ -3,18 +3,20 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
 
-function Waypoint({ isGoal, onClick, ...props }) {
+function Waypoint({ isGoal, ...props }) {
   const [hovered, setHover] = useState(false);
 
   const color = isGoal ? "hotpink" : hovered ? "blue" : "gray";
 
+  const onClick = (event) => {
+    event.stopPropagation();
+    props.onClick();
+  };
+
   return (
     <mesh
       {...props}
-      onClick={(e) => {
-        e.stopPropagation();
-        onClick();
-      }}
+      onClick={onClick}
       onPointerOver={() => setHover(true)}
       onPointerOut={() => setHover(false)}
       rotation-x={Math.PI / 2}

@@ -1,7 +1,14 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 
-function Ground({ onClick }) {
+function Ground(props) {
+  const onClick = (event) => {
+    if (!event.shiftKey) {
+      return;
+    }
+    props.onClick(event);
+  };
+
   return (
     <group>
       <axesHelper />
