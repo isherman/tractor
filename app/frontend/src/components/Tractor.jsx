@@ -9,13 +9,13 @@ function Tractor() {
   // TODO: Should this be bundled?
   const stl = useLoader(STLLoader, "./stl/tractor.v0.stl");
 
-  const [position, setTractorP] = useState([0, 0, 0]);
-  const [quaternion, setTractorQ] = useState([0, 0, 0, 0]);
+  const [position, setPosition] = useState([0, 0, 0]);
+  const [quaternion, setQuaternion] = useState([0, 0, 0, 1]);
 
   useEffect(() => {
     webSocketClient.on("message", (message) => {
-      setTractorP(message.world_translation_tractor);
-      setTractorQ(message.world_quaternion_tractor);
+      setPosition(message.world_translation_tractor);
+      setQuaternion(message.world_quaternion_tractor);
     });
   }, [position, quaternion]);
 
