@@ -1,23 +1,17 @@
-import React, { Suspense, useState, useEffect } from "react";
+import React, { Suspense, useState } from "react";
 import { Canvas } from "react-three-fiber";
 import Tractor from "./Tractor";
 import Controls from "./Controls";
 import Lights from "./Lights";
-import Grid from "./Grid";
-
-const socket = new WebSocket("ws://localhost:8989/simsocket");
+import Ground from "./Ground";
+import Waypoints from "./Waypoints";
 
 function Scene() {
-  const [position, setPosition] = useState([0, 0, 0]);
-  const [quaternion, setQuaternion] = useState([0, 0, 0, 0]);
+  const [waypoints, setWaypoints] = useState([]);
 
-  useEffect(() => {
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      setPosition(message.world_translation_tractor);
-      setQuaternion(message.world_quaternion_tractor);
-    };
-  }, [position, quaternion]);
+  const onGroundClick = (event) => {
+    setWaypoints([...waypoints, event.point]);
+  };
 
   return (
     <Canvas
@@ -25,17 +19,19 @@ function Scene() {
       camera={{
         position: [2.5, 2.5, 2.5],
         fov: 60,
-        near: 0.001,
+        near: 0.1,
         far: 500,
         up: [0, 0, 1]
       }}
     >
       <Lights />
-      <Grid />
+      <Ground onClick={onGroundClick} />
+      <fogExp2 args={["#cccccc", 0.02]} />
       <Controls />
       <Suspense fallback={null}>
-        <Tractor position={position} quaternion={quaternion} />
+        <Tractor />
       </Suspense>
+      <Waypoints waypoints={waypoints} />
     </Canvas>
   );
 }
