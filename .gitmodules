@@ -1,0 +1,6 @@
+[submodule "app/third_party/protoc-gen-validate"]
+	path = app/third_party/protoc-gen-validate
+	url = git@github.com:envoyproxy/protoc-gen-validate.git
+[submodule "app/third_party/api-common-protos"]
+	path = app/third_party/api-common-protos
+	url = git@github.com:googleapis/api-common-protos.git

@@ -1,6 +1,7 @@
 *~
 __pycache__
 *.pyc
+.mypy_cache
 
 # Prerequisites
 *.d
@@ -34,3 +35,6 @@ __pycache__
 *.exe
 *.out
 *.app
+
+# Generated code
+genproto

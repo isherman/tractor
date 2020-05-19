@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+// import "google/api/client.proto";
+// import "google/api/field_behavior.proto";
+// import "google/longrunning/operations.proto";
+// import "google/protobuf/duration.proto";
+// import "google/protobuf/timestamp.proto";
+// import "google/rpc/status.proto";
+
+import "validate/validate.proto";
+import "google/protobuf/wrappers.proto";
+
+package farmng.tractor.v1;
+
+// option go_package = "github.com/googleapis/gapic-showcase/server/genproto";
+// option java_package = "com.google.showcase.v1beta1";
+// option java_multiple_files = true;
+
+service Mission {
+  rpc CreateWaypoint(CreateWaypointRequest) returns (Waypoint) {
+    option (google.api.http) = {
+      post: "/v1/waypoints"
+      body: "waypoint"
+    };
+  }
+
+  rpc ListWaypoints(ListWaypointsRequest) returns (ListWaypointsResponse) {
+    option (google.api.http) = {
+      get: "/v1/waypoints"
+    };
+  }
+
+  // rpc StreamPose(StreamPoseRequest) returns (stream PoseResponse) {
+  //   option (google.api.http) = {
+  //     post: "/v1/stream/pose"
+  //     body: "*"
+  //   };
+  // }
+}
+
+message Waypoint {
+  uint64 id = 1 [(validate.rules).uint64.gt = 999];
+
+  double lat = 2 [(validate.rules).double = { gte: -90, lte: 90 }];
+
+  double lng = 3 [(validate.rules).double = { gte: -180, lte: 180 }];
+
+  double angle = 4 [(validate.rules).double = { gte: -180, lte: 180 }];
+
+  google.protobuf.DoubleValue delay = 5 [(validate.rules).double.gte = 0];
+
+  google.protobuf.DoubleValue hit_radius = 6 [(validate.rules).double.gte = 0];
+}
+
+message CreateWaypointRequest {
+  Waypoint waypoint = 1;
+}
+
+message ListWaypointsRequest {}
+
+message ListWaypointsResponse {
+  repeated Waypoint waypoints = 1;
+}
