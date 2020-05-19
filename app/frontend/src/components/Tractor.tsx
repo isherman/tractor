@@ -1,23 +1,30 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable react/jsx-props-no-spreading */
 import { useState, useEffect } from "react";
 import * as React from "react";
 import { useLoader, ReactThreeFiber } from "react-three-fiber";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { webSocketClient } from "../config";
 import { Quaternion, Vector3, Color } from "three";
+import { IWebSocketMessage, ITractorStatus } from "../models/IWebSocketMessage";
 
-function Tractor() {
+export const Tractor: React.FC = () => {
   // TODO: Should this be bundled?
   const stl = useLoader(STLLoader, "./stl/tractor.v0.stl");
 
-  const [position, setPosition] = useState<ReactThreeFiber.Vector3>(new Vector3());
-  const [quaternion, setQuaternion] = useState<THREE.Quaternion>(new Quaternion());
+  const [position, setPosition] = useState<ReactThreeFiber.Vector3>(
+    new Vector3()
+  );
+  const [quaternion, setQuaternion] = useState<THREE.Quaternion>(
+    new Quaternion()
+  );
 
   useEffect(() => {
-    webSocketClient.on("message", (message: any) => {
-      setPosition(new Vector3(...message.world_translation_tractor));
-      setQuaternion(new Quaternion(...message.world_quaternion_tractor));
+    webSocketClient.on("message", (message: IWebSocketMessage) => {
+      setPosition(
+        new Vector3(...(message as ITractorStatus).world_translation_tractor)
+      );
+      setQuaternion(
+        new Quaternion(...(message as ITractorStatus).world_quaternion_tractor)
+      );
     });
   }, [position, quaternion]);
 
@@ -35,5 +42,4 @@ function Tractor() {
       </mesh>
     </group>
   );
-}
-export default Tractor;
+};

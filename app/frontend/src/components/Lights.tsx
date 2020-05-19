@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Color } from "three";
 
-function Lights() {
+export const Lights: React.FC = () => {
   return (
     <group>
       <directionalLight color={new Color(0xffffff)} position={[1, 1, 1]} />
@@ -9,6 +9,4 @@ function Lights() {
       <ambientLight color={new Color(0x222222)} />
     </group>
   );
-}
-
-export default Lights;
+};

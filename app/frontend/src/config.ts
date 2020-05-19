@@ -1,5 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-
 // import MockWebSocketClient from "./clients/MockWebSocketClient";
 
 // const webSocketClient = new MockWebSocketClient();

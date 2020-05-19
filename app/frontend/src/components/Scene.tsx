@@ -1,19 +1,19 @@
 import * as React from "react";
 import { Suspense, useState } from "react";
 import { Canvas, PointerEvent } from "react-three-fiber";
-import Tractor from "./Tractor";
-import Controls from "./Controls";
-import Lights from "./Lights";
-import Ground from "./Ground";
-import Waypoints from "./Waypoints";
+import { Tractor } from "./Tractor";
+import { Controls } from "./Controls";
+import { Lights } from "./Lights";
+import { Ground } from "./Ground";
+import { Waypoints } from "./Waypoints";
 import { Vector3 } from "three";
 
 type Waypoints = Vector3[];
 
-function Scene() {
+export const Scene: React.FC = () => {
   const [waypoints, setWaypoints] = useState<Waypoints>([]);
 
-  const onGroundClick = (event: PointerEvent) => {
+  const onGroundClick = (event: PointerEvent): void => {
     setWaypoints([...waypoints, event.point]);
   };
 
@@ -38,6 +38,4 @@ function Scene() {
       <Waypoints waypoints={waypoints} />
     </Canvas>
   );
-}
-
-export default Scene;
+};

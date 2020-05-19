@@ -5,7 +5,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 extend({ OrbitControls });
 
-function Controls() {
+export const Controls: React.FC = () => {
   const ref = useRef<OrbitControls>();
   const { camera, gl } = useThree();
 
@@ -23,6 +23,4 @@ function Controls() {
       maxPolarAngle={Math.PI / 2}
     />
   );
-}
-
-export default Controls;
+};

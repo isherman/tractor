@@ -1,21 +1,19 @@
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable react/prop-types */
 import { useState } from "react";
 import * as React from "react";
-import Waypoint from "./Waypoint";
+import { Waypoint } from "./Waypoint";
 import { webSocketClient } from "../config";
 import { Vector3 } from "three";
 
 type WaypointsProps = {
   waypoints: Vector3[];
-}
+};
 
-function Waypoints({ waypoints }: WaypointsProps) {
+export const Waypoints: React.FC<WaypointsProps> = ({ waypoints }) => {
   const [goal, setGoal] = useState<number | null>(null);
 
-  const selectGoal = (index: number) => {
+  const selectGoal = (index: number): void => {
     setGoal(goal === index ? null : index);
-    webSocketClient.send(waypoints[index]);
+    webSocketClient.send({ waypoint: waypoints[index].toArray() });
   };
 
   const waypointObjects = waypoints.map((waypoint, index) => (
@@ -26,7 +24,6 @@ function Waypoints({ waypoints }: WaypointsProps) {
       onClick={(_) => selectGoal(index)}
     />
   ));
-  return <group>{waypointObjects}</group>;
-}
 
-export default Waypoints;
+  return <group>{waypointObjects}</group>;
+};

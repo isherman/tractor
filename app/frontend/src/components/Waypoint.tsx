@@ -1,25 +1,22 @@
-/* eslint-disable no-nested-ternary */
-/* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable react/prop-types */
 import { useState } from "react";
 import * as React from "react";
 import { PointerEvent } from "react-three-fiber";
-import { Mesh, Vector3 } from "three";
+import { Vector3 } from "three";
 
 type WaypointProps = {
   isGoal: boolean;
   onClick: (event: PointerEvent) => void;
   position: Vector3;
-}
+};
 
-function Waypoint(props: WaypointProps) {
-  const {isGoal, position} = props;
+export const Waypoint: React.FC<WaypointProps> = (props) => {
+  const { isGoal, position } = props;
 
   const [hovered, setHover] = useState(false);
 
   const color = isGoal ? "hotpink" : hovered ? "blue" : "gray";
 
-  const onClick = (event: PointerEvent) => {
+  const onClick = (event: PointerEvent): void => {
     event.stopPropagation();
     props.onClick(event);
   };
@@ -36,6 +33,4 @@ function Waypoint(props: WaypointProps) {
       <meshStandardMaterial attach="material" color={color} />
     </mesh>
   );
-}
-
-export default Waypoint;
+};

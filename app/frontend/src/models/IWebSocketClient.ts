@@ -1,4 +1,6 @@
+import { IWebSocketMessage } from "./IWebSocketMessage";
+
 export interface IWebSocketClient {
-  on: (event: string, callback: (data: any) => void) => void;
-  send: (data: any) => void;
+  on: (event: string, callback: (data: IWebSocketMessage) => void) => void;
+  send: (data: IWebSocketMessage) => void;
 }

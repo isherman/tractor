@@ -1,13 +1,12 @@
-/* eslint-disable react/prop-types */
 import * as React from "react";
 import { PointerEvent } from "react-three-fiber";
 
 type GroundProps = {
   onClick: (event: PointerEvent) => void;
-}
+};
 
-function Ground(props: GroundProps) {
-  const onClick = (event: PointerEvent) => {
+export const Ground: React.FC<GroundProps> = (props) => {
+  const onClick = (event: PointerEvent): void => {
     if (!event.altKey) {
       return;
     }
@@ -28,6 +27,4 @@ function Ground(props: GroundProps) {
       </mesh>
     </group>
   );
-}
-
-export default Ground;
+};

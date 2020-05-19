@@ -1,37 +1,37 @@
-/* eslint-disable no-console */
-/* eslint-disable class-methods-use-this */
-
 import { IWebSocketClient } from "../models/IWebSocketClient";
+import { IWebSocketMessage } from "../models/IWebSocketMessage";
 
-type ICallback = (data: any) => void;
+type ICallback = (data: IWebSocketMessage) => void;
 
 type ICallbackMap = {
-  [event: string]: ICallback[]
+  [event: string]: ICallback[];
 };
 
-export class MockWebSocketClient implements IWebSocketClient{
-  private callbacks: ICallbackMap = {}
+export class MockWebSocketClient implements IWebSocketClient {
+  private callbacks: ICallbackMap = {};
 
   constructor() {
     this.simulateTractorUpdates();
   }
 
-  public on(event: string, callback: ICallback) {
+  public on(event: string, callback: ICallback): void {
     this.callbacks[event] = [...(this.callbacks[event] || []), callback];
   }
 
-  public send(data: any) {
+  public send(data: IWebSocketMessage): void {
+    // eslint-disable-next-line no-console
     console.log("[ws_send]", data);
   }
 
-  private emit(event: string, data: any) {
+  private emit(event: string, data: IWebSocketMessage): void {
     (this.callbacks[event] || []).forEach((cb) => cb(data));
   }
 
-  private simulateTractorUpdates() {
+  private simulateTractorUpdates(): void {
     let x = 0;
     let y = 0;
 
+    /* eslint-disable @typescript-eslint/camelcase */
     setInterval(() => {
       x += (Math.random() - 0.5) * 0.1;
       y += (Math.random() - 0.5) * 0.1;
@@ -40,5 +40,6 @@ export class MockWebSocketClient implements IWebSocketClient{
         world_quaternion_tractor: [0, 0, 0, 1]
       });
     }, 200);
+    /* eslint-enable @typescript-eslint/camelcase */
   }
 }

@@ -1,0 +1,2 @@
+- Fix pre-commit eslint
+- Fix performance issues (new Color()?)
