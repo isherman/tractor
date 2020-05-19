@@ -4,11 +4,16 @@ import { useState } from "react";
 import * as React from "react";
 import Waypoint from "./Waypoint";
 import { webSocketClient } from "../config";
+import { Vector3 } from "three";
 
-function Waypoints({ waypoints }) {
-  const [goal, setGoal] = useState(null);
+type WaypointsProps = {
+  waypoints: Vector3[];
+}
 
-  const selectGoal = (index) => {
+function Waypoints({ waypoints }: WaypointsProps) {
+  const [goal, setGoal] = useState<number | null>(null);
+
+  const selectGoal = (index: number) => {
     setGoal(goal === index ? null : index);
     webSocketClient.send(waypoints[index]);
   };
@@ -18,7 +23,7 @@ function Waypoints({ waypoints }) {
       key={index}
       position={waypoint}
       isGoal={goal === index}
-      onClick={() => selectGoal(index)}
+      onClick={(_) => selectGoal(index)}
     />
   ));
   return <group>{waypointObjects}</group>;

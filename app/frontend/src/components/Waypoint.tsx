@@ -4,20 +4,29 @@
 import { useState } from "react";
 import * as React from "react";
 import { PointerEvent } from "react-three-fiber";
+import { Mesh, Vector3 } from "three";
 
-function Waypoint({ isGoal, ...props }) {
+type WaypointProps = {
+  isGoal: boolean;
+  onClick: (event: PointerEvent) => void;
+  position: Vector3;
+}
+
+function Waypoint(props: WaypointProps) {
+  const {isGoal, position} = props;
+
   const [hovered, setHover] = useState(false);
 
   const color = isGoal ? "hotpink" : hovered ? "blue" : "gray";
 
   const onClick = (event: PointerEvent) => {
     event.stopPropagation();
-    props.onClick();
+    props.onClick(event);
   };
 
   return (
     <mesh
-      {...props}
+      position={position}
       onClick={onClick}
       onPointerOver={() => setHover(true)}
       onPointerOut={() => setHover(false)}

@@ -1,8 +1,13 @@
 /* eslint-disable react/prop-types */
 import * as React from "react";
+import { PointerEvent } from "react-three-fiber";
 
-function Ground(props) {
-  const onClick = (event) => {
+type GroundProps = {
+  onClick: (event: PointerEvent) => void;
+}
+
+function Ground(props: GroundProps) {
+  const onClick = (event: PointerEvent) => {
     if (!event.altKey) {
       return;
     }

@@ -8,8 +8,10 @@ import Ground from "./Ground";
 import Waypoints from "./Waypoints";
 import { Vector3 } from "three";
 
+type Waypoints = Vector3[];
+
 function Scene() {
-  const [waypoints, setWaypoints] = useState<Vector3[]>([]);
+  const [waypoints, setWaypoints] = useState<Waypoints>([]);
 
   const onGroundClick = (event: PointerEvent) => {
     setWaypoints([...waypoints, event.point]);

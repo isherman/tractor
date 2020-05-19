@@ -15,7 +15,7 @@ function Tractor() {
   const [quaternion, setQuaternion] = useState<THREE.Quaternion>(new Quaternion());
 
   useEffect(() => {
-    webSocketClient.on("message", (message) => {
+    webSocketClient.on("message", (message: any) => {
       setPosition(new Vector3(...message.world_translation_tractor));
       setQuaternion(new Quaternion(...message.world_quaternion_tractor));
     });
