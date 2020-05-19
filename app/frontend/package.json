@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.0.1",
   "description": "The farm-ng web application",
-  "main": "index.jsx",
+  "main": "index.tsx",
   "license": "All Rights Reserved",
   "private": true,
   "devDependencies": {
