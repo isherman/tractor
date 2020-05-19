@@ -3,8 +3,9 @@ import * as React from "react";
 import { useLoader, ReactThreeFiber } from "react-three-fiber";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { webSocketClient } from "../config";
-import { Quaternion, Vector3, Color } from "three";
+import { Quaternion, Vector3 } from "three";
 import { IWebSocketMessage, ITractorStatus } from "../models/IWebSocketMessage";
+import { red, gray900 } from "./colors";
 
 export const Tractor: React.FC = () => {
   // TODO: Should this be bundled?
@@ -26,7 +27,7 @@ export const Tractor: React.FC = () => {
         new Quaternion(...(message as ITractorStatus).world_quaternion_tractor)
       );
     });
-  }, [position, quaternion]);
+  }, []);
 
   return (
     <group position={position} quaternion={quaternion}>
@@ -35,8 +36,8 @@ export const Tractor: React.FC = () => {
         <bufferGeometry attach="geometry" {...stl} />
         <meshPhongMaterial
           attach="material"
-          color={new Color("#ff5533")}
-          specular={new Color("#111111")}
+          color={red}
+          specular={gray900}
           shininess={200}
         />
       </mesh>

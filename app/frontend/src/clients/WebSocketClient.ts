@@ -7,7 +7,7 @@ type ICallbackMap = {
   [event: string]: ICallback[];
 };
 
-class WebSocketClient implements IWebSocketClient {
+export class WebSocketClient implements IWebSocketClient {
   private websocket: WebSocket;
   private callbacks: ICallbackMap = {};
 
@@ -34,5 +34,3 @@ class WebSocketClient implements IWebSocketClient {
     (this.callbacks[event] || []).forEach((cb) => cb(data));
   }
 }
-
-export default WebSocketClient;

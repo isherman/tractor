@@ -1,12 +1,12 @@
 import * as React from "react";
-import { Color } from "three";
+import { white, blue900, gray800 } from "./colors";
 
 export const Lights: React.FC = () => {
   return (
     <group>
-      <directionalLight color={new Color(0xffffff)} position={[1, 1, 1]} />
-      <directionalLight color={new Color(0x002288)} position={[-1, -1, -1]} />
-      <ambientLight color={new Color(0x222222)} />
+      <directionalLight color={white} position={[1, 1, 1]} />
+      <directionalLight color={blue900} position={[-1, -1, -1]} />
+      <ambientLight color={gray800} />
     </group>
   );
 };

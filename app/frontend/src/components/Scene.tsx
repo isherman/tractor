@@ -7,6 +7,7 @@ import { Lights } from "./Lights";
 import { Ground } from "./Ground";
 import { Waypoints } from "./Waypoints";
 import { Vector3 } from "three";
+import { gray300 } from "./colors";
 
 type Waypoints = Vector3[];
 
@@ -19,7 +20,7 @@ export const Scene: React.FC = () => {
 
   return (
     <Canvas
-      style={{ background: "#cccccc" }}
+      style={{ background: gray300 }}
       camera={{
         position: [2.5, 2.5, 2.5],
         fov: 60,
@@ -30,7 +31,7 @@ export const Scene: React.FC = () => {
     >
       <Lights />
       <Ground onClick={onGroundClick} />
-      <fogExp2 args={["#cccccc", 0.02]} />
+      <fogExp2 args={[gray300.getHex(), 0.02]} />
       <Controls />
       <Suspense fallback={null}>
         <Tractor />
