@@ -1,21 +1,23 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-props-no-spreading */
-import React, { useState, useEffect } from "react";
-import { useLoader } from "react-three-fiber";
+import { useState, useEffect } from "react";
+import * as React from "react";
+import { useLoader, ReactThreeFiber } from "react-three-fiber";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { webSocketClient } from "../config";
+import { Quaternion, Vector3, Color } from "three";
 
 function Tractor() {
   // TODO: Should this be bundled?
   const stl = useLoader(STLLoader, "./stl/tractor.v0.stl");
 
-  const [position, setPosition] = useState([0, 0, 0]);
-  const [quaternion, setQuaternion] = useState([0, 0, 0, 1]);
+  const [position, setPosition] = useState<ReactThreeFiber.Vector3>(new Vector3());
+  const [quaternion, setQuaternion] = useState<THREE.Quaternion>(new Quaternion());
 
   useEffect(() => {
     webSocketClient.on("message", (message) => {
-      setPosition(message.world_translation_tractor);
-      setQuaternion(message.world_quaternion_tractor);
+      setPosition(new Vector3(...message.world_translation_tractor));
+      setQuaternion(new Quaternion(...message.world_quaternion_tractor));
     });
   }, [position, quaternion]);
 
@@ -26,8 +28,8 @@ function Tractor() {
         <bufferGeometry attach="geometry" {...stl} />
         <meshPhongMaterial
           attach="material"
-          color="#ff5533"
-          specular="#111111"
+          color={new Color("#ff5533")}
+          specular={new Color("#111111")}
           shininess={200}
         />
       </mesh>

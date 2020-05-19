@@ -1,14 +1,16 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import { useState } from "react";
+import * as React from "react";
+import { PointerEvent } from "react-three-fiber";
 
 function Waypoint({ isGoal, ...props }) {
   const [hovered, setHover] = useState(false);
 
   const color = isGoal ? "hotpink" : hovered ? "blue" : "gray";
 
-  const onClick = (event) => {
+  const onClick = (event: PointerEvent) => {
     event.stopPropagation();
     props.onClick();
   };

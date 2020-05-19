@@ -1,15 +1,17 @@
-import React, { Suspense, useState } from "react";
-import { Canvas } from "react-three-fiber";
+import * as React from "react";
+import { Suspense, useState } from "react";
+import { Canvas, PointerEvent } from "react-three-fiber";
 import Tractor from "./Tractor";
 import Controls from "./Controls";
 import Lights from "./Lights";
 import Ground from "./Ground";
 import Waypoints from "./Waypoints";
+import { Vector3 } from "three";
 
 function Scene() {
-  const [waypoints, setWaypoints] = useState([]);
+  const [waypoints, setWaypoints] = useState<Vector3[]>([]);
 
-  const onGroundClick = (event) => {
+  const onGroundClick = (event: PointerEvent) => {
     setWaypoints([...waypoints, event.point]);
   };
 
