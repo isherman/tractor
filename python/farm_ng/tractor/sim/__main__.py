@@ -20,6 +20,8 @@ from farm_ng.tractor.controller import TractorMoveToGoalController
 from farm_ng.tractor.kinematics import TractorKinematics
 from genproto.farmng.tractor.v1 import waypoint_pb2
 from liegroups import SE3
+from validate.validator import validate
+from validate.validator import ValidationFailed
 
 logger = logging.getLogger('fe')
 logger.setLevel(logging.INFO)
@@ -93,13 +95,19 @@ class WaypointsHandler(tornado.web.RequestHandler):
     def post(self):
         (waypoint_json, waypoint_proto) = parse_request(self.request)
         waypoint = waypoint_pb2.Waypoint()
-        # TODO: try / catch
-        if waypoint_json:
-            google.protobuf.json_format.ParseDict(waypoint_json, waypoint)
-        else:
-            waypoint.ParseFromString(waypoint_proto)
+        try:
+            if waypoint_json:
+                google.protobuf.json_format.ParseDict(waypoint_json, waypoint)
+            else:
+                waypoint.ParseFromString(waypoint_proto)
+        except(google.protobuf.json_format.ParseError, google.protobuf.message.DecodeError):
+            raise tornado.web.HTTPError(400)
 
-        # VALIDATE
+        try:
+            validate(waypoint)(waypoint)
+        except ValidationFailed as e:
+            raise tornado.web.HTTPError(422, reason=str(e))
+
         # DESERIALIZE TO IN-MEMORY REPRESENTATION
 
         waypoint.id.value = Database.nextId()
@@ -110,9 +118,6 @@ class WaypointsHandler(tornado.web.RequestHandler):
 
 class WaypointHandler(tornado.web.RequestHandler):
     def get(self, waypoint_id):
-
-        # VALIDATE
-
         id = int(waypoint_id)
         if id not in Database.waypoints:
             raise tornado.web.HTTPError(404)
