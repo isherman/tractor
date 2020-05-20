@@ -1,6 +1,9 @@
 import asyncio
+import json
 import logging
 import os
+from typing import Any
+from typing import Dict
 from typing import Set
 
 import numpy as np
@@ -18,6 +21,14 @@ logger = logging.getLogger('fe')
 logger.setLevel(logging.INFO)
 
 
+def request_as_json(request):
+    if request.headers['Content-Type'] != 'application/json':
+        raise tornado.web.HTTPError(
+            400, reason='Content-Type must be application/json',
+        )
+    return json.loads(request.body)
+
+
 class Application(tornado.web.Application):
     def __init__(self):
         third_party_path = os.path.join(
@@ -28,6 +39,8 @@ class Application(tornado.web.Application):
         handlers = [
             # GET request, called from root directory localhost:8080/
             (r'/', MainHandler),
+            (r'/waypoints/?', WaypointsHandler),
+            (r'/waypoints/([0-9]+)/?', WaypointHandler),
             (r'/simsocket', SimSocketHandler),
             (
                 r'/third_party/(.*)', tornado.web.StaticFileHandler,
@@ -39,15 +52,64 @@ class Application(tornado.web.Application):
             cookie_secret='__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__',
             template_path=os.path.join(os.path.dirname(__file__), 'templates'),
             static_path=os.path.join(os.path.dirname(__file__), 'static'),
-            xsrf_cookies=True,
+            # xsrf_cookies=True,
+            xsrf_cookies=False,
             debug=True,
         )
         super().__init__(handlers, **settings)
 
 
+class Database:
+    waypoints: Dict[int, Any] = {}
+    id = 1
+
+    @staticmethod
+    def nextId():
+        id = Database.id
+        Database.id += 1
+        return id
+
+
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.render('index.html')
+
+
+class WaypointsHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write({'waypoints': list(Database.waypoints.values())})
+
+    def post(self):
+        waypoint = request_as_json(self.request)
+
+        # VALIDATE
+        # DESERIALIZE TO IN-MEMORY REPRESENTATION
+
+        waypoint['id'] = Database.nextId()
+        Database.waypoints[waypoint['id']] = waypoint
+
+        self.write(waypoint)
+
+
+class WaypointHandler(tornado.web.RequestHandler):
+    def get(self, waypoint_id):
+
+        # VALIDATE
+
+        id = int(waypoint_id)
+        if id not in Database.waypoints:
+            raise tornado.web.HTTPError(404)
+
+        # SERIALIZE IN-MEMORY-REPRESENTATION
+
+        self.write(Database.waypoints[id])
+
+    def delete(self, waypoint_id):
+        id = int(waypoint_id)
+        if id not in Database.waypoints:
+            raise tornado.web.HTTPError(404)
+
+        del Database.waypoints[id]
 
 
 class SimSocketHandler(tornado.websocket.WebSocketHandler):
