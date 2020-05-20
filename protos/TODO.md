@@ -1,6 +1,7 @@
 NEXT STEPS
-- Python internal data models, toProto, fromProto
-- Python validation
+- Add IsRequired validation
+- Refactor middleware
+- Tests
 - Typescript rpcImpls
 
 ISSUES

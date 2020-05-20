@@ -4,8 +4,9 @@ import asyncio
 import json
 import logging
 import os
-from typing import Any
+from dataclasses import dataclass
 from typing import Dict
+from typing import Optional
 from typing import Set
 
 import google.protobuf.json_format
@@ -18,7 +19,9 @@ import tornado.web
 import tornado.websocket
 from farm_ng.tractor.controller import TractorMoveToGoalController
 from farm_ng.tractor.kinematics import TractorKinematics
-from genproto.farmng.tractor.v1 import waypoint_pb2
+from farmng.tractor.v1 import waypoint_pb2
+from google.protobuf import duration_pb2
+from google.protobuf import wrappers_pb2
 from liegroups import SE3
 from validate.validator import validate
 from validate.validator import ValidationFailed
@@ -68,7 +71,7 @@ class Application(tornado.web.Application):
 
 
 class Database:
-    waypoints: Dict[int, Any] = {}
+    waypoints: Dict[int, 'Waypoint'] = {}
     id = 1
 
     @staticmethod
@@ -76,6 +79,67 @@ class Database:
         id = Database.id
         Database.id += 1
         return id
+
+
+@dataclass
+class Duration:
+    seconds: int
+    nanos: int
+
+    @staticmethod
+    def fromProto(proto: duration_pb2.Duration) -> 'Duration':
+        return Duration(seconds=proto.seconds, nanos=proto.nanos)
+
+    def toProto(self) -> duration_pb2.Duration:
+        return duration_pb2.Duration(seconds=self.seconds, nanos=self.nanos)
+
+# Models like this should exist on-robot, separate from their serialized representation.
+# Models provide helper functions to (de)serialize to/from the network, database, etc.
+
+
+@dataclass
+class Waypoint:
+
+    id: int
+    lat: float
+    lng: float
+    angle: float
+    delay: Optional[Duration]
+    radius: Optional[float]
+
+    @staticmethod
+    def fromDb(db_model):
+        return db_model
+
+    def toDb(self):
+        return self
+
+    @staticmethod
+    def fromProto(proto: waypoint_pb2.Waypoint) -> 'Waypoint':
+        return Waypoint(
+            id=proto.id.value if proto.HasField('id') else None,
+            lat=proto.lat,
+            lng=proto.lng,
+            angle=proto.angle,
+            delay=Duration.fromProto(
+                proto.delay,
+            ) if proto.HasField('delay') else None,
+            radius=proto.radius.value if proto.HasField('radius') else None,
+        )
+
+    def toProto(self) -> waypoint_pb2.Waypoint:
+        return waypoint_pb2.Waypoint(
+            id=wrappers_pb2.UInt64Value(
+                value=self.id,
+            ) if self.id else None,
+            lat=self.lat,
+            lng=self.lng,
+            angle=self.angle,
+            delay=self.delay.toProto() if self.delay else None,
+            radius=wrappers_pb2.DoubleValue(
+                value=self.radius,
+            ) if self.radius else None,
+        )
 
 
 class MainHandler(tornado.web.RequestHandler):
@@ -87,33 +151,39 @@ class WaypointsHandler(tornado.web.RequestHandler):
     def get(self):
         waypoints = [
             google.protobuf.json_format.MessageToDict(
-                waypoint,
-            ) for waypoint in Database.waypoints.values()
+                Waypoint.fromDb(record).toProto(),
+            ) for record in Database.waypoints.values()
         ]
         self.write({'waypoints': waypoints})
 
     def post(self):
-        (waypoint_json, waypoint_proto) = parse_request(self.request)
-        waypoint = waypoint_pb2.Waypoint()
+        (waypoint_json, waypoint_proto_str) = parse_request(self.request)
+        waypoint_proto = waypoint_pb2.Waypoint()
         try:
             if waypoint_json:
-                google.protobuf.json_format.ParseDict(waypoint_json, waypoint)
+                google.protobuf.json_format.ParseDict(
+                    waypoint_json, waypoint_proto,
+                )
             else:
-                waypoint.ParseFromString(waypoint_proto)
+                waypoint_proto.ParseFromString(waypoint_proto_str)
         except(google.protobuf.json_format.ParseError, google.protobuf.message.DecodeError):
             raise tornado.web.HTTPError(400)
 
         try:
-            validate(waypoint)(waypoint)
+            validate(waypoint_proto)(waypoint_proto)
         except ValidationFailed as e:
             raise tornado.web.HTTPError(422, reason=str(e))
 
-        # DESERIALIZE TO IN-MEMORY REPRESENTATION
+        waypoint = Waypoint.fromProto(waypoint_proto)
+        waypoint.id = Database.nextId()
 
-        waypoint.id.value = Database.nextId()
-        Database.waypoints[waypoint.id.value] = waypoint
+        Database.waypoints[waypoint.id] = waypoint.toDb()
 
-        self.write(google.protobuf.json_format.MessageToJson(waypoint))
+        self.write(
+            google.protobuf.json_format.MessageToJson(
+                waypoint.toProto(),
+            ),
+        )
 
 
 class WaypointHandler(tornado.web.RequestHandler):
@@ -122,12 +192,13 @@ class WaypointHandler(tornado.web.RequestHandler):
         if id not in Database.waypoints:
             raise tornado.web.HTTPError(404)
 
-        # SERIALIZE IN-MEMORY-REPRESENTATION
+        waypoint = Waypoint.fromDb(Database.waypoints[id])
 
-        waypoint = google.protobuf.json_format.MessageToJson(
-            Database.waypoints[id],
+        response = google.protobuf.json_format.MessageToJson(
+            waypoint.toProto(),
         )
-        self.write(waypoint)
+
+        self.write(response)
 
     def delete(self, waypoint_id):
         id = int(waypoint_id)
