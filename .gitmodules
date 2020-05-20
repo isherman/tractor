@@ -4,3 +4,6 @@
 [submodule "app/third_party/api-common-protos"]
 	path = app/third_party/api-common-protos
 	url = git@github.com:googleapis/api-common-protos.git
+[submodule "third_party/librealsense"]
+	path = third_party/librealsense
+	url = https://github.com/IntelRealSense/librealsense.git
