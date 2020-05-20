@@ -1,60 +1,43 @@
 syntax = "proto3";
 
-import "google/api/annotations.proto";
-// import "google/api/client.proto";
-// import "google/api/field_behavior.proto";
-// import "google/longrunning/operations.proto";
-// import "google/protobuf/duration.proto";
-// import "google/protobuf/timestamp.proto";
-// import "google/rpc/status.proto";
-
-import "validate/validate.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/wrappers.proto";
+import "validate/validate.proto";
 
 package farmng.tractor.v1;
 
-// option go_package = "github.com/googleapis/gapic-showcase/server/genproto";
-// option java_package = "com.google.showcase.v1beta1";
-// option java_multiple_files = true;
-
-service Mission {
-  rpc CreateWaypoint(CreateWaypointRequest) returns (Waypoint) {
-    option (google.api.http) = {
-      post: "/v1/waypoints"
-      body: "waypoint"
-    };
-  }
-
-  rpc ListWaypoints(ListWaypointsRequest) returns (ListWaypointsResponse) {
-    option (google.api.http) = {
-      get: "/v1/waypoints"
-    };
-  }
-
-  // rpc StreamPose(StreamPoseRequest) returns (stream PoseResponse) {
-  //   option (google.api.http) = {
-  //     post: "/v1/stream/pose"
-  //     body: "*"
-  //   };
-  // }
-}
-
 message Waypoint {
-  uint64 id = 1 [(validate.rules).uint64.gt = 999];
+  // The waypoint's ID. Any ID provided at creation time will be ignored.
+  google.protobuf.UInt64Value id = 1 [(validate.rules).uint64.gte = 0];
 
+  // Latitude
   double lat = 2 [(validate.rules).double = { gte: -90, lte: 90 }];
 
+  // Longitude
   double lng = 3 [(validate.rules).double = { gte: -180, lte: 180 }];
 
-  double angle = 4 [(validate.rules).double = { gte: -180, lte: 180 }];
+  // Azimuth
+  double angle = 4
+      [(validate.rules).double = { gte: -3.14159265, lte: 3.14159265 }];
 
-  google.protobuf.DoubleValue delay = 5 [(validate.rules).double.gte = 0];
+  // An optional amount of time to spend at the waypoint
+  google.protobuf.Duration delay = 5
+      [(validate.rules).duration.gte.seconds = 0];
 
-  google.protobuf.DoubleValue hit_radius = 6 [(validate.rules).double.gte = 0];
+  // An optional radius within which the waypoint is considered to be reached
+  google.protobuf.DoubleValue radius = 6 [(validate.rules).double.gte = 0];
 }
 
 message CreateWaypointRequest {
   Waypoint waypoint = 1;
+}
+
+message GetWaypointRequest {
+  uint64 waypoint = 1;
+}
+
+message DeleteWaypointRequest {
+  uint64 waypoint = 1;
 }
 
 message ListWaypointsRequest {}

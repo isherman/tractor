@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+import "farmng/tractor/v1/geometry.proto";
+import "farmng/tractor/v1/status.proto";
+
+package farmng.tractor.v1;
+
+service Status {
+  rpc StreamPose(StreamPoseRequest) returns (stream SE3Pose) {}
+}

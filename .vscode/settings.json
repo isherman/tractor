@@ -1,6 +1,14 @@
 {
   "clang-format.style": "google",
   "eslint.workingDirectories": ["./app/frontend"],
+  "protoc": {
+    "compile_on_save": false,
+    "options": [
+        "--proto_path=${workspaceRoot}/schema",
+        "--proto_path=${workspaceRoot}/schema/third-party/protoc-gen-validate",
+        "--proto_path=${workspaceRoot}/schema/third_party/api-common-protos"
+    ]
+  },
   "[javascript]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"

@@ -11,7 +11,7 @@ const request = new farmng.tractor.v1.CreateWaypointRequest({
     angle: 1,
     lat: 2,
     lng: 1000,
-    delay: { value: 3 }
+    delay: { seconds: 3 }
   })
 });
 
@@ -30,7 +30,7 @@ async function createWaypoint(): Promise<farmng.tractor.v1.Waypoint> {
       angle: 1,
       lat: 2,
       lng: 1000,
-      delay: { value: 3 }
+      delay: { seconds: 3 }
     }
   });
   return waypoint;
