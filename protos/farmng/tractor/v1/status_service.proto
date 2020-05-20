@@ -5,6 +5,6 @@ import "farmng/tractor/v1/status.proto";
 
 package farmng.tractor.v1;
 
-service Status {
+service StatusService {
   rpc StreamPose(StreamPoseRequest) returns (stream SE3Pose) {}
 }

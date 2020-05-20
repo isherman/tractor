@@ -1,6 +1,5 @@
 NEXT STEPS
 - Python internal data models, toProto, fromProto
-- Python HTTP endpoints
 - Python validation
 - Typescript rpcImpls
 

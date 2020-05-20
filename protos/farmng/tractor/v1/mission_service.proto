@@ -5,7 +5,7 @@ import "farmng/tractor/v1/mission.proto";
 
 package farmng.tractor.v1;
 
-service Mission {
+service MissionService {
   rpc CreateWaypoint(CreateWaypointRequest) returns (Waypoint) {}
   rpc ListWaypoints(ListWaypointsRequest) returns (ListWaypointsResponse) {}
   rpc GetWaypoint(GetWaypointRequest) returns (Waypoint) {}

@@ -68,3 +68,10 @@ repos:
             - 'eslint-plugin-import@2.20.2'
             - 'prettier@2.0.5'
             - 'typescript@3.9.2'
+-   repo: local
+    hooks:
+    -   id: proto-lint
+        name: proto-lint
+        language: docker_image
+        pass_filenames: false
+        entry: docker.io/bufbuild/buf:latest check lint
