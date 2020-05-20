@@ -5,7 +5,8 @@ set -e
 protoc \
   --proto_path=protos \
   --python_out=python/genproto \
-  protos/farmng/tractor/v1/*.proto
+  protos/farmng/tractor/v1/*.proto \
+  protos/validate/validate.proto
 
 # Build JS/TS protos with protobuf.js
 cd app/frontend && yarn build-protos

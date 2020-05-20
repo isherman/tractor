@@ -1,3 +1,5 @@
+# TODO: Make pylint handle protobuf generated code properly, possibly with pylint-protobuf
+# pylint: disable=no-member
 import asyncio
 import json
 import logging
@@ -6,6 +8,7 @@ from typing import Any
 from typing import Dict
 from typing import Set
 
+import google.protobuf.json_format
 import numpy as np
 import tornado.gen
 import tornado.ioloop
@@ -15,18 +18,21 @@ import tornado.web
 import tornado.websocket
 from farm_ng.tractor.controller import TractorMoveToGoalController
 from farm_ng.tractor.kinematics import TractorKinematics
+from genproto.farmng.tractor.v1 import waypoint_pb2
 from liegroups import SE3
 
 logger = logging.getLogger('fe')
 logger.setLevel(logging.INFO)
 
 
-def request_as_json(request):
-    if request.headers['Content-Type'] != 'application/json':
-        raise tornado.web.HTTPError(
-            400, reason='Content-Type must be application/json',
-        )
-    return json.loads(request.body)
+def parse_request(request):
+    if request.headers['Content-Type'] == 'application/json':
+        return (json.loads(request.body), None)
+    if request.headers['Content-Type'] == 'application/x-protobuf':
+        return (None, request.body)
+    raise tornado.web.HTTPError(
+        400, reason='Content-Type must be application/json or application/x-protobuf',
+    )
 
 
 class Application(tornado.web.Application):
@@ -77,18 +83,29 @@ class MainHandler(tornado.web.RequestHandler):
 
 class WaypointsHandler(tornado.web.RequestHandler):
     def get(self):
-        self.write({'waypoints': list(Database.waypoints.values())})
+        waypoints = [
+            google.protobuf.json_format.MessageToDict(
+                waypoint,
+            ) for waypoint in Database.waypoints.values()
+        ]
+        self.write({'waypoints': waypoints})
 
     def post(self):
-        waypoint = request_as_json(self.request)
+        (waypoint_json, waypoint_proto) = parse_request(self.request)
+        waypoint = waypoint_pb2.Waypoint()
+        # TODO: try / catch
+        if waypoint_json:
+            google.protobuf.json_format.ParseDict(waypoint_json, waypoint)
+        else:
+            waypoint.ParseFromString(waypoint_proto)
 
         # VALIDATE
         # DESERIALIZE TO IN-MEMORY REPRESENTATION
 
-        waypoint['id'] = Database.nextId()
-        Database.waypoints[waypoint['id']] = waypoint
+        waypoint.id.value = Database.nextId()
+        Database.waypoints[waypoint.id.value] = waypoint
 
-        self.write(waypoint)
+        self.write(google.protobuf.json_format.MessageToJson(waypoint))
 
 
 class WaypointHandler(tornado.web.RequestHandler):
@@ -102,7 +119,10 @@ class WaypointHandler(tornado.web.RequestHandler):
 
         # SERIALIZE IN-MEMORY-REPRESENTATION
 
-        self.write(Database.waypoints[id])
+        waypoint = google.protobuf.json_format.MessageToJson(
+            Database.waypoints[id],
+        )
+        self.write(waypoint)
 
     def delete(self, waypoint_id):
         id = int(waypoint_id)

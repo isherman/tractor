@@ -20,6 +20,9 @@
   "[proto3]": {
     "editor.formatOnSave": true
   },
+  "[python]": {
+    "editor.formatOnSave": true
+  },
   "[typescript]": {
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
