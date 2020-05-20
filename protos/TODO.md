@@ -1,6 +1,4 @@
 NEXT STEPS
-- Add IsRequired validation
-- Refactor middleware
 - Tests
 - Typescript rpcImpls
 
