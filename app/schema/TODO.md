@@ -1,10 +1,9 @@
-- Run gaip linter
- - https://linter.aip.dev/
- ```
- go get -u github.com/googleapis/api-linter/cmd/api-linter
- api-linter proto_file1
- ```
-- google optional types
+NEXT STEPS
+- Python internal data models, toProto, fromProto
+- Python HTTP endpoints
+- Python validation
+- Typescript rpcImpls
 
-- Gnostic
-- https://github.com/googleapis/gnostic
+ISSUES
+- What's the right package structure for these generated python libs?
+- https://developers.google.com/protocol-buffers/docs/reference/python-generated#cpp_impl
