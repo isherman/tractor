@@ -1,6 +1,9 @@
 {
   "clang-format.style": "google",
   "eslint.workingDirectories": ["./app/frontend"],
+  "python.linting.pylintEnabled": false,
+  "python.linting.flake8Enabled": true,
+  "python.linting.enabled": true,
   "protoc": {
     "compile_on_save": false,
     "options": ["--proto_path=${workspaceRoot}/protos"]
@@ -17,6 +20,9 @@
     "editor.formatOnSave": true
   },
   "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    },
     "editor.formatOnSave": true
   },
   "[typescript]": {
