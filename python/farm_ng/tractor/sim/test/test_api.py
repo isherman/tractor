@@ -1,9 +1,12 @@
 import requests
 from farmng.tractor.v1 import waypoint_pb2
 
+PORT = 5555
+BASE_URL = 'http://localhost:' + str(PORT)
+
 
 def test_get_waypoints():
-    response = requests.get('http://localhost:8989/waypoints')
+    response = requests.get(BASE_URL + '/waypoints')
     assert response.status_code == 200
     response_body = response.json()
     assert type(response_body is list)
@@ -15,10 +18,10 @@ def test_get_waypoints_pb():
         'lng': -1,
         'angle': 0,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
 
     response = requests.get(
-        'http://localhost:8989/waypoints',
+        BASE_URL + '/waypoints',
         headers={'Accept': 'application/x-protobuf'},
     )
     assert response.status_code == 200
@@ -33,10 +36,10 @@ def test_get_waypoint():
         'lng': -1,
         'angle': 0,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
     id = response.json()['id']
 
-    response = requests.get(f'http://localhost:8989/waypoints/{id}')
+    response = requests.get(BASE_URL + f'/waypoints/{id}')
     assert response.status_code == 200
     response_body = response.json()
     assert response_body['lat'] == waypoint['lat']
@@ -48,11 +51,11 @@ def test_get_waypoint_pb():
         'lng': -1,
         'angle': 0,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
     id = response.json()['id']
 
     response = requests.get(
-        f'http://localhost:8989/waypoints/{id}', headers={'Accept': 'application/x-protobuf'},
+        BASE_URL + f'/waypoints/{id}', headers={'Accept': 'application/x-protobuf'},
     )
     assert response.status_code == 200
     waypoint_proto = waypoint_pb2.Waypoint()
@@ -66,7 +69,7 @@ def test_post_waypoint():
         'lng': -1,
         'angle': 0,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
     assert response.status_code == 200
     response_body = response.json()
     assert response_body['id']
@@ -81,7 +84,7 @@ def test_post_waypoint_full():
         'delay': '3.000000001s',
         'radius': 1,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
     assert response.status_code == 200
     response_body = response.json()
     assert response_body['id']
@@ -91,7 +94,7 @@ def test_post_waypoint_full():
 def test_post_waypoint_request_pb_response_json():
     waypoint_proto = waypoint_pb2.Waypoint(lat=42, lng=-1, angle=0)
     response = requests.post(
-        'http://localhost:8989/waypoints', data=waypoint_proto.SerializeToString(), headers={'Content-Type': 'application/x-protobuf'},
+        BASE_URL + '/waypoints', data=waypoint_proto.SerializeToString(), headers={'Content-Type': 'application/x-protobuf'},
     )
     assert response.status_code == 200
     response_body = response.json()
@@ -102,7 +105,7 @@ def test_post_waypoint_request_pb_response_json():
 def test_post_waypoint_request_pb_response_pb():
     waypoint_proto = waypoint_pb2.Waypoint(lat=42, lng=-1, angle=0)
     response = requests.post(
-        'http://localhost:8989/waypoints',
+        BASE_URL + '/waypoints',
         data=waypoint_proto.SerializeToString(),
         headers={
             'Accept': 'application/x-protobuf',
@@ -123,7 +126,7 @@ def test_post_waypoint_invalid_lat():
         'lng': -1,
         'angle': 0,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
     assert response.status_code == 422
     assert 'lat' in response.text
 
@@ -134,7 +137,7 @@ def test_post_waypoint_invalid_delay():
         'lng': -1,
         'angle': 0,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
     assert response.status_code == 422
     assert 'lat' in response.text
 
@@ -145,7 +148,7 @@ def test_post_waypoint_bad_request_lat_type_str():
         'lng': -1,
         'angle': 0,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
     assert response.status_code == 400
 
 
@@ -155,7 +158,7 @@ def test_post_waypoint_bad_request_lat_type_obj():
         'lng': -1,
         'angle': 0,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
     assert response.status_code == 400
 
 
@@ -165,11 +168,11 @@ def test_delete_waypoint():
         'lng': -1,
         'angle': 0,
     }
-    response = requests.post('http://localhost:8989/waypoints', json=waypoint)
+    response = requests.post(BASE_URL + '/waypoints', json=waypoint)
     id = response.json()['id']
 
-    response = requests.delete(f'http://localhost:8989/waypoints/{id}')
+    response = requests.delete(BASE_URL + f'/waypoints/{id}')
     assert response.status_code == 200
 
-    response = requests.delete(f'http://localhost:8989/waypoints/{id}')
+    response = requests.delete(BASE_URL + f'/waypoints/{id}')
     assert response.status_code == 404

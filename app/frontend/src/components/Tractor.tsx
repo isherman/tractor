@@ -4,8 +4,9 @@ import { useLoader, ReactThreeFiber } from "react-three-fiber";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import { webSocketClient } from "../config";
 import { Quaternion, Vector3 } from "three";
-import { IWebSocketMessage, ITractorStatus } from "../models/IWebSocketMessage";
+import { IWebSocketMessage } from "../models/IWebSocketMessage";
 import { red, gray900 } from "./colors";
+import { farmng } from "../genproto/protos";
 
 export const Tractor: React.FC = () => {
   // TODO: Should this be bundled?
@@ -18,16 +19,22 @@ export const Tractor: React.FC = () => {
     new Quaternion()
   );
 
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
   useEffect(() => {
     webSocketClient.on("message", (message: IWebSocketMessage) => {
-      setPosition(
-        new Vector3(...(message as ITractorStatus).world_translation_tractor)
-      );
-      setQuaternion(
-        new Quaternion(...(message as ITractorStatus).world_quaternion_tractor)
-      );
+      const status = message as farmng.tractor.v1.Status;
+      if (!status.pose || !status.pose.position || !status.pose.rotation) {
+        // eslint-disable-next-line no-console
+        console.error("Unexpected status:", status);
+        return;
+      }
+      const { x: tx, y: ty, z: tz } = status.pose.position;
+      const { x: qx, y: qy, z: qz, w: qw } = status.pose.rotation;
+      setPosition(new Vector3(tx!, ty!, tz!));
+      setQuaternion(new Quaternion(qx!, qy!, qz!, qw!));
     });
   }, []);
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
   return (
     <group position={position} quaternion={quaternion}>

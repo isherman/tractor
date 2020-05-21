@@ -1,10 +1,7 @@
-export interface ITractorStatus {
-  world_translation_tractor: number[];
-  world_quaternion_tractor: number[];
-}
+import { farmng } from "../genproto/protos";
 
 export interface ISetWaypoint {
   waypoint: number[];
 }
 
-export type IWebSocketMessage = ITractorStatus | ISetWaypoint;
+export type IWebSocketMessage = farmng.tractor.v1.Status | ISetWaypoint;

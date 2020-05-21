@@ -1,6 +1,7 @@
 # TODO: Make pylint handle protobuf generated code properly, possibly with pylint-protobuf
 # pylint: disable=no-member
 import asyncio
+import base64
 import json
 import logging
 import os
@@ -19,6 +20,8 @@ import tornado.web
 import tornado.websocket
 from farm_ng.tractor.controller import TractorMoveToGoalController
 from farm_ng.tractor.kinematics import TractorKinematics
+from farmng.tractor.v1 import geometry_pb2
+from farmng.tractor.v1 import status_pb2
 from farmng.tractor.v1 import waypoint_pb2
 from google.protobuf import duration_pb2
 from google.protobuf import wrappers_pb2
@@ -92,8 +95,7 @@ class Application(tornado.web.Application):
             cookie_secret='__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__',
             template_path=os.path.join(os.path.dirname(__file__), 'templates'),
             static_path=os.path.join(os.path.dirname(__file__), 'static'),
-            # xsrf_cookies=True,
-            xsrf_cookies=False,
+            xsrf_cookies=False,  # TODO: ENABLE THIS
             debug=True,
         )
         super().__init__(handlers, **settings)
@@ -228,13 +230,17 @@ class SimSocketHandler(tornado.websocket.WebSocketHandler):
 
     def get_compression_options(self):
         # Non-None enables compression with default options.
-        return {}
+        # We don't need compression if we're using protobuf
+        return None
 
     def open(self):
         SimSocketHandler.waiters.add(self)
 
     def on_close(self):
         SimSocketHandler.waiters.remove(self)
+
+    def check_origin(self, origin):
+        return True  # TODO: REMOVE
 
     @classmethod
     def send_updates(cls, status_msg):
@@ -280,14 +286,32 @@ class TractorSimulator:
             self.v_left += np.random.uniform(0.0, 0.5)
             self.v_right += np.random.uniform(0.0, 0.5)
 
-            SimSocketHandler.send_updates(
-                dict(
-                    world_translation_tractor=self.world_pose_tractor.trans.tolist(),
-                    world_quaternion_tractor=self.world_pose_tractor.rot.to_quaternion(
-                        ordering='xyzw',
-                    ).tolist(),
-                    t=t,
+            status_proto = status_pb2.Status(
+                pose=geometry_pb2.SE3Pose(
+                    position=geometry_pb2.Vec3(
+                        x=self.world_pose_tractor.trans[0],
+                        y=self.world_pose_tractor.trans[1],
+                        z=self.world_pose_tractor.trans[2],
+                    ),
+                    rotation=geometry_pb2.Quaternion(
+                        x=self.world_pose_tractor.rot.to_quaternion(
+                            ordering='xyzw',
+                        )[0],
+                        y=self.world_pose_tractor.rot.to_quaternion(
+                            ordering='xyzw',
+                        )[1],
+                        z=self.world_pose_tractor.rot.to_quaternion(
+                            ordering='xyzw',
+                        )[2],
+                        w=self.world_pose_tractor.rot.to_quaternion(
+                            ordering='xyzw',
+                        )[3],
+                    ),
                 ),
+            )
+
+            SimSocketHandler.send_updates(
+                base64.b64encode(status_proto.SerializeToString()),
             )
             t += dt
             self.world_pose_tractor = self.model.evolve_world_pose_tractor(

@@ -1,3 +1,4 @@
+import { farmng } from "../genproto/protos";
 import { IWebSocketClient } from "../models/IWebSocketClient";
 import { IWebSocketMessage } from "../models/IWebSocketMessage";
 
@@ -35,10 +36,15 @@ export class MockWebSocketClient implements IWebSocketClient {
     setInterval(() => {
       x += (Math.random() - 0.5) * 0.1;
       y += (Math.random() - 0.5) * 0.1;
-      this.emit("message", {
-        world_translation_tractor: [x, y, 0],
-        world_quaternion_tractor: [0, 0, 0, 1]
-      });
+      this.emit(
+        "message",
+        new farmng.tractor.v1.Status({
+          pose: {
+            position: { x, y, z: 0 },
+            rotation: { x: 0, y: 0, z: 0, w: 1 }
+          }
+        })
+      );
     }, 200);
     /* eslint-enable @typescript-eslint/camelcase */
   }

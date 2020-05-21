@@ -24,7 +24,11 @@ const rpcImpl: RPCImpl = function (method, requestData, callback) {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function createWaypoint(): Promise<farmng.tractor.v1.Waypoint> {
-  const client = farmng.tractor.v1.Mission.create(rpcImpl, false, false);
+  const client = farmng.tractor.v1.WaypointService.create(
+    rpcImpl,
+    false,
+    false
+  );
   const waypoint = await client.createWaypoint({
     waypoint: {
       angle: 1,

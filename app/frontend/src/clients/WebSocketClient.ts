@@ -1,3 +1,5 @@
+import { farmng } from "../genproto/protos";
+import * as protobuf from "protobufjs";
 import { IWebSocketClient } from "../models/IWebSocketClient";
 import { IWebSocketMessage } from "../models/IWebSocketMessage";
 
@@ -15,7 +17,11 @@ export class WebSocketClient implements IWebSocketClient {
     this.websocket = new WebSocket(uri);
 
     this.websocket.onmessage = (event): void => {
-      this.emit("message", JSON.parse(event.data));
+      const buffer = protobuf.util.newBuffer(
+        protobuf.util.base64.length(event.data)
+      );
+      protobuf.util.base64.decode(event.data, buffer, 0);
+      this.emit("message", farmng.tractor.v1.Status.decode(buffer));
     };
   }
 
