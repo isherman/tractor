@@ -1,7 +1,6 @@
 # TODO: Make pylint handle protobuf generated code properly, possibly with pylint-protobuf
 # pylint: disable=no-member
 import asyncio
-import base64
 import json
 import logging
 import os
@@ -247,7 +246,7 @@ class SimSocketHandler(tornado.websocket.WebSocketHandler):
         logger.debug('sending message to %d waiters', len(cls.waiters))
         for waiter in cls.waiters:
             try:
-                waiter.write_message(status_msg)
+                waiter.write_message(status_msg, binary=True)
             except RuntimeError as e:
                 logger.error('Error sending message, %s', e, exc_info=True)
 
@@ -310,9 +309,7 @@ class TractorSimulator:
                 ),
             )
 
-            SimSocketHandler.send_updates(
-                base64.b64encode(status_proto.SerializeToString()),
-            )
+            SimSocketHandler.send_updates(status_proto.SerializeToString())
             t += dt
             self.world_pose_tractor = self.model.evolve_world_pose_tractor(
                 self.world_pose_tractor, self.v_left, self.v_right, dt,

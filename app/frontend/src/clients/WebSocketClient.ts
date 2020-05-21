@@ -1,5 +1,4 @@
 import { farmng } from "../genproto/protos";
-import * as protobuf from "protobufjs";
 import { IWebSocketClient } from "../models/IWebSocketClient";
 import { IWebSocketMessage } from "../models/IWebSocketMessage";
 
@@ -15,13 +14,13 @@ export class WebSocketClient implements IWebSocketClient {
 
   constructor(uri: string) {
     this.websocket = new WebSocket(uri);
+    this.websocket.binaryType = "arraybuffer";
 
     this.websocket.onmessage = (event): void => {
-      const buffer = protobuf.util.newBuffer(
-        protobuf.util.base64.length(event.data)
+      this.emit(
+        "message",
+        farmng.tractor.v1.Status.decode(new Uint8Array(event.data))
       );
-      protobuf.util.base64.decode(event.data, buffer, 0);
-      this.emit("message", farmng.tractor.v1.Status.decode(buffer));
     };
   }
 
