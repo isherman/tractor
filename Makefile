@@ -1,4 +1,7 @@
 protos:
 	scripts/build-protos.sh
 
-.PHONY: protos
+test:
+	./env.sh pytest
+
+.PHONY: protos test

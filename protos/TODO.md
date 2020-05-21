@@ -1,6 +1,6 @@
 NEXT STEPS
-- Tests
 - Typescript rpcImpls
+- Websockets
 
 ISSUES
 - What's the right package structure for these generated python libs?

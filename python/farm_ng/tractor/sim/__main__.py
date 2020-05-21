@@ -66,7 +66,7 @@ def serialize_response(response: google.protobuf.message.Message, request: HTTPS
     if 'application/x-protobuf' in request.headers.get_list('Accept'):
         return response.SerializeToString()
     else:
-        return google.protobuf.json_format.MessageToDict(response)
+        return google.protobuf.json_format.MessageToDict(response, including_default_value_fields=True)
 
 
 class Application(tornado.web.Application):

@@ -3,3 +3,4 @@ covdefaults
 coverage
 pre-commit
 pytest
+requests
