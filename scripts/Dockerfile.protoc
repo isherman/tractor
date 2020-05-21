@@ -1,0 +1,11 @@
+FROM golang:alpine
+
+# Install protoc
+RUN apk add --update-cache \
+  git \
+  protobuf \
+  protobuf-dev
+
+# Install protoc plugins
+RUN go get -u github.com/daroot/protoc-gen-twirp_python_srv
+RUN go get -u github.com/elliots/protoc-gen-twirp_swagger
