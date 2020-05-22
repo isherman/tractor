@@ -12,13 +12,13 @@ interface IServiceConstructor<T> {
   new (rpcImpl: IRpc): T;
 }
 
-type IOptions = {
+type RpcImplOptions = {
   host: string;
   port: number;
   type: "protobuf" | "json";
 };
 
-function createRpcImpl(options: IOptions): IRpc {
+function createRpcImpl(options: RpcImplOptions): IRpc {
   return {
     request: async (service, method, data) => {
       const url = `${options.host}:${options.port}/twirp/${service}/${method}`;

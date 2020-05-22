@@ -38,7 +38,6 @@ def test_get_waypoint():
     response = requests.post(BASE_URL + '/GetWaypoint', json={'waypoint': _id})
     assert response.status_code == 200
     response_body = response.json()
-    print(response_body)
     assert response_body['lat'] == seed['lat']
 
 
@@ -99,7 +98,7 @@ def test_post_waypoint_invalid_lat():
         },
     }
     response = requests.post(BASE_URL + '/CreateWaypoint', json=data)
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert 'lat' in response.text
 
 
@@ -112,7 +111,7 @@ def test_post_waypoint_invalid_delay():
         },
     }
     response = requests.post(BASE_URL + '/CreateWaypoint', json=data)
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert 'lat' in response.text
 
 
@@ -125,7 +124,7 @@ def test_create_waypoint_bad_request_lat_type_str():
         },
     }
     response = requests.post(BASE_URL + '/CreateWaypoint', json=data)
-    assert response.status_code == 400
+    assert response.status_code == 500
 
 
 def test_create_waypoint_bad_request_lat_type_obj():
@@ -137,7 +136,7 @@ def test_create_waypoint_bad_request_lat_type_obj():
         },
     }
     response = requests.post(BASE_URL + '/CreateWaypoint', json=data)
-    assert response.status_code == 400
+    assert response.status_code == 500
 
 
 def test_delete_waypoint():
