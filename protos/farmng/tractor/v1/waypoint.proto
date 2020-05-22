@@ -7,7 +7,7 @@ import "validate/validate.proto";
 package farmng.tractor.v1;
 
 message Waypoint {
-  // The waypoint's ID. Any ID provided at creation time will be ignored.
+  // The waypoint's ID. The server will populate this field upon creation.
   google.protobuf.UInt64Value id = 1 [(validate.rules).uint64.gte = 0];
 
   // Latitude
@@ -20,11 +20,11 @@ message Waypoint {
   double angle = 4
       [(validate.rules).double = { gte: -3.14159265, lte: 3.14159265 }];
 
-  // An optional amount of time to spend at the waypoint
+  // An optional amount of time to spend at the waypoint.
   google.protobuf.Duration delay = 5
       [(validate.rules).duration.gte.seconds = 0];
 
-  // An optional radius within which the waypoint is considered to be reached
+  // An optional radius within which the waypoint is considered to be reached.
   google.protobuf.DoubleValue radius = 6 [(validate.rules).double.gte = 0];
 }
 
@@ -45,3 +45,5 @@ message ListWaypointsRequest {}
 message ListWaypointsResponse {
   repeated Waypoint waypoints = 1;
 }
+
+message DeleteWaypointResponse {}

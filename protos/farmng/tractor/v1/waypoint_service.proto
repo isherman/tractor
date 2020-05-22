@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
 import "farmng/tractor/v1/waypoint.proto";
 
 package farmng.tractor.v1;
@@ -9,5 +8,5 @@ service WaypointService {
   rpc CreateWaypoint(CreateWaypointRequest) returns (Waypoint) {}
   rpc ListWaypoints(ListWaypointsRequest) returns (ListWaypointsResponse) {}
   rpc GetWaypoint(GetWaypointRequest) returns (Waypoint) {}
-  rpc DeleteWaypoint(DeleteWaypointRequest) returns (google.protobuf.Empty) {}
+  rpc DeleteWaypoint(DeleteWaypointRequest) returns (DeleteWaypointResponse) {}
 }
