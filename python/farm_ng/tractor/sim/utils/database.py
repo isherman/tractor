@@ -1,9 +1,11 @@
 from typing import Dict
 
+from farm_ng.tractor.sim.models.waypoint import Waypoint
+
 
 class Database:
     def __init__(self):
-        self._waypoints: Dict[int, 'Waypoint'] = {}
+        self._waypoints: Dict[int, Waypoint] = {}
         self._id = 0
 
     def _nextId(self):
