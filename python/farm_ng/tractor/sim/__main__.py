@@ -14,9 +14,7 @@ import tornado.web
 import tornado.websocket
 from farm_ng.tractor.controller import TractorMoveToGoalController
 from farm_ng.tractor.kinematics import TractorKinematics
-from farm_ng.tractor.sim.handlers.waypoint_handler import WaypointHandler
 from farm_ng.tractor.sim.handlers.waypoint_service import WaypointService
-from farm_ng.tractor.sim.handlers.waypoints_handler import WaypointsHandler
 from farmng.tractor.v1 import geometry_pb2
 from farmng.tractor.v1 import status_pb2
 from gensrv.farmng.tractor.v1.waypoint_service_twirp_srv import \
@@ -37,8 +35,6 @@ class Application(tornado.web.Application):
         handlers = [
             # GET request, called from root directory localhost:8080/
             (r'/', MainHandler),
-            (r'/waypoints/?', WaypointsHandler),
-            (r'/waypoints/([0-9]+)/?', WaypointHandler),
             (r'/simsocket', SimSocketHandler),
             (
                 r'/third_party/(.*)', tornado.web.StaticFileHandler,
