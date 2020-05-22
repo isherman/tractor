@@ -1,4 +1,8 @@
 /* eslint-disable no-console */
+
+// A sandbox for playing with Twirp clients
+// TODO: Turn this into tests
+
 import { WaypointServiceClientImpl } from "../../genproto/farmng/tractor/v1/waypoint_service";
 import { createTwirpClient } from "./createTwirpClient";
 
