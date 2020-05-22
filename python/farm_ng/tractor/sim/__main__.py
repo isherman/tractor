@@ -15,9 +15,12 @@ import tornado.websocket
 from farm_ng.tractor.controller import TractorMoveToGoalController
 from farm_ng.tractor.kinematics import TractorKinematics
 from farm_ng.tractor.sim.handlers.waypoint_handler import WaypointHandler
+from farm_ng.tractor.sim.handlers.waypoint_service import WaypointService
 from farm_ng.tractor.sim.handlers.waypoints_handler import WaypointsHandler
 from farmng.tractor.v1 import geometry_pb2
 from farmng.tractor.v1 import status_pb2
+from gensrv.farmng.tractor.v1.waypoint_service_twirp_srv import \
+    WaypointServiceRequestHandler
 from liegroups import SE3
 
 logger = logging.getLogger('fe')
@@ -42,6 +45,10 @@ class Application(tornado.web.Application):
                 dict(path=third_party_path),
             ),
         ]
+
+        # Add Twirp services
+        for service, handler in [(WaypointService, WaypointServiceRequestHandler)]:
+            handlers.append((rf'{handler.prefix}/.*/?', handler, {'service': service()}))
 
         settings = dict(
             cookie_secret='__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__',
