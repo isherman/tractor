@@ -2,11 +2,7 @@
 import { WaypointServiceClientImpl } from "../../genproto/farmng/tractor/v1/waypoint_service";
 import { createTwirpClient } from "./createTwirpClient";
 
-const protobufClient = createTwirpClient(
-  WaypointServiceClientImpl,
-  "WaypointService",
-  "protobuf"
-);
+const protobufClient = createTwirpClient(WaypointServiceClientImpl, "protobuf");
 
 export async function callServices(): Promise<void> {
   const client = protobufClient;
