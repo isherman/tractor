@@ -6,7 +6,7 @@ import { webSocketClient } from "../config";
 import { Quaternion, Vector3 } from "three";
 import { IWebSocketMessage } from "../models/IWebSocketMessage";
 import { red, gray900 } from "./colors";
-import { farmng } from "../genproto/protos";
+import { Status } from "../../genproto/farmng/tractor/v1/status";
 
 export const Tractor: React.FC = () => {
   // TODO: Should this be bundled?
@@ -22,7 +22,7 @@ export const Tractor: React.FC = () => {
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
   useEffect(() => {
     webSocketClient.on("message", (message: IWebSocketMessage) => {
-      const status = message as farmng.tractor.v1.Status;
+      const status = message as Status;
       if (!status.pose || !status.pose.position || !status.pose.rotation) {
         // eslint-disable-next-line no-console
         console.error("Unexpected status:", status);

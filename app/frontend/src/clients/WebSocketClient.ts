@@ -1,4 +1,4 @@
-import { farmng } from "../genproto/protos";
+import { Status } from "../../genproto/farmng/tractor/v1/status";
 import { IWebSocketClient } from "../models/IWebSocketClient";
 import { IWebSocketMessage } from "../models/IWebSocketMessage";
 
@@ -17,10 +17,7 @@ export class WebSocketClient implements IWebSocketClient {
     this.websocket.binaryType = "arraybuffer";
 
     this.websocket.onmessage = (event): void => {
-      this.emit(
-        "message",
-        farmng.tractor.v1.Status.decode(new Uint8Array(event.data))
-      );
+      this.emit("message", Status.decode(new Uint8Array(event.data)));
     };
   }
 

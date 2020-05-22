@@ -1,7 +1,7 @@
-import { farmng } from "../genproto/protos";
+import { Status } from "../../genproto/farmng/tractor/v1/status";
 
 export interface ISetWaypoint {
   waypoint: number[];
 }
 
-export type IWebSocketMessage = farmng.tractor.v1.Status | ISetWaypoint;
+export type IWebSocketMessage = Status | ISetWaypoint;

@@ -1,4 +1,4 @@
-import { farmng } from "../genproto/protos";
+import { Status } from "../../genproto/farmng/tractor/v1/status";
 import { IWebSocketClient } from "../models/IWebSocketClient";
 import { IWebSocketMessage } from "../models/IWebSocketMessage";
 
@@ -38,7 +38,7 @@ export class MockWebSocketClient implements IWebSocketClient {
       y += (Math.random() - 0.5) * 0.1;
       this.emit(
         "message",
-        new farmng.tractor.v1.Status({
+        Status.fromJSON({
           pose: {
             position: { x, y, z: 0 },
             rotation: { x: 0, y: 0, z: 0, w: 1 }

@@ -3,3 +3,6 @@ import * as ReactDOM from "react-dom";
 import { Scene } from "./components/Scene";
 
 ReactDOM.render(<Scene />, document.getElementById("scene"));
+
+import { callServices } from "./clients/WaypointServiceClient";
+callServices();
