@@ -34,7 +34,7 @@ class Waypoint:
 
     def toProto(self) -> waypoint_pb2.Waypoint:
         return waypoint_pb2.Waypoint(
-            id=wrappers_pb2.UInt64Value(
+            id=wrappers_pb2.UInt32Value(
                 value=self.id,
             ) if self.id else None,
             lat=self.lat,

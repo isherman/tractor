@@ -17,11 +17,13 @@ from gensrv.farmng.tractor.v1.waypoint_service_twirp_srv import WaypointServiceI
 
 class WaypointService(WaypointServiceImpl):
     def CreateWaypoint(self, create_waypoint_request: waypoint_pb2.CreateWaypointRequest):
+        print('CreateWaypoint', create_waypoint_request)
         waypoint = Waypoint.fromProto(create_waypoint_request.waypoint)
         result = database.saveWaypoint(waypoint)
         return result.toProto()
 
     def ListWaypoints(self, list_waypoints_request):
+        print('ListWaypoints')
         return waypoint_pb2.ListWaypointsResponse(
             waypoints=[
                 waypoint.toProto() for waypoint in database.getAllWaypoints()
@@ -29,14 +31,14 @@ class WaypointService(WaypointServiceImpl):
         )
 
     def GetWaypoint(self, get_waypoint_request: waypoint_pb2.GetWaypointRequest):
-        print(get_waypoint_request.waypoint)
-        print(database.getWaypoint(get_waypoint_request.waypoint))
+        print('GetWaypoint', get_waypoint_request)
         waypoint = database.getWaypoint(get_waypoint_request.waypoint)
         if not waypoint:
             raise TwirpServerException(Errors.NotFound, 'Not Found')
         return waypoint.toProto()
 
     def DeleteWaypoint(self, delete_waypoint_request: waypoint_pb2.DeleteWaypointRequest):
+        print('DeleteWaypoint', delete_waypoint_request)
         success = database.deleteWaypoint(delete_waypoint_request.waypoint)
         if not success:
             raise TwirpServerException(Errors.NotFound, 'Not Found')

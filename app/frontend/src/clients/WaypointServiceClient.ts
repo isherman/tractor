@@ -10,21 +10,32 @@ const protobufClient = createTwirpClient(
 
 export async function callServices(): Promise<void> {
   const client = protobufClient;
-  console.log(
-    "CreateWaypoint",
-    await client.CreateWaypoint({
-      waypoint: {
-        lat: 42,
-        lng: -1,
-        angle: 1,
-        delay: undefined,
-        radius: undefined,
-        id: undefined
-      }
-    })
-  );
 
-  console.log("ListWaypoints", await client.ListWaypoints({}));
-  console.log("GetWaypoint", await client.GetWaypoint({ waypoint: 1 }));
-  console.log("DeleteWaypoint", await client.DeleteWaypoint({ waypoint: 1 }));
+  const createWaypoint = await client.CreateWaypoint({
+    waypoint: {
+      lat: 42,
+      lng: -1,
+      angle: 1,
+      delay: undefined,
+      radius: undefined,
+      id: undefined
+    }
+  });
+  console.log("CreateWaypoint", createWaypoint);
+
+  const listWaypoints = await client.ListWaypoints({});
+  console.log("ListWaypoints", listWaypoints);
+
+  try {
+    const getWaypoint = await client.GetWaypoint({ waypoint: 1 });
+    console.log("GetWaypoint", getWaypoint);
+  } catch (error) {
+    console.error("GetWaypoint", error);
+  }
+  try {
+    const deleteWaypoint = await client.DeleteWaypoint({ waypoint: 99999 });
+    console.log("DeleteWaypoint", deleteWaypoint);
+  } catch (error) {
+    console.error("DeleteWaypoint", error);
+  }
 }

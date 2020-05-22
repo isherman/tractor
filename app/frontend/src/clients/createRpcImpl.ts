@@ -39,9 +39,14 @@ export const createRpcImpl = function (options: IOptions): IRpc {
             : "application/json"
         }
       });
-      const binaryResponse = await response.arrayBuffer();
-      console.log("binaryResponse: ", binaryResponse);
-      return isProtobuf ? binaryResponse : await response.json();
+
+      if (!response.ok) {
+        throw Error(response.statusText); // TODO: JSON
+      }
+
+      return isProtobuf
+        ? new Uint8Array(await response.arrayBuffer())
+        : await response.json();
     }
   };
 };
