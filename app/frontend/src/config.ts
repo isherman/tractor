@@ -1,5 +1,5 @@
+// TODO: Use environment variable to select mock
 // import { MockWebSocketClient } from "./clients/MockWebSocketClient";
-
 // const webSocketClient = new MockWebSocketClient();
 
 import { WebSocketClient } from "./clients/WebSocketClient";

@@ -9,7 +9,6 @@
       "module": "es6",
       "jsx": "react",
       "target": "es5",
-      "allowJs": true, // required by genproto
       "typeRoots" : ["./typings", "node_modules/@types"],
       "moduleResolution": "node"  // required by Three.js
   },

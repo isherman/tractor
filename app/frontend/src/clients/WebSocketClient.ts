@@ -26,10 +26,11 @@ export class WebSocketClient implements IWebSocketClient {
   }
 
   public send(data: IWebSocketMessage): void {
+    // TODO: Enable client->server websocket communication
+    // this.websocket.send(data);
+
     // eslint-disable-next-line no-console
     console.log("[ws_send]", data);
-
-    // this.websocket.send(data);
   }
 
   private emit(event: string, data: IWebSocketMessage): void {

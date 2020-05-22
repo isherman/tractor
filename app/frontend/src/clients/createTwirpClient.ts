@@ -21,34 +21,24 @@ type RpcImplOptions = {
 function createRpcImpl(options: RpcImplOptions): IRpc {
   return {
     request: async (service, method, data) => {
-      const url = `${options.host}:${options.port}/twirp/${service}/${method}`;
       const isProtobuf = options.type === "protobuf";
 
-      const body = data;
-
-      // if (!isProtobuf) {
-      //   const message = (method as Method).resolvedRequestType?.decode(
-      //     requestData
-      //   );
-      //   console.log("METHOD", method);
-      //   console.log("REQUEST TYPE", (method as Method).resolvedRequestType);
-      //   if (message) {
-      //     body = JSON.stringify(message.toJSON());
-      //   }
-      // }
-
-      const response = await fetch(url, {
-        method: "POST",
-        body: body,
-        headers: {
-          "Content-Type": isProtobuf
-            ? "application/protobuf"
-            : "application/json"
+      const response = await fetch(
+        `${options.host}:${options.port}/twirp/${service}/${method}`,
+        {
+          method: "POST",
+          body: data,
+          headers: {
+            "Content-Type": isProtobuf
+              ? "application/protobuf"
+              : "application/json"
+          }
         }
-      });
+      );
 
       if (!response.ok) {
-        throw Error(response.statusText); // TODO: JSON
+        // TODO: Handle Twirp JSON errors
+        throw Error(response.statusText);
       }
 
       return isProtobuf

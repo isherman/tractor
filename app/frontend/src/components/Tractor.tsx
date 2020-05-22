@@ -19,7 +19,6 @@ export const Tractor: React.FC = () => {
     new Quaternion()
   );
 
-  /* eslint-disable @typescript-eslint/no-non-null-assertion */
   useEffect(() => {
     webSocketClient.on("message", (message: IWebSocketMessage) => {
       const status = message as Status;
@@ -29,12 +28,12 @@ export const Tractor: React.FC = () => {
         return;
       }
       const { x: tx, y: ty, z: tz } = status.pose.position;
+      setPosition(new Vector3(tx, ty, tz));
+
       const { x: qx, y: qy, z: qz, w: qw } = status.pose.rotation;
-      setPosition(new Vector3(tx!, ty!, tz!));
-      setQuaternion(new Quaternion(qx!, qy!, qz!, qw!));
+      setQuaternion(new Quaternion(qx, qy, qz, qw));
     });
   }, []);
-  /* eslint-enable @typescript-eslint/no-non-null-assertion */
 
   return (
     <group position={position} quaternion={quaternion}>

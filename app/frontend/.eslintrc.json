@@ -3,7 +3,6 @@
   "env": {
     "browser": true
   },
-  "ignorePatterns": ["genproto/*.js"],
   "parser": "@typescript-eslint/parser",
   "plugins": [
     "@typescript-eslint",

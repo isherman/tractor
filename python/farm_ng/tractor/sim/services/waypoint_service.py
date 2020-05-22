@@ -5,15 +5,6 @@ from gensrv.farmng.tractor.v1.waypoint_service_twirp_srv import Errors
 from gensrv.farmng.tractor.v1.waypoint_service_twirp_srv import TwirpServerException
 from gensrv.farmng.tractor.v1.waypoint_service_twirp_srv import WaypointServiceImpl
 
-# TODO: VALIDATION
-# from validate.validator import validate
-# from validate.validator import ValidationFailed
-
-# try:
-#     validate(request_proto)(request_proto)
-# except ValidationFailed as e:
-#     raise tornado.web.HTTPError(422, reason=str(e))
-
 
 class WaypointService(WaypointServiceImpl):
     def CreateWaypoint(self, create_waypoint_request: waypoint_pb2.CreateWaypointRequest):

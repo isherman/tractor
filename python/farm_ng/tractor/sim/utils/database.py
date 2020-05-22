@@ -4,6 +4,8 @@ from farm_ng.tractor.sim.models.waypoint import Waypoint
 
 
 class Database:
+    """A mock database for prototyping."""
+
     def __init__(self):
         self._waypoints: Dict[int, Waypoint] = {}
         self._id = 0
