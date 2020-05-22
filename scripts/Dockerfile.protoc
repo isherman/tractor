@@ -7,5 +7,4 @@ RUN apk add --update-cache \
   protobuf-dev
 
 # Install protoc plugins
-RUN go get -u github.com/daroot/protoc-gen-twirp_python_srv
-RUN go get -u github.com/elliots/protoc-gen-twirp_swagger
+RUN go get -u github.com/isherman/protoc-gen-twirp_tornado_srv
