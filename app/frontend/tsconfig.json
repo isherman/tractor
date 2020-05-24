@@ -12,7 +12,5 @@
       "typeRoots" : ["./typings", "node_modules/@types"],
       "moduleResolution": "node"  // required by Three.js
   },
-  "include": [
-      "./src/"
-  ]
+  "include": ["src", "test"]
 }
