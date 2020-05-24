@@ -105,14 +105,15 @@ def test_post_waypoint_invalid_lat():
 def test_post_waypoint_invalid_delay():
     data = {
         'waypoint':  {
-            'lat': -91,
+            'lat': 1,
             'lng': -1,
             'angle': 0,
+            'delay': '-0.000000001s',
         },
     }
     response = requests.post(BASE_URL + '/CreateWaypoint', json=data)
     assert response.status_code == 400
-    assert 'lat' in response.text
+    assert 'delay' in response.text
 
 
 def test_create_waypoint_bad_request_lat_type_str():
