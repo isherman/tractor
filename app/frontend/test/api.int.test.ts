@@ -2,6 +2,7 @@ import "jest";
 import "node-fetch";
 import { WaypointServiceClientImpl } from "../genproto/farmng/tractor/v1/waypoint_service";
 import { createTwirpClient } from "../src/clients/createTwirpClient";
+import { TwirpError } from "../src/clients/TwirpError";
 
 describe("WaypointService", () => {
   const protobufClient = createTwirpClient(
@@ -44,11 +45,16 @@ describe("WaypointService", () => {
     expect(response.id).toEqual(id);
   });
 
-  it("DeleteWaypoint succeeds", async () => {
+  it("DeleteWaypoint succeeds (and GetWaypoint fails)", async () => {
     const id = await createWaypoint();
     await protobufClient.DeleteWaypoint({ waypoint: id });
-    expect(async () => {
+
+    try {
       await protobufClient.GetWaypoint({ waypoint: id });
-    }).rejects.toThrow();
+    } catch (error) {
+      expect(error).toBeInstanceOf(TwirpError);
+      expect(error.message).toBe("Not Found");
+      expect(error.code).toBe("not_found");
+    }
   });
 });

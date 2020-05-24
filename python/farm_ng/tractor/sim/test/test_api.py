@@ -146,4 +146,3 @@ class TestClass:
             BASE_URL + '/DeleteWaypoint', data=data, headers={'Content-Type': 'application/protobuf'},
         )
         assert response.status_code == 200
-        assert False

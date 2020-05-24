@@ -1,4 +1,5 @@
 import { host, port } from "../config";
+import { TwirpError } from "./TwirpError";
 
 interface IRpc {
   request(
@@ -37,8 +38,7 @@ function createRpcImpl(options: RpcImplOptions): IRpc {
       );
 
       if (!response.ok) {
-        // TODO: Handle Twirp JSON errors
-        throw Error(response.statusText);
+        throw new TwirpError(await response.json());
       }
 
       return isProtobuf
