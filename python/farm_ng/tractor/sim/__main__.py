@@ -15,7 +15,7 @@ import tornado.websocket
 from farm_ng.tractor.controller import TractorMoveToGoalController
 from farm_ng.tractor.kinematics import TractorKinematics
 from farm_ng.tractor.sim.services.waypoint_service import WaypointService
-from farmng.tractor.v1 import geometry_pb2
+from farm_ng.utils.proto import se3_to_proto
 from farmng.tractor.v1 import status_pb2
 from gensrv.farmng.tractor.v1.waypoint_service_twirp_srv import \
     WaypointServiceRequestHandler
@@ -123,27 +123,7 @@ class TractorSimulator:
             self.v_right += np.random.uniform(0.0, 0.5)
 
             status_proto = status_pb2.Status(
-                pose=geometry_pb2.SE3Pose(
-                    position=geometry_pb2.Vec3(
-                        x=self.world_pose_tractor.trans[0],
-                        y=self.world_pose_tractor.trans[1],
-                        z=self.world_pose_tractor.trans[2],
-                    ),
-                    rotation=geometry_pb2.Quaternion(
-                        x=self.world_pose_tractor.rot.to_quaternion(
-                            ordering='xyzw',
-                        )[0],
-                        y=self.world_pose_tractor.rot.to_quaternion(
-                            ordering='xyzw',
-                        )[1],
-                        z=self.world_pose_tractor.rot.to_quaternion(
-                            ordering='xyzw',
-                        )[2],
-                        w=self.world_pose_tractor.rot.to_quaternion(
-                            ordering='xyzw',
-                        )[3],
-                    ),
-                ),
+                pose=se3_to_proto(self.world_pose_tractor),
             )
 
             SimSocketHandler.send_updates(status_proto.SerializeToString())
