@@ -4,11 +4,7 @@
     "browser": true
   },
   "parser": "@typescript-eslint/parser",
-  "plugins": [
-    "@typescript-eslint",
-    "react",
-    "prettier"
-  ],
+  "plugins": ["@typescript-eslint", "react", "prettier"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
@@ -26,9 +22,7 @@
     "no-console": 1,
     "prettier/prettier": 2,
     "@typescript-eslint/interface-name-prefix": 0,
-    "@typescript-eslint/explicit-function-return-type": [2, {
-      "allowExpressions": true
-    }],
+    "@typescript-eslint/explicit-function-return-type": 0,
     "@typescript-eslint/no-unused-vars": [2, { "argsIgnorePattern": "^_" }]
   }
 }
