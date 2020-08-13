@@ -6,10 +6,10 @@ import (
 	pb "github.com/farm-ng/tractor/genproto"
 )
 
-// Server implements the Haberdasher service
+// Server ...
 type Server struct{}
 
-// StartStream ...
-func (s *Server) StartStream(ctx context.Context, request *pb.StartStreamRequest) (res *pb.StartStreamResponse, err error) {
-	return &pb.StartStreamResponse{}, nil
+// InitiatePeerConnection ...
+func (s *Server) InitiatePeerConnection(ctx context.Context, request *pb.InitiatePeerConnectionRequest) (res *pb.InitiatePeerConnectionResponse, err error) {
+	return &pb.InitiatePeerConnectionResponse{}, nil
 }

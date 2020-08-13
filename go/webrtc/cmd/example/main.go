@@ -14,11 +14,6 @@ import (
 
 func main() {
 
-	// Start the server
-	// server := &server.Server{}
-	// twirpHandler := genproto.NewWebRTCServiceServer(server, nil)
-	// http.ListenAndServe(":9900", twirpHandler)
-
 	// Wait for the offer to be pasted
 	offer := webrtc.SessionDescription{}
 	signal.Decode(signal.MustReadStdin(), &offer)
