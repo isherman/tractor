@@ -1,8 +1,4 @@
-package main
-
-// A combination of:
-// https://github.com/pion/webrtc/tree/master/examples/rtp-to-webrtc
-// https://github.com/pion/webrtc/tree/master/examples/data-channels-detach
+package proxy
 
 import (
 	"fmt"
@@ -10,18 +6,17 @@ import (
 	"net"
 	"time"
 
+	"github.com/farm-ng/tractor/webrtc/internal/signal"
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v3"
-
-	"github.com/farm-ng/tractor/webrtc/internal/signal"
 )
 
-func main() {
+// Proxy ...
+type Proxy struct{}
 
-	// Wait for the offer to be pasted
-	offer := webrtc.SessionDescription{}
-	signal.Decode(signal.MustReadStdin(), &offer)
-
+// Start ...
+// TODO: Return errors rather than panic, support graceful shutdown
+func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription {
 	// We make our own mediaEngine so we can place the sender's codecs in it.  This because we must use the
 	// dynamic media type from the sender in our answer. This is not required if we are the offerer
 	mediaEngine := webrtc.MediaEngine{}
@@ -48,11 +43,11 @@ func main() {
 	// read from and write to the data channel. It must be explicitly enabled as a setting since it
 	// diverges from the WebRTC API.
 	// https://github.com/pion/webrtc/blob/master/examples/data-channels-detach/main.go
-	s := webrtc.SettingEngine{}
-	s.DetachDataChannels()
+	settingEngine := webrtc.SettingEngine{}
+	settingEngine.DetachDataChannels()
 
 	// Create a new RTCPeerConnection
-	api := webrtc.NewAPI(webrtc.WithSettingEngine(s), webrtc.WithMediaEngine(mediaEngine))
+	api := webrtc.NewAPI(webrtc.WithSettingEngine(settingEngine), webrtc.WithMediaEngine(mediaEngine))
 	peerConnection, err := api.NewPeerConnection(webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
 			{
@@ -69,11 +64,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		if err = listener.Close(); err != nil {
-			panic(err)
-		}
-	}()
+
+	// TODO: Close the listener gracefully
+	// defer func() {
+	// 	if err = listener.Close(); err != nil {
+	// 		panic(err)
+	// 	}
+	// }()
 
 	fmt.Println("Waiting for RTP Packets, please run GStreamer or ffmpeg now")
 
@@ -151,27 +148,28 @@ func main() {
 	// in a production application you should exchange ICE Candidates via OnICECandidate
 	<-gatherComplete
 
-	// Output the answer in base64 so we can paste it in browser
-	fmt.Println(signal.Encode(*peerConnection.LocalDescription()))
-
 	// Read RTP packets forever and send them to the WebRTC Client
-	for {
-		n, _, err := listener.ReadFrom(inboundRTPPacket)
-		if err != nil {
-			fmt.Printf("error during read: %s", err)
-			panic(err)
-		}
+	go func() {
+		for {
+			n, _, err := listener.ReadFrom(inboundRTPPacket)
+			if err != nil {
+				fmt.Printf("error during read: %s", err)
+				panic(err)
+			}
 
-		packet := &rtp.Packet{}
-		if err := packet.Unmarshal(inboundRTPPacket[:n]); err != nil {
-			panic(err)
-		}
-		packet.Header.PayloadType = payloadType
+			packet := &rtp.Packet{}
+			if err := packet.Unmarshal(inboundRTPPacket[:n]); err != nil {
+				panic(err)
+			}
+			packet.Header.PayloadType = payloadType
 
-		if writeErr := videoTrack.WriteRTP(packet); writeErr != nil {
-			panic(writeErr)
+			if writeErr := videoTrack.WriteRTP(packet); writeErr != nil {
+				panic(writeErr)
+			}
 		}
-	}
+	}()
+
+	return *peerConnection.LocalDescription()
 }
 
 const messageSize = 1024

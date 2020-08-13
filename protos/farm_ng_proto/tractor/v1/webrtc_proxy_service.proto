@@ -4,12 +4,14 @@ package farm_ng_proto.tractor.v1;
 option go_package = "github.com/farm_ng/genproto";
 
 message InitiatePeerConnectionRequest {
-  // The offerer's Session Description Protocol description
+  // The offerer's Session Description Protocol description, as base64-encoded
+  // JSON
   string sdp = 1;
 }
 
 message InitiatePeerConnectionResponse {
-  // The answerer's Session Description Protocol description
+  // The answerer's Session Description Protocol description, as base64-encoded
+  // JSON
   string sdp = 1;
 }
 

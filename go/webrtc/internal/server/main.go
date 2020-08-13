@@ -2,14 +2,40 @@ package server
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 
 	pb "github.com/farm-ng/tractor/genproto"
+	"github.com/farm-ng/tractor/webrtc/internal/proxy"
+	"github.com/pion/webrtc/v3"
+	"github.com/twitchtv/twirp"
 )
 
 // Server ...
 type Server struct{}
 
 // InitiatePeerConnection ...
-func (s *Server) InitiatePeerConnection(ctx context.Context, request *pb.InitiatePeerConnectionRequest) (res *pb.InitiatePeerConnectionResponse, err error) {
-	return &pb.InitiatePeerConnectionResponse{}, nil
+func (s *Server) InitiatePeerConnection(ctx context.Context,
+	req *pb.InitiatePeerConnectionRequest) (res *pb.InitiatePeerConnectionResponse, err error) {
+
+	offer := webrtc.SessionDescription{}
+	b, err := base64.StdEncoding.DecodeString(req.Sdp)
+	if err != nil {
+		return nil, twirp.NewError(twirp.InvalidArgument, "invalid base64")
+	}
+	err = json.Unmarshal(b, &offer)
+	if err != nil {
+		return nil, twirp.NewError(twirp.InvalidArgument, "invalid json")
+	}
+
+	p := &proxy.Proxy{}
+	answer := p.Start(offer)
+
+	b, err = json.Marshal(answer)
+	if err != nil {
+		return nil, twirp.NewError(twirp.Internal, "could not generate SDP")
+	}
+	return &pb.InitiatePeerConnectionResponse{
+		Sdp: base64.StdEncoding.EncodeToString(b),
+	}, nil
 }
