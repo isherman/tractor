@@ -11,21 +11,28 @@ import (
 	"github.com/pion/webrtc/v3"
 )
 
-// Proxy ...
+// Proxy is a webRTC proxy that proxies UDP packets to/from a webRTC data channel and
+// RTP packets to a webRTC video channel.
 type Proxy struct{}
 
-// Start ...
-// TODO: Return errors rather than panic, support graceful shutdown
+// Start accepts an offer SDP from a peer, listens for local UDP and RTP traffic, returns an
+// answer SDP, and loops forever.
+// TODO: Actually proxy data channel to UDP
+// TODO: Support configuration (RTP port number, etc.)
+// TODO: Return errors rather than panic
+// TODO: Support graceful shutdown
 func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription {
-	// We make our own mediaEngine so we can place the sender's codecs in it.  This because we must use the
-	// dynamic media type from the sender in our answer. This is not required if we are the offerer
+	// Do some configuration in preparation for creating a new RTCPeerConnection
+
+	// We make our own mediaEngine so we can place the offerer's codecs in it.  This because we must use the
+	// dynamic media type from the offerer in our answer. This is not required if we are the offerer
 	mediaEngine := webrtc.MediaEngine{}
 	err := mediaEngine.PopulateFromSDP(offer)
 	if err != nil {
 		panic(err)
 	}
 
-	// Search for VP8 Payload type. If the offer doesn't support VP8 exit since
+	// Search for VP8 Payload type. If the offer doesn't support VP8, exit,
 	// since they won't be able to decode anything we send them
 	var payloadType uint8
 	for _, videoCodec := range mediaEngine.GetCodecsByKind(webrtc.RTPCodecTypeVideo) {
@@ -39,9 +46,8 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 	}
 
 	// Create a SettingEngine and enable Detach.
-	// This isn't strictly necessary, but doing so allows us to use a more idiomatic API to
-	// read from and write to the data channel. It must be explicitly enabled as a setting since it
-	// diverges from the WebRTC API.
+	// Doing so allows us to use a more idiomatic API to read from and write to the data channel.
+	// It must be explicitly enabled as a setting since it diverges from the WebRTC API
 	// https://github.com/pion/webrtc/blob/master/examples/data-channels-detach/main.go
 	settingEngine := webrtc.SettingEngine{}
 	settingEngine.DetachDataChannels()
