@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net"
+	"time"
 
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v3"
@@ -11,6 +13,12 @@ import (
 )
 
 func main() {
+
+	// Start the server
+	// server := &server.Server{}
+	// twirpHandler := genproto.NewWebRTCServiceServer(server, nil)
+	// http.ListenAndServe(":9900", twirpHandler)
+
 	// Wait for the offer to be pasted
 	offer := webrtc.SessionDescription{}
 	signal.Decode(signal.MustReadStdin(), &offer)
@@ -36,8 +44,16 @@ func main() {
 		panic("Remote peer does not support VP8")
 	}
 
+	// Create a SettingEngine and enable Detach.
+	// This isn't strictly necessary, but doing so allows us to use a more idiomatic API to
+	// read from and write to the data channel. It must be explicitly enabled as a setting since it
+	// diverges from the WebRTC API.
+	// https://github.com/pion/webrtc/blob/master/examples/data-channels-detach/main.go
+	s := webrtc.SettingEngine{}
+	s.DetachDataChannels()
+
 	// Create a new RTCPeerConnection
-	api := webrtc.NewAPI(webrtc.WithMediaEngine(mediaEngine))
+	api := webrtc.NewAPI(webrtc.WithSettingEngine(s), webrtc.WithMediaEngine(mediaEngine))
 	peerConnection, err := api.NewPeerConnection(webrtc.Configuration{
 		ICEServers: []webrtc.ICEServer{
 			{
@@ -83,6 +99,28 @@ func main() {
 	if _, err = peerConnection.AddTrack(videoTrack); err != nil {
 		panic(err)
 	}
+
+	// Register data channel creation handling
+	peerConnection.OnDataChannel(func(d *webrtc.DataChannel) {
+		fmt.Printf("New DataChannel %s %d\n", d.Label(), d.ID())
+
+		// Register channel opening handling
+		d.OnOpen(func() {
+			fmt.Printf("Data channel '%s'-'%d' open.\n", d.Label(), d.ID())
+
+			// Detach the data channel
+			raw, dErr := d.Detach()
+			if dErr != nil {
+				panic(dErr)
+			}
+
+			// Handle reading from the data channel
+			go ReadLoop(raw)
+
+			// Handle writing to the data channel
+			go WriteLoop(raw)
+		})
+	})
 
 	// Set the handler for ICE connection state
 	// This will notify you when the peer has connected/disconnected
@@ -133,6 +171,35 @@ func main() {
 
 		if writeErr := videoTrack.WriteRTP(packet); writeErr != nil {
 			panic(writeErr)
+		}
+	}
+}
+
+const messageSize = 1024
+
+// ReadLoop shows how to read from the datachannel directly
+func ReadLoop(d io.Reader) {
+	for {
+		buffer := make([]byte, messageSize)
+		n, err := d.Read(buffer)
+		if err != nil {
+			fmt.Println("Datachannel closed; Exit the readloop:", err)
+			return
+		}
+
+		fmt.Printf("Message from DataChannel: %s\n", string(buffer[:n]))
+	}
+}
+
+// WriteLoop shows how to write to the datachannel directly
+func WriteLoop(d io.Writer) {
+	for range time.NewTicker(5 * time.Second).C {
+		message := signal.RandSeq(messageSize)
+		fmt.Printf("Sending %s \n", message)
+
+		_, err := d.Write([]byte(message))
+		if err != nil {
+			panic(err)
 		}
 	}
 }
