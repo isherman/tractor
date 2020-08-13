@@ -3,10 +3,10 @@ package proxy
 import (
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"time"
 
-	"github.com/farm-ng/tractor/webrtc/internal/signal"
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v3"
 )
@@ -111,10 +111,10 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 			}
 
 			// Handle reading from the data channel
-			go ReadLoop(raw)
+			go readLoop(raw)
 
 			// Handle writing to the data channel
-			go WriteLoop(raw)
+			go writeLoop(raw)
 		})
 	})
 
@@ -172,10 +172,23 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 	return *peerConnection.LocalDescription()
 }
 
+// RandSeq generates a random string to serve as dummy data
+//
+// It returns a deterministic sequence of values each time a program is run.
+// Use rand.Seed() function in your real applications.
+func randSeq(n int) string {
+	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
+}
+
 const messageSize = 1024
 
 // ReadLoop shows how to read from the datachannel directly
-func ReadLoop(d io.Reader) {
+func readLoop(d io.Reader) {
 	for {
 		buffer := make([]byte, messageSize)
 		n, err := d.Read(buffer)
@@ -189,9 +202,9 @@ func ReadLoop(d io.Reader) {
 }
 
 // WriteLoop shows how to write to the datachannel directly
-func WriteLoop(d io.Writer) {
+func writeLoop(d io.Writer) {
 	for range time.NewTicker(5 * time.Second).C {
-		message := signal.RandSeq(messageSize)
+		message := randSeq(messageSize)
 		fmt.Printf("Sending %s \n", message)
 
 		_, err := d.Write([]byte(message))

@@ -16,6 +16,6 @@ gst-launch-1.0 videotestsrc ! 'video/x-raw, width=640, height=480' ! videoconver
 # OR
 ffmpeg -re -f lavfi -i testsrc=size=640x480:rate=30 -vcodec libvpx -cpu-used 5 -deadline 1 -g 10 -error-resilient 1 -auto-alt-ref 1 -f rtp rtp://127.0.0.1:5004
 
-# Run https://jsfiddle.net/z0Lhsog4/14/
+# Run https://jsfiddle.net/y5aq6hnm/1/
 # You should see video streaming to the browser and data streaming both directions
 ```
