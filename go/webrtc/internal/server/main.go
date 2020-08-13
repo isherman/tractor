@@ -11,10 +11,10 @@ import (
 	"github.com/twitchtv/twirp"
 )
 
-// Server ...
+// Server is a Twirp server that exposes a webRTC proxy
 type Server struct{}
 
-// InitiatePeerConnection ...
+// InitiatePeerConnection starts the proxy and returns an SDP answer to the client
 func (s *Server) InitiatePeerConnection(ctx context.Context,
 	req *pb.InitiatePeerConnectionRequest) (res *pb.InitiatePeerConnectionResponse, err error) {
 
