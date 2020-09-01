@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"sync"
 	"time"
 
 	pb "github.com/farm-ng/tractor/genproto"
@@ -15,29 +16,31 @@ const (
 	maxDatagramSize = 1024
 )
 
-type eventBus struct {
-	announceAddress   string
-	announcements     map[string]*pb.Announce
-	State             map[string]*pb.Event
-	eventChan         chan<- *pb.Event
-	multicastSender   *net.UDPConn
-	multicastListener *net.UDPConn
-	listenConn        *net.UDPConn
+type EventBus struct {
+	announceAddress    string
+	announcements      map[string]*pb.Announce
+	announcementsMutex *sync.Mutex
+	State              map[string]*pb.Event
+	eventChan          chan<- *pb.Event
+	multicastSender    *net.UDPConn
+	multicastListener  *net.UDPConn
+	listenConn         *net.UDPConn
 }
 
 // NewEventBus returns a new EventBus.
 //
 // A channel may be provided for event callbacks. This channel must be serviced, or the bus will hang.
-func NewEventBus(announceAddress string, eventChan chan<- *pb.Event) *eventBus {
-	return &eventBus{
-		announceAddress: announceAddress,
-		announcements:   make(map[string]*pb.Announce),
-		State:           make(map[string]*pb.Event),
-		eventChan:       eventChan,
+func NewEventBus(announceAddress string, eventChan chan<- *pb.Event) *EventBus {
+	return &EventBus{
+		announceAddress:    announceAddress,
+		announcements:      make(map[string]*pb.Announce),
+		announcementsMutex: &sync.Mutex{},
+		State:              make(map[string]*pb.Event),
+		eventChan:          eventChan,
 	}
 }
 
-func (bus *eventBus) Start() {
+func (bus *EventBus) Start() {
 	addr, err := net.ResolveUDPAddr("udp", bus.announceAddress)
 	if err != nil {
 		log.Fatal(err)
@@ -63,27 +66,30 @@ func (bus *eventBus) Start() {
 	}
 	bus.listenConn.SetReadBuffer(maxDatagramSize)
 
+	log.Println("Starting eventbus...")
 	go bus.announce()
 	go bus.handleAnnouncements()
 	go bus.handleEvents()
 	select {}
 }
 
-func (bus *eventBus) SendEvent(e *pb.Event) {
+func (bus *EventBus) SendEvent(e *pb.Event) {
 	event_bytes, err := proto.Marshal(e)
 	if err != nil {
 		log.Fatalln("Could not marshal event: ", e)
 	}
 
+	bus.announcementsMutex.Lock()
 	for _, a := range bus.announcements {
 		bus.listenConn.WriteToUDP(event_bytes, &net.UDPAddr{
 			IP:   []byte(a.Host),
 			Port: int(a.Port),
 		})
 	}
+	bus.announcementsMutex.Unlock()
 }
 
-func (bus *eventBus) announce() {
+func (bus *EventBus) announce() {
 	announce := &pb.Announce{
 		Host:    bus.listenConn.LocalAddr().(*net.UDPAddr).IP.String(),
 		Port:    int32(bus.listenConn.LocalAddr().(*net.UDPAddr).Port),
@@ -96,9 +102,10 @@ func (bus *eventBus) announce() {
 	}
 
 	for {
-		log.Println("announcing: ", announce)
+		// log.Println("announcing: ", announce)
 		bus.multicastSender.Write(announceBytes)
 
+		bus.announcementsMutex.Lock()
 		for key, a := range bus.announcements {
 			receiveTime, err := ptypes.Timestamp(a.RecvStamp)
 			if err != nil {
@@ -107,20 +114,21 @@ func (bus *eventBus) announce() {
 			if time.Now().Sub(receiveTime) > time.Second*10 {
 				log.Println("deleting stale: ", key)
 				delete(bus.announcements, key)
-			} else {
-				bus.listenConn.WriteToUDP(announceBytes, &net.UDPAddr{
-					IP:   []byte(a.Host),
-					Port: int(a.Port),
-				})
-				log.Println("announcing to: ", a.Host, a.Port)
+				continue
 			}
+			bus.listenConn.WriteToUDP(announceBytes, &net.UDPAddr{
+				IP:   []byte(a.Host),
+				Port: int(a.Port),
+			})
+			// log.Println("announcing to: ", a.Host, a.Port)
 		}
+		bus.announcementsMutex.Unlock()
 
 		time.Sleep(1 * time.Second)
 	}
 }
 
-func (bus *eventBus) handleAnnouncements() {
+func (bus *EventBus) handleAnnouncements() {
 	for {
 		buf := make([]byte, maxDatagramSize)
 		n, src, err := bus.multicastListener.ReadFromUDP(buf)
@@ -134,12 +142,14 @@ func (bus *eventBus) handleAnnouncements() {
 			log.Fatalln("Failed to parse announcement:", err, announce)
 		}
 		announce.RecvStamp = now
-		log.Println("received announcement: ", announce)
+		// log.Println("received announcement: ", announce)
+		bus.announcementsMutex.Lock()
 		bus.announcements[fmt.Sprintf("%s:%d", src.IP, src.Port)] = announce
+		bus.announcementsMutex.Unlock()
 	}
 }
 
-func (bus *eventBus) handleEvents() {
+func (bus *EventBus) handleEvents() {
 	for {
 		buf := make([]byte, maxDatagramSize)
 		n, _, err := bus.listenConn.ReadFromUDP(buf)

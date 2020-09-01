@@ -3,22 +3,37 @@ package proxy
 import (
 	"fmt"
 	"io"
-	"math/rand"
+	"log"
 	"net"
-	"time"
 
+	pb "github.com/farm-ng/tractor/genproto"
+	"github.com/farm-ng/tractor/webrtc/internal/eventbus"
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v3"
+	"google.golang.org/protobuf/proto"
 )
 
-// Proxy is a webRTC proxy that proxies UDP packets to/from a webRTC data channel and
+// Proxy is a webRTC proxy that proxies EventBus events to/from a webRTC data channel and
 // RTP packets to a webRTC video channel.
-type Proxy struct{}
+type Proxy struct {
+	eventChan chan *pb.Event
+	eventBus  *eventbus.EventBus
+	rtpHost   string
+	rtpPort   uint32
+}
+
+func NewProxy(eventbusAddr string, rtpHost string, rtpPort uint32) *Proxy {
+	c := make(chan *pb.Event)
+	return &Proxy{
+		eventChan: c,
+		eventBus:  eventbus.NewEventBus(eventbusAddr, c),
+		rtpHost:   rtpHost,
+		rtpPort:   rtpPort,
+	}
+}
 
 // Start accepts an offer SDP from a peer, listens for local UDP and RTP traffic, returns an
 // answer SDP, and loops forever.
-// TODO: Actually proxy data channel to UDP
-// TODO: Support configuration (RTP port number, etc.)
 // TODO: Return errors rather than panic
 // TODO: Support graceful shutdown
 func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription {
@@ -65,8 +80,8 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 		panic(err)
 	}
 
-	// Open a UDP Listener for RTP Packets on port 5004
-	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 5004})
+	// Open a UDP Listener for RTP Packets
+	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP(p.rtpHost), Port: int(p.rtpPort)})
 	if err != nil {
 		panic(err)
 	}
@@ -116,11 +131,10 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 				panic(dErr)
 			}
 
-			// Handle reading from the data channel
-			go readLoop(raw)
-
-			// Handle writing to the data channel
-			go writeLoop(raw)
+			// Start the eventbus, and the goroutines to handle reading from and writing to it
+			go readLoop(raw, p.eventBus)
+			go writeLoop(raw, p.eventChan)
+			p.eventBus.Start()
 		})
 	})
 
@@ -178,23 +192,10 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 	return *peerConnection.LocalDescription()
 }
 
-// RandSeq generates a random string to serve as dummy data
-//
-// It returns a deterministic sequence of values each time a program is run.
-// Use rand.Seed() function in your real applications.
-func randSeq(n int) string {
-	letters := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
-}
-
 const messageSize = 1024
 
-// ReadLoop shows how to read from the datachannel directly
-func readLoop(d io.Reader) {
+// ReadLoop reads from the datachannel and forwards events to the eventbus
+func readLoop(d io.Reader, bus *eventbus.EventBus) {
 	for {
 		buffer := make([]byte, messageSize)
 		n, err := d.Read(buffer)
@@ -203,19 +204,31 @@ func readLoop(d io.Reader) {
 			return
 		}
 
-		fmt.Printf("Message from DataChannel: %s\n", string(buffer[:n]))
+		event := &pb.Event{}
+		err = proto.Unmarshal(buffer[:n], event)
+		if err != nil {
+			log.Println("Received non-event on the data channel:", err)
+			continue
+		}
+
+		log.Println("Forwarding event from data channel to eventbus:", event)
+		bus.SendEvent(event)
 	}
 }
 
-// WriteLoop shows how to write to the datachannel directly
-func writeLoop(d io.Writer) {
-	for range time.NewTicker(5 * time.Second).C {
-		message := randSeq(messageSize)
-		fmt.Printf("Sending %s \n", message)
-
-		_, err := d.Write([]byte(message))
-		if err != nil {
-			panic(err)
+// WriteLoop reads from the eventbus and forwards events to the datachannel
+func writeLoop(d io.Writer, c chan *pb.Event) {
+	for {
+		select {
+		case e := <-c:
+			eventBytes, err := proto.Marshal(e)
+			if err != nil {
+				log.Fatalln("Could not marshal event: ", e)
+			}
+			_, err = d.Write(eventBytes)
+			if err != nil {
+				log.Fatalln("Could not write event to datachannel: ", e)
+			}
 		}
 	}
 }

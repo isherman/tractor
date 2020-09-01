@@ -12,10 +12,18 @@ import (
 )
 
 // Server is a Twirp server that exposes a webRTC proxy
-type Server struct{}
+type server struct {
+	proxy *proxy.Proxy
+}
+
+func NewServer(p *proxy.Proxy) *server {
+	return &server{
+		proxy: p,
+	}
+}
 
 // InitiatePeerConnection starts the proxy and returns an SDP answer to the client
-func (s *Server) InitiatePeerConnection(ctx context.Context,
+func (s *server) InitiatePeerConnection(ctx context.Context,
 	req *pb.InitiatePeerConnectionRequest) (res *pb.InitiatePeerConnectionResponse, err error) {
 
 	offer := webrtc.SessionDescription{}
@@ -28,8 +36,7 @@ func (s *Server) InitiatePeerConnection(ctx context.Context,
 		return nil, twirp.NewError(twirp.InvalidArgument, "invalid json")
 	}
 
-	p := &proxy.Proxy{}
-	answer := p.Start(offer)
+	answer := s.proxy.Start(offer)
 
 	b, err = json.Marshal(answer)
 	if err != nil {
