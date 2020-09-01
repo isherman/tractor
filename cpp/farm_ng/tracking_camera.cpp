@@ -2,6 +2,7 @@
 // Copyright(c) 2019 Intel Corporation. All Rights Reserved.
 #include <iomanip>
 #include <iostream>
+#include <mutex>
 #include <librealsense2/rs.hpp>
 
 #include <farm_ng/ipc.h>
