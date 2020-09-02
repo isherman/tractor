@@ -2,9 +2,10 @@ package proxy
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"net"
+	"sync"
+	"time"
 
 	pb "github.com/farm-ng/tractor/genproto"
 	"github.com/farm-ng/tractor/webrtc/internal/eventbus"
@@ -13,31 +14,85 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+func uniqueId() int64 {
+	return time.Now().UnixNano() / 1e6
+}
+
 // Proxy is a webRTC proxy that proxies EventBus events to/from a webRTC data channel and
 // RTP packets to a webRTC video channel.
 type Proxy struct {
-	eventChan chan *pb.Event
-	eventBus  *eventbus.EventBus
-	rtpHost   string
-	rtpPort   uint32
+	eventBus        *eventbus.EventBus
+	eventSource     chan *pb.Event
+	eventSinks      map[string]chan []byte
+	eventSinksMutex *sync.Mutex
+	ssrc            uint32
+	rtpListener     *net.UDPConn
+	rtpSinks        map[string]chan *rtp.Packet
+	rtpSinksMutex   *sync.Mutex
 }
 
-func NewProxy(eventbusAddr string, rtpHost string, rtpPort uint32) *Proxy {
-	c := make(chan *pb.Event)
+func NewProxy(eventBus *eventbus.EventBus, eventSource chan *pb.Event, ssrc uint32, rtpListener *net.UDPConn) *Proxy {
 	return &Proxy{
-		eventChan: c,
-		eventBus:  eventbus.NewEventBus(eventbusAddr, c),
-		rtpHost:   rtpHost,
-		rtpPort:   rtpPort,
+		eventBus:        eventBus,
+		eventSource:     eventSource,
+		eventSinks:      make(map[string]chan []byte),
+		eventSinksMutex: &sync.Mutex{},
+		ssrc:            ssrc,
+		rtpListener:     rtpListener,
+		rtpSinks:        make(map[string]chan *rtp.Packet),
+		rtpSinksMutex:   &sync.Mutex{},
 	}
+}
+
+func (p *Proxy) Start() {
+	// Continuously read from the event bus and publish to all registered event sinks
+	go func() {
+		for {
+			select {
+			case e := <-p.eventSource:
+				eventBytes, err := proto.Marshal(e)
+				if err != nil {
+					log.Fatalln("Could not marshal event: ", e)
+				}
+				p.eventSinksMutex.Lock()
+				for _, s := range p.eventSinks {
+					s <- eventBytes
+				}
+				p.eventSinksMutex.Unlock()
+			}
+		}
+	}()
+
+	// Continuously read from the RTP stream and publish to all registered RTP sinks
+	inboundRTPPacket := make([]byte, 4096)
+	go func() {
+		for {
+			n, _, err := p.rtpListener.ReadFrom(inboundRTPPacket)
+			if err != nil {
+				fmt.Printf("error during read: %s", err)
+				panic(err)
+			}
+
+			packet := &rtp.Packet{}
+			if err := packet.Unmarshal(inboundRTPPacket[:n]); err != nil {
+				panic(err)
+			}
+
+			p.rtpSinksMutex.Lock()
+			for _, s := range p.rtpSinks {
+				s <- packet
+			}
+			p.rtpSinksMutex.Unlock()
+		}
+	}()
 }
 
 // Start accepts an offer SDP from a peer, listens for local UDP and RTP traffic, returns an
 // answer SDP, and loops forever.
 // TODO: Return errors rather than panic
 // TODO: Support graceful shutdown
-func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription {
-	// Do some configuration in preparation for creating a new RTCPeerConnection
+func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescription {
+	log.Println("Adding peer.")
 
 	// We make our own mediaEngine so we can place the offerer's codecs in it.  This because we must use the
 	// dynamic media type from the offerer in our answer. This is not required if we are the offerer
@@ -61,7 +116,7 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 	}
 
 	// Create a SettingEngine and enable Detach.
-	// Doing so allows us to use a more idiomatic API to read from and write to the data channel.
+	// Detach allows us to use a more idiomatic API to read from and write to the data channel.
 	// It must be explicitly enabled as a setting since it diverges from the WebRTC API
 	// https://github.com/pion/webrtc/blob/master/examples/data-channels-detach/main.go
 	settingEngine := webrtc.SettingEngine{}
@@ -80,42 +135,33 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 		panic(err)
 	}
 
-	// Open a UDP Listener for RTP Packets
-	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP(p.rtpHost), Port: int(p.rtpPort)})
-	if err != nil {
-		panic(err)
-	}
-
-	// TODO: Close the listener gracefully
-	// defer func() {
-	// 	if err = listener.Close(); err != nil {
-	// 		panic(err)
-	// 	}
-	// }()
-
-	fmt.Println("Waiting for RTP Packets, please run GStreamer or ffmpeg now")
-
-	// Listen for a single RTP Packet, we need this to determine the SSRC
-	inboundRTPPacket := make([]byte, 4096) // UDP MTU
-	n, _, err := listener.ReadFromUDP(inboundRTPPacket)
-	if err != nil {
-		panic(err)
-	}
-
-	// Unmarshal the incoming packet
-	packet := &rtp.Packet{}
-	if err = packet.Unmarshal(inboundRTPPacket[:n]); err != nil {
-		panic(err)
-	}
-
-	// Create a video track, using the same SSRC as the incoming RTP Packet
-	videoTrack, err := peerConnection.NewTrack(payloadType, packet.SSRC, "video", "pion")
+	// Create a video track, using the payloadType of the offer and the SSRC of the RTP stream
+	videoTrack, err := peerConnection.NewTrack(payloadType, p.ssrc, "video", "pion")
 	if err != nil {
 		panic(err)
 	}
 	if _, err = peerConnection.AddTrack(videoTrack); err != nil {
 		panic(err)
 	}
+
+	// Register a new consumer with the RTP stream and service the received packets
+	c := make(chan *rtp.Packet)
+	p.rtpSinksMutex.Lock()
+	p.rtpSinks[fmt.Sprint(uniqueId())] = c
+	p.rtpSinksMutex.Unlock()
+	log.Println("Registered new RTP sink.", len(p.rtpSinks))
+	go func() {
+		for {
+			select {
+			case packet := <-c:
+				packet.Header.PayloadType = payloadType
+				err := videoTrack.WriteRTP(packet)
+				if err != nil {
+					panic(err)
+				}
+			}
+		}
+	}()
 
 	// Register data channel creation handling
 	peerConnection.OnDataChannel(func(d *webrtc.DataChannel) {
@@ -131,10 +177,47 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 				panic(dErr)
 			}
 
-			// Start the eventbus, and the goroutines to handle reading from and writing to it
-			go readLoop(raw, p.eventBus)
-			go writeLoop(raw, p.eventChan)
-			p.eventBus.Start()
+			// Handle reading from the data channel and writing to the eventbus
+			const messageSize = 1024
+			go func() {
+				for {
+					buffer := make([]byte, messageSize)
+					n, err := raw.Read(buffer)
+					if err != nil {
+						fmt.Println("Datachannel closed; Exiting writeToEventBus:", err)
+						return
+					}
+
+					event := &pb.Event{}
+					err = proto.Unmarshal(buffer[:n], event)
+					if err != nil {
+						log.Println("Received invalid event on the data channel:", err)
+						continue
+					}
+
+					p.eventBus.SendEvent(event)
+				}
+			}()
+
+			// Handle reading from the eventbus and writing to the data channel
+			// Register a new consumer with the eventbus and service the received events
+			c := make(chan []byte)
+			fmt.Println("Registering new event sink:", fmt.Sprint(uniqueId()), p.eventSinks)
+			p.eventSinksMutex.Lock()
+			p.eventSinks[fmt.Sprint(uniqueId())] = c
+			p.eventSinksMutex.Unlock()
+
+			go func() {
+				for {
+					select {
+					case eventBytes := <-c:
+						_, err = raw.Write(eventBytes)
+						if err != nil {
+							log.Fatalln("Could not write event to datachannel: ", err)
+						}
+					}
+				}
+			}()
 		})
 	})
 
@@ -158,7 +241,7 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 	// Create channel that is blocked until ICE Gathering is complete
 	gatherComplete := webrtc.GatheringCompletePromise(peerConnection)
 
-	// Sets the LocalDescription, and starts our UDP listeners
+	// Set the LocalDescription
 	if err = peerConnection.SetLocalDescription(answer); err != nil {
 		panic(err)
 	}
@@ -168,67 +251,5 @@ func (p *Proxy) Start(offer webrtc.SessionDescription) webrtc.SessionDescription
 	// in a production application you should exchange ICE Candidates via OnICECandidate
 	<-gatherComplete
 
-	// Read RTP packets forever and send them to the WebRTC Client
-	go func() {
-		for {
-			n, _, err := listener.ReadFrom(inboundRTPPacket)
-			if err != nil {
-				fmt.Printf("error during read: %s", err)
-				panic(err)
-			}
-
-			packet := &rtp.Packet{}
-			if err := packet.Unmarshal(inboundRTPPacket[:n]); err != nil {
-				panic(err)
-			}
-			packet.Header.PayloadType = payloadType
-
-			if writeErr := videoTrack.WriteRTP(packet); writeErr != nil {
-				panic(writeErr)
-			}
-		}
-	}()
-
 	return *peerConnection.LocalDescription()
-}
-
-const messageSize = 1024
-
-// ReadLoop reads from the datachannel and forwards events to the eventbus
-func readLoop(d io.Reader, bus *eventbus.EventBus) {
-	for {
-		buffer := make([]byte, messageSize)
-		n, err := d.Read(buffer)
-		if err != nil {
-			fmt.Println("Datachannel closed; Exit the readloop:", err)
-			return
-		}
-
-		event := &pb.Event{}
-		err = proto.Unmarshal(buffer[:n], event)
-		if err != nil {
-			log.Println("Received non-event on the data channel:", err)
-			continue
-		}
-
-		log.Println("Forwarding event from data channel to eventbus:", event)
-		bus.SendEvent(event)
-	}
-}
-
-// WriteLoop reads from the eventbus and forwards events to the datachannel
-func writeLoop(d io.Writer, c chan *pb.Event) {
-	for {
-		select {
-		case e := <-c:
-			eventBytes, err := proto.Marshal(e)
-			if err != nil {
-				log.Fatalln("Could not marshal event: ", e)
-			}
-			_, err = d.Write(eventBytes)
-			if err != nil {
-				log.Fatalln("Could not write event to datachannel: ", e)
-			}
-		}
-	}
 }

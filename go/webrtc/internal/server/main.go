@@ -36,7 +36,7 @@ func (s *server) InitiatePeerConnection(ctx context.Context,
 		return nil, twirp.NewError(twirp.InvalidArgument, "invalid json")
 	}
 
-	answer := s.proxy.Start(offer)
+	answer := s.proxy.AddPeer(offer)
 
 	b, err = json.Marshal(answer)
 	if err != nil {

@@ -66,7 +66,7 @@ func (bus *EventBus) Start() {
 	}
 	bus.listenConn.SetReadBuffer(maxDatagramSize)
 
-	log.Println("Starting eventbus...")
+	log.Println("Starting eventbus")
 	go bus.announce()
 	go bus.handleAnnouncements()
 	go bus.handleEvents()
