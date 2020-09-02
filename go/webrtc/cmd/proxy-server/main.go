@@ -13,7 +13,7 @@ import (
 const (
 	eventBusAddr = "239.20.20.21:10000"
 	rtpHost      = "127.0.0.1"
-	rtpPort      = 5004
+	rtpPort      = 5000
 	serverAddr   = ":9900"
 )
 
