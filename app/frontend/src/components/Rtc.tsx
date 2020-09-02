@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 import { SteeringCommand } from "../../genproto/farm_ng_proto/tractor/v1/steering";
 import {
@@ -10,6 +10,10 @@ import {
 } from "../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
 import { NamedSE3Pose } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { MotorControllerState } from "../../genproto/farm_ng_proto/tractor/v1/motor";
+import {
+  ApriltagDetections,
+  ApriltagDetection
+} from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
 
 type TractorState = {
   [key: string]:
@@ -17,11 +21,76 @@ type TractorState = {
     | TrackingCameraPoseFrame
     | TrackingCameraMotionFrame
     | NamedSE3Pose
-    | MotorControllerState;
+    | MotorControllerState
+    | ApriltagDetections;
+};
+
+const t265Resolution = {
+  width: 848,
+  height: 800
 };
 
 export const Rtc: React.FC = () => {
   const [tractorState, setTractorState] = useState<TractorState>({});
+  const [apriltagDetections, setApriltagDetections] = useState<
+    ApriltagDetections
+  >();
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const resize = (): void => {
+    const videoDiv = document.getElementById("video") as HTMLVideoElement;
+    const canvasDiv = document.getElementById(
+      "annotations"
+    ) as HTMLCanvasElement;
+    if (videoDiv && canvasDiv) {
+      canvasDiv.width = videoDiv.clientWidth;
+      canvasDiv.height = videoDiv.clientHeight;
+    }
+  };
+
+  const startVideo = (): void => {
+    const videoEl = document.getElementById("video") as HTMLVideoElement;
+    if (videoEl) {
+      videoEl.play();
+    }
+  };
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      return;
+    }
+
+    resize();
+    context.fillStyle = "#ff0000";
+    context.strokeStyle = "#ff0000";
+    context.lineWidth = 4;
+    context.font = "16px Arial";
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    if (apriltagDetections) {
+      apriltagDetections.detections.forEach((d: ApriltagDetection) => {
+        const coords = d.p.map((point) => ({
+          x: point.x * (canvas.width / t265Resolution.width),
+          y: point.y * (canvas.height / t265Resolution.height)
+        }));
+        context.beginPath();
+        context.moveTo(coords[0].x, coords[0].y);
+        context.lineTo(coords[1].x, coords[1].y);
+        context.lineTo(coords[2].x, coords[2].y);
+        context.lineTo(coords[3].x, coords[3].y);
+        context.closePath();
+        context.stroke();
+        if (d.c) {
+          context.fillText(d.id.toString(), d.c.x, d.c.y);
+        }
+      });
+    }
+  }, [canvasRef, apriltagDetections]);
 
   useEffect(() => {
     const pc = new RTCPeerConnection({
@@ -38,7 +107,8 @@ export const Rtc: React.FC = () => {
       const el = document.createElement<"video">("video");
       el.srcObject = event.streams[0];
       el.autoplay = true;
-      el.controls = true;
+      el.id = "video";
+      el.style.width = "100%";
       document.getElementById("videos")?.appendChild(el);
     };
 
@@ -92,16 +162,24 @@ export const Rtc: React.FC = () => {
             return NamedSE3Pose.decode;
           case "type.googleapis.com/farm_ng_proto.tractor.v1.MotorControllerState":
             return MotorControllerState.decode;
+          case "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections":
+            return ApriltagDetections.decode;
           default:
+            console.log("Unknown message type: ", typeUrl);
             return undefined;
         }
       })(event.data?.typeUrl || "");
+      // console.log("Message received: ", event.data?.typeUrl);
 
       if (event.data && decoder) {
+        const value = decoder(event.data?.value || new Uint8Array());
         setTractorState((state) => ({
           ...state,
-          [event.name]: decoder(event.data?.value || new Uint8Array())
+          [event.name]: value
         }));
+        if (decoder === ApriltagDetections.decode) {
+          setApriltagDetections(value as ApriltagDetections);
+        }
       }
     };
 
@@ -116,12 +194,20 @@ export const Rtc: React.FC = () => {
   };
 
   return (
-    <div style={{ display: "flex", flexBasis: "horizontal" }}>
-      <div id="videos">
+    <div style={{ display: "flex", flexDirection: "row" }}>
+      <div id="annotatedVideo" style={{ position: "relative", width: "50%" }}>
+        <div id="videos" style={{}}></div>
+        <canvas
+          id="annotations"
+          ref={canvasRef}
+          style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: 0 }}
+        ></canvas>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <button onClick={startVideo}>Start Video</button>
         <button onClick={sendEvent}>Send Test Event</button>
       </div>
-
-      <div style={{ color: "white" }}>
+      <div style={{ color: "white", width: "50%" }}>
         {Object.keys(tractorState).map((key, i) => (
           <React.Fragment key={i}>
             <span>Key Name: {key} </span>
