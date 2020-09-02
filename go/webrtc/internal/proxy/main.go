@@ -109,17 +109,17 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 		panic(err)
 	}
 
-	// Search for VP8 Payload type. If the offer doesn't support VP8, exit,
+	// Search for H264 Payload type. If the offer doesn't support H264, exit,
 	// since they won't be able to decode anything we send them
 	var payloadType uint8
 	for _, videoCodec := range mediaEngine.GetCodecsByKind(webrtc.RTPCodecTypeVideo) {
-		if videoCodec.Name == "VP8" {
+		if videoCodec.Name == "H264" {
 			payloadType = videoCodec.PayloadType
 			break
 		}
 	}
 	if payloadType == 0 {
-		panic("Remote peer does not support VP8")
+		panic("Remote peer does not support H264")
 	}
 
 	// Create a SettingEngine and enable Detach.

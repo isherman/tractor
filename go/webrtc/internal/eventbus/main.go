@@ -50,6 +50,7 @@ func (bus *EventBus) Start() {
 		log.Fatal(err)
 	}
 	bus.multicastSender.SetReadBuffer(maxDatagramSize)
+
 	bus.multicastListener, err = net.ListenMulticastUDP("udp", nil, addr)
 	if err != nil {
 		log.Fatal(err)

@@ -17,8 +17,7 @@ import (
 
 const (
 	eventBusAddr = "239.20.20.21:10000"
-	rtpHost      = "127.0.0.1"
-	rtpPort      = 5004
+	rtpAddr      = "239.20.20.20:5000"
 	serverAddr   = ":9900"
 )
 
@@ -33,14 +32,20 @@ func main() {
 	// TODO : Encapsulate this better
 
 	// Open a UDP Listener for RTP Packets
-	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP(rtpHost), Port: rtpPort})
+	const maxRtpDatagramSize = 4096
+	resolvedRtpAddr, err := net.ResolveUDPAddr("udp", rtpAddr)
 	if err != nil {
 		panic(err)
 	}
-	log.Printf("Waiting for RTP Packets at %s:%d\n", rtpHost, rtpPort)
+	listener, err := net.ListenMulticastUDP("udp", nil, resolvedRtpAddr)
+	if err != nil {
+		panic(err)
+	}
+	listener.SetReadBuffer(maxRtpDatagramSize)
+	log.Println("Waiting for RTP Packets at:", rtpAddr)
 
 	// Listen for a single RTP Packet, we need this to determine the SSRC
-	inboundRTPPacket := make([]byte, 4096) // UDP MTU
+	inboundRTPPacket := make([]byte, maxRtpDatagramSize)
 	n, _, err := listener.ReadFromUDP(inboundRTPPacket)
 	if err != nil {
 		panic(err)
