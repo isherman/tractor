@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 import * as React from "react";
 import { useEffect, useState } from "react";
@@ -79,7 +80,6 @@ export const Rtc: React.FC = () => {
     dataChannel.onopen = () => console.log("data channel opened");
     dataChannel.onmessage = (msg) => {
       const event = BusEvent.decode(new Uint8Array(msg.data));
-      console.log(msg, event);
       const decoder = ((typeUrl: string) => {
         switch (typeUrl) {
           case "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand":
@@ -123,17 +123,19 @@ export const Rtc: React.FC = () => {
 
       <div style={{ color: "white" }}>
         {Object.keys(tractorState).map((key, i) => (
-          <p key={i}>
+          <React.Fragment key={i}>
             <span>Key Name: {key} </span>
             <p>
               {Object.keys(tractorState[key]).map((keyJ, _j) => (
-                <p key={keyJ}>
+                <React.Fragment key={keyJ}>
                   <span> {keyJ} </span>
-                  <span> {JSON.stringify(tractorState[key][keyJ])} </span>
-                </p>
+                  <span>
+                    {JSON.stringify((tractorState[key] as any)[keyJ])}{" "}
+                  </span>
+                </React.Fragment>
               ))}
             </p>
-          </p>
+          </React.Fragment>
         ))}
       </div>
     </div>

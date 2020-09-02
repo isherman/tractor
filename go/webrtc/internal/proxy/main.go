@@ -18,34 +18,39 @@ func uniqueId() int64 {
 	return time.Now().UnixNano() / 1e6
 }
 
+type eventCallback func([]byte)
+type rtpCallback func(*rtp.Packet)
+
 // Proxy is a webRTC proxy that proxies EventBus events to/from a webRTC data channel and
 // RTP packets to a webRTC video channel.
 type Proxy struct {
-	eventBus        *eventbus.EventBus
-	eventSource     chan *pb.Event
-	eventSinks      map[string]chan []byte
-	eventSinksMutex *sync.Mutex
-	ssrc            uint32
-	rtpListener     *net.UDPConn
-	rtpSinks        map[string]chan *rtp.Packet
-	rtpSinksMutex   *sync.Mutex
+	eventBus            *eventbus.EventBus
+	eventSource         chan *pb.Event
+	eventCallbacks      map[string]eventCallback
+	eventCallbacksMutex *sync.Mutex
+	ssrc                uint32
+	rtpListener         *net.UDPConn
+	rtpCallbacks        map[string]rtpCallback
+	rtpCallbacksMutex   *sync.Mutex
 }
 
 func NewProxy(eventBus *eventbus.EventBus, eventSource chan *pb.Event, ssrc uint32, rtpListener *net.UDPConn) *Proxy {
 	return &Proxy{
-		eventBus:        eventBus,
-		eventSource:     eventSource,
-		eventSinks:      make(map[string]chan []byte),
-		eventSinksMutex: &sync.Mutex{},
-		ssrc:            ssrc,
-		rtpListener:     rtpListener,
-		rtpSinks:        make(map[string]chan *rtp.Packet),
-		rtpSinksMutex:   &sync.Mutex{},
+		eventBus:            eventBus,
+		eventSource:         eventSource,
+		eventCallbacks:      make(map[string]eventCallback),
+		eventCallbacksMutex: &sync.Mutex{},
+		ssrc:                ssrc,
+		rtpListener:         rtpListener,
+		rtpCallbacks:        make(map[string]rtpCallback),
+		rtpCallbacksMutex:   &sync.Mutex{},
 	}
 }
 
+// Start begins reading continously from the EventBus and RTP stream
+// TODO: Support reconnection with EventBus and RTP
 func (p *Proxy) Start() {
-	// Continuously read from the event bus and publish to all registered event sinks
+	// Continuously read from the event bus and publish to all registered event callbacks
 	go func() {
 		for {
 			select {
@@ -54,22 +59,22 @@ func (p *Proxy) Start() {
 				if err != nil {
 					log.Fatalln("Could not marshal event: ", e)
 				}
-				p.eventSinksMutex.Lock()
-				for _, s := range p.eventSinks {
-					s <- eventBytes
+				p.eventCallbacksMutex.Lock()
+				for _, cb := range p.eventCallbacks {
+					cb(eventBytes)
 				}
-				p.eventSinksMutex.Unlock()
+				p.eventCallbacksMutex.Unlock()
 			}
 		}
 	}()
 
-	// Continuously read from the RTP stream and publish to all registered RTP sinks
+	// Continuously read from the RTP stream and publish to all registered RTP callbacks
 	inboundRTPPacket := make([]byte, 4096)
 	go func() {
 		for {
 			n, _, err := p.rtpListener.ReadFrom(inboundRTPPacket)
 			if err != nil {
-				fmt.Printf("error during read: %s", err)
+				log.Printf("error during read: %s", err)
 				panic(err)
 			}
 
@@ -78,18 +83,20 @@ func (p *Proxy) Start() {
 				panic(err)
 			}
 
-			p.rtpSinksMutex.Lock()
-			for _, s := range p.rtpSinks {
-				s <- packet
+			p.rtpCallbacksMutex.Lock()
+			for _, cb := range p.rtpCallbacks {
+				cb(packet)
 			}
-			p.rtpSinksMutex.Unlock()
+			p.rtpCallbacksMutex.Unlock()
 		}
 	}()
 }
 
-// Start accepts an offer SDP from a peer, listens for local UDP and RTP traffic, returns an
-// answer SDP, and loops forever.
+// AddPeer accepts an offer SDP from a peer, registers callbacks for RTP and EventBus events, and returns an
+// answer SDP.
+// TODO: Handle peers that go away
 // TODO: Return errors rather than panic
+// TODO: Clean up logging
 // TODO: Support graceful shutdown
 func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescription {
 	log.Println("Adding peer.")
@@ -122,6 +129,11 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 	settingEngine := webrtc.SettingEngine{}
 	settingEngine.DetachDataChannels()
 
+	// Without a persistent signaling channel, the connection will disconnect after 5s and fail after 30s.
+	// TODO: Remove when persistent signaling is enabled
+	// See https://godoc.org/github.com/pions/webrtc#SettingEngine.SetICETimeouts
+	settingEngine.SetICETimeouts(60*time.Minute, 60*time.Second, 2*time.Second)
+
 	// Create a new RTCPeerConnection
 	api := webrtc.NewAPI(webrtc.WithSettingEngine(settingEngine), webrtc.WithMediaEngine(mediaEngine))
 	peerConnection, err := api.NewPeerConnection(webrtc.Configuration{
@@ -145,31 +157,24 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 	}
 
 	// Register a new consumer with the RTP stream and service the received packets
-	c := make(chan *rtp.Packet)
-	p.rtpSinksMutex.Lock()
-	p.rtpSinks[fmt.Sprint(uniqueId())] = c
-	p.rtpSinksMutex.Unlock()
-	log.Println("Registered new RTP sink.", len(p.rtpSinks))
-	go func() {
-		for {
-			select {
-			case packet := <-c:
-				packet.Header.PayloadType = payloadType
-				err := videoTrack.WriteRTP(packet)
-				if err != nil {
-					panic(err)
-				}
-			}
+	rtpCallback := func(packet *rtp.Packet) {
+		packet.Header.PayloadType = payloadType
+		err := videoTrack.WriteRTP(packet)
+		if err != nil {
+			panic(err)
 		}
-	}()
+	}
+	p.rtpCallbacksMutex.Lock()
+	p.rtpCallbacks[fmt.Sprint(uniqueId())] = rtpCallback
+	p.rtpCallbacksMutex.Unlock()
 
 	// Register data channel creation handling
 	peerConnection.OnDataChannel(func(d *webrtc.DataChannel) {
-		fmt.Printf("New DataChannel %s %d\n", d.Label(), d.ID())
+		log.Printf("New DataChannel %s %d\n", d.Label(), d.ID())
 
 		// Register channel opening handling
 		d.OnOpen(func() {
-			fmt.Printf("Data channel '%s'-'%d' open.\n", d.Label(), d.ID())
+			log.Printf("Data channel '%s'-'%d' open.\n", d.Label(), d.ID())
 
 			// Detach the data channel
 			raw, dErr := d.Detach()
@@ -184,7 +189,7 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 					buffer := make([]byte, messageSize)
 					n, err := raw.Read(buffer)
 					if err != nil {
-						fmt.Println("Datachannel closed; Exiting writeToEventBus:", err)
+						log.Println("Datachannel closed; Exiting writeToEventBus:", err)
 						return
 					}
 
@@ -200,31 +205,22 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 			}()
 
 			// Handle reading from the eventbus and writing to the data channel
-			// Register a new consumer with the eventbus and service the received events
-			c := make(chan []byte)
-			fmt.Println("Registering new event sink:", fmt.Sprint(uniqueId()), p.eventSinks)
-			p.eventSinksMutex.Lock()
-			p.eventSinks[fmt.Sprint(uniqueId())] = c
-			p.eventSinksMutex.Unlock()
-
-			go func() {
-				for {
-					select {
-					case eventBytes := <-c:
-						_, err = raw.Write(eventBytes)
-						if err != nil {
-							log.Fatalln("Could not write event to datachannel: ", err)
-						}
-					}
+			eventCallback := func(eventBytes []byte) {
+				_, err = raw.Write(eventBytes)
+				if err != nil {
+					log.Fatalln("Could not write event to datachannel: ", err)
 				}
-			}()
+			}
+			p.eventCallbacksMutex.Lock()
+			p.eventCallbacks[fmt.Sprint(uniqueId())] = eventCallback
+			p.eventCallbacksMutex.Unlock()
 		})
 	})
 
 	// Set the handler for ICE connection state
 	// This will notify you when the peer has connected/disconnected
 	peerConnection.OnICEConnectionStateChange(func(connectionState webrtc.ICEConnectionState) {
-		fmt.Printf("Connection State has changed %s \n", connectionState.String())
+		log.Printf("Connection State has changed %s \n", connectionState.String())
 	})
 
 	// Set the remote SessionDescription
