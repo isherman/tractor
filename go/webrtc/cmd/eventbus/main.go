@@ -1,31 +1,34 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
+	"net"
+	"time"
 
-	pb "github.com/farm-ng/tractor/genproto"
 	"github.com/farm-ng/tractor/webrtc/internal/eventbus"
 )
 
-const (
-	srvAddr = "239.20.20.21:10000"
-)
+func prettyPrint(i interface{}) string {
+	s, _ := json.MarshalIndent(i, "", "  ")
+	return string(s)
+}
 
 func main() {
-	c := make(chan *pb.Event)
-	b := eventbus.NewEventBus(srvAddr, c)
+	b := eventbus.NewEventBus(net.UDPAddr{IP: net.ParseIP("239.20.20.21"), Port: 10000}, nil)
+
+	stateTicker := time.NewTicker(1 * time.Second)
+	announcementsTicker := time.NewTicker(10 * time.Second)
+
 	go func() {
 		for {
 			select {
-			case e := <-c:
-				handleEvent(e)
+			case <-stateTicker.C:
+				log.Println("State", prettyPrint(b.State))
+			case <-announcementsTicker.C:
+				log.Println("Announcements", prettyPrint(b.Announcements))
 			}
 		}
-
 	}()
 	b.Start()
-}
-
-func handleEvent(e *pb.Event) {
-	log.Println(e)
 }

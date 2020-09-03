@@ -9,6 +9,27 @@
     "**/env": true,
     "**/third_party/build-*": true
   },
+  "go.useLanguageServer": true,
+  "[go]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    },
+    // Optional: Disable snippets, as they conflict with completion ranking.
+    "editor.snippetSuggestions": "none"
+  },
+  "[go.mod]": {
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+  "gopls": {
+    // Add parameter placeholders when completing a function.
+    "usePlaceholders": true,
+
+    // If true, enable additional analyses with staticcheck.
+    // Warning: This will significantly increase memory usage.
+    "staticcheck": false
+  },
   "python.linting.pylintEnabled": false,
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
