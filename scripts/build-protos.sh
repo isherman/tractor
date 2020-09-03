@@ -22,5 +22,5 @@ docker run \
 # Twirp doesn't yet provide the 'module' flag to output generated code in a structure compatible
 # with Go Modules (https://github.com/twitchtv/twirp/issues/226), so clean it up manually.
 shopt -s globstar
-mv go/genproto/**/*.twirp.go go/genproto
+mv go/genproto/farm_ng_proto/**/*.twirp.go go/genproto
 find go/genproto -type d -empty -delete
