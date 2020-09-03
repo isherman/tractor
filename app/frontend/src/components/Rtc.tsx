@@ -8,7 +8,10 @@ import {
   TrackingCameraPoseFrame,
   TrackingCameraMotionFrame
 } from "../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
-import { NamedSE3Pose } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
+import {
+  NamedSE3Pose,
+  Vec2
+} from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { MotorControllerState } from "../../genproto/farm_ng_proto/tractor/v1/motor";
 import {
   ApriltagDetections,
@@ -72,21 +75,23 @@ export const Rtc: React.FC = () => {
     context.lineWidth = 4;
     context.font = "16px Arial";
     context.clearRect(0, 0, canvas.width, canvas.height);
+    const toCanvasCoords = (v: Vec2): Vec2 => ({
+      x: v.x * (canvas.width / t265Resolution.width),
+      y: v.y * (canvas.height / t265Resolution.height)
+    });
     if (apriltagDetections) {
       apriltagDetections.detections.forEach((d: ApriltagDetection) => {
-        const coords = d.p.map((point) => ({
-          x: point.x * (canvas.width / t265Resolution.width),
-          y: point.y * (canvas.height / t265Resolution.height)
-        }));
+        const pCoords = d.p.map(toCanvasCoords);
         context.beginPath();
-        context.moveTo(coords[0].x, coords[0].y);
-        context.lineTo(coords[1].x, coords[1].y);
-        context.lineTo(coords[2].x, coords[2].y);
-        context.lineTo(coords[3].x, coords[3].y);
+        context.moveTo(pCoords[0].x, pCoords[0].y);
+        context.lineTo(pCoords[1].x, pCoords[1].y);
+        context.lineTo(pCoords[2].x, pCoords[2].y);
+        context.lineTo(pCoords[3].x, pCoords[3].y);
         context.closePath();
         context.stroke();
         if (d.c) {
-          context.fillText(d.id.toString(), d.c.x, d.c.y);
+          const cCoords = toCanvasCoords(d.c);
+          context.fillText(d.id.toString(), cCoords.x, cCoords.y);
         }
       });
     }
@@ -205,7 +210,9 @@ export const Rtc: React.FC = () => {
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <button onClick={startVideo}>Start Video</button>
-        <button onClick={sendEvent}>Send Test Event</button>
+        <button onClick={sendEvent} disabled>
+          Send Test Event
+        </button>
       </div>
       <div style={{ color: "white", width: "50%" }}>
         {Object.keys(tractorState).map((key, i) => (

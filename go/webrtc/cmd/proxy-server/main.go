@@ -16,7 +16,8 @@ import (
 )
 
 const (
-	eventBusAddr = "239.20.20.21:10000"
+	eventBusAddr = "239.20.20.21"
+	eventBusPort = 10000
 	rtpAddr      = "239.20.20.20:5000"
 	serverAddr   = ":9900"
 )
@@ -25,7 +26,7 @@ func main() {
 
 	// Create eventbus client
 	eventChan := make(chan *pb.Event)
-	eventBus := eventbus.NewEventBus(eventBusAddr, eventChan)
+	eventBus := eventbus.NewEventBus((net.UDPAddr{IP: net.ParseIP(eventBusAddr), Port: eventBusPort}), eventChan)
 	go eventBus.Start()
 
 	// Create RTP client

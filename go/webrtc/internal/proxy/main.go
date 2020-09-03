@@ -18,8 +18,8 @@ func uniqueId() int64 {
 	return time.Now().UnixNano() / 1e6
 }
 
-type eventCallback func([]byte)
-type rtpCallback func(*rtp.Packet)
+type eventCallback func([]byte) error
+type rtpCallback func(*rtp.Packet) error
 
 // Proxy is a webRTC proxy that proxies EventBus events to/from a webRTC data channel and
 // RTP packets to a webRTC video channel.
@@ -57,11 +57,16 @@ func (p *Proxy) Start() {
 			case e := <-p.eventSource:
 				eventBytes, err := proto.Marshal(e)
 				if err != nil {
-					log.Fatalln("Could not marshal event: ", e)
+					log.Println("Could not marshal event: ", e)
+					continue
 				}
 				p.eventCallbacksMutex.Lock()
-				for _, cb := range p.eventCallbacks {
-					cb(eventBytes)
+				for id, cb := range p.eventCallbacks {
+					err := cb(eventBytes)
+					if err != nil {
+						log.Printf("Ending eventbus->datachannel forwarding [%s]\n", id)
+						delete(p.eventCallbacks, id)
+					}
 				}
 				p.eventCallbacksMutex.Unlock()
 			}
@@ -84,12 +89,28 @@ func (p *Proxy) Start() {
 			}
 
 			p.rtpCallbacksMutex.Lock()
-			for _, cb := range p.rtpCallbacks {
-				cb(packet)
+			for id, cb := range p.rtpCallbacks {
+				err := cb(packet)
+				if err != nil {
+					log.Printf("Ending rtp->videoTrack forwarding [%s]\n", id)
+					delete(p.rtpCallbacks, id)
+				}
 			}
 			p.rtpCallbacksMutex.Unlock()
 		}
 	}()
+}
+
+func (p *Proxy) registerEventCallback(id string, cb eventCallback) {
+	p.eventCallbacksMutex.Lock()
+	p.eventCallbacks[id] = cb
+	p.eventCallbacksMutex.Unlock()
+}
+
+func (p *Proxy) registerRTPCallback(id string, cb rtpCallback) {
+	p.rtpCallbacksMutex.Lock()
+	p.rtpCallbacks[id] = cb
+	p.rtpCallbacksMutex.Unlock()
 }
 
 // AddPeer accepts an offer SDP from a peer, registers callbacks for RTP and EventBus events, and returns an
@@ -99,7 +120,8 @@ func (p *Proxy) Start() {
 // TODO: Clean up logging
 // TODO: Support graceful shutdown
 func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescription {
-	log.Println("Adding peer.")
+	peerId := fmt.Sprint(uniqueId())
+	log.Printf("New peer [%s]\n", peerId)
 
 	// We make our own mediaEngine so we can place the offerer's codecs in it.  This because we must use the
 	// dynamic media type from the offerer in our answer. This is not required if we are the offerer
@@ -157,16 +179,15 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 	}
 
 	// Register a new consumer with the RTP stream and service the received packets
-	rtpCallback := func(packet *rtp.Packet) {
+	cb := func(packet *rtp.Packet) error {
 		packet.Header.PayloadType = payloadType
 		err := videoTrack.WriteRTP(packet)
 		if err != nil {
-			panic(err)
+			log.Println("Could not write packet to videoTrack: ", err)
 		}
+		return err
 	}
-	p.rtpCallbacksMutex.Lock()
-	p.rtpCallbacks[fmt.Sprint(uniqueId())] = rtpCallback
-	p.rtpCallbacksMutex.Unlock()
+	p.registerRTPCallback(peerId, cb)
 
 	// Register data channel creation handling
 	peerConnection.OnDataChannel(func(d *webrtc.DataChannel) {
@@ -182,15 +203,16 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 				panic(dErr)
 			}
 
-			// Handle reading from the data channel and writing to the eventbus
+			// datachannel -> eventbus
 			const messageSize = 1024
 			go func() {
+				log.Printf("Starting datachannel->eventbus forwarding [%s]\n", peerId)
 				for {
 					buffer := make([]byte, messageSize)
 					n, err := raw.Read(buffer)
 					if err != nil {
-						log.Println("Datachannel closed; Exiting writeToEventBus:", err)
-						return
+						log.Println("Datachannel closed:", err)
+						break
 					}
 
 					event := &pb.Event{}
@@ -202,18 +224,19 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 
 					p.eventBus.SendEvent(event)
 				}
+				log.Println("Ending datachannel->eventbus forwarding.")
 			}()
 
-			// Handle reading from the eventbus and writing to the data channel
-			eventCallback := func(eventBytes []byte) {
+			// eventbus -> datachannel
+			cb := func(eventBytes []byte) error {
 				_, err = raw.Write(eventBytes)
 				if err != nil {
-					log.Fatalln("Could not write event to datachannel: ", err)
+					log.Println("Could not write event to datachannel : ", err)
 				}
+				return err
 			}
-			p.eventCallbacksMutex.Lock()
-			p.eventCallbacks[fmt.Sprint(uniqueId())] = eventCallback
-			p.eventCallbacksMutex.Unlock()
+			log.Printf("Starting eventbus->datachannel forwarding [%s]\n", peerId)
+			p.registerEventCallback(peerId, cb)
 		})
 	})
 
