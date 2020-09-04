@@ -20,10 +20,13 @@ const (
 	eventBusPort = 10000
 	rtpAddr      = "239.20.20.20:5000"
 	serverAddr   = ":9900"
+	// Set this too low and we see packet loss in chrome://webrtc-internals, and on the network interface (`netstat -suna`)
+	// But what should it be? `sysctl net.core.rmem_max`?
+	rtpReadBufferSize  = 1024 * 1024 * 8
+	maxRtpDatagramSize = 4096
 )
 
 func main() {
-
 	// Create eventbus client
 	eventChan := make(chan *pb.Event)
 	eventBus := eventbus.NewEventBus((net.UDPAddr{IP: net.ParseIP(eventBusAddr), Port: eventBusPort}), eventChan)
@@ -33,7 +36,6 @@ func main() {
 	// TODO : Encapsulate this better
 
 	// Open a UDP Listener for RTP Packets
-	const maxRtpDatagramSize = 4096
 	resolvedRtpAddr, err := net.ResolveUDPAddr("udp", rtpAddr)
 	if err != nil {
 		panic(err)
@@ -42,7 +44,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	listener.SetReadBuffer(maxRtpDatagramSize)
+	listener.SetReadBuffer(rtpReadBufferSize)
 	log.Println("Waiting for RTP Packets at:", rtpAddr)
 
 	// Listen for a single RTP Packet, we need this to determine the SSRC

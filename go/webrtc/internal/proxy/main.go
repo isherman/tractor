@@ -18,6 +18,8 @@ func uniqueId() int64 {
 	return time.Now().UnixNano() / 1e6
 }
 
+const maxRtpDatagramSize = 4096
+
 type eventCallback func([]byte) error
 type rtpCallback func(*rtp.Packet) error
 
@@ -74,7 +76,7 @@ func (p *Proxy) Start() {
 	}()
 
 	// Continuously read from the RTP stream and publish to all registered RTP callbacks
-	inboundRTPPacket := make([]byte, 4096)
+	inboundRTPPacket := make([]byte, maxRtpDatagramSize)
 	go func() {
 		for {
 			n, _, err := p.rtpListener.ReadFrom(inboundRTPPacket)
@@ -159,10 +161,11 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 	// Create a new RTCPeerConnection
 	api := webrtc.NewAPI(webrtc.WithSettingEngine(settingEngine), webrtc.WithMediaEngine(mediaEngine))
 	peerConnection, err := api.NewPeerConnection(webrtc.Configuration{
+		// No ICE servers for now, to ensure candidate pair that's selected operates solely over LAN
 		ICEServers: []webrtc.ICEServer{
-			{
-				URLs: []string{"stun:stun.l.google.com:19302"},
-			},
+			// {
+			// 	URLs: []string{"stun:stun.l.google.com:19302"},
+			// },
 		},
 	})
 	if err != nil {

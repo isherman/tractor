@@ -10,10 +10,8 @@ require (
 	github.com/rs/cors v1.7.0
 	github.com/twitchtv/twirp v5.12.1+incompatible
 	golang.org/x/net v0.0.0-20200625001655-4c5254603344
-	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd
-	golang.org/x/text v0.3.0 // indirect
+	golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a
 	google.golang.org/protobuf v1.25.0
-	rsc.io/quote v1.5.2
 )
 
 replace github.com/farm-ng/tractor/genproto => ../genproto
