@@ -123,7 +123,7 @@ export const Rtc: React.FC = () => {
     pc.onicecandidate = async (event: RTCPeerConnectionIceEvent) => {
       if (event.candidate === null) {
         const response = await fetch(
-          "http://localhost:9900/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection",
+          `http://${window.location.hostname}:9900/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`,
           {
             method: "POST",
             mode: "cors",

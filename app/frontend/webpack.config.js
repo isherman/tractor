@@ -33,6 +33,7 @@ module.exports = {
   devtool: "source-map",
   devServer: {
     contentBase: "dist",
+    host: "0.0.0.0",
     port: 3000,
     hotOnly: true
   },
