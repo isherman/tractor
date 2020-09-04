@@ -1,21 +1,41 @@
-# To try it
+# Usage
 
 ```bash
-# install go
-# (tested with 1.14, where go modules are enabled by default)
+# install go (tested with version 1.14, where go modules are enabled by default)
 
 # build protobufs and twirp server stubs for Go
 make protos
 
-# start the twirp server
+# start the webrtc proxy
 cd go/webrtc
 go run cmd/proxy-server/main.go
 
-# Send some test video
-gst-launch-1.0 videotestsrc ! 'video/x-raw, width=640, height=480' ! videoconvert ! video/x-raw,format=I420 ! vp8enc error-resilient=partitions keyframe-max-dist=10 auto-alt-ref=true cpu-used=5 deadline=1 ! rtpvp8pay ! udpsink host=127.0.0.1 port=5004
-# OR
-ffmpeg -re -f lavfi -i testsrc=size=640x480:rate=30 -vcodec libvpx -cpu-used 5 -deadline 1 -g 10 -error-resilient 1 -auto-alt-ref 1 -f rtp rtp://127.0.0.1:5000
+# OR start just the eventbus
+go run cmd/eventbus/main.go
+```
 
-# Run https://jsfiddle.net/y5aq6hnm/1/
-# You should see video streaming to the browser and data streaming both directions
+# Scratchpad
+
+```
+gst-launch-1.0 videotestsrc ! videoconvert !  x264enc bitrate=600 speed-preset=ultrafast tune=zerolatency key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue max-size-time=100000000 ! h264parse !  rtph264pay pt=96 mtu=1400 config-interval=10 ! udpsink host=239.20.20.20 auto-multicast=true port=5000
+
+t265 resolution: 848x800
+
+x264enc bitrate is in kbit/sec, default value is 2048 (2Mbit/s)
+omxh264enc bitrate is in bit/sec, default value is 4000000 (4Mbit/s)
+
+The VP8 codec used for video encoding also requires 100–2,000+ Kbit/s of bandwidth, and the bitrate depends on the quality of the streams:
+720p at 30 FPS: 1.0~2.0 Mbps
+360p at 30 FPS: 0.5~1.0 Mbps
+180p at 30 FPS: 0.1~0.5 Mbps
+
+https://stackoverflow.com/questions/7968566/what-would-cause-udp-packets-to-be-dropped-when-being-sent-to-localhost
+(env) ian@liszt:~/dev/tractor/build$ sysctl net.core.rmem_max
+net.core.rmem_max = 212992
+(env) ian@liszt:~/dev/tractor/build$ sysctl net.core.rmem_default
+net.core.rmem_default = 212992
+(env) ian@liszt:~/dev/tractor/build$ sysctl net.core.wmem_max
+net.core.wmem_max = 212992
+(env) ian@liszt:~/dev/tractor/build$ sysctl net.core.wmem_default
+net.core.wmem_default = 212992
 ```

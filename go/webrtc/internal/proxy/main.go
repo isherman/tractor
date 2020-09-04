@@ -50,7 +50,6 @@ func NewProxy(eventBus *eventbus.EventBus, eventSource chan *pb.Event, ssrc uint
 }
 
 // Start begins reading continously from the EventBus and RTP stream
-// TODO: Support reconnection with EventBus and RTP
 func (p *Proxy) Start() {
 	// Continuously read from the event bus and publish to all registered event callbacks
 	go func() {
@@ -117,7 +116,6 @@ func (p *Proxy) registerRTPCallback(id string, cb rtpCallback) {
 
 // AddPeer accepts an offer SDP from a peer, registers callbacks for RTP and EventBus events, and returns an
 // answer SDP.
-// TODO: Handle peers that go away
 // TODO: Return errors rather than panic
 // TODO: Clean up logging
 // TODO: Support graceful shutdown
@@ -161,7 +159,7 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 	// Create a new RTCPeerConnection
 	api := webrtc.NewAPI(webrtc.WithSettingEngine(settingEngine), webrtc.WithMediaEngine(mediaEngine))
 	peerConnection, err := api.NewPeerConnection(webrtc.Configuration{
-		// No ICE servers for now, to ensure candidate pair that's selected operates solely over LAN
+		// No STUN servers for now, to ensure candidate pair that's selected operates solely over LAN
 		ICEServers: []webrtc.ICEServer{
 			// {
 			// 	URLs: []string{"stun:stun.l.google.com:19302"},
