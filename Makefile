@@ -4,7 +4,7 @@ ifdef TEST_FILTER
 endif
 
 frontend:
-    cd app/frontend && yarn
+	cd app/frontend && yarn
 
 protos:
 	scripts/build-protos.sh

@@ -1,5 +1,5 @@
 #!/bin/bash -ex
-. setup.bash
+. ../setup.bash
 
 # Eventually we won't be building these artifacts on the device, but for now they're necessary.
 
