@@ -44,10 +44,8 @@ ap_config = {
 
 
 def find_connection(id):
-    # print(id)
     connections = NetworkManager.Settings.ListConnections()
     connections = {x.GetSettings()['connection']['id']: x for x in connections}
-    # print(connections)
     return connections.get(id)
 
 
@@ -65,23 +63,23 @@ def get_ap_connection():
 
 def activate_connection(connection):
     # Find a suitable device
+    connection_id = connection.GetSettings()['connection']['id']
     connection_type = connection.GetSettings()['connection']['type']
     device_type = {'802-11-wireless': NetworkManager.NM_DEVICE_TYPE_WIFI}.get(connection_type, connection_type)
     devices = NetworkManager.NetworkManager.GetDevices()
     device = next((d for d in devices if d.DeviceType == device_type), None)
-
     if not device:
         raise Exception(f'No suitable and available {connection_type} device found')
 
     # Activate connection
     NetworkManager.NetworkManager.ActivateConnection(connection, device, '/')
-    logger.info(f'Activated connection={connection}, dev={device}.')
+    logger.info(f'Activated connection={connection_id}, dev={device.Interface}.')
 
     # Check for success
     i = 0
     while device.State != NetworkManager.NM_DEVICE_STATE_ACTIVATED:
         if i % 5 == 0:
-            print('Waiting for connection to become active...')
+            logger.info('Waiting for connection to become active...')
         if i > 30:
             break
         time.sleep(1)
@@ -90,7 +88,7 @@ def activate_connection(connection):
     if device.State != NetworkManager.NM_DEVICE_STATE_ACTIVATED:
         raise Exception(f'Enabling connection {ap_connection_id} failed.')
 
-    print(f'Connection {ap_SSID} is active.')
+    logger.info(f'Connection {connection_id} is active.')
 
 
 def disable_connection():
@@ -102,7 +100,7 @@ def disable_connection():
     )
 
     if current:
-        print(f"Deactivating connection {current.Connection.GetSettings()['connection']['id']}")
+        logger.info(f"Deactivating connection {current.Connection.GetSettings()['connection']['id']}")
         NetworkManager.NetworkManager.DeactivateConnection(current)
 
 
@@ -114,7 +112,7 @@ def enable_connection(name):
     connection = find_connection(name)
     if not connection:
         raise Exception(f'The connection {name} does not exist.')
-    enable_connection(connection)
+    activate_connection(connection)
 
 
 def print_connections():
