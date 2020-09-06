@@ -55,6 +55,6 @@ Or `tail -f /var/log/syslog` ...
 
 ### Connect the tractor to a wifi network
 
-- NOTE: This workflow supports connecting to WiFi networks for which you already have a password saved. To connect to a wifi network for which you don't already have a password saved, please use the Gnome desktop tools or [nmcli](https://developer.gnome.org/NetworkManager/stable/nmcli.html).
+- NOTE: This workflow supports connecting to WiFi networks for which you already have a password saved, and for which you've enabled "All users may connect to this network". To connect to a wifi network for which you don't already have a password saved, please use the Gnome desktop tools or [nmcli](https://developer.gnome.org/NetworkManager/stable/nmcli.html).
 - To list the WiFi networks for which you already have a password saved, run `python -m farm_ng.wifi list`
 - To connect to a wifi network, run `python -m farm_ng.wifi connect <id>` with an `id` from the previous step.
