@@ -13,34 +13,36 @@ logger.setLevel(logging.INFO)
 
 ap_connection_id = 'farm_ng-' + socket.gethostname()
 ap_SSID = ap_connection_id
-ap_password = 'shellyandhelly'
 ap_ip = '192.168.42.1'
+wifi_interface = 'wlan0'
 
-ap_config = {
-    '802-11-wireless': {
-        'mode': 'ap',
-        'security': '801-22-wireless-security',
-        'ssid': ap_SSID,
-    },
-    '802-11-wireless-security': {
-        'key-mgmt': 'wpa-psk',
-        'psk': ap_password,
-    },
-    'connection': {
-        'autoconnect': False,
-        'id': ap_connection_id,
-        'interface-name': 'wlan0',
-        'type': '802-11-wireless',
-        'uuid': str(uuid.uuid4()),
-    },
-    'ipv4': {
-        'address-data': [{'address': ap_ip, 'prefix': 24}],
-        'addresses': [[ap_ip, 24, ap_ip]],
-        'gateway': ap_ip,
-        'method': 'shared',
-    },
-    'ipv6': {'method': 'auto'},
-}
+
+def get_ap_config(password):
+    return {
+        '802-11-wireless': {
+            'mode': 'ap',
+            'security': '801-22-wireless-security',
+            'ssid': ap_SSID,
+        },
+        '802-11-wireless-security': {
+            'key-mgmt': 'wpa-psk',
+            'psk': password,
+        },
+        'connection': {
+            'autoconnect': False,
+            'id': ap_connection_id,
+            'interface-name': wifi_interface,
+            'type': '802-11-wireless',
+            'uuid': str(uuid.uuid4()),
+        },
+        'ipv4': {
+            'address-data': [{'address': ap_ip, 'prefix': 24}],
+            'addresses': [[ap_ip, 24, ap_ip]],
+            'gateway': ap_ip,
+            'method': 'shared',
+        },
+        'ipv6': {'method': 'auto'},
+    }
 
 
 def find_connection(id):
@@ -49,33 +51,36 @@ def find_connection(id):
     return connections.get(id)
 
 
-def get_ap_connection():
+def refresh_ap_connection(password):
     connection = find_connection(ap_connection_id)
-    if not connection:
-        NetworkManager.Settings.AddConnection(ap_config)
-        logger.info(f'Added connection: {ap_config}')
+
+    if connection:
+        settings = connection.GetSettings()
+        if (settings['802-11-wireless-security']['password'] != password):
+            settings['802-11-wireless-security']['password'] = password
+            connection.Update(settings)
+            connection = find_connection(ap_connection_id)
+    else:
+        NetworkManager.Settings.AddConnection(get_ap_config(password))
+        logger.info(f'Added connection: {ap_connection_id}')
         print(ap_connection_id)
         connection = find_connection(ap_connection_id)
+
     if not connection:
         raise Exception('Could not get ap connection.')
+
     return connection
 
 
 def activate_connection(connection):
-    # Find a suitable device
     connection_id = connection.GetSettings()['connection']['id']
-    connection_type = connection.GetSettings()['connection']['type']
-    device_type = {'802-11-wireless': NetworkManager.NM_DEVICE_TYPE_WIFI}.get(connection_type, connection_type)
-    devices = NetworkManager.NetworkManager.GetDevices()
-    device = next((d for d in devices if d.DeviceType == device_type), None)
+    device = next((d for d in NetworkManager.NetworkManager.GetDevices() if d.Interface == wifi_interface), None)
     if not device:
-        raise Exception(f'No suitable and available {connection_type} device found')
+        raise Exception(f'No {wifi_interface} device found')
 
-    # Activate connection
     NetworkManager.NetworkManager.ActivateConnection(connection, device, '/')
     logger.info(f'Activated connection={connection_id}, dev={device.Interface}.')
 
-    # Check for success
     i = 0
     while device.State != NetworkManager.NM_DEVICE_STATE_ACTIVATED:
         if i % 5 == 0:
@@ -91,11 +96,11 @@ def activate_connection(connection):
     logger.info(f'Connection {connection_id} is active.')
 
 
-def disable_connection():
+def disable_current_connection():
     current = next(
         (
             c for c in NetworkManager.NetworkManager.ActiveConnections if c.Connection.GetSettings()
-            ['connection']['interface-name'] == 'wlan0'
+            ['connection']['interface-name'] == wifi_interface
         ), None,
     )
 
@@ -104,8 +109,9 @@ def disable_connection():
         NetworkManager.NetworkManager.DeactivateConnection(current)
 
 
-def enable_ap():
-    activate_connection(get_ap_connection())
+def enable_ap(password):
+    connection = refresh_ap_connection(password)
+    activate_connection(connection)
 
 
 def enable_connection(name):
@@ -127,10 +133,12 @@ if __name__ == '__main__':
     if sys.argv[1] == 'list':
         print_connections()
     elif sys.argv[1] == 'ap':
-        enable_ap()
+        if not sys.argv[2]:
+            logger.error("'ap' expects an additional argument <password>, e.g. 'ap mypassword'.")
+        enable_ap(sys.argv[2])
     elif sys.argv[1] == 'connect':
         if not sys.argv[2]:
-            logger.error("'connect' expects another positional argument, e.g. 'connect homewifi'.")
+            logger.error("'connect' expects an additional argument <SSID> e.g. 'connect homewifi'.")
         enable_connection(sys.argv[2])
     else:
         logger.error("Please invoke with 'list', 'ap', or 'connect <connection-id>'")
