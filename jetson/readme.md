@@ -43,9 +43,15 @@ Or `tail -f /var/log/syslog` ...
 
 - Run `python -m farm_ng.wifi ap`.
 - **NOTE**: If you are logged in via SSH this will terminate your SSH session
+- You will be prompted to enter a password to use for this access point
 - You can now connect your computer or mobile device to the `farm_ng-<tractorhostname>` wifi network.
 - Your device will be assigned an address in the `192.168.48/24` subnet.
 - The tractor is reachable at `192.168.48.1`.
+
+### Change the tractor's access point password
+- Run `python -m farm_ng.wifi list`
+- Run `python -m farm_ng.wifi delete <id>` with the `farm_ng-<tractorhostname>` id from the previous step
+- Run `python -m farm_ng.wifi ap` 
 
 ### Connect the tractor to a wifi network
 

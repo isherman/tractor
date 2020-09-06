@@ -1,5 +1,6 @@
 # based on https://github.com/OpenAgricultureFoundation/python-wifi-connect
 # which is based on https://github.com/balena-io/wifi-connect
+from getpass import getpass
 import logging
 import socket
 import sys
@@ -51,19 +52,13 @@ def find_connection(id):
     return connections.get(id)
 
 
-def refresh_ap_connection(password):
+def get_ap_connection():
     connection = find_connection(ap_connection_id)
 
-    if connection:
-        settings = connection.GetSettings()
-        if (settings['802-11-wireless-security']['password'] != password):
-            settings['802-11-wireless-security']['password'] = password
-            connection.Update(settings)
-            connection = find_connection(ap_connection_id)
-    else:
+    if not connection:
+        password = getpass(prompt='AP Password (at least 8 characters): ')
         NetworkManager.Settings.AddConnection(get_ap_config(password))
         logger.info(f'Added connection: {ap_connection_id}')
-        print(ap_connection_id)
         connection = find_connection(ap_connection_id)
 
     if not connection:
@@ -95,8 +90,14 @@ def activate_connection(connection):
 
     logger.info(f'Connection {connection_id} is active.')
 
+def delete_connection(name):
+    connection = find_connection(name)
+    if not connection:
+        raise Exception(f'The connection {name} does not exist.')
+    connection.Delete()
+    logger.info(f'Connection {name} deleted.')
 
-def disable_current_connection():
+def disable_current():
     current = next(
         (
             c for c in NetworkManager.NetworkManager.ActiveConnections if c.Connection.GetSettings()
@@ -109,8 +110,8 @@ def disable_current_connection():
         NetworkManager.NetworkManager.DeactivateConnection(current)
 
 
-def enable_ap(password):
-    connection = refresh_ap_connection(password)
+def enable_ap():
+    connection = get_ap_connection()
     activate_connection(connection)
 
 
@@ -130,16 +131,25 @@ def print_connections():
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
+    if len(sys.argv) < 2:
+        logger.error("expects a command argument, e.g. 'list'")
+        sys.exit(1)
+
     if sys.argv[1] == 'list':
         print_connections()
     elif sys.argv[1] == 'ap':
-        if not sys.argv[2]:
-            logger.error("'ap' expects an additional argument <password>, e.g. 'ap mypassword'.")
-        enable_ap(sys.argv[2])
+        enable_ap()
     elif sys.argv[1] == 'connect':
-        if not sys.argv[2]:
+        if len(sys.argv) < 3:
             logger.error("'connect' expects an additional argument <SSID> e.g. 'connect homewifi'.")
+            sys.exit(1)
         enable_connection(sys.argv[2])
+    elif sys.argv[1] == 'delete':
+        if len(sys.argv) < 3:
+            logger.error("'delete' expects an additional argument <SSID> e.g. 'delete homewifi'.")
+            sys.exit(1)
+        delete_connection(sys.argv[2])
+ 
     else:
-        logger.error("Please invoke with 'list', 'ap', or 'connect <connection-id>'")
+        logger.error("Unrecognized command: " + sys.argv[1])
         sys.exit(1)
