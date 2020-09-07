@@ -30,7 +30,7 @@ def get_ap_config(password):
             'psk': password,
         },
         'connection': {
-            'autoconnect': False,
+            'autoconnect': True,
             'id': ap_connection_id,
             'interface-name': wifi_interface,
             'type': '802-11-wireless',
@@ -69,9 +69,18 @@ def get_ap_connection():
 
 def activate_connection(connection):
     connection_id = connection.GetSettings()['connection']['id']
+
+    # Get the wireless network interface
     device = next((d for d in NetworkManager.NetworkManager.GetDevices() if d.Interface == wifi_interface), None)
     if not device:
         raise Exception(f'No {wifi_interface} device found')
+
+    # Enable autoconnect for selected connection only
+    wifi_connections = [c for c in NetworkManager.Settings.ListConnections() if c.GetSettings()['connection']['type'] == '802-11-wireless']
+    for c in wifi_connections:
+        c_settings = c.GetSettings()
+        c_settings['connection']['autoconnect'] = (c_settings['connection']['id'] == connection_id)
+        c.Update(c_settings)
 
     NetworkManager.NetworkManager.ActivateConnection(connection, device, '/')
     logger.info(f'Activated connection={connection_id}, dev={device.Interface}.')
