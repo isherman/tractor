@@ -12,32 +12,26 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== "false";
 
-// style files regexes
+// CSS/SASS regexes
 const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss|sass)$/;
 const sassModuleRegex = /\.module\.(scss|sass)$/;
 
+// Any images less than this limit (in bytes) will be inlined
 const imageInlineSizeLimit = parseInt(
   process.env.IMAGE_INLINE_SIZE_LIMIT || "10000"
 );
 
 module.exports = function (env, argv) {
-  const isEnvDevelopment = argv.mode === "development";
+  const isEnvDevelopment = argv.mode !== "production";
   const isEnvProduction = argv.mode === "production";
 
-  // common function to get style loaders
+  // Common function to get style loaders
   const getStyleLoaders = (cssOptions, preProcessor) => {
     const loaders = [
       isEnvDevelopment && require.resolve("style-loader"),
-      isEnvProduction && {
-        loader: MiniCssExtractPlugin.loader
-        // css is located in `static/css`, use '../../' to locate index.html folder
-        // in production `paths.publicUrlOrPath` can be a relative path
-        // options: paths.publicUrlOrPath.startsWith(".")
-        //   ? { publicPath: "../../" }
-        //   : {}
-      },
+      isEnvProduction && { loader: MiniCssExtractPlugin.loader },
       {
         loader: require.resolve("css-loader"),
         options: cssOptions
@@ -96,12 +90,12 @@ module.exports = function (env, argv) {
     bail: isEnvProduction,
     entry: "./src/index.tsx",
     output: {
+      filename: "bundle.js",
       path: path.resolve(__dirname, "dist/"),
-      publicPath: "/",
       // Add /* filename */ comments to generated require()s in the output.
       pathinfo: isEnvDevelopment,
-      filename: "bundle.js",
-      // TODO: remove this when upgrading to webpack 5
+      // Use the future version of asset emitting logic,
+      // which allows freeing memory of assets after emitting
       futureEmitAssets: true
     },
     optimization: {
@@ -112,8 +106,16 @@ module.exports = function (env, argv) {
         ? "source-map"
         : false
       : isEnvDevelopment && "cheap-module-source-map",
+    entry: isEnvDevelopment
+      ? [
+          require.resolve("webpack-dev-server/client") + "?/",
+          require.resolve("webpack/hot/dev-server"),
+          path.resolve(__dirname, "src/index.tsx")
+        ]
+      : path.resolve(__dirname, "src/index.tsx"),
     resolve: { extensions: ["*", ".js", ".jsx", ".ts", ".tsx"] },
     module: {
+      // makes missing exports an error instead of warning
       strictExportPresence: true,
       rules: [
         {
@@ -121,9 +123,8 @@ module.exports = function (env, argv) {
           // match the requirements. When no loader matches it will fall
           // back to the "file" loader at the end of the loader list.
           oneOf: [
-            // "url" loader works like "file" loader except that it embeds assets
+            // "url-loader" works like "file-loader" except that it embeds assets
             // smaller than specified limit in bytes as data URLs to avoid requests.
-            // A missing `test` is equivalent to a match.
             {
               test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
               loader: require.resolve("url-loader"),
@@ -132,6 +133,8 @@ module.exports = function (env, argv) {
                 name: "static/media/[name].[hash:8].[ext]"
               }
             },
+            // Compile Typescript
+            // Could potentially be replaced by babel7, which supports TS compilation
             {
               test: /\.(js|jsx|ts|tsx)$/,
               exclude: /(node_modules|bower_components)/,
@@ -211,11 +214,9 @@ module.exports = function (env, argv) {
                 "sass-loader"
               )
             },
-            // "file" loader makes sure those assets get served by WebpackDevServer.
-            // When you `import` an asset, you get its (virtual) filename.
-            // In production, they would get copied to the `build` folder.
-            // This loader doesn't use a "test" so it will catch all modules
-            // that fall through the other loaders.
+            // A catch-all loader for other types of files not captured above.
+            // In development, serves assets with WebpackDevServer.
+            // In production, copies assets to the `build` folder.
             {
               loader: require.resolve("file-loader"),
               // Exclude `js` files to keep "css" loader working as it injects
@@ -233,33 +234,22 @@ module.exports = function (env, argv) {
         }
       ]
     },
-    devServer: {
-      contentBase: "dist",
-      host: "0.0.0.0",
-      port: 3000,
-      hotOnly: true
-    },
     plugins: [
       // Clears the output directory before each build
       new CleanWebpackPlugin(),
       // Generates an `index.html` file with the <script> injected.
-      new HtmlWebpackPlugin(
-        Object.assign(
-          {},
-          {
-            inject: true,
-            template: "src/index.html"
-          }
-        )
-      ),
+      new HtmlWebpackPlugin({
+        inject: true,
+        template: "src/index.html"
+      }),
+      // This is necessary to emit hot updates (CSS and Fast Refresh):
+      isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
+      // Generate separate .css file(s) in production
       isEnvProduction &&
         new MiniCssExtractPlugin({
-          // Options similar to the same options in webpackOptions.output
-          // both options are optional
           filename: "static/css/[name].[contenthash:8].css",
           chunkFilename: "static/css/[name].[contenthash:8].chunk.css"
-        }),
-      isEnvDevelopment && new webpack.HotModuleReplacementPlugin()
+        })
     ].filter(Boolean)
   };
 };

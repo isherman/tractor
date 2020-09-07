@@ -64,8 +64,8 @@
     ]
   },
   "scripts": {
-    "dev-start": "webpack-dev-server --mode development --progress",
-    "dev-build": "webpack --mode development --progress",
+    "dev-start": "webpack-dev-server --progress",
+    "dev-build": "webpack --progress",
     "build": "webpack --mode production --progress",
     "dev-watch": "webpack --progress --watch",
     "test": "jest",
