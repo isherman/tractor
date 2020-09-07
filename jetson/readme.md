@@ -51,7 +51,7 @@ Or `tail -f /var/log/syslog` ...
 ### Change the tractor's access point password
 - Run `python -m farm_ng.wifi list`
 - Run `python -m farm_ng.wifi delete <id>` with the `farm_ng-<tractorhostname>` id from the previous step
-- Run `python -m farm_ng.wifi ap` 
+- Run `python -m farm_ng.wifi ap`
 
 ### Connect the tractor to a wifi network
 

@@ -1,11 +1,11 @@
 # based on https://github.com/OpenAgricultureFoundation/python-wifi-connect
 # which is based on https://github.com/balena-io/wifi-connect
-from getpass import getpass
 import logging
 import socket
 import sys
 import time
 import uuid
+from getpass import getpass
 
 import NetworkManager
 
@@ -99,12 +99,14 @@ def activate_connection(connection):
 
     logger.info(f'Connection {connection_id} is active.')
 
+
 def delete_connection(name):
     connection = find_connection(name)
     if not connection:
         raise Exception(f'The connection {name} does not exist.')
     connection.Delete()
     logger.info(f'Connection {name} deleted.')
+
 
 def disable_current():
     current = next(
@@ -158,7 +160,7 @@ if __name__ == '__main__':
             logger.error("'delete' expects an additional argument <SSID> e.g. 'delete homewifi'.")
             sys.exit(1)
         delete_connection(sys.argv[2])
- 
+
     else:
-        logger.error("Unrecognized command: " + sys.argv[1])
+        logger.error('Unrecognized command: ' + sys.argv[1])
         sys.exit(1)
