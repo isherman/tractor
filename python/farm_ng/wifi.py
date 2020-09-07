@@ -1,5 +1,6 @@
 # based on https://github.com/OpenAgricultureFoundation/python-wifi-connect
 # which is based on https://github.com/balena-io/wifi-connect
+import argparse
 import logging
 import socket
 import sys
@@ -139,28 +140,45 @@ def print_connections():
         print(c.GetSettings()['connection']['id'])
 
 
+class WifiCLI:
+    def __init__(self):
+        parser = argparse.ArgumentParser(
+            description='Manage NetworkManager wifi configuration', usage='''wifi <command> [<args>]
+
+The most commonly used commands are:
+  list          Show saved wifi configurations
+  ap            Enable access point
+  connect <id>  Connect to a wifi network
+  delete <id>   Delete a saved wifi configuration
+''',
+        )
+        parser.add_argument('command', help='Subcommand to run')
+        args = parser.parse_args(sys.argv[1:2])
+        if not hasattr(self, args.command):
+            print('Unrecognized command')
+            parser.print_help()
+            exit(1)
+        getattr(self, args.command)()
+
+    def list(self):
+        print_connections()
+
+    def ap(self):
+        enable_ap()
+
+    def connect(self):
+        parser = argparse.ArgumentParser(description='Connect to a wifi network')
+        parser.add_argument('id', help='connection id')
+        args = parser.parse_args(sys.argv[2:])
+        enable_connection(args.id)
+
+    def delete(self):
+        parser = argparse.ArgumentParser(description='Delete a saved wifi configuration')
+        parser.add_argument('id', help='connection id')
+        args = parser.parse_args(sys.argv[2:])
+        delete_connection(args.id)
+
+
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-
-    if len(sys.argv) < 2:
-        logger.error("expects a command argument, e.g. 'list'")
-        sys.exit(1)
-
-    if sys.argv[1] == 'list':
-        print_connections()
-    elif sys.argv[1] == 'ap':
-        enable_ap()
-    elif sys.argv[1] == 'connect':
-        if len(sys.argv) < 3:
-            logger.error("'connect' expects an additional argument <SSID> e.g. 'connect homewifi'.")
-            sys.exit(1)
-        enable_connection(sys.argv[2])
-    elif sys.argv[1] == 'delete':
-        if len(sys.argv) < 3:
-            logger.error("'delete' expects an additional argument <SSID> e.g. 'delete homewifi'.")
-            sys.exit(1)
-        delete_connection(sys.argv[2])
-
-    else:
-        logger.error('Unrecognized command: ' + sys.argv[1])
-        sys.exit(1)
+    WifiCLI()
