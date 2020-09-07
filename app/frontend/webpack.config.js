@@ -1,49 +1,265 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* global require __dirname */
 const path = require("path");
 const webpack = require("webpack");
-const CopyPlugin = require("copy-webpack-plugin");
+const postcssNormalize = require("postcss-normalize");
+const getCSSModuleLocalIdent = require("react-dev-utils/getCSSModuleLocalIdent");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
-module.exports = {
-  entry: "./src/index.tsx",
-  mode: "development",
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx|ts|tsx)$/,
-        exclude: /(node_modules|bower_components)/,
-        loader: "ts-loader"
+// Source maps are resource heavy and can cause out of memory issue for large source files.
+const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== "false";
+
+// style files regexes
+const cssRegex = /\.css$/;
+const cssModuleRegex = /\.module\.css$/;
+const sassRegex = /\.(scss|sass)$/;
+const sassModuleRegex = /\.module\.(scss|sass)$/;
+
+const imageInlineSizeLimit = parseInt(
+  process.env.IMAGE_INLINE_SIZE_LIMIT || "10000"
+);
+
+module.exports = function (env, argv) {
+  const isEnvDevelopment = argv.mode === "development";
+  const isEnvProduction = argv.mode === "production";
+
+  // common function to get style loaders
+  const getStyleLoaders = (cssOptions, preProcessor) => {
+    const loaders = [
+      isEnvDevelopment && require.resolve("style-loader"),
+      isEnvProduction && {
+        loader: MiniCssExtractPlugin.loader
+        // css is located in `static/css`, use '../../' to locate index.html folder
+        // in production `paths.publicUrlOrPath` can be a relative path
+        // options: paths.publicUrlOrPath.startsWith(".")
+        //   ? { publicPath: "../../" }
+        //   : {}
       },
       {
-        enforce: "pre",
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loader: "source-map-loader"
+        loader: require.resolve("css-loader"),
+        options: cssOptions
       },
       {
-        test: /\.css$/,
-        use: ["style-loader", "css-loader"]
+        // Options for PostCSS as we reference these options twice
+        // Adds vendor prefixing based on your specified browser support in
+        // package.json
+        loader: require.resolve("postcss-loader"),
+        options: {
+          postcssOptions: {
+            // Necessary for external CSS imports to work
+            // https://github.com/facebook/create-react-app/issues/2677
+            ident: "postcss",
+            plugins: () => [
+              require("postcss-flexbugs-fixes"),
+              require("postcss-preset-env")({
+                autoprefixer: {
+                  flexbox: "no-2009"
+                },
+                stage: 3
+              }),
+              // Adds PostCSS Normalize as the reset css with default options,
+              // so that it honors browserslist config in package.json
+              // which in turn let's users customize the target behavior as per their needs.
+              postcssNormalize()
+            ],
+            sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment
+          }
+        }
       }
-    ]
-  },
-  resolve: { extensions: ["*", ".js", ".jsx", ".ts", ".tsx"] },
-  output: {
-    path: path.resolve(__dirname, "dist/"),
-    filename: "bundle.js"
-  },
-  devtool: "source-map",
-  devServer: {
-    contentBase: "dist",
-    host: "0.0.0.0",
-    port: 3000,
-    hotOnly: true
-  },
-  plugins: [
-    new CopyPlugin({
-      patterns: [
+    ].filter(Boolean);
+    if (preProcessor) {
+      loaders.push(
         {
-          from: "public/"
+          loader: require.resolve("resolve-url-loader"),
+          options: {
+            sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
+            root: path.resolve(__dirname, "src/")
+          }
+        },
+        {
+          loader: require.resolve(preProcessor),
+          options: {
+            sourceMap: true
+          }
+        }
+      );
+    }
+    return loaders;
+  };
+
+  return {
+    mode: isEnvProduction ? "production" : isEnvDevelopment && "development",
+    // Fail immediately on error in production
+    bail: isEnvProduction,
+    entry: "./src/index.tsx",
+    output: {
+      path: path.resolve(__dirname, "dist/"),
+      publicPath: "/",
+      // Add /* filename */ comments to generated require()s in the output.
+      pathinfo: isEnvDevelopment,
+      filename: "bundle.js",
+      // TODO: remove this when upgrading to webpack 5
+      futureEmitAssets: true
+    },
+    optimization: {
+      // none yet
+    },
+    devtool: isEnvProduction
+      ? shouldUseSourceMap
+        ? "source-map"
+        : false
+      : isEnvDevelopment && "cheap-module-source-map",
+    resolve: { extensions: ["*", ".js", ".jsx", ".ts", ".tsx"] },
+    module: {
+      strictExportPresence: true,
+      rules: [
+        {
+          // "oneOf" will traverse all following loaders until one will
+          // match the requirements. When no loader matches it will fall
+          // back to the "file" loader at the end of the loader list.
+          oneOf: [
+            // "url" loader works like "file" loader except that it embeds assets
+            // smaller than specified limit in bytes as data URLs to avoid requests.
+            // A missing `test` is equivalent to a match.
+            {
+              test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+              loader: require.resolve("url-loader"),
+              options: {
+                limit: imageInlineSizeLimit,
+                name: "static/media/[name].[hash:8].[ext]"
+              }
+            },
+            {
+              test: /\.(js|jsx|ts|tsx)$/,
+              exclude: /(node_modules|bower_components)/,
+              loader: "ts-loader"
+            },
+            // "postcss" loader applies autoprefixer to our CSS.
+            // "css" loader resolves paths in CSS and adds assets as dependencies.
+            // "style" loader turns CSS into JS modules that inject <style> tags.
+            // In production, we use MiniCSSExtractPlugin to extract that CSS
+            // to a file, but in development "style" loader enables hot editing
+            // of CSS.
+            // By default we support CSS Modules with the extension .module.css
+            {
+              test: cssRegex,
+              exclude: cssModuleRegex,
+              use: getStyleLoaders({
+                importLoaders: 1,
+                sourceMap: isEnvProduction
+                  ? shouldUseSourceMap
+                  : isEnvDevelopment
+              }),
+              // Don't consider CSS imports dead code even if the
+              // containing package claims to have no side effects.
+              // Remove this when webpack adds a warning or an error for this.
+              // See https://github.com/webpack/webpack/issues/6571
+              sideEffects: true
+            },
+            // Adds support for CSS Modules (https://github.com/css-modules/css-modules)
+            // using the extension .module.css
+            {
+              test: cssModuleRegex,
+              use: getStyleLoaders({
+                importLoaders: 1,
+                sourceMap: isEnvProduction
+                  ? shouldUseSourceMap
+                  : isEnvDevelopment,
+                modules: {
+                  getLocalIdent: getCSSModuleLocalIdent
+                }
+              })
+            },
+            // Opt-in support for SASS (using .scss or .sass extensions).
+            // By default we support SASS Modules with the
+            // extensions .module.scss or .module.sass
+            {
+              test: sassRegex,
+              exclude: sassModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 3,
+                  sourceMap: isEnvProduction
+                    ? shouldUseSourceMap
+                    : isEnvDevelopment
+                },
+                "sass-loader"
+              ),
+              // Don't consider CSS imports dead code even if the
+              // containing package claims to have no side effects.
+              // Remove this when webpack adds a warning or an error for this.
+              // See https://github.com/webpack/webpack/issues/6571
+              sideEffects: true
+            },
+            // Adds support for CSS Modules, but using SASS
+            // using the extension .module.scss or .module.sass
+            {
+              test: sassModuleRegex,
+              use: getStyleLoaders(
+                {
+                  importLoaders: 3,
+                  sourceMap: isEnvProduction
+                    ? shouldUseSourceMap
+                    : isEnvDevelopment,
+                  modules: {
+                    getLocalIdent: getCSSModuleLocalIdent
+                  }
+                },
+                "sass-loader"
+              )
+            },
+            // "file" loader makes sure those assets get served by WebpackDevServer.
+            // When you `import` an asset, you get its (virtual) filename.
+            // In production, they would get copied to the `build` folder.
+            // This loader doesn't use a "test" so it will catch all modules
+            // that fall through the other loaders.
+            {
+              loader: require.resolve("file-loader"),
+              // Exclude `js` files to keep "css" loader working as it injects
+              // its runtime that would otherwise be processed through "file" loader.
+              // Also exclude `html` and `json` extensions so they get processed
+              // by webpacks internal loaders.
+              exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+              options: {
+                name: "static/media/[name].[hash:8].[ext]"
+              }
+            }
+            // ** STOP ** Are you adding a new loader?
+            // Make sure to add the new loader(s) before the "file" loader.
+          ]
         }
       ]
-    }),
-    new webpack.HotModuleReplacementPlugin()
-  ]
+    },
+    devServer: {
+      contentBase: "dist",
+      host: "0.0.0.0",
+      port: 3000,
+      hotOnly: true
+    },
+    plugins: [
+      // Clears the output directory before each build
+      new CleanWebpackPlugin(),
+      // Generates an `index.html` file with the <script> injected.
+      new HtmlWebpackPlugin(
+        Object.assign(
+          {},
+          {
+            inject: true,
+            template: "src/index.html"
+          }
+        )
+      ),
+      isEnvProduction &&
+        new MiniCssExtractPlugin({
+          // Options similar to the same options in webpackOptions.output
+          // both options are optional
+          filename: "static/css/[name].[contenthash:8].css",
+          chunkFilename: "static/css/[name].[contenthash:8].chunk.css"
+        }),
+      isEnvDevelopment && new webpack.HotModuleReplacementPlugin()
+    ].filter(Boolean)
+  };
 };

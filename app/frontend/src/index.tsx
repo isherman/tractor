@@ -13,7 +13,10 @@ import {
 import { NamedSE3Pose } from "../genproto/farm_ng_proto/tractor/v1/geometry";
 import { MotorControllerState } from "../genproto/farm_ng_proto/tractor/v1/motor";
 
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles.css";
+import "./App.scss";
+import "./custom.scss";
 
 type ProtobufAnyMap = {
   [key: string]: (data: Uint8Array) => any;
