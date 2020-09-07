@@ -40,6 +40,6 @@ jobs:
       run: make protos
     - name: Install Python dependencies
       run: |
-        sudo apt-get install -y network-manager
+        sudo apt-get install -y network-manager dbus
         python -m pip install --upgrade pip
         pip install -r requirements.txt -r requirements-dev.txt
