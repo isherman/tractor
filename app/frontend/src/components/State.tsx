@@ -4,6 +4,16 @@ import { useRootStore } from "../models/RootStore";
 import { useObserver } from "mobx-react-lite";
 import { flatten } from "../utils/flatten";
 
+const formatValue = (value: unknown): string => {
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  if (typeof value === "number") {
+    return value.toFixed(4);
+  }
+  return String(value);
+};
+
 export const State: React.FC = () => {
   const busEventStore = useRootStore().busEventStore;
 
@@ -24,7 +34,7 @@ export const State: React.FC = () => {
               <td>{subkey}</td>
               <td></td>
               <td></td>
-              <td>{(value as any).toString()}</td>
+              <td>{formatValue(value)}</td>
             </tr>
           )
         )}
