@@ -3,6 +3,7 @@ import { Table } from "react-bootstrap";
 import { useRootStore } from "../models/RootStore";
 import { useObserver } from "mobx-react-lite";
 import { flatten } from "../utils/flatten";
+import styles from "./State.module.scss";
 
 const formatValue = (value: unknown): string => {
   if (value instanceof Date) {
@@ -22,16 +23,16 @@ export const State: React.FC = () => {
       Object.fromEntries(busEventStore.lastSnapshot.entries())
     ).map(([key, stream]) => (
       <React.Fragment key={key}>
-        <tr>
+        <tr className={styles.primaryKey}>
           <td>{key}</td>
           <td>{stream.latestEventTime?.toISOString()}</td>
           <td>{stream.eventsSinceLastSnapshot}</td>
           <td></td>
         </tr>
         {Object.entries(flatten(stream.latestEvent || {})).map(
-          ([subkey, value]) => (
-            <tr key={subkey}>
-              <td>{subkey}</td>
+          ([subKey, value]) => (
+            <tr key={subKey}>
+              <td className={styles.subKey}>{subKey}</td>
               <td></td>
               <td></td>
               <td>{formatValue(value)}</td>
