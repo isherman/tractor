@@ -8,6 +8,7 @@ import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apri
 import { useWebRTC } from "../hooks/useWebRTC";
 import { BusEvent } from "../models/BusEvent";
 import { decodeAnyEvent } from "../models/decodeAnyEvent";
+import Button from "react-bootstrap/Button";
 
 type TractorState = {
   [key: string]: BusEvent;
@@ -123,7 +124,9 @@ export const Rtc: React.FC = () => {
         ></canvas>
       </div>
       <div style={{ display: "flex", flexDirection: "column" }}>
-        <button onClick={startVideo}>Start Video</button>
+        <Button variant={"primary"} onClick={startVideo}>
+          Start Video
+        </Button>
         <button disabled>Send Test Event</button>
       </div>
       <div style={{ color: "white", width: "50%" }}>

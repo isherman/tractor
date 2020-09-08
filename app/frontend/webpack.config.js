@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global require __dirname */
@@ -88,7 +89,6 @@ module.exports = function (env, argv) {
     mode: isEnvProduction ? "production" : isEnvDevelopment && "development",
     // Fail immediately on error in production
     bail: isEnvProduction,
-    entry: "./src/index.tsx",
     output: {
       filename: "bundle.js",
       path: path.resolve(__dirname, "dist/"),
@@ -100,6 +100,9 @@ module.exports = function (env, argv) {
     },
     optimization: {
       // none yet
+    },
+    devServer: {
+      historyApiFallback: true
     },
     devtool: isEnvProduction
       ? shouldUseSourceMap
