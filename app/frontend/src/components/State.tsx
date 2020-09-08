@@ -9,20 +9,36 @@ export const State: React.FC = () => {
 
   return useObserver(() => {
     const rows = Object.entries(
-      flatten(Object.fromEntries(busEventStore.state.entries()))
-    ).map(([key, value]) => (
-      <tr key={key}>
-        <td>{key}</td>
-        <td>{value.toString()}</td>
-      </tr>
+      Object.fromEntries(busEventStore.lastSnapshot.entries())
+    ).map(([key, stream]) => (
+      <React.Fragment key={key}>
+        <tr>
+          <td>{key}</td>
+          <td>{stream.latestEventTime?.toISOString()}</td>
+          <td>{stream.eventsSinceLastSnapshot}</td>
+          <td></td>
+        </tr>
+        {Object.entries(flatten(stream.latestEvent || {})).map(
+          ([subkey, value]) => (
+            <tr key={subkey}>
+              <td>{subkey}</td>
+              <td></td>
+              <td></td>
+              <td>{(value as any).toString()}</td>
+            </tr>
+          )
+        )}
+      </React.Fragment>
     ));
 
     return (
-      <Table striped bordered hover size="sm">
+      <Table striped bordered hover size="sm" responsive="md">
         <thead>
           <tr>
             <th>Key</th>
-            <th>Value</th>
+            <th>Latest Timestamp</th>
+            <th>Events/s</th>
+            <th>Latest Value</th>
           </tr>
         </thead>
         <tbody>{rows}</tbody>
