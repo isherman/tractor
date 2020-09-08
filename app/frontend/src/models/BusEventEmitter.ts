@@ -1,14 +1,3 @@
-// The following hack is a work around for this issue:
-// https://github.com/stephenh/ts-proto/issues/108
-
-import * as protobuf from "protobufjs/minimal";
-import * as Long from "long";
-
-if (protobuf.util.Long !== Long) {
-  protobuf.util.Long = Long;
-  protobuf.configure();
-}
-
 import { Event as BusAnyEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 
 type ICallback = (event: BusAnyEvent) => void;
@@ -17,6 +6,8 @@ type ICallbackMap = {
   [event: string]: ICallback[];
 };
 
+// A generic emitter of eventbus events.
+// May be used by various transports (e.g. webRTC, websocket, or a test transport).
 export class BusEventEmitter {
   private callbacks: ICallbackMap = {};
 

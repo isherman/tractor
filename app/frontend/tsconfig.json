@@ -1,16 +1,26 @@
 {
   "compilerOptions": {
-      "outDir": "./dist/",
-      "sourceMap": true,
-      "strict": true,
-      "forceConsistentCasingInFileNames": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "module": "es6",
-      "jsx": "react",
-      "target": "es5",
-      "typeRoots" : ["./typings", "node_modules/@types"],
-      "moduleResolution": "node"  // required by Three.js
+    "experimentalDecorators": true,
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "module": "es6",
+    "lib": [
+      "ES6",
+      "DOM",
+      "DOM.Iterable",
+      "ES2015.Iterable",
+      "es2018",
+      "ES2019",
+      "esnext"
+    ],
+    "jsx": "react",
+    "target": "es6",
+    "typeRoots": ["./typings", "node_modules/@types"],
+    "moduleResolution": "node" // required by Three.js
   },
   "include": ["src", "test"]
 }

@@ -6,10 +6,11 @@ import { State } from "./State";
 import { Video } from "./Video";
 import { Debug } from "./Debug";
 import { Map } from "./Map";
+import styles from "./App.module.scss";
 
 export const App: React.FC = () => {
   return (
-    <div>
+    <div className={styles.app}>
       <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
         <Navbar.Brand as={Link} to="/">
           farm-ng

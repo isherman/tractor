@@ -1,18 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 import * as React from "react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useObserver } from "mobx-react-lite";
 
 import { Vec2 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
-import { useWebRTC } from "../hooks/useWebRTC";
-import { BusEvent } from "../models/BusEvent";
-import { decodeAnyEvent } from "../models/decodeAnyEvent";
 import Button from "react-bootstrap/Button";
-
-type TractorState = {
-  [key: string]: BusEvent;
-};
+import { useRootStore } from "../models/RootStore";
+import { autorun } from "mobx";
 
 const t265Resolution = {
   width: 848,
@@ -52,13 +48,10 @@ const drawAprilTagDetections = (
 };
 
 export const Rtc: React.FC = () => {
-  const [tractorState, setTractorState] = useState<TractorState>({});
-  const [
-    apriltagDetections,
-    setApriltagDetections
-  ] = useState<ApriltagDetections | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const busEventStore = useRootStore().busEventStore;
+  const mediaStreamStore = useRootStore().mediaStreamStore;
 
   const resize = (): void => {
     const videoElement = videoRef?.current;
@@ -76,43 +69,44 @@ export const Rtc: React.FC = () => {
     }
   };
 
-  const busEventEmitter = useWebRTC(
-    `http://${window.location.hostname}:9900/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`,
-    videoRef
+  useEffect(
+    () =>
+      autorun(() => {
+        const videoElement = videoRef?.current;
+        if (!videoElement) {
+          return;
+        }
+        videoElement.srcObject = mediaStreamStore.videoStream;
+      }),
+    [videoRef]
   );
 
-  busEventEmitter.on("*", (event) => {
-    const value = decodeAnyEvent(event);
-    if (value) {
-      setTractorState((state) => ({
-        ...state,
-        [event.name]: value
-      }));
-    }
-    if (
-      event.data?.typeUrl ===
-      "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections"
-    ) {
-      setApriltagDetections(value as ApriltagDetections);
-    }
-  });
+  useEffect(
+    () =>
+      autorun(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) {
+          return;
+        }
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      return;
-    }
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          return;
+        }
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      return;
-    }
+        resize();
+        drawAprilTagDetections(
+          busEventStore.state.get(
+            "tracking_camera/front/apriltags"
+          ) as ApriltagDetections,
+          ctx,
+          canvas
+        );
+      }),
+    [canvasRef]
+  );
 
-    resize();
-    drawAprilTagDetections(apriltagDetections, ctx, canvas);
-  }, [canvasRef, apriltagDetections]);
-
-  return (
+  return useObserver(() => (
     <div style={{ display: "flex", flexDirection: "row" }}>
       <div id="annotatedVideo" style={{ position: "relative", width: "50%" }}>
         <div id="videos">
@@ -129,23 +123,27 @@ export const Rtc: React.FC = () => {
         </Button>
         <button disabled>Send Test Event</button>
       </div>
-      <div style={{ color: "white", width: "50%" }}>
-        {Object.keys(tractorState).map((key, i) => (
+      <div style={{ width: "50%" }}>
+        {Array.from(busEventStore.state.keys()).map((key, i) => (
           <React.Fragment key={i}>
             <span>Key Name: {key} </span>
             <p>
-              {Object.keys(tractorState[key]).map((keyJ, _j) => (
-                <React.Fragment key={keyJ}>
-                  <span> {keyJ} </span>
-                  <span>
-                    {JSON.stringify((tractorState[key] as any)[keyJ])}{" "}
-                  </span>
-                </React.Fragment>
-              ))}
+              {Object.keys(busEventStore.state.get(key) || {}).map(
+                (keyJ, _j) => (
+                  <React.Fragment key={keyJ}>
+                    <span> {keyJ} </span>
+                    <span>
+                      {JSON.stringify(
+                        (busEventStore.state.get(key) as any)[keyJ]
+                      )}{" "}
+                    </span>
+                  </React.Fragment>
+                )
+              )}
             </p>
           </React.Fragment>
         ))}
       </div>
     </div>
-  );
+  ));
 };
