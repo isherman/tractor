@@ -15,7 +15,6 @@ prefix=/opt/farm_ng make -C $SERVICE_DIR/uhubctl install
 cp $SERVICE_DIR/*.sh /opt/farm_ng/systemd
 cp $SERVICE_DIR/*.service /etc/systemd/system/
 cp $SERVICE_DIR/*.path /etc/systemd/system/
-cp $SERVICE_DIR/*.socket /etc/systemd/system/
 # https://superuser.com/a/1398400 - add udev rule so we can have services wait on the usb bus.
 cp $SERVICE_DIR/20-usb-bus.rules /etc/udev/rules.d/
 systemctl daemon-reload

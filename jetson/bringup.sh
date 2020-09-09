@@ -13,7 +13,6 @@ export SERVICE_DIR=$( cd "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 route add -net 224.0.0.0 netmask 240.0.0.0 dev lo
 route add -net 224.0.0.0 netmask 240.0.0.0 dev wlan0
 
-
 # enable multicast on loopback, cause we may not have a wireless or wired link.
 ifconfig lo multicast
 ifconfig wlan0 multicast
