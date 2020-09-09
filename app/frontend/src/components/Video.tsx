@@ -104,21 +104,50 @@ export const Video: React.FC = () => {
   );
 
   return useObserver(() => (
-    <div style={{ display: "flex", flexDirection: "column" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "0",
+        flex: "1 1 auto",
+        backgroundColor: "black"
+      }}
+    >
       <div style={{ display: "flex", flexDirection: "row" }}>
         <Button variant={"primary"} onClick={startVideo}>
           Start Video
         </Button>
         <button disabled>Send Test Event</button>
       </div>
-      <div id="annotatedVideo" style={{ position: "relative", width: "100%" }}>
-        <div id="videos">
-          <video ref={videoRef} autoPlay style={{ width: "100%" }}></video>
+      <div
+        style={{
+          minHeight: "0",
+          display: "flex",
+          justifyContent: "center"
+        }}
+      >
+        <div style={{ height: "100%", position: "relative" }}>
+          <video
+            ref={videoRef}
+            autoPlay
+            style={{
+              maxHeight: "100%",
+              maxWidth: "100%"
+              // margin: "auto",
+              // display: "block"
+            }}
+          ></video>
+          <canvas
+            ref={canvasRef}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0
+            }}
+          ></canvas>
         </div>
-        <canvas
-          ref={canvasRef}
-          style={{ position: "absolute", top: 0, left: 0, bottom: 0, right: 0 }}
-        ></canvas>
       </div>
     </div>
   ));
