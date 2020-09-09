@@ -3,13 +3,20 @@ ifdef TEST_FILTER
 	JS_TEST_FILTER=:$(TEST_FILTER)
 endif
 
-frontend: protos
-	cd app/frontend && yarn && yarn build
-	cp -rT app/frontend/dist build/frontend
-	cd go/webrtc && go build -o $(FARM_NG_ROOT)/build/go/farm-ng-webservices cmd/proxy-server/main.go
-
 protos:
 	scripts/build-protos.sh
+
+frontend:
+	cd app/frontend && yarn && yarn build
+	cp -rT app/frontend/dist build/frontend
+
+webservices-only:
+	cd go/webrtc && ../../env.sh make
+
+webservices:
+	make protos
+	make frontend
+	make webservices-only
 
 test:
 	./env.sh pytest $(PY_TEST_FILTER)
