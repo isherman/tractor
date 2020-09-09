@@ -9,6 +9,7 @@ import { NamedSE3Pose } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { MotorControllerState } from "../../genproto/farm_ng_proto/tractor/v1/motor";
 import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
 import { BusEvent } from "./BusEvent";
+import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 
 export function decodeAnyEvent(event: BusAnyEvent): BusEvent | null {
   const eventData = event.data;
@@ -27,6 +28,8 @@ export function decodeAnyEvent(event: BusAnyEvent): BusEvent | null {
         return MotorControllerState.decode;
       case "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections":
         return ApriltagDetections.decode;
+      case "type.googleapis.com/farm_ng_proto.tractor.v1.TractorState":
+        return TractorState.decode;
       default:
         console.log("Unknown message type: ", typeUrl);
         return undefined;

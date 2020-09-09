@@ -6,6 +6,7 @@ import {
 import { NamedSE3Pose } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { MotorControllerState } from "../../genproto/farm_ng_proto/tractor/v1/motor";
 import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
+import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 
 export type BusEvent =
   | SteeringCommand
@@ -13,4 +14,5 @@ export type BusEvent =
   | TrackingCameraMotionFrame
   | NamedSE3Pose
   | MotorControllerState
-  | ApriltagDetections;
+  | ApriltagDetections
+  | TractorState;
