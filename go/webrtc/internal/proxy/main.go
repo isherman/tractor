@@ -171,24 +171,24 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 	}
 
 	// Create a video track, using the payloadType of the offer and the SSRC of the RTP stream
-	videoTrack, err := peerConnection.NewTrack(payloadType, p.ssrc, "video", "pion")
-	if err != nil {
-		panic(err)
-	}
-	if _, err = peerConnection.AddTrack(videoTrack); err != nil {
-		panic(err)
-	}
+	// videoTrack, err := peerConnection.NewTrack(payloadType, p.ssrc, "video", "pion")
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// if _, err = peerConnection.AddTrack(videoTrack); err != nil {
+	// 	panic(err)
+	// }
 
 	// Register a new consumer with the RTP stream and service the received packets
-	cb := func(packet *rtp.Packet) error {
-		packet.Header.PayloadType = payloadType
-		err := videoTrack.WriteRTP(packet)
-		if err != nil {
-			log.Println("Could not write packet to videoTrack: ", err)
-		}
-		return err
-	}
-	p.registerRTPCallback(peerId, cb)
+	// cb := func(packet *rtp.Packet) error {
+	// 	packet.Header.PayloadType = payloadType
+	// 	err := videoTrack.WriteRTP(packet)
+	// 	if err != nil {
+	// 		log.Println("Could not write packet to videoTrack: ", err)
+	// 	}
+	// 	return err
+	// }
+	// p.registerRTPCallback(peerId, cb)
 
 	// Register data channel creation handling
 	peerConnection.OnDataChannel(func(d *webrtc.DataChannel) {

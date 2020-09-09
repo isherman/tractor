@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 
-	"github.com/pion/rtp"
 	"github.com/rs/cors"
 
 	"github.com/farm-ng/tractor/genproto"
@@ -49,21 +48,21 @@ func main() {
 	listener.SetReadBuffer(rtpReadBufferSize)
 	log.Println("Waiting for RTP Packets at:", rtpAddr)
 
-	// Listen for a single RTP Packet, we need this to determine the SSRC
-	inboundRTPPacket := make([]byte, maxRtpDatagramSize)
-	n, _, err := listener.ReadFromUDP(inboundRTPPacket)
-	if err != nil {
-		panic(err)
-	}
+	// // Listen for a single RTP Packet, we need this to determine the SSRC
+	// inboundRTPPacket := make([]byte, maxRtpDatagramSize)
+	// n, _, err := listener.ReadFromUDP(inboundRTPPacket)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	// Unmarshal the incoming packet
-	packet := &rtp.Packet{}
-	if err = packet.Unmarshal(inboundRTPPacket[:n]); err != nil {
-		panic(err)
-	}
-	log.Println("RTP packet received. Starting server.")
+	// // Unmarshal the incoming packet
+	// packet := &rtp.Packet{}
+	// if err = packet.Unmarshal(inboundRTPPacket[:n]); err != nil {
+	// 	panic(err)
+	// }
+	// log.Println("RTP packet received. Starting server.")
 
-	proxy := proxy.NewProxy(eventBus, eventChan, packet.SSRC, listener)
+	proxy := proxy.NewProxy(eventBus, eventChan, 0, listener)
 	proxy.Start()
 	server := server.NewServer(proxy)
 	twirpHandler := genproto.NewWebRTCProxyServiceServer(server, nil)
