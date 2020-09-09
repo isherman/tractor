@@ -4,12 +4,12 @@ Requires=tractor-webservices.socket
 After=network-online.target tractor.service
 
 [Service]
-ExecStart=/home/farmer/tractor/build/go/farm-ng-webservices
+ExecStart=/home/farmer/tractor/env.sh /home/farmer/tractor/build/go/farm-ng-webservices
 WorkingDirectory=/opt/farm_ng/systemd
 StandardOutput=inherit
 StandardError=inherit
 Restart=always
-Environment=PORT=80
+Environment=PORT=8080
 NonBlocking=true
 
 [Install]

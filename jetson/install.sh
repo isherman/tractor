@@ -29,3 +29,4 @@ systemctl enable tractor-webservices.service
 systemctl start tractor-ready.path
 systemctl start tractor-steering.service
 systemctl start tractor-bringup.service
+systemctl start tractor-webservices.service
