@@ -1,15 +1,14 @@
-system configuration for nano
------------------------------
+## system configuration for nano
 
 This directory has scripts to install systemd level services to make
 the tractor functional at boot.
 
 Ensure the repository is up to date (including submodules), built.
 
-This assumes the user on the nano is farmer and the code is located at ``~/tractor``
-
+This assumes the user on the nano is farmer and the code is located at `~/tractor`
 
 Run the jetson/install.sh script to install the services.
+
 ```bash
 cd ~/tractor/jetson
 sudo ./install.sh
@@ -26,6 +25,10 @@ This installs the following services:
 - tractor.service - Responsible for talking to the motors, and
   receiving steering commands to drive the tractor arround.
 
+- tractor-webservices.service - Responsible for proxying ipc traffic over webRTC,
+  serving a Twirp API, and serving the static frontend.
+
+- tractor-webservices-port.service - Opens port 80 for webservices.
 
 The install script enables these services so that they start at boot.
 
@@ -35,6 +38,8 @@ To see their log output:
 journalctl -f -u tractor
 journalctl -f -u tractor-bringup
 journalctl -f -u tractor-steering
+journalctl -f -u tractor-webservices
+journalctl -f -u tractor-webservices-port
 ```
 
-Or ``tail -f /var/log/syslog`` ...
+Or `tail -f /var/log/syslog` ...
