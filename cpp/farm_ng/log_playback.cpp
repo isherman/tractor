@@ -40,7 +40,7 @@ class IpcLogPlayback {
  public:
   IpcLogPlayback(boost::asio::io_service& io_service)
       : io_service_(io_service),
-        bus_(GetEventBus(io_service)),
+        bus_(GetEventBus(io_service, "log-playback")),
         log_reader_(FLAGS_log),
         log_timer_(io_service) {
     log_read_and_send(boost::system::error_code());

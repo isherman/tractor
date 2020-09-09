@@ -29,7 +29,7 @@ const (
 func main() {
 	// Create eventbus client
 	eventChan := make(chan *pb.Event)
-	eventBus := eventbus.NewEventBus((net.UDPAddr{IP: net.ParseIP(eventBusAddr), Port: eventBusPort}), eventChan)
+	eventBus := eventbus.NewEventBus((net.UDPAddr{IP: net.ParseIP(eventBusAddr), Port: eventBusPort}), "webrtc-proxy", eventChan, true)
 	go eventBus.Start()
 
 	// Create RTP client

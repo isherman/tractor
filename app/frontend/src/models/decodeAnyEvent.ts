@@ -10,6 +10,7 @@ import { MotorControllerState } from "../../genproto/farm_ng_proto/tractor/v1/mo
 import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
 import { BusEvent } from "./BusEvent";
 import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
+import { Announce } from "../../genproto/farm_ng_proto/tractor/v1/io";
 
 export function decodeAnyEvent(event: BusAnyEvent): BusEvent | null {
   const eventData = event.data;
@@ -30,6 +31,9 @@ export function decodeAnyEvent(event: BusAnyEvent): BusEvent | null {
         return ApriltagDetections.decode;
       case "type.googleapis.com/farm_ng_proto.tractor.v1.TractorState":
         return TractorState.decode;
+      case "type.googleapis.com/farm_ng_proto.tractor.v1.Announce":
+        return Announce.decode;
+
       default:
         console.log("Unknown message type: ", typeUrl);
         return undefined;
