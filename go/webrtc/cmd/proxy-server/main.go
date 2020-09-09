@@ -6,14 +6,17 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 
 	"github.com/rs/cors"
 
 	"github.com/farm-ng/tractor/genproto"
 	pb "github.com/farm-ng/tractor/genproto"
+	"github.com/farm-ng/tractor/webrtc/internal/api"
 	"github.com/farm-ng/tractor/webrtc/internal/eventbus"
 	"github.com/farm-ng/tractor/webrtc/internal/proxy"
-	"github.com/farm-ng/tractor/webrtc/internal/server"
+	"github.com/farm-ng/tractor/webrtc/internal/spa"
+	"github.com/gorilla/mux"
 )
 
 const (
@@ -64,7 +67,7 @@ func main() {
 
 	proxy := proxy.NewProxy(eventBus, eventChan, 0, listener)
 	proxy.Start()
-	server := server.NewServer(proxy)
+	server := api.NewServer(proxy)
 	twirpHandler := genproto.NewWebRTCProxyServiceServer(server, nil)
 
 	// Enable CORS
@@ -84,9 +87,20 @@ func main() {
 	if port != "" {
 		serverAddr = ":" + port
 	}
-	mux := http.NewServeMux()
-	mux.Handle("/twirp/", corsWrapper.Handler(twirpHandler))
-	mux.Handle("/", http.FileServer(http.Dir(path.Join(farmNgRoot, "build/frontend"))))
+
+	router := mux.NewRouter()
+	api := corsWrapper.Handler(twirpHandler)
+	router.PathPrefix("/twirp/").Handler(api)
+	spa := spa.Handler{StaticPath: path.Join(farmNgRoot, "build/frontend"), IndexPath: "index.html"}
+	router.PathPrefix("/").Handler(spa)
+
+	srv := &http.Server{
+		Handler:      router,
+		Addr:         serverAddr,
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
+	}
+
 	log.Println("Serving frontend and API at:", serverAddr)
-	http.ListenAndServe(serverAddr, mux)
+	log.Fatal(srv.ListenAndServe())
 }

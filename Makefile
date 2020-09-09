@@ -10,13 +10,13 @@ frontend:
 	cd app/frontend && yarn && yarn build
 	cp -rT app/frontend/dist build/frontend
 
-webservices-only:
+webserver:
 	cd go/webrtc && ../../env.sh make
 
 webservices:
 	make protos
 	make frontend
-	make webservices-only
+	make webserver
 
 test:
 	./env.sh pytest $(PY_TEST_FILTER)
