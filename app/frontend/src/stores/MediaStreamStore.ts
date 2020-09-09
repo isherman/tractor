@@ -1,5 +1,5 @@
 import { observable } from "mobx";
-import { MediaStreamEmitter } from "./MediaStreamEmitter";
+import { MediaStreamEmitter } from "../models/MediaStreamEmitter";
 
 // A store for information about available media streams
 export class MediaStreamStore {

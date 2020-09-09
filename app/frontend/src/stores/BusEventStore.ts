@@ -1,7 +1,7 @@
-import { BusEvent } from "./BusEvent";
+import { BusEvent } from "../models/BusEvent";
 import { observable, ObservableMap } from "mobx";
-import { decodeAnyEvent } from "./decodeAnyEvent";
-import { BusEventEmitter } from "./BusEventEmitter";
+import { decodeAnyEvent } from "../models/decodeAnyEvent";
+import { BusEventEmitter } from "../models/BusEventEmitter";
 
 interface StreamSnapshot {
   latestEvent: BusEvent | null;
@@ -18,8 +18,12 @@ export class BusEventStore {
   @observable lastSnapshot = new ObservableMap<string, StreamSnapshot>();
   nextSnapshot = new Map<string, StreamSnapshot>();
 
+  // TODO: Remove this once we have a better way of managing the stream of poses
+  public transport: BusEventEmitter;
+
   constructor(transport: BusEventEmitter) {
-    transport.on("*", (event) => {
+    this.transport = transport;
+    this.transport.on("*", (event) => {
       this.nextSnapshot.set(event.name, {
         latestEvent: decodeAnyEvent(event),
         latestEventTime: event.stamp,

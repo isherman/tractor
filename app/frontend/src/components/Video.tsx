@@ -5,9 +5,9 @@ import { useObserver } from "mobx-react-lite";
 import { Vec2 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
 import Button from "react-bootstrap/Button";
-import { useRootStore } from "../models/RootStore";
 import { autorun } from "mobx";
 import styles from "./Video.module.scss";
+import { useStores } from "../hooks/useStores";
 
 const t265Resolution = {
   width: 848,
@@ -49,8 +49,7 @@ const drawAprilTagDetections = (
 export const Video: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const busEventStore = useRootStore().busEventStore;
-  const mediaStreamStore = useRootStore().mediaStreamStore;
+  const { busEventStore, mediaStreamStore } = useStores();
 
   const resize = (): void => {
     const videoElement = videoRef?.current;

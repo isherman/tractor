@@ -12,6 +12,16 @@ import { BusEvent } from "./BusEvent";
 import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { Announce } from "../../genproto/farm_ng_proto/tractor/v1/io";
 
+// The following hack is a work around for this issue:
+// https://github.com/stephenh/ts-proto/issues/108
+import * as protobuf from "protobufjs/minimal";
+import * as Long from "long";
+
+if (protobuf.util.Long !== Long) {
+  protobuf.util.Long = Long;
+  protobuf.configure();
+}
+
 export function decodeAnyEvent(event: BusAnyEvent): BusEvent | null {
   const eventData = event.data;
   if (!eventData || !eventData.value) return null;

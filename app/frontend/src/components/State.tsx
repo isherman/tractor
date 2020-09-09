@@ -1,22 +1,13 @@
 import * as React from "react";
 import { Table } from "react-bootstrap";
-import { useRootStore } from "../models/RootStore";
 import { useObserver } from "mobx-react-lite";
 import { flatten } from "../utils/flatten";
+import { formatValue } from "../utils/formatValue";
 import styles from "./State.module.scss";
-
-const formatValue = (value: unknown): string => {
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-  if (typeof value === "number") {
-    return value.toFixed(4);
-  }
-  return String(value);
-};
+import { useStores } from "../hooks/useStores";
 
 export const State: React.FC = () => {
-  const busEventStore = useRootStore().busEventStore;
+  const { busEventStore } = useStores();
 
   return useObserver(() => {
     const rows = Object.entries(

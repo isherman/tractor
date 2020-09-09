@@ -11,8 +11,16 @@ type ICallbackMap = {
 export class BusEventEmitter {
   private callbacks: ICallbackMap = {};
 
-  public on(event: string, callback: ICallback): void {
-    this.callbacks[event] = [...(this.callbacks[event] || []), callback];
+  public on(eventType: string, callback: ICallback): void {
+    this.callbacks[eventType] = [
+      ...(this.callbacks[eventType] || []),
+      callback
+    ];
+  }
+
+  // TODO: Replace this super crude unsubscription with a handle
+  public off(eventType: string): void {
+    delete this.callbacks[eventType];
   }
 
   public emit(event: BusAnyEvent): void {
