@@ -43,6 +43,12 @@ journalctl -f -u tractor-webservices
 
 Or `tail -f /var/log/syslog` ...
 
+## Debugging
+
+```
+systemd-analyze plot >bootup.svg
+```
+
 ## Wifi Configuration
 
 ### Enable the tractor as an access point
@@ -55,6 +61,7 @@ Or `tail -f /var/log/syslog` ...
 - The tractor is reachable at `192.168.48.1`.
 
 ### Change the tractor's access point password
+
 - Run `python -m farm_ng.wifi list`
 - Run `python -m farm_ng.wifi delete <id>` with the `farm_ng-<tractorhostname>` id from the previous step
 - Run `python -m farm_ng.wifi ap`
