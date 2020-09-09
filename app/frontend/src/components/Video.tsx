@@ -7,6 +7,7 @@ import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apri
 import Button from "react-bootstrap/Button";
 import { useRootStore } from "../models/RootStore";
 import { autorun } from "mobx";
+import styles from "./Video.module.scss";
 
 const t265Resolution = {
   width: 848,
@@ -104,49 +105,17 @@ export const Video: React.FC = () => {
   );
 
   return useObserver(() => (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "0",
-        flex: "1 1 auto",
-        backgroundColor: "black"
-      }}
-    >
-      <div style={{ display: "flex", flexDirection: "row" }}>
+    <div className={styles.content}>
+      <div className={styles.buttons}>
         <Button variant={"primary"} onClick={startVideo}>
           Start Video
         </Button>
         <button disabled>Send Test Event</button>
       </div>
-      <div
-        style={{
-          minHeight: "0",
-          display: "flex",
-          justifyContent: "center"
-        }}
-      >
-        <div style={{ height: "100%", position: "relative" }}>
-          <video
-            ref={videoRef}
-            autoPlay
-            style={{
-              maxHeight: "100%",
-              maxWidth: "100%"
-              // margin: "auto",
-              // display: "block"
-            }}
-          ></video>
-          <canvas
-            ref={canvasRef}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0
-            }}
-          ></canvas>
+      <div className={styles.annotatedVideoContainer}>
+        <div className={styles.annotatedVideo}>
+          <video ref={videoRef} autoPlay className={styles.video}></video>
+          <canvas ref={canvasRef} className={styles.canvas}></canvas>
         </div>
       </div>
     </div>
