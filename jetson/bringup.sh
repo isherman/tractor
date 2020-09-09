@@ -31,11 +31,17 @@ ifconfig wlan0 multicast
 # events?
 sleep 1
 
-$SERVICE_DIR/bringup_can.sh
+# bring up canbus
+if [ ! -f "/opt/farm_ng/flags/canbus_disable.touch" ]; then
+    $SERVICE_DIR/bringup_can.sh
+fi
+
 touch /tmp/tractor-ready.touch
 
 while true
 do
-    ip -details -statistics link show can0
+    if [ ! -f "/opt/farm_ng/flags/canbus_disable.touch" ]; then
+        ip -details -statistics link show can0
+    fi
     sleep 5
 done

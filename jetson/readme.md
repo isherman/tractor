@@ -28,7 +28,7 @@ This installs the following services:
 - tractor-webservices.service - Responsible for proxying ipc traffic over webRTC,
   serving a Twirp API, and serving the static frontend.
 
-- tractor-webservices-port.service - Opens port 80 for webservices.
+- tractor-webservices.socket - Opens port 80 for webservices.
 
 The install script enables these services so that they start at boot.
 
@@ -39,7 +39,6 @@ journalctl -f -u tractor
 journalctl -f -u tractor-bringup
 journalctl -f -u tractor-steering
 journalctl -f -u tractor-webservices
-journalctl -f -u tractor-webservices-port
 ```
 
 Or `tail -f /var/log/syslog` ...
