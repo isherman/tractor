@@ -4,6 +4,8 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
+	"path"
 
 	"github.com/pion/rtp"
 	"github.com/rs/cors"
@@ -16,10 +18,10 @@ import (
 )
 
 const (
-	eventBusAddr = "239.20.20.21"
-	eventBusPort = 10000
-	rtpAddr      = "239.20.20.20:5000"
-	serverAddr   = ":9900"
+	eventBusAddr      = "239.20.20.21"
+	eventBusPort      = 10000
+	rtpAddr           = "239.20.20.20:5000"
+	defaultServerAddr = ":8080"
 	// Set this too low and we see packet loss in chrome://webrtc-internals, and on the network interface (`netstat -suna`)
 	// But what should it be? `sysctl net.core.rmem_max`?
 	rtpReadBufferSize  = 1024 * 1024 * 8
@@ -73,5 +75,19 @@ func main() {
 		AllowedHeaders: []string{"Content-Type"},
 	})
 
-	http.ListenAndServe(serverAddr, corsWrapper.Handler(twirpHandler))
+	// Serve the twirp services and frontend
+	farmNgRoot := os.Getenv("FARM_NG_ROOT")
+	if farmNgRoot == "" {
+		log.Fatalln("FARM_NG_ROOT must be set.")
+	}
+	serverAddr := defaultServerAddr
+	port := os.Getenv("PORT")
+	if port != "" {
+		serverAddr = ":" + port
+	}
+	mux := http.NewServeMux()
+	mux.Handle("/twirp/", corsWrapper.Handler(twirpHandler))
+	mux.Handle("/", http.FileServer(http.Dir(path.Join(farmNgRoot, "build/frontend"))))
+	log.Println("Serving frontend and API at:", serverAddr)
+	http.ListenAndServe(serverAddr, mux)
 }
