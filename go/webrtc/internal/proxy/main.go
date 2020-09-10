@@ -79,6 +79,7 @@ func (p *RtpProxy) start() error {
 				p.packetsReceived = 0
 			}
 		}
+	}()
 
 	// Continuously read from the RTP stream and publish to all registered callbacks
 	inboundRTPPacket := make([]byte, p.config.MaxDatagramSize)
