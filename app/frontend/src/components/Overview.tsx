@@ -1,12 +1,14 @@
 import * as React from "react";
-import { ListGroup } from "react-bootstrap";
+import { ListGroup, Card, CardColumns, Table } from "react-bootstrap";
 import { useObserver } from "mobx-react-lite";
 import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { MotorControllerState } from "../../genproto/farm_ng_proto/tractor/v1/motor";
 import { formatValue } from "../utils/formatValue";
 import { useStores } from "../hooks/useStores";
+import styles from "./Overview.module.scss";
 
-const voltageWarningThreshold = 38;
+const voltageWarningThreshold = 38; // v
+const processWarningThreshold = 1000; // ms
 
 export const Overview: React.FC = () => {
   const { busEventStore } = useStores();
@@ -34,36 +36,62 @@ export const Overview: React.FC = () => {
         busEventStore.lastSnapshot.get(key)?.latestEventTime
       ]);
     const processStatus = (
-      <ListGroup>
-        {processes.map(([serviceName, lastSeen]) => (
-          <React.Fragment key={serviceName}>
-            <ListGroup.Item>{serviceName}</ListGroup.Item>
-            <ListGroup.Item>{formatValue(lastSeen)}</ListGroup.Item>
-          </React.Fragment>
-        ))}
-      </ListGroup>
+      <Table className={styles.processTable} responsive>
+        <tbody>
+          {processes.map(([serviceName, lastSeen]) => (
+            <tr key={serviceName}>
+              <td>
+                {!lastSeen ||
+                new Date().getTime() - lastSeen.getTime() >
+                  processWarningThreshold
+                  ? "⚠️"
+                  : "✔️"}
+              </td>
+              <td>{serviceName}</td>
+              <td>{formatValue(lastSeen)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     );
 
     return (
-      <div>
-        <h1>Overview</h1>
-        <h2>Distance Traveled</h2>
-        <ListGroup>
-          <ListGroup.Item>{absDistanceTraveled}</ListGroup.Item>
-        </ListGroup>
-        <h2>Battery</h2>
-        {
-          <ListGroup>
-            <ListGroup.Item variant={rightMotorWarning && "warning"}>
-              {rightMotorInputVoltage}
-            </ListGroup.Item>
-            <ListGroup.Item variant={leftMotorWarning && "warning"}>
-              {leftMotorInputVoltage}
-            </ListGroup.Item>
-          </ListGroup>
-        }
-        <h2>Process Status</h2>
-        {processStatus}
+      <div className={styles.content}>
+        <CardColumns>
+          <Card bg={"light"} className={"shadow-sm"}>
+            <Card.Body>
+              <Card.Title>Distance Traveled</Card.Title>
+              <ListGroup>
+                <ListGroup.Item>
+                  {formatValue(absDistanceTraveled || 0)} m
+                </ListGroup.Item>
+              </ListGroup>
+            </Card.Body>
+          </Card>
+
+          <Card bg={"light"} className={"shadow-sm"}>
+            <Card.Body>
+              <Card.Title>Battery</Card.Title>
+              <ListGroup horizontal>
+                <ListGroup.Item className="flex-fill">
+                  {leftMotorWarning && "⚠️"}{" "}
+                  {leftMotorInputVoltage && `${leftMotorInputVoltage} v`}
+                </ListGroup.Item>
+                <ListGroup.Item className="flex-fill">
+                  {rightMotorWarning && "⚠️"}{" "}
+                  {rightMotorInputVoltage && `${rightMotorInputVoltage} v`}
+                </ListGroup.Item>
+              </ListGroup>
+            </Card.Body>
+          </Card>
+
+          <Card bg={"light"} className={"shadow-sm"}>
+            <Card.Body>
+              <Card.Title>Processes</Card.Title>
+              {processStatus}
+            </Card.Body>
+          </Card>
+        </CardColumns>
       </div>
     );
   });

@@ -4,7 +4,6 @@ import { useObserver } from "mobx-react-lite";
 
 import { Vec2 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
-import Button from "react-bootstrap/Button";
 import { autorun } from "mobx";
 import styles from "./Video.module.scss";
 import { useStores } from "../hooks/useStores";
@@ -60,13 +59,6 @@ export const Video: React.FC = () => {
     }
   };
 
-  const startVideo = (): void => {
-    const videoElement = videoRef?.current;
-    if (videoElement) {
-      videoElement.play();
-    }
-  };
-
   useEffect(
     () =>
       autorun(() => {
@@ -105,15 +97,9 @@ export const Video: React.FC = () => {
 
   return useObserver(() => (
     <div className={styles.content}>
-      <div className={styles.buttons}>
-        <Button variant={"primary"} onClick={startVideo}>
-          Start Video
-        </Button>
-        <button disabled>Send Test Event</button>
-      </div>
       <div className={styles.annotatedVideoContainer}>
         <div className={styles.annotatedVideo}>
-          <video ref={videoRef} autoPlay className={styles.video}></video>
+          <video ref={videoRef} autoPlay muted className={styles.video}></video>
           <canvas ref={canvasRef} className={styles.canvas}></canvas>
         </div>
       </div>
