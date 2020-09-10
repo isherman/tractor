@@ -25,4 +25,4 @@ test:
 test-integration:
 	scripts/test-integration.sh
 
-.PHONY: frontend protos test test-integration
+.PHONY: frontend protos test test-integration webserver webservices
