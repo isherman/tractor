@@ -327,6 +327,11 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) (*webrtc.SessionDescrip
 					p.eventBusProxy.sendEvent(event)
 				}
 				log.Printf("[%s] Ending datachannel->eventbus forwarding", peerID)
+
+				// This is the most reliable signal I've been able to find so far that a peer
+				// has disappeared. End RTP forwarding as well.
+				log.Printf("[%s] Ending rtp->videostream forwarding", peerID)
+				p.rtpProxy.unregisterCallback(peerID)
 			}()
 
 			// Service received EventBus events, forwarding them to the data channel
