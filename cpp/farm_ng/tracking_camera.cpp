@@ -244,6 +244,27 @@ class TrackingCameraClient {
     auto tm2 = profile.get_device().as<rs2::tm2>();
     auto pose_sensor = tm2.first<rs2::pose_sensor>();
 
+    // Start pipe and get camera calibrations
+    const int fisheye_sensor_idx = 1;  // for the left fisheye lens of T265
+    auto fisheye_stream =
+        profile.get_stream(RS2_STREAM_FISHEYE, fisheye_sensor_idx);
+    auto fisheye_intrinsics =
+        fisheye_stream.as<rs2::video_stream_profile>().get_intrinsics();
+
+    LOG(INFO) << " intrinsics model: "
+              << rs2_distortion_to_string(fisheye_intrinsics.model)
+              << " width=" << fisheye_intrinsics.width
+              << " height=" << fisheye_intrinsics.height
+              << " ppx=" << fisheye_intrinsics.ppx
+              << " ppx=" << fisheye_intrinsics.ppy
+              << " fx=" << fisheye_intrinsics.fx
+              << " fy=" << fisheye_intrinsics.fy
+              << " coeffs=" << fisheye_intrinsics.coeffs[0] << ", "
+              << fisheye_intrinsics.coeffs[1] << ", "
+              << fisheye_intrinsics.coeffs[2] << ", "
+              << fisheye_intrinsics.coeffs[3] << ", "
+              << fisheye_intrinsics.coeffs[4];
+
     // setting options for slam:
     // https://github.com/IntelRealSense/librealsense/issues/1011
     // and what to set:
