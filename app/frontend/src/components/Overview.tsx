@@ -8,7 +8,7 @@ import { useStores } from "../hooks/useStores";
 import styles from "./Overview.module.scss";
 
 const voltageWarningThreshold = 38; // v
-const processWarningThreshold = 1000; // ms
+const processWarningThreshold = 5000; // ms
 
 export const Overview: React.FC = () => {
   const { busEventStore } = useStores();
