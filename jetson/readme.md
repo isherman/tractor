@@ -28,8 +28,6 @@ This installs the following services:
 - tractor-webservices.service - Responsible for proxying ipc traffic over webRTC,
   serving a Twirp API, and serving the static frontend.
 
-- tractor-webservices.socket - Opens port 80 for webservices.
-
 The install script enables these services so that they start at boot.
 
 To see their log output:
@@ -46,7 +44,12 @@ Or `tail -f /var/log/syslog` ...
 ## Debugging
 
 ```
-systemd-analyze plot >bootup.svg
+systemd-analyze plot > bootup.svg
+systemd-analyze dot --from-pattern='tractor*.service' | dot -Tsvg > graph.svg
+systemd-analyze verify multi-user.target (look for anything tractor related)
+systemctl list-unit-files
+systemctl show -p Requires,Wants,Requisite,BindsTo,PartOf,Before,After <name>.service
+
 ```
 
 ## Wifi Configuration
