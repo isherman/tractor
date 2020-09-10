@@ -9,7 +9,7 @@ export function getWebRTCEmitters(
   const busEventEmitter = new BusEventEmitter();
   const mediaStreamEmitter = new MediaStreamEmitter();
   const pc = new RTCPeerConnection({
-    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    iceServers: [] // no iceServers, since we only support LAN
   });
 
   pc.ontrack = (event) => {
@@ -51,7 +51,9 @@ export function getWebRTCEmitters(
   // Offer to receive 1 video track and a data channel
   pc.addTransceiver("video", { direction: "recvonly" });
 
-  const dataChannel = pc.createDataChannel("foo"); // TODO: investigate data channel naming
+  const dataChannel = pc.createDataChannel("data", {
+    ordered: false
+  });
   dataChannel.onclose = () => console.log("Data channel closed");
   dataChannel.onopen = () => console.log("Data channel opened");
   dataChannel.onmessage = (msg) => {

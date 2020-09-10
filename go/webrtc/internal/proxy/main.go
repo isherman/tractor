@@ -12,6 +12,7 @@ import (
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v3"
 	"google.golang.org/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 )
 
 func uniqueId() int64 {
@@ -238,6 +239,24 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) webrtc.SessionDescripti
 			}
 			log.Printf("Starting eventbus->datachannel forwarding [%s]\n", peerId)
 			p.registerEventCallback(peerId, cb)
+
+			// Immediately write some data to fill the write buffers
+			for i := 0; i < 100; i++ {
+				event := &pb.Event{}
+				event.RecvStamp = ptypes.TimestampNow()
+				event.Stamp = ptypes.TimestampNow()
+				event.Name = "ipc/announcement/webrtc-proxy"
+				event.Data, err = ptypes.MarshalAny(&pb.Announce{
+					Service: "webrtc-proxy",
+					Stamp:   ptypes.TimestampNow(),
+				})
+
+				eventBytes, err := proto.Marshal(event)
+				_, err = raw.Write(eventBytes)
+				if err != nil {
+					log.Println("Could not write event to datachannel : ", err)
+				}
+			}
 		})
 	})
 
