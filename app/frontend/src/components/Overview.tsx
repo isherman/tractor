@@ -74,11 +74,11 @@ export const Overview: React.FC = () => {
               <Card.Title>Battery</Card.Title>
               <ListGroup horizontal>
                 <ListGroup.Item className="flex-fill">
-                  {leftMotorWarning && "⚠️"}{" "}
+                  {leftMotorWarning && "⚠️"}
                   {leftMotorInputVoltage && `${leftMotorInputVoltage} v`}
                 </ListGroup.Item>
                 <ListGroup.Item className="flex-fill">
-                  {rightMotorWarning && "⚠️"}{" "}
+                  {rightMotorWarning && "⚠️"}
                   {rightMotorInputVoltage && `${rightMotorInputVoltage} v`}
                 </ListGroup.Item>
               </ListGroup>

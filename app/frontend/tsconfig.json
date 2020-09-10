@@ -8,17 +8,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "module": "es6",
-    "lib": [
-      "ES6",
-      "DOM",
-      "DOM.Iterable",
-      "ES2015.Iterable",
-      "es2018",
-      "ES2019",
-      "esnext"
-    ],
+    "lib": ["DOM", "ES2019"],
     "jsx": "react",
-    "target": "es6",
+    "target": "es5",
     "typeRoots": ["./typings", "node_modules/@types"],
     "moduleResolution": "node" // required by Three.js
   },

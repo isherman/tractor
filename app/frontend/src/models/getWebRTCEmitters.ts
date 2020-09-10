@@ -9,7 +9,7 @@ export function getWebRTCEmitters(
   const busEventEmitter = new BusEventEmitter();
   const mediaStreamEmitter = new MediaStreamEmitter();
   const pc = new RTCPeerConnection({
-    iceServers: [] // no iceServers, since we only support LAN
+    iceServers: [] // no STUN servers, since we only support LAN
   });
 
   pc.ontrack = (event) => {
