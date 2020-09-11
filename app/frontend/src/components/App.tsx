@@ -6,6 +6,7 @@ import { State } from "./State";
 import { Video } from "./Video";
 import { Debug } from "./Debug";
 import { Map } from "./Map";
+import { Root as Viz } from "./viz/Root";
 import styles from "./App.module.scss";
 
 export const App: React.FC = () => {
@@ -33,6 +34,9 @@ export const App: React.FC = () => {
             <Nav.Link as={Link} to="/debug">
               Debug
             </Nav.Link>
+            <Nav.Link as={Link} to="/viz">
+              Viz
+            </Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Navbar>
@@ -43,6 +47,7 @@ export const App: React.FC = () => {
         <Route exact path="/video" component={Video} />
         <Route exact path="/map" component={Map} />
         <Route exact path="/debug" component={Debug} />
+        <Route exact path="/viz" component={Viz} />
         <Route render={() => <p>Not found</p>} />
       </Switch>
     </div>
