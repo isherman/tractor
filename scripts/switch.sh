@@ -28,7 +28,13 @@ else
     echo "PR must be a number" >&2
     exit 1
   fi
-  git fetch $REMOTE pull/$1/head:pr-$1
+
+  if [[ $(git rev-parse --abbrev-ref HEAD) = "pr-$1" ]]; then
+    git pull $REMOTE pull/$1/head:pr-$1
+  else
+    git fetch $REMOTE pull/$1/head:pr-$1
+  fi
+
   if [ $? -ne 0 ]; then
       echo "There was an error during git fetch, cannot proceed."
       exit 1
