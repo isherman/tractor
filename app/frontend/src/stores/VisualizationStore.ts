@@ -75,9 +75,9 @@ export class VisualizationStore {
   @observable dataSource: DataSourceType = "live";
   @observable bufferStart = new Date();
   @observable bufferEnd = new Date();
-  @observable bufferRangeStart = new Date();
-  @observable bufferRangeEnd = new Date();
-  @observable bufferRate = 0;
+  @observable bufferRangeStart = 0;
+  @observable bufferRangeEnd = 1;
+  @observable bufferThrottle = 0;
   @observable bufferSize = 0;
 
   @observable panels: ObservableMap<string, Panel>;

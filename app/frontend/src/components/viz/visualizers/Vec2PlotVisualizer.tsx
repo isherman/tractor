@@ -1,10 +1,11 @@
 import * as React from "react";
-import { Line } from "react-chartjs-2";
+// import { Line } from "react-chartjs-2";
 import { Vec2 } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
 import {
   VisualizerOptionConfig,
   VisualizerProps
 } from "../../../data/registry";
+import { Plot } from "./Plot";
 
 export class Vec2PlotVisualizer {
   name = "plot";
@@ -18,39 +19,66 @@ export class Vec2PlotVisualizer {
       return null;
     }
 
-    const plotData = {
-      labels: values.map((v) => new Date(v[0])),
-      datasets: [
+    const plotData = [
+      values.map((v) => v[0] / 1000),
+      values.map((v) => v[1].x),
+      values.map((v) => v[1].y)
+    ];
+
+    const plotOptions = {
+      // title: "MyPlot",
+      width: 800,
+      height: 600,
+      series: [
+        {
+          show: false
+        },
         {
           label: "x",
-          data: values.map((v) => v[1].x),
-          fill: false,
-          borderColor: "rgba(75,192,192,1)",
-          borderWidth: parseInt(options[0].value)
+          stroke: "rgb(75,192,192)",
+          width: parseInt(options[0].value)
         },
         {
           label: "y",
-          data: values.map((v) => v[1].y),
-          fill: false,
-          borderColor: "#742774",
-          borderWidth: parseInt(options[0].value)
+          stroke: "#742774",
+          width: parseInt(options[0].value)
         }
       ]
     };
-    const plotOptions = {
-      scales: {
-        xAxes: [
-          {
-            display: false
-          }
-        ]
-      }
-    };
 
-    return (
-      <div>
-        <Line data={plotData} options={plotOptions} />
-      </div>
-    );
+    //   datasets: [
+    //     {
+    //       label: "x",
+    //       data: values.map((v) => v[1].x),
+    //       fill: false,
+    //       borderColor: "rgba(75,192,192,1)",
+    //       borderWidth: parseInt(options[0].value)
+    //     },
+    //     {
+    //       label: "y",
+    //       data: values.map((v) => v[1].y),
+    //       fill: false,
+    //       borderColor: "#742774",
+    //       borderWidth: parseInt(options[0].value)
+    //     }
+    //   ]
+    // };
+    // const plotOptions = {
+    //   scales: {
+    //     xAxes: [
+    //       {
+    //         display: false
+    //       }
+    //     ]
+    //   }
+    // };
+
+    return <Plot data={plotData} options={plotOptions} />;
+
+    // return (
+    //   <div>
+    //     <Line data={plotData} options={plotOptions} />
+    //   </div>
+    // );
   };
 }

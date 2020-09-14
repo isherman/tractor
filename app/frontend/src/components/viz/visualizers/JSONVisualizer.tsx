@@ -51,7 +51,7 @@ export class JSONVisualizer {
     } else if (options[0].value === "row") {
       return (
         <div className={styles.row}>
-          {values.slice(0, 10).map((v) => (
+          {values.map((v, index) => (
             <Card key={v[0]} bg={"light"} className={"shadow-sm"}>
               <Card.Body>
                 <ListGroup>

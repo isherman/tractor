@@ -17,7 +17,7 @@ type Buffer = { [k in EventTypeId]?: NamedTimestampedEventVector[] };
 
 const currentTime = Date.now();
 const startTime = currentTime - 60 * 1000;
-const numTimestamps = 100;
+const numTimestamps = 1000;
 const timestamps = Array(numTimestamps)
   .fill(0)
   .map(

@@ -15,9 +15,12 @@ export const PanelContent: React.FC<IProps> = ({ id }) => {
   return useObserver(() => {
     const panel = store.panels.get(id);
     if (!panel) return null;
-    const streams = (buffer[panel.eventType] || []).map((stream) => (
-      <Stream key={stream.name} panelId={id} stream={stream} />
-    ));
+    const filter = new RegExp(panel.tagFilter);
+    const streams = (buffer[panel.eventType] || [])
+      .filter((stream) => filter.test(stream.name))
+      .map((stream) => (
+        <Stream key={stream.name} panelId={id} stream={stream} />
+      ));
     return <div className={styles.panelContent}>{streams}</div>;
   });
 };

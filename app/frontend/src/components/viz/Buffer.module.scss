@@ -4,3 +4,11 @@
   padding: 10px;
   justify-content: space-around;
 }
+
+.rangeSliders {
+  flex-grow: 1;
+
+  input[type="range"] {
+    width: 100%;
+  }
+}

@@ -63,7 +63,8 @@
     "react-router-dom": "^5.2.0",
     "react-three-fiber": "^4.2.20",
     "three": "^0.119.1",
-    "ts-proto": "^1.27.1"
+    "ts-proto": "^1.27.1",
+    "uplot": "^1.1.2"
   },
   "jest": {
     "preset": "ts-jest",

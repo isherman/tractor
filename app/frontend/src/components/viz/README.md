@@ -1,6 +1,5 @@
 # TODO
 
-- Hook RangeStart, RangeEnd, Rate
 - Hook up Steering Command
 
   - Factor out plotter. Remove react-chartjs-2.
