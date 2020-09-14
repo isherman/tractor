@@ -16,6 +16,11 @@ fi
 
 if [ "$1" = "master" ]; then
   git fetch $REMOTE master
+  if [ $? -ne 0 ]; then
+      echo "There was an error during git fetch, cannot proceed."
+      exit 1
+  fi
+
   git checkout master
 else
   re='^[0-9]+$'
@@ -24,6 +29,11 @@ else
     exit 1
   fi
   git fetch $REMOTE pull/$1/head:pr-$1
+  if [ $? -ne 0 ]; then
+      echo "There was an error during git fetch, cannot proceed."
+      exit 1
+  fi
+
   git checkout pr-$1
 fi
 
