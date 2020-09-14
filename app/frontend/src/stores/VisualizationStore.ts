@@ -5,6 +5,7 @@ import {
   VisualizerId,
   visualizerMap,
   VisualizerOption,
+  VisualizerOptionConfig,
   visualizerRegistry
 } from "../data/registry";
 
@@ -18,7 +19,9 @@ function getVisualizers(eventType: EventTypeId): Visualizer[] {
   return [visualizerRegistry.default];
 }
 
-function getVisualizerOptions(visualizerId: VisualizerId): VisualizerOption[] {
+function getVisualizerOptionConfigs(
+  visualizerId: VisualizerId
+): VisualizerOptionConfig[] {
   return visualizerRegistry[visualizerId].options;
 }
 
@@ -27,21 +30,28 @@ export class Panel {
   private streams = ["tractor", "steering", "joystick"];
   public id = Math.random().toString(36).substring(7);
   @observable eventType: EventTypeId =
-    "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand";
+    "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2";
   @observable visualizers: Visualizer[];
   @observable selectedVisualizer: number;
-  @observable options: VisualizerOption[];
+  @observable optionConfigs: VisualizerOptionConfig[];
   @observable selectedOptions: number[];
 
   constructor() {
     this.visualizers = getVisualizers(this.eventType);
     this.selectedVisualizer = 0;
-    this.options = getVisualizerOptions(this.visualizer.name);
-    this.selectedOptions = this.options.map((_) => 0);
+    this.optionConfigs = getVisualizerOptionConfigs(this.visualizer.name);
+    this.selectedOptions = this.optionConfigs.map((_) => 0);
   }
 
   @computed get visualizer(): Visualizer {
     return this.visualizers[this.selectedVisualizer];
+  }
+
+  @computed get options(): VisualizerOption[] {
+    return this.optionConfigs.map((o, index) => ({
+      ...o,
+      value: o.options[this.selectedOptions[index]]
+    }));
   }
 
   @computed get visibleStreams(): string[] {
@@ -52,14 +62,14 @@ export class Panel {
     this.eventType = d;
     this.visualizers = getVisualizers(d);
     this.selectedVisualizer = 0;
-    this.options = getVisualizerOptions(this.visualizer.name);
-    this.selectedOptions = this.options.map((_) => 0);
+    this.optionConfigs = getVisualizerOptionConfigs(this.visualizer.name);
+    this.selectedOptions = this.optionConfigs.map((_) => 0);
   }
 
   setVisualizer(index: number): void {
     this.selectedVisualizer = index;
-    this.options = getVisualizerOptions(this.visualizer.name);
-    this.selectedOptions = this.options.map((_) => 0);
+    this.optionConfigs = getVisualizerOptionConfigs(this.visualizer.name);
+    this.selectedOptions = this.optionConfigs.map((_) => 0);
   }
 
   setOption(optionIndex: number, valueIndex: number): void {

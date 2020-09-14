@@ -14,7 +14,7 @@ export const PanelContent: React.FC<IProps> = ({ id }) => {
   return useObserver(() => {
     const streams = store.panels
       .get(id)
-      ?.visibleStreams.map((_) => <Stream key={_} id={_} />);
+      ?.visibleStreams.map((_) => <Stream key={_} panelId={id} name={_} />);
     return <div className={styles.panelContent}>{streams}</div>;
   });
 };

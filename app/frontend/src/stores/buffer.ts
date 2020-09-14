@@ -12,7 +12,7 @@ type Buffer = { [k: string]: TimestampedEventVector };
 
 const currentTime = Date.now();
 const startTime = currentTime - 60 * 1000;
-const numTimestamps = 1000;
+const numTimestamps = 100;
 const timestamps = Array(numTimestamps)
   .fill(0)
   .map((_, i) => startTime + (i * (currentTime - startTime)) / numTimestamps);
@@ -20,7 +20,7 @@ const timestamps = Array(numTimestamps)
 const vec2DummyData = (t: Timestamp): Vec2 => {
   return Vec2.fromJSON({
     x: Math.sin(2 * t) + Math.sin(Math.PI * t),
-    y: Math.sin(2 * t) + Math.cos(Math.PI * t)
+    y: Math.sin(2 * t + Math.PI) + Math.sin(Math.PI * t)
   });
 };
 

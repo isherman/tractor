@@ -12,6 +12,7 @@ import {
 } from "../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
 import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { DefaultVisualizer } from "../components/viz/visualizers/DefaultVisualizer";
+import { Vec2PlotVisualizer } from "../components/viz/visualizers/Vec2PlotVisualizer";
 import { Vec2SummaryVisualizer } from "../components/viz/visualizers/Vec2SummaryVisualizer";
 
 export type EventType =
@@ -60,18 +61,20 @@ export type TimestampedEventVector<
   T extends EventType = EventType
 > = TimestampedEvent<T>[];
 
-export interface VisualizerOption {
+export interface VisualizerOptionConfig {
   label: string;
   options: string[];
 }
+export type VisualizerOption = VisualizerOptionConfig & { value: string };
 
 export interface VisualizerProps<T extends EventType = EventType> {
   values: TimestampedEventVector<T>;
+  options: VisualizerOption[];
 }
 export interface Visualizer<T extends EventType = EventType> {
   name: string;
   component: React.FC<VisualizerProps<T>>;
-  options: VisualizerOption[];
+  options: VisualizerOptionConfig[];
 }
 
 export const visualizerIds = [
@@ -87,11 +90,7 @@ type VisualizerRegistry = {
   [K in VisualizerId]: Visualizer;
 };
 export const visualizerRegistry: VisualizerRegistry = {
-  plot: {
-    name: "plot",
-    component: Vec2SummaryVisualizer as React.FC<VisualizerProps>,
-    options: [{ label: "strokeWidth", options: ["1", "2", "3", "4"] }]
-  },
+  plot: new Vec2PlotVisualizer() as Visualizer,
   histogram: {
     name: "histogram",
     component: Vec2SummaryVisualizer as React.FC<VisualizerProps>,

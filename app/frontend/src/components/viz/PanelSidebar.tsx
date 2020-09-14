@@ -30,7 +30,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
       tagFilter,
       selectedVisualizer,
       visualizers,
-      options,
+      optionConfigs: optionConfigs,
       selectedOptions
     } = panel;
     const setEventType = (e: ChangeEvent<HTMLSelectElement>): void => {
@@ -81,7 +81,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
           </Form.Control>
         </Form.Group>
 
-        {options.map((optionLabel, optionIndex) => (
+        {optionConfigs.map((optionLabel, optionIndex) => (
           <Form.Group
             key={optionLabel.label}
             controlId={`option.{option.label}`}
