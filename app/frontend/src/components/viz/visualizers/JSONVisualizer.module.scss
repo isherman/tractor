@@ -1,0 +1,10 @@
+.row {
+  display: flex;
+  overflow-x: auto;
+
+  :global(.card) {
+    width: 18rem;
+    min-width: 18rem;
+    margin-right: 1rem;
+  }
+}

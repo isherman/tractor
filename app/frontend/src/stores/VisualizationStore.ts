@@ -6,29 +6,27 @@ import {
   visualizerMap,
   VisualizerOption,
   VisualizerOptionConfig,
-  visualizerRegistry
+  visualizerRegistry,
+  visualizerRegistryGlobals
 } from "../data/registry";
 
 export type DataSourceType = "live" | "pause" | "log";
 
 function getVisualizers(eventType: EventTypeId): Visualizer[] {
-  const registeredVisualizers = visualizerMap[eventType];
-  if (registeredVisualizers && registeredVisualizers.length > 0) {
-    return registeredVisualizers as Visualizer[];
-  }
-  return [visualizerRegistry.default];
+  const visualizers = visualizerMap[eventType] as Visualizer[];
+  return [...(visualizers || []), ...visualizerRegistryGlobals] as Visualizer[];
 }
 
 function getVisualizerOptionConfigs(
   visualizerId: VisualizerId
 ): VisualizerOptionConfig[] {
-  return visualizerRegistry[visualizerId].options;
+  return visualizerRegistry[visualizerId].options || [];
 }
 
 export class Panel {
-  @observable tagFilter = "";
-  private streams = ["tractor", "steering", "joystick"];
   public id = Math.random().toString(36).substring(7);
+
+  @observable tagFilter = "";
   @observable eventType: EventTypeId =
     "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2";
   @observable visualizers: Visualizer[];
@@ -52,10 +50,6 @@ export class Panel {
       ...o,
       value: o.options[this.selectedOptions[index]]
     }));
-  }
-
-  @computed get visibleStreams(): string[] {
-    return this.streams.filter((_) => new RegExp(this.tagFilter).test(_));
   }
 
   setEventType(d: EventTypeId): void {

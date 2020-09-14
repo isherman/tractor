@@ -11,9 +11,9 @@ import {
   TrackingCameraMotionFrame
 } from "../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
 import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
-import { DefaultVisualizer } from "../components/viz/visualizers/DefaultVisualizer";
+import { TimeSkewVisualizer } from "../components/viz/visualizers/TimeSkewVisualizer";
+import { JSONVisualizer } from "../components/viz/visualizers/JSONVisualizer";
 import { Vec2PlotVisualizer } from "../components/viz/visualizers/Vec2PlotVisualizer";
-import { Vec2SummaryVisualizer } from "../components/viz/visualizers/Vec2SummaryVisualizer";
 
 export type EventType =
   | SteeringCommand
@@ -77,13 +77,7 @@ export interface Visualizer<T extends EventType = EventType> {
   options: VisualizerOptionConfig[];
 }
 
-export const visualizerIds = [
-  "plot",
-  "histogram",
-  "values",
-  "overlay",
-  "default"
-];
+export const visualizerIds = ["plot", "timeSkew", "json"];
 export type VisualizerId = typeof visualizerIds[number];
 
 type VisualizerRegistry = {
@@ -91,36 +85,19 @@ type VisualizerRegistry = {
 };
 export const visualizerRegistry: VisualizerRegistry = {
   plot: new Vec2PlotVisualizer() as Visualizer,
-  histogram: {
-    name: "histogram",
-    component: Vec2SummaryVisualizer as React.FC<VisualizerProps>,
-    options: [{ label: "bins", options: ["1", "2", "3", "4"] }]
-  },
-  values: {
-    name: "values",
-    component: Vec2SummaryVisualizer as React.FC<VisualizerProps>,
-    options: [{ label: "color", options: ["red", "blue", "green", "yellow"] }]
-  },
-  overlay: {
-    name: "overlay",
-    component: Vec2SummaryVisualizer as React.FC<VisualizerProps>,
-    options: [{ label: "transparency", options: ["0.2", "0.4", "0.6", "0.8"] }]
-  },
-  default: {
-    name: "default",
-    component: DefaultVisualizer,
-    options: []
-  }
+  timeSkew: new TimeSkewVisualizer(),
+  json: new JSONVisualizer()
 };
+export const visualizerRegistryGlobals = [
+  visualizerRegistry.timeSkew,
+  visualizerRegistry.json
+];
 
 type GenericVisualizerMap = {
   [K in EventTypeId]?: Visualizer<EventTypesMap[K]>[];
 };
 export const visualizerMap: GenericVisualizerMap = {
   "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": [
-    visualizerRegistry.plot as Visualizer<Vec2>,
-    visualizerRegistry.histogram as Visualizer<Vec2>,
-    visualizerRegistry.values as Visualizer<Vec2>,
-    visualizerRegistry.overlay as Visualizer<Vec2>
+    visualizerRegistry.plot as Visualizer<Vec2>
   ]
 };
