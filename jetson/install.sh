@@ -12,9 +12,16 @@ export SERVICE_DIR=$( cd "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 mkdir -p /opt/farm_ng/systemd
 prefix=/opt/farm_ng make -C $SERVICE_DIR/uhubctl
 prefix=/opt/farm_ng make -C $SERVICE_DIR/uhubctl install
+
+rm /opt/farm_ng/systemd/*.sh
 cp $SERVICE_DIR/*.sh /opt/farm_ng/systemd
+
+rm /etc/systemd/system/tractor*.service
 cp $SERVICE_DIR/*.service /etc/systemd/system/
+
+rm /etc/systemd/system/tractor*.path
 cp $SERVICE_DIR/*.path /etc/systemd/system/
+
 # https://superuser.com/a/1398400 - add udev rule so we can have services wait on the usb bus.
 cp $SERVICE_DIR/20-usb-bus.rules /etc/udev/rules.d/
 systemctl daemon-reload

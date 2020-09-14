@@ -8,6 +8,7 @@ bootstrap:
 	./bootstrap.sh
 
 cpp:
+	make protos
 	mkdir -p build
 	cd build && cmake .. && make -j$(nproc --ignore=1)
 
@@ -42,10 +43,8 @@ webservices:
 all:
 	make bootstrap
 	make third_party
-	make protos
-	make frontend
-	make webserver
 	make cpp
+	make webservices
 	make systemd
 
 .PHONY: bootstrap cpp frontend protos systemd third_party test test-integration webserver webservices all
