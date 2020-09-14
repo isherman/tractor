@@ -10,7 +10,8 @@ then
 fi
 
 if [[ $(git diff --stat) != '' ]]; then
-  echo 'Your git working directory is dirty.'
+  echo 'Your git working directory is dirty. Please revert or stash your local changes.'
+  exit 1
 fi
 
 if [ "$1" = "master" ]; then
