@@ -3,12 +3,33 @@ ifdef TEST_FILTER
 	JS_TEST_FILTER=:$(TEST_FILTER)
 endif
 
-protos:
-	scripts/build-protos.sh
+
+bootstrap:
+	./bootstrap.sh
+
+cpp:
+	mkdir -p build
+	cd build && cmake .. && make -j$(nproc --ignore=1)
 
 frontend:
 	cd app/frontend && yarn && yarn build
 	cp -rT app/frontend/dist build/frontend
+
+protos:
+	scripts/build-protos.sh
+
+systemd:
+	cd jetson && sudo ./install.sh
+
+third_party:
+	cd third_party && ./install.sh
+
+test:
+	./env.sh pytest $(PY_TEST_FILTER)
+	cd app/frontend && yarn test$(JS_TEST_FILTER)
+
+test-integration:
+	scripts/test-integration.sh
 
 webserver:
 	cd go/webrtc && ../../env.sh make
@@ -18,11 +39,13 @@ webservices:
 	make frontend
 	make webserver
 
-test:
-	./env.sh pytest $(PY_TEST_FILTER)
-	cd app/frontend && yarn test$(JS_TEST_FILTER)
+all:
+	make bootstrap
+	make third_party
+	make protos
+	make frontend
+	make webserver
+	make cpp
+	make systemd
 
-test-integration:
-	scripts/test-integration.sh
-
-.PHONY: frontend protos test test-integration webserver webservices
+.PHONY: bootstrap cpp frontend protos systemd third_party test test-integration webserver webservices all
