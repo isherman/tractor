@@ -39,8 +39,9 @@ apt-get install -y \
 pip3 install virtualenv
 
 # Go
-wget https://golang.org/dl/go1.15.1.linux-arm64.tar.gz -P /tmp/
-sudo tar -C /usr/local -xzf /tmp/go1.15.1.linux-arm64.tar.gz
+arch="$(dpkg --print-architecture)"
+wget https://golang.org/dl/go1.15.1.linux-$arch.tar.gz -P /tmp/
+sudo tar -C /usr/local -xzf /tmp/go1.15.1.linux-$arch.tar.gz
 /usr/local/go/bin/go version
 
 # Node
