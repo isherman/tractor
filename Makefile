@@ -3,6 +3,13 @@ ifdef TEST_FILTER
 	JS_TEST_FILTER=:$(TEST_FILTER)
 endif
 
+all:
+	make bootstrap
+	make third_party
+	make cpp
+	make webservices
+	make systemd
+	echo "\nSuccessful full system build.\n"
 
 bootstrap:
 	./bootstrap.sh
@@ -39,12 +46,5 @@ webservices:
 	make protos
 	make frontend
 	make webserver
-
-all:
-	make bootstrap
-	make third_party
-	make cpp
-	make webservices
-	make systemd
 
 .PHONY: bootstrap cpp frontend protos systemd third_party test test-integration webserver webservices all
