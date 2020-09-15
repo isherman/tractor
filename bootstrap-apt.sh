@@ -20,6 +20,7 @@ apt-get install -y \
      build-essential \
      cmake \
      git \
+     git-lfs \
      libatlas-base-dev \
      libboost-filesystem-dev \
      libboost-regex-dev \
@@ -55,3 +56,16 @@ curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 sudo apt update
 sudo apt -y install yarn
+
+# git-lfs
+if [ ! -d "$HOME/tractor-logs" ]; then
+  git clone git@github.com:farm-ng/tractor-logs.git $HOME/tractor-logs
+  if [ $? -eq 0 ]; then
+    cd ~/tractor-logs
+    git lfs install --local
+  else
+      ssh-keygen -t rsa -b 4096 -C "tractor-logs keypair" -N "" -f "$HOME/.ssh/tractor-logs" -q
+      echo "Please add the following public key to the tractor-logs repository:"
+      cat $HOME/.ssh/tractor-logs.pub
+  fi
+fi
