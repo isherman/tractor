@@ -58,9 +58,13 @@ sudo apt update
 sudo apt -y install yarn
 
 # git-lfs
+
 if [ ! -d "$HOME/tractor-logs" ]; then
+  set +e
   git clone git@github.com:farm-ng/tractor-logs.git $HOME/tractor-logs
-  if [ $? -eq 0 ]; then
+  ret=$?
+  set -e
+  if [ $ret -eq 0 ]; then
     cd ~/tractor-logs
     git lfs install --local
   else
