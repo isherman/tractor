@@ -30,7 +30,7 @@ export const Buffer: React.FC = () => {
               max={1}
               value={store.bufferRangeStart}
               onChange={(e) =>
-                (store.bufferRangeStart = parseFloat(e.target.value))
+                store.setBufferRangeStart(parseFloat(e.target.value))
               }
             />
           </Col>
@@ -44,7 +44,7 @@ export const Buffer: React.FC = () => {
               max={1}
               value={store.bufferRangeEnd}
               onChange={(e) =>
-                (store.bufferRangeEnd = parseFloat(e.target.value))
+                store.setBufferRangeEnd(parseFloat(e.target.value))
               }
             />
           </Col>

@@ -92,6 +92,18 @@ export class VisualizationStore {
     this.panels.set(panel.id, panel);
   }
 
+  setBufferRangeStart(value: number): void {
+    if (value < this.bufferRangeEnd) {
+      this.bufferRangeStart = value;
+    }
+  }
+
+  setBufferRangeEnd(value: number): void {
+    if (value > this.bufferRangeStart) {
+      this.bufferRangeEnd = value;
+    }
+  }
+
   deletePanel(id: string): void {
     this.panels.delete(id);
   }

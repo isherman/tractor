@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import uPlot from "uplot";
 import "uplot/dist/uPlot.min.css";
 
@@ -8,16 +8,44 @@ interface IProps {
   options: uPlot.Options;
 }
 
-export const Plot: React.FC<IProps> = (props) => {
-  const plotRef = useRef<HTMLDivElement | null>(null);
+export const Plot: React.FC<IProps> = ({ data, options }) => {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [uPlotInstance, setUPlotInstance] = useState<uPlot | null>(null);
+
+  const resize = (): void => {
+    const containerElement = containerRef?.current;
+    console.log("resize", containerElement, uPlotInstance);
+
+    if (containerElement && uPlotInstance) {
+      uPlotInstance.setSize({
+        width: containerElement.clientWidth,
+        height: uPlotInstance.height
+      });
+    }
+  };
 
   useEffect(() => {
-    new uPlot(props.options, props.data, plotRef.current as HTMLElement);
-  }, [props]);
+    setUPlotInstance(
+      new uPlot(options, data, containerRef.current as HTMLElement)
+    );
+    return () => {
+      uPlotInstance && uPlotInstance.destroy();
+    };
+  }, [containerRef, options]);
 
-  return (
-    <div>
-      <div ref={plotRef} />
-    </div>
-  );
+  useEffect(resize, [containerRef, uPlotInstance]);
+  useEffect(() => {
+    window.addEventListener("resize", resize);
+    return () => window.removeEventListener("resize", resize);
+  }, [containerRef, uPlotInstance]);
+
+  useEffect(() => {
+    if (!uPlotInstance) {
+      return;
+    }
+    uPlotInstance.setData(data);
+    uPlotInstance.redraw();
+  }, [data]);
+
+  return <div ref={containerRef}></div>;
 };

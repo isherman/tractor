@@ -26,7 +26,6 @@ export class Vec2PlotVisualizer {
     ];
 
     const plotOptions = {
-      // title: "MyPlot",
       width: 800,
       height: 600,
       series: [
@@ -46,39 +45,6 @@ export class Vec2PlotVisualizer {
       ]
     };
 
-    //   datasets: [
-    //     {
-    //       label: "x",
-    //       data: values.map((v) => v[1].x),
-    //       fill: false,
-    //       borderColor: "rgba(75,192,192,1)",
-    //       borderWidth: parseInt(options[0].value)
-    //     },
-    //     {
-    //       label: "y",
-    //       data: values.map((v) => v[1].y),
-    //       fill: false,
-    //       borderColor: "#742774",
-    //       borderWidth: parseInt(options[0].value)
-    //     }
-    //   ]
-    // };
-    // const plotOptions = {
-    //   scales: {
-    //     xAxes: [
-    //       {
-    //         display: false
-    //       }
-    //     ]
-    //   }
-    // };
-
     return <Plot data={plotData} options={plotOptions} />;
-
-    // return (
-    //   <div>
-    //     <Line data={plotData} options={plotOptions} />
-    //   </div>
-    // );
   };
 }
