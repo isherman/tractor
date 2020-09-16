@@ -1,10 +1,10 @@
 import * as React from "react";
-import { Line } from "react-chartjs-2";
 import {
   EventType,
   VisualizerOptionConfig,
   VisualizerProps
 } from "../../../data/registry";
+import { Plot } from "./Plot";
 
 export class TimeSkewVisualizer {
   name = "timeSkew";
@@ -16,32 +16,31 @@ export class TimeSkewVisualizer {
       return null;
     }
 
-    const plotData = {
-      labels: values.map((_, i) => i),
-      datasets: [
+    const plotData = [values.map((_, i) => i), values.map((v) => v[0] / 1000)];
+
+    const plotOptions = {
+      width: 800,
+      height: 600,
+      series: [
+        {
+          show: false
+        },
         {
           label: "t",
-          data: values.map((v) => v[0]),
-          fill: false,
-          borderColor: "rgba(75,192,192,1)",
-          borderWidth: 1
+          stroke: "rgb(75,192,192)",
+          width: 1
         }
-      ]
-    };
-    const plotOptions = {
+      ],
       scales: {
-        xAxes: [
-          {
-            display: false
-          }
-        ]
+        x: {
+          time: false
+        },
+        y: {
+          time: true
+        }
       }
     };
 
-    return (
-      <div>
-        <Line data={plotData} options={plotOptions} />
-      </div>
-    );
+    return <Plot data={plotData} options={plotOptions} />;
   };
 }

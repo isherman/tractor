@@ -11,7 +11,7 @@ export type NamedTimestampedEventVector = {
   name: string;
   values: TimestampedEventVector;
 };
-type Buffer = { [k in EventTypeId]?: NamedTimestampedEventVector[] };
+export type Buffer = { [k in EventTypeId]?: NamedTimestampedEventVector[] };
 
 // Generate some dummy data
 
@@ -34,7 +34,7 @@ const vec2DummyData = (t: Timestamp): Vec2 => {
   });
 };
 
-export const buffer: Buffer = {
+export const dummy: Buffer = {
   "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": [
     { name: "tractor", values: timestamps.map((t) => [t, vec2DummyData(t)]) },
     {

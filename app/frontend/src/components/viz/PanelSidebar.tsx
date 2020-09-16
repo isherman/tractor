@@ -45,22 +45,35 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
       panel.setOption(i, parseInt(e.target.value) as number);
     };
 
+    const selectDisabled = Object.keys(store.buffer).length === 0;
+
     return (
       <div className={styles.panelSidebar}>
         <Button onClick={removePanel}>X</Button>
 
         <Form.Group controlId="eventType">
           <Form.Label>Data Type</Form.Label>
-          <Form.Control as="select" value={eventType} onChange={setEventType}>
+          <Form.Control
+            as="select"
+            disabled={selectDisabled}
+            value={eventType}
+            onChange={setEventType}
+          >
             {eventTypeIds.map((_) => (
-              <option key={_}>{_}</option>
+              <option disabled={!(_ in store.buffer)} key={_}>
+                {_}
+              </option>
             ))}
           </Form.Control>
         </Form.Group>
 
         <Form.Group controlId="tags">
           <Form.Label>Tag Filter</Form.Label>
-          <Form.Control value={tagFilter} onChange={setTagFilter} />
+          <Form.Control
+            value={tagFilter}
+            onChange={setTagFilter}
+            disabled={selectDisabled}
+          />
           <Form.Text className="text-muted">
             Supports regular expressions
           </Form.Text>
@@ -72,6 +85,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
             as="select"
             value={selectedVisualizer}
             onChange={setVisualizer}
+            disabled={selectDisabled}
           >
             {visualizers.map((v, index) => (
               <option key={v.name} value={index}>
@@ -93,6 +107,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 setOption(optionIndex, e)
               }
+              disabled={selectDisabled}
             >
               {optionLabel.options.map((valueLabel, valueIndex) => (
                 <option key={valueLabel} value={valueIndex}>

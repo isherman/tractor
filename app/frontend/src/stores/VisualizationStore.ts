@@ -9,6 +9,7 @@ import {
   visualizerRegistry,
   visualizerRegistryGlobals
 } from "../data/registry";
+import { Buffer } from "./buffer";
 
 export type DataSourceType = "live" | "pause" | "log";
 
@@ -73,12 +74,14 @@ export class Panel {
 
 export class VisualizationStore {
   @observable dataSource: DataSourceType = "live";
-  @observable bufferStart = new Date();
-  @observable bufferEnd = new Date();
+  @observable bufferStart: Date | null = null;
+  @observable bufferEnd: Date | null = null;
   @observable bufferRangeStart = 0;
   @observable bufferRangeEnd = 1;
   @observable bufferThrottle = 0;
   @observable bufferSize = 0;
+  @observable buffer: Buffer = {};
+  @observable bufferLoadProgress = 0;
 
   @observable panels: ObservableMap<string, Panel>;
 

@@ -14,6 +14,7 @@ import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { TimeSkewVisualizer } from "../components/viz/visualizers/TimeSkewVisualizer";
 import { JSONVisualizer } from "../components/viz/visualizers/JSONVisualizer";
 import { Vec2PlotVisualizer } from "../components/viz/visualizers/Vec2PlotVisualizer";
+import { SteeringCommandVisualizer } from "../components/viz/visualizers/SteeringCommandVisualizer";
 
 export type EventType =
   | SteeringCommand
@@ -77,7 +78,7 @@ export interface Visualizer<T extends EventType = EventType> {
   options: VisualizerOptionConfig[];
 }
 
-export const visualizerIds = ["plot", "timeSkew", "json"];
+export const visualizerIds = ["plot", "timeSkew", "json", "steeringPlot"];
 export type VisualizerId = typeof visualizerIds[number];
 
 type VisualizerRegistry = {
@@ -85,12 +86,13 @@ type VisualizerRegistry = {
 };
 export const visualizerRegistry: VisualizerRegistry = {
   plot: new Vec2PlotVisualizer() as Visualizer,
+  json: new JSONVisualizer(),
   timeSkew: new TimeSkewVisualizer(),
-  json: new JSONVisualizer()
+  steeringPlot: new SteeringCommandVisualizer() as Visualizer
 };
 export const visualizerRegistryGlobals = [
-  visualizerRegistry.timeSkew,
-  visualizerRegistry.json
+  visualizerRegistry.json,
+  visualizerRegistry.timeSkew
 ];
 
 type GenericVisualizerMap = {
@@ -99,5 +101,8 @@ type GenericVisualizerMap = {
 export const visualizerMap: GenericVisualizerMap = {
   "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": [
     visualizerRegistry.plot as Visualizer<Vec2>
+  ],
+  "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand": [
+    visualizerRegistry.steeringPlot as Visualizer<SteeringCommand>
   ]
 };
