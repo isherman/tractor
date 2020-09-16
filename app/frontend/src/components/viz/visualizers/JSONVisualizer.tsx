@@ -4,14 +4,17 @@ import { Card, ListGroup } from "react-bootstrap";
 import RangeSlider from "react-bootstrap-range-slider";
 import styles from "./JSONVisualizer.module.scss";
 import {
+  Visualizer,
+  VisualizerId,
   VisualizerOptionConfig,
   VisualizerProps
 } from "../../../registry/visualization";
 import { EventType } from "../../../registry/events";
 import { formatValue } from "../../../utils/formatValue";
 
-export class JSONVisualizer {
-  name = "json";
+export class JSONVisualizer implements Visualizer {
+  static id: VisualizerId = "json";
+  types = "*" as const;
 
   options: VisualizerOptionConfig[] = [
     { label: "view", options: ["overlay", "row"] }

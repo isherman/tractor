@@ -3,25 +3,14 @@ import { EventTypeId } from "../registry/events";
 import {
   Visualizer,
   VisualizerId,
-  visualizerMap,
   VisualizerOption,
   VisualizerOptionConfig,
-  visualizerRegistry,
-  visualizerRegistryGlobals
+  visualizerRegistry
 } from "../registry/visualization";
 import { Buffer } from "./buffer";
 
-export type DataSourceType = "live" | "pause" | "log";
-
-function getVisualizers(eventType: EventTypeId): Visualizer[] {
-  const visualizers = visualizerMap[eventType] as Visualizer[];
-  return [...(visualizers || []), ...visualizerRegistryGlobals] as Visualizer[];
-}
-
-function getVisualizerOptionConfigs(
-  visualizerId: VisualizerId
-): VisualizerOptionConfig[] {
-  return visualizerRegistry[visualizerId].options || [];
+export function visualizerId(v: Visualizer): VisualizerId {
+  return Object.getPrototypeOf(v).constructor.id;
 }
 
 export class Panel {
@@ -30,20 +19,21 @@ export class Panel {
   @observable tagFilter = "";
   @observable eventType: EventTypeId =
     "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2";
-  @observable visualizers: Visualizer[];
-  @observable selectedVisualizer: number;
-  @observable optionConfigs: VisualizerOptionConfig[];
-  @observable selectedOptions: number[];
+  @observable selectedVisualizer = 0;
+  @observable selectedOptions = this.optionConfigs.map((_) => 0);
 
-  constructor() {
-    this.visualizers = getVisualizers(this.eventType);
-    this.selectedVisualizer = 0;
-    this.optionConfigs = getVisualizerOptionConfigs(this.visualizer.name);
-    this.selectedOptions = this.optionConfigs.map((_) => 0);
+  @computed get visualizers(): Visualizer[] {
+    return Object.values(visualizerRegistry).filter(
+      (v) => v.types.includes(this.eventType) || v.types === "*"
+    );
   }
 
   @computed get visualizer(): Visualizer {
     return this.visualizers[this.selectedVisualizer];
+  }
+
+  @computed get optionConfigs(): VisualizerOptionConfig[] {
+    return this.visualizer.options;
   }
 
   @computed get options(): VisualizerOption[] {
@@ -55,15 +45,12 @@ export class Panel {
 
   setEventType(d: EventTypeId): void {
     this.eventType = d;
-    this.visualizers = getVisualizers(d);
     this.selectedVisualizer = 0;
-    this.optionConfigs = getVisualizerOptionConfigs(this.visualizer.name);
     this.selectedOptions = this.optionConfigs.map((_) => 0);
   }
 
   setVisualizer(index: number): void {
     this.selectedVisualizer = index;
-    this.optionConfigs = getVisualizerOptionConfigs(this.visualizer.name);
     this.selectedOptions = this.optionConfigs.map((_) => 0);
   }
 
@@ -71,6 +58,8 @@ export class Panel {
     this.selectedOptions[optionIndex] = valueIndex;
   }
 }
+
+export type DataSourceType = "live" | "pause" | "log";
 
 export class VisualizationStore {
   @observable dataSource: DataSourceType = "live";

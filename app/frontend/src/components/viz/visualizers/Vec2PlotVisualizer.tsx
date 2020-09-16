@@ -1,13 +1,17 @@
 import * as React from "react";
 import { Vec2 } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
+import { EventTypeId } from "../../../registry/events";
 import {
+  Visualizer,
+  VisualizerId,
   VisualizerOptionConfig,
   VisualizerProps
 } from "../../../registry/visualization";
 import { Plot } from "./Plot";
 
-export class Vec2PlotVisualizer {
-  name = "plot";
+export class Vec2PlotVisualizer implements Visualizer<Vec2> {
+  static id: VisualizerId = "plot";
+  types: EventTypeId[] = ["type.googleapis.com/farm_ng_proto.tractor.v1.Vec2"];
 
   options: VisualizerOptionConfig[] = [
     { label: "strokeWidth", options: ["1", "2", "3", "4"] }

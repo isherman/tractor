@@ -1,14 +1,17 @@
 import * as React from "react";
 import { EventType } from "../../../registry/events";
 import {
+  Visualizer,
+  VisualizerId,
   VisualizerOptionConfig,
   VisualizerProps
 } from "../../../registry/visualization";
 
 import { Plot } from "./Plot";
 
-export class TimeSkewVisualizer {
-  name = "timeSkew";
+export class TimeSkewVisualizer implements Visualizer {
+  static id: VisualizerId = "timeSkew";
+  types = "*" as const;
 
   options: VisualizerOptionConfig[] = [];
 

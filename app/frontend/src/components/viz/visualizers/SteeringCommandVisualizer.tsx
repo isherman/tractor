@@ -1,13 +1,19 @@
 import * as React from "react";
 import { SteeringCommand } from "../../../../genproto/farm_ng_proto/tractor/v1/steering";
+import { EventTypeId } from "../../../registry/events";
 import {
+  Visualizer,
+  VisualizerId,
   VisualizerOptionConfig,
   VisualizerProps
 } from "../../../registry/visualization";
 import { Plot } from "./Plot";
 
-export class SteeringCommandVisualizer {
-  name = "plot";
+export class SteeringCommandVisualizer implements Visualizer<SteeringCommand> {
+  static id: VisualizerId = "steeringcommand";
+  types: EventTypeId[] = [
+    "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand"
+  ];
 
   options: VisualizerOptionConfig[] = [
     { label: "strokeWidth", options: ["1", "2", "3", "4"] }

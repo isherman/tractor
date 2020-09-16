@@ -5,6 +5,7 @@ import { useStores } from "../../hooks/useStores";
 import { useObserver } from "mobx-react-lite";
 import { ChangeEvent } from "react";
 import { EventTypeId, eventTypeIds } from "../../registry/events";
+import { visualizerId } from "../../stores/VisualizationStore";
 
 interface IProps {
   id: string;
@@ -93,8 +94,8 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
             disabled={bufferEmpty}
           >
             {visualizers.map((v, index) => (
-              <option key={v.name} value={index}>
-                {v.name}
+              <option key={visualizerId(v)} value={index}>
+                {visualizerId(v)}
               </option>
             ))}
           </Form.Control>
