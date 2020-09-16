@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "farm_ng_proto/tractor/v1/resource.proto";
+
+package farm_ng_proto.tractor.v1;
+option go_package = "github.com/farm_ng/genproto";
+
+message Image {
+  // The associated image resource
+  Resource resource = 1;
+
+  // General metadata
+  ImageMetadata metadata = 2;
+
+  // CalibrationMetadata (objects, apriltag detections, reprojections, rmse),
+  // etc.
+}
+
+message ImageMetadata {
+  // (Optional) The time the image was captured.
+  google.protobuf.Timestamp timestamp = 1;
+
+  // (Optional) The width of the image.
+  google.protobuf.UInt32Value width = 2;
+
+  // (Optional) The height of the image.
+  google.protobuf.UInt32Value height = 3;
+
+  // Imager type, camera intrinsics, etc.
+}
+
+// Metadata common to a full image set
+message ImageSetMetadata {
+  // (Optional) The time the image set was assembled.
+  google.protobuf.Timestamp timestamp = 1;
+
+  // Camera intrinsics, etc.
+}
+
+message ImageSet {
+  repeated Image images = 1;
+  ImageSetMetadata metadata = 2;
+}
