@@ -1,5 +1,5 @@
 import * as React from "react";
-import { VisualizerProps } from "../../../data/registry";
+import { VisualizerProps } from "../../../registry/visualization";
 
 export const DefaultVisualizer: React.FC<VisualizerProps> = ({ values }) => {
   if (!values) {

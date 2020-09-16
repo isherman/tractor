@@ -1,6 +1,6 @@
 import { Vec2 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { Announce } from "../../genproto/farm_ng_proto/tractor/v1/io";
-import { EventType, EventTypeId } from "../data/registry";
+import { EventType, EventTypeId } from "../registry/events";
 
 type Timestamp = number;
 type TimestampedEvent<T extends EventType = EventType> = [Timestamp, T];

@@ -8,7 +8,7 @@ import { ChangeEvent, useRef } from "react";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";
 import { Event } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import { Buffer } from "../../stores/buffer";
-import { EventTypeId } from "../../data/registry";
+import { EventTypeId } from "../../registry/events";
 
 export const DataSource: React.FC = () => {
   const { visualizationStore: store } = useStores();

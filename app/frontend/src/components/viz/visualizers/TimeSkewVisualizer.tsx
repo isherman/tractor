@@ -1,9 +1,10 @@
 import * as React from "react";
+import { EventType } from "../../../registry/events";
 import {
-  EventType,
   VisualizerOptionConfig,
   VisualizerProps
-} from "../../../data/registry";
+} from "../../../registry/visualization";
+
 import { Plot } from "./Plot";
 
 export class TimeSkewVisualizer {

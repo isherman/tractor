@@ -4,7 +4,7 @@ import { Button, Form } from "react-bootstrap";
 import { useStores } from "../../hooks/useStores";
 import { useObserver } from "mobx-react-lite";
 import { ChangeEvent } from "react";
-import { EventTypeId, eventTypeIds } from "../../data/registry";
+import { EventTypeId, eventTypeIds } from "../../registry/events";
 
 interface IProps {
   id: string;
@@ -34,7 +34,9 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
       selectedOptions
     } = panel;
     const setEventType = (e: ChangeEvent<HTMLSelectElement>): void => {
-      panel.setEventType(e.target.value as EventTypeId);
+      if (e.target.value) {
+        panel.setEventType(e.target.value as EventTypeId);
+      }
     };
 
     const setVisualizer = (e: ChangeEvent<HTMLSelectElement>): void => {
@@ -45,7 +47,10 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
       panel.setOption(i, parseInt(e.target.value) as number);
     };
 
-    const selectDisabled = Object.keys(store.buffer).length === 0;
+    const bufferEmpty = Object.keys(store.buffer).length === 0;
+    if (!bufferEmpty && !Object.keys(store.buffer).includes(eventType)) {
+      panel.setEventType(Object.keys(store.buffer)[0] as EventTypeId);
+    }
 
     return (
       <div className={styles.panelSidebar}>
@@ -55,11 +60,11 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
           <Form.Label>Data Type</Form.Label>
           <Form.Control
             as="select"
-            disabled={selectDisabled}
-            value={eventType}
+            disabled={bufferEmpty}
+            value={bufferEmpty ? "" : eventType}
             onChange={setEventType}
           >
-            {eventTypeIds.map((_) => (
+            {["", ...eventTypeIds].map((_) => (
               <option disabled={!(_ in store.buffer)} key={_}>
                 {_}
               </option>
@@ -72,7 +77,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
           <Form.Control
             value={tagFilter}
             onChange={setTagFilter}
-            disabled={selectDisabled}
+            disabled={bufferEmpty}
           />
           <Form.Text className="text-muted">
             Supports regular expressions
@@ -85,7 +90,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
             as="select"
             value={selectedVisualizer}
             onChange={setVisualizer}
-            disabled={selectDisabled}
+            disabled={bufferEmpty}
           >
             {visualizers.map((v, index) => (
               <option key={v.name} value={index}>
@@ -107,7 +112,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
                 setOption(optionIndex, e)
               }
-              disabled={selectDisabled}
+              disabled={bufferEmpty}
             >
               {optionLabel.options.map((valueLabel, valueIndex) => (
                 <option key={valueLabel} value={valueIndex}>

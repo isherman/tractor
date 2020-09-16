@@ -1,6 +1,6 @@
 import { observable, computed, ObservableMap } from "mobx";
+import { EventTypeId } from "../registry/events";
 import {
-  EventTypeId,
   Visualizer,
   VisualizerId,
   visualizerMap,
@@ -8,7 +8,7 @@ import {
   VisualizerOptionConfig,
   visualizerRegistry,
   visualizerRegistryGlobals
-} from "../data/registry";
+} from "../registry/visualization";
 import { Buffer } from "./buffer";
 
 export type DataSourceType = "live" | "pause" | "log";

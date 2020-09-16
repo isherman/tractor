@@ -1,6 +1,6 @@
 import { useObserver } from "mobx-react-lite";
 import * as React from "react";
-import { TimestampedEventVector } from "../../data/registry";
+import { TimestampedEventVector } from "../../types/common";
 import { useStores } from "../../hooks/useStores";
 import { NamedTimestampedEventVector } from "../../stores/buffer";
 import styles from "./Stream.module.scss";

@@ -3,12 +3,11 @@ import { useState } from "react";
 import { Card, ListGroup } from "react-bootstrap";
 import RangeSlider from "react-bootstrap-range-slider";
 import styles from "./JSONVisualizer.module.scss";
-
 import {
-  EventType,
   VisualizerOptionConfig,
   VisualizerProps
-} from "../../../data/registry";
+} from "../../../registry/visualization";
+import { EventType } from "../../../registry/events";
 import { formatValue } from "../../../utils/formatValue";
 
 export class JSONVisualizer {

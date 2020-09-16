@@ -3,7 +3,7 @@ import { SteeringCommand } from "../../../../genproto/farm_ng_proto/tractor/v1/s
 import {
   VisualizerOptionConfig,
   VisualizerProps
-} from "../../../data/registry";
+} from "../../../registry/visualization";
 import { Plot } from "./Plot";
 
 export class SteeringCommandVisualizer {

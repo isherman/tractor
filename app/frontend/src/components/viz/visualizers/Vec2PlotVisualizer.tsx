@@ -1,10 +1,9 @@
 import * as React from "react";
-// import { Line } from "react-chartjs-2";
 import { Vec2 } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
 import {
   VisualizerOptionConfig,
   VisualizerProps
-} from "../../../data/registry";
+} from "../../../registry/visualization";
 import { Plot } from "./Plot";
 
 export class Vec2PlotVisualizer {
