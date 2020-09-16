@@ -11,6 +11,7 @@ import {
   TrackingCameraMotionFrame
 } from "../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
 import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
+import { Message } from "../types/common";
 
 export type EventType =
   | SteeringCommand
@@ -23,30 +24,16 @@ export type EventType =
   | Announce
   | Vec2;
 
-export const eventTypeIds = [
-  "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand",
-  "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraPoseFrame",
-  "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraMotionFrame",
-  "type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose",
-  "type.googleapis.com/farm_ng_proto.tractor.v1.MotorControllerState",
-  "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections",
-  "type.googleapis.com/farm_ng_proto.tractor.v1.TractorState",
-  "type.googleapis.com/farm_ng_proto.tractor.v1.Announce",
-  "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2"
-] as const;
-export type EventTypeId = typeof eventTypeIds[number];
-
-type GenericEventTypeMap = {
-  [k in EventTypeId]: EventType;
+export const eventRegistry: { [k: string]: Message<EventType> } = {
+  "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand": SteeringCommand,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraPoseFrame": TrackingCameraPoseFrame,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraMotionFrame": TrackingCameraMotionFrame,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose": NamedSE3Pose,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.MotorControllerState": MotorControllerState,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections": ApriltagDetections,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.TractorState": TractorState,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.Announce": Announce,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": Vec2
 };
-export interface EventTypesMap extends GenericEventTypeMap {
-  "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand": SteeringCommand;
-  "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraPoseFrame": TrackingCameraPoseFrame;
-  "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraMotionFrame": TrackingCameraMotionFrame;
-  "type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose": NamedSE3Pose;
-  "type.googleapis.com/farm_ng_proto.tractor.v1.MotorControllerState": MotorControllerState;
-  "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections": ApriltagDetections;
-  "type.googleapis.com/farm_ng_proto.tractor.v1.TractorState": TractorState;
-  "type.googleapis.com/farm_ng_proto.tractor.v1.Announce": Announce;
-  "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": Vec2;
-}
+export const eventTypeIds = Object.keys(eventRegistry);
+export type EventTypeId = typeof eventTypeIds[number];

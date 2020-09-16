@@ -7,7 +7,7 @@ import {
   VisualizerOptionConfig,
   visualizerRegistry
 } from "../registry/visualization";
-import { Buffer } from "./buffer";
+import { Buffer } from "../types/common";
 
 export function visualizerId(v: Visualizer): VisualizerId {
   return Object.getPrototypeOf(v).constructor.id;

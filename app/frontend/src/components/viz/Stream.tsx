@@ -2,7 +2,7 @@ import { useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { TimestampedEventVector } from "../../types/common";
 import { useStores } from "../../hooks/useStores";
-import { NamedTimestampedEventVector } from "../../stores/buffer";
+import { NamedTimestampedEventVector } from "../../types/common";
 import styles from "./Stream.module.scss";
 
 interface IProps {

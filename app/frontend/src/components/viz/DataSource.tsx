@@ -7,7 +7,7 @@ import { useObserver } from "mobx-react-lite";
 import { ChangeEvent, useRef } from "react";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";
 import { Event } from "../../../genproto/farm_ng_proto/tractor/v1/io";
-import { Buffer } from "../../stores/buffer";
+import { Buffer } from "../../types/common";
 import { EventTypeId } from "../../registry/events";
 
 export const DataSource: React.FC = () => {

@@ -1,10 +1,10 @@
-import { BusEvent } from "../models/BusEvent";
 import { observable, ObservableMap } from "mobx";
 import { decodeAnyEvent } from "../models/decodeAnyEvent";
 import { BusEventEmitter } from "../models/BusEventEmitter";
+import { EventType } from "../registry/events";
 
 interface StreamSnapshot {
-  latestEvent: BusEvent | null;
+  latestEvent: EventType | null;
   latestEventTime?: Date;
   eventsSinceLastSnapshot: number;
 }

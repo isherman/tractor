@@ -24,9 +24,9 @@ export interface Visualizer<T extends EventType = EventType> {
 
 export const visualizerRegistry: { [k: string]: Visualizer } = {
   [Vec2PlotVisualizer.id]: new Vec2PlotVisualizer() as Visualizer,
+  [SteeringCommandVisualizer.id]: new SteeringCommandVisualizer() as Visualizer,
   [JSONVisualizer.id]: new JSONVisualizer() as Visualizer,
-  [TimeSkewVisualizer.id]: new TimeSkewVisualizer() as Visualizer,
-  [SteeringCommandVisualizer.id]: new SteeringCommandVisualizer() as Visualizer
+  [TimeSkewVisualizer.id]: new TimeSkewVisualizer() as Visualizer
 };
 export const visualizerIds = Object.keys(visualizerRegistry);
 export type VisualizerId = typeof visualizerIds[number];
