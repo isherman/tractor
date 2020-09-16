@@ -2,15 +2,26 @@ import { useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { TimestampedEventVector } from "../../types/common";
 import { useStores } from "../../hooks/useStores";
-import { NamedTimestampedEventVector } from "../../types/common";
 import styles from "./Stream.module.scss";
 
 interface IProps {
   panelId: string;
-  stream: NamedTimestampedEventVector;
+  name: string;
+  values: TimestampedEventVector;
 }
 
-export const Stream: React.FC<IProps> = ({ panelId, stream }) => {
+const throttle = (
+  values: TimestampedEventVector,
+  throttle: number
+): TimestampedEventVector =>
+  values.reduce<TimestampedEventVector>((acc, [t, v]) => {
+    if (acc.length === 0 || t - acc[acc.length - 1][0] > throttle) {
+      acc.push([t, v]);
+    }
+    return acc;
+  }, []);
+
+export const Stream: React.FC<IProps> = ({ panelId, name, values }) => {
   const { visualizationStore: store } = useStores();
 
   return useObserver(() => {
@@ -18,26 +29,19 @@ export const Stream: React.FC<IProps> = ({ panelId, stream }) => {
     if (!panel) return null;
     const { visualizer, options } = panel;
 
-    const values = stream.values
-      .slice(
-        Math.floor(store.bufferRangeStart * stream.values.length),
-        Math.ceil(store.bufferRangeEnd * stream.values.length)
-      )
-      .reduce<TimestampedEventVector>((acc, [t, v]) => {
-        if (
-          acc.length === 0 ||
-          t - acc[acc.length - 1][0] > store.bufferThrottle
-        ) {
-          acc.push([t, v]);
-        }
-        return acc;
-      }, []);
+    const filteredValues = throttle(
+      values.slice(
+        Math.floor(store.bufferRangeStart * values.length),
+        Math.ceil(store.bufferRangeEnd * values.length)
+      ),
+      store.bufferThrottle
+    );
 
     return (
       <div className={styles.stream}>
-        <h4>{stream.name}</h4>
+        <h4>{name}</h4>
         {React.createElement(visualizer.component, {
-          values,
+          values: filteredValues,
           options
         })}
       </div>

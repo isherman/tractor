@@ -9,12 +9,9 @@ export type TimestampedEventVector<
   T extends EventType = EventType
 > = TimestampedEvent<T>[];
 
-export type NamedTimestampedEventVector = {
-  name: string;
-  values: TimestampedEventVector;
+export type Buffer = {
+  [k in EventTypeId]?: { [k: string]: TimestampedEventVector };
 };
-
-export type Buffer = { [k in EventTypeId]?: NamedTimestampedEventVector[] };
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 
