@@ -1,4 +1,7 @@
 import { observable, computed, ObservableMap } from "mobx";
+import { Image } from "../../genproto/farm_ng_proto/tractor/v1/image";
+import { Resource } from "../../genproto/farm_ng_proto/tractor/v1/resource";
+import { ResourceArchive } from "../models/ResourceArchive";
 import { EventTypeId } from "../registry/events";
 import {
   Visualizer,
@@ -61,6 +64,25 @@ export class Panel {
 
 export type DataSourceType = "live" | "pause" | "log";
 
+function testBuffer(): Buffer {
+  return {
+    "type.googleapis.com/farm_ng_proto.tractor.v1.Image": {
+      foo: [
+        "a.jpg",
+        "b.jpg",
+        "c.jpg",
+        "foo/a.jpg",
+        "foo/bar/a.jpg",
+        "foo/bar/b.jpg",
+        "foo/bar/c.png"
+      ].map((path, i) => [
+        i,
+        Image.fromJSON({ resource: Resource.fromJSON({ path }) })
+      ])
+    }
+  };
+}
+
 export class VisualizationStore {
   @observable dataSource: DataSourceType = "live";
   @observable bufferStart: Date | null = null;
@@ -71,12 +93,16 @@ export class VisualizationStore {
   @observable bufferSize = 0;
   @observable buffer: Buffer = {};
   @observable bufferLoadProgress = 0;
+  @observable resourceArchive: ResourceArchive | null = new ResourceArchive(
+    null
+  );
 
   @observable panels: ObservableMap<string, Panel>;
 
   constructor() {
     const p = new Panel();
     this.panels = new ObservableMap<string, Panel>([[p.id, p]]);
+    this.buffer = testBuffer();
   }
 
   addPanel(): void {
@@ -98,5 +124,9 @@ export class VisualizationStore {
 
   deletePanel(id: string): void {
     this.panels.delete(id);
+  }
+
+  setResourceArchive(files: FileList | null): void {
+    this.resourceArchive = new ResourceArchive(files);
   }
 }

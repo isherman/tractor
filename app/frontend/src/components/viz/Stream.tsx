@@ -42,7 +42,8 @@ export const Stream: React.FC<IProps> = ({ panelId, name, values }) => {
         <h4>{name}</h4>
         {React.createElement(visualizer.component, {
           values: filteredValues,
-          options
+          options,
+          resources: store.resourceArchive
         })}
       </div>
     );

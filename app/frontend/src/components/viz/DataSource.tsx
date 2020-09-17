@@ -9,6 +9,7 @@ import { decodeAnyEvent } from "../../models/decodeAnyEvent";
 import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import { Buffer } from "../../types/common";
 import { EventTypeId } from "../../registry/events";
+import { FileInput } from "./FileInput";
 
 class UploadBuffer {
   public bufferStart: Date | null = null;
@@ -33,6 +34,7 @@ class UploadBuffer {
 export const DataSource: React.FC = () => {
   const { visualizationStore: store } = useStores();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const logDirectoryRef = useRef<HTMLInputElement | null>(null);
 
   const setDataSource = (d: DataSourceType): void => {
     store.dataSource = d;
@@ -44,6 +46,12 @@ export const DataSource: React.FC = () => {
   };
 
   return useObserver(() => {
+    const handleOnLogDirectorySelect = async (
+      e: ChangeEvent<HTMLInputElement>
+    ): Promise<void> => {
+      store.setResourceArchive(e.target.files);
+    };
+
     const handleOnLogSelect = async (
       e: ChangeEvent<HTMLInputElement>
     ): Promise<void> => {
@@ -105,6 +113,16 @@ export const DataSource: React.FC = () => {
             id="file"
             ref={fileInputRef}
             onChange={handleOnLogSelect}
+          />
+        </label>
+        <label>
+          Log Directory
+          <FileInput
+            type="file"
+            id="file"
+            ref={logDirectoryRef}
+            webkitdirectory={"true"}
+            onChange={handleOnLogDirectorySelect}
           />
         </label>
         <span>{store.bufferLoadProgress}</span>
