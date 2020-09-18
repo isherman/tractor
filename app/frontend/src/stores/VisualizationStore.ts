@@ -84,7 +84,7 @@ function testBuffer(): Buffer {
 }
 
 export class VisualizationStore {
-  @observable dataSource: DataSourceType = "live";
+  @observable dataSource: DataSourceType = "log";
   @observable bufferStart: Date | null = null;
   @observable bufferEnd: Date | null = null;
   @observable bufferRangeStart = 0;
@@ -93,9 +93,7 @@ export class VisualizationStore {
   @observable bufferSize = 0;
   @observable buffer: Buffer = {};
   @observable bufferLoadProgress = 0;
-  @observable resourceArchive: ResourceArchive | null = new ResourceArchive(
-    null
-  );
+  @observable resourceArchive: ResourceArchive | null = null;
 
   @observable panels: ObservableMap<string, Panel>;
 
@@ -124,9 +122,5 @@ export class VisualizationStore {
 
   deletePanel(id: string): void {
     this.panels.delete(id);
-  }
-
-  setResourceArchive(files: FileList | null): void {
-    this.resourceArchive = new ResourceArchive(files);
   }
 }

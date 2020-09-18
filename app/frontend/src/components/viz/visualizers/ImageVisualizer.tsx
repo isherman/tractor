@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { Card, ListGroup } from "react-bootstrap";
@@ -36,7 +37,11 @@ export class ImageVisualizer implements Visualizer<Image> {
       const fetchImage = async (): Promise<void> => {
         const resource = values[index][1].resource;
         if (resources && resource) {
-          setImgSrc(await resources.get(resource.path));
+          try {
+            setImgSrc(await resources.getDataUrl(resource.path));
+          } catch (e) {
+            console.error(`Error loading resource ${resource.path}: ${e}`);
+          }
         }
       };
       fetchImage();

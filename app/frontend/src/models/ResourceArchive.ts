@@ -1,24 +1,44 @@
-export class ResourceArchive {
-  constructor(private files: FileList | null) {}
+import { TarReader } from "./TarReader";
 
-  public async get(path: string): Promise<string | null> {
-    for (let i = 0; i < (this.files?.length || 0); i++) {
-      const file = this.files?.item(i);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const webkitRelativePath = (file as any).webkitRelativePath;
-      const normalizedPath = webkitRelativePath.substring(
-        webkitRelativePath.indexOf("/") + 1
-      );
-      if (file && normalizedPath === path) {
-        const reader = new FileReader();
-        return new Promise((resolve) => {
-          reader.onload = (e: ProgressEvent<FileReader>) => {
-            resolve(e.target?.result as string);
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-    }
-    return Promise.resolve(null);
+function extension(filename: string): string {
+  return filename.substr(filename.lastIndexOf(".") + 1);
+}
+
+// TODO: Use a proper mime types library
+function mimeType(filename: string): string | undefined {
+  const mimeTypes: Record<string, string> = {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png"
+  };
+  return mimeTypes[extension(filename)];
+}
+
+export class ResourceArchive {
+  tarReader: TarReader;
+  constructor(file: File) {
+    this.tarReader = new TarReader(file);
+  }
+
+  public async getBlob(path: string): Promise<Blob> {
+    return await this.tarReader.getFileBlob(path);
+  }
+
+  public async getDataUrl(path: string): Promise<string> {
+    const reader = new FileReader();
+    const blob = await this.tarReader.getFileBlob(path, {
+      type: mimeType(path)
+    });
+    return new Promise((resolve, reject) => {
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const result = e.target?.result;
+        if (typeof result === "string") {
+          resolve(result as string);
+        } else {
+          reject(`failed to readAsDataURL ${path}`);
+        }
+      };
+      reader.readAsDataURL(blob);
+    });
   }
 }
