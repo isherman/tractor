@@ -130,26 +130,29 @@ export class ApriltagDetectionsVisualizer
       return (
         <div className={styles.row}>
           {values.map((v, index) => (
-            <Card key={v[0]} bg={"light"} className={"shadow-sm"}>
+            <Card
+              key={v[0]}
+              bg={"light"}
+              className={[styles.card, "shadow-sm"].join(" ")}
+            >
               <Card.Body>
-                <Card.Body>
-                  <div className={styles.annotatedImageContainer}>
-                    <div className={styles.annotatedImage}>
-                      <img
-                        ref={imageRef}
-                        src={imgSrc || undefined}
-                        className={styles.image}
-                      />
-                      <canvas
-                        ref={canvasRef}
-                        className={styles.canvas}
-                      ></canvas>
-                    </div>
-                    {formatValue(new Date(values[index][0]))}
-                    <JsonPopover json={values[index][1]} />
+                <div className={styles.annotatedImageContainer}>
+                  <div className={styles.annotatedImage}>
+                    <img
+                      ref={imageRef}
+                      src={imgSrc || undefined}
+                      className={styles.image}
+                    />
+                    <canvas ref={canvasRef} className={styles.canvas}></canvas>
                   </div>
-                </Card.Body>
+                </div>
               </Card.Body>
+              <Card.Footer className={styles.footer}>
+                <span className="text-muted">
+                  {formatValue(new Date(values[index][0]))}
+                </span>
+                <JsonPopover json={values[index][1]} />
+              </Card.Footer>
             </Card>
           ))}
         </div>

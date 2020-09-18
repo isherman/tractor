@@ -2,16 +2,11 @@
   display: flex;
   overflow-x: auto;
 
-  img {
-    width: 100%;
-  }
-
   :global(.card) {
     width: 24rem;
     min-width: 24rem;
     margin-right: 1rem;
     max-height: 50rem;
-    overflow-y: scroll;
   }
 }
 
