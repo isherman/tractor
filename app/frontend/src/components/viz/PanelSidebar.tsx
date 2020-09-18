@@ -68,7 +68,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
             value={bufferEmpty ? "" : eventType}
             onChange={setEventType}
           >
-            {["", ...eventTypeIds].map((_) => (
+            {[...eventTypeIds].map((_) => (
               <option disabled={!(_ in store.buffer)} key={_}>
                 {_}
               </option>

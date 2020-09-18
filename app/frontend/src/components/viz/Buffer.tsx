@@ -7,6 +7,8 @@ import { formatValue } from "../../utils/formatValue";
 import RangeSlider from "react-bootstrap-range-slider";
 import { ChangeEvent } from "react";
 
+const tooltipLabel = (v: number): string => `${Math.round(v * 100)}%`;
+
 export const Buffer: React.FC = () => {
   const { visualizationStore: store } = useStores();
 
@@ -20,13 +22,14 @@ export const Buffer: React.FC = () => {
         </Form.Group>
 
         <div className={styles.rangeSliders}>
-          <Form.Group controlId="buffer.rangeStart">
+          <Form.Group as={Form.Row} controlId="buffer.rangeStart">
             <Form.Label>Range Start</Form.Label>
             <Col>
               <RangeSlider
                 step={0.01}
                 max={1}
                 value={store.bufferRangeStart}
+                tooltipLabel={tooltipLabel}
                 onChange={(e) =>
                   store.setBufferRangeStart(parseFloat(e.target.value))
                 }
@@ -34,13 +37,14 @@ export const Buffer: React.FC = () => {
             </Col>
           </Form.Group>
 
-          <Form.Group controlId="buffer.rangeEnd">
+          <Form.Group as={Form.Row} controlId="buffer.rangeEnd">
             <Form.Label>Range End</Form.Label>
             <Col>
               <RangeSlider
                 step={0.01}
                 max={1}
                 value={store.bufferRangeEnd}
+                tooltipLabel={tooltipLabel}
                 onChange={(e) =>
                   store.setBufferRangeEnd(parseFloat(e.target.value))
                 }

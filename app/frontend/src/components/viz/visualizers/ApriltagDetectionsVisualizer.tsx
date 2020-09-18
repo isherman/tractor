@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import * as React from "react";
-import { useState, useEffect } from "react";
-import { Card, ListGroup } from "react-bootstrap";
+import { useState, useEffect, useRef } from "react";
+import { Card } from "react-bootstrap";
 import RangeSlider from "react-bootstrap-range-slider";
 import styles from "./ApriltagDetectionsVisualizer.module.scss";
 import {
@@ -13,6 +13,9 @@ import {
 import { formatValue } from "../../../utils/formatValue";
 import { ApriltagDetections } from "../../../../genproto/farm_ng_proto/tractor/v1/apriltag";
 import { EventTypeId } from "../../../registry/events";
+import { autorun } from "mobx";
+import { drawAprilTagDetections } from "../../../utils/drawApriltagDetections";
+import { JsonPopover } from "../../JsonPopover";
 
 export class ApriltagDetectionsVisualizer
   implements Visualizer<ApriltagDetections> {
@@ -36,6 +39,9 @@ export class ApriltagDetectionsVisualizer
 
     const [index, setIndex] = useState(0);
     const [imgSrc, setImgSrc] = useState<string | null>(null);
+    const imageRef = useRef<HTMLImageElement | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const viewOption = options[0].value as "overlay" | "row";
 
     useEffect(() => {
       const fetchImage = async (): Promise<void> => {
@@ -51,9 +57,47 @@ export class ApriltagDetectionsVisualizer
       fetchImage();
     }, [values, resources, index]);
 
-    if (options[0].value === "overlay") {
+    const resize = (): void => {
+      const imageElement = imageRef?.current;
+      const canvasElement = canvasRef?.current;
+      if (imageElement && canvasElement) {
+        canvasElement.width = imageElement.clientWidth;
+        canvasElement.height = imageElement.clientHeight;
+      }
+    };
+
+    useEffect(
+      () =>
+        autorun(() => {
+          const canvas = canvasRef.current;
+          if (!canvas) {
+            return;
+          }
+
+          const ctx = canvas.getContext("2d");
+          if (!ctx) {
+            return;
+          }
+
+          resize();
+
+          const { imageWidth: width, imageHeight: height } =
+            values[index][1].image?.cameraModel || {};
+
+          drawAprilTagDetections(
+            values[index][1],
+            ctx,
+            canvas,
+            width && height ? { width, height } : undefined,
+            2
+          );
+        }),
+      [canvasRef, values, index, imgSrc]
+    );
+
+    if (viewOption === "overlay") {
       return (
-        <Card bg={"light"} className={"shadow-sm"}>
+        <Card bg={"light"} className={[styles.card, "shadow-sm"].join(" ")}>
           <Card.Body>
             <RangeSlider
               value={index}
@@ -63,37 +107,48 @@ export class ApriltagDetectionsVisualizer
               step={1}
               tooltip={"off"}
             />
-            <ListGroup horizontal>
-              <ListGroup.Item>
-                <img src={imgSrc || undefined} />
-              </ListGroup.Item>
-              <ListGroup.Item>
-                {formatValue(new Date(values[index][0]))}
-              </ListGroup.Item>
-              <ListGroup.Item>
-                {JSON.stringify(values[index][1])}
-              </ListGroup.Item>
-            </ListGroup>
+            <div className={styles.annotatedImageContainer}>
+              <div className={styles.annotatedImage}>
+                <img
+                  ref={imageRef}
+                  src={imgSrc || undefined}
+                  className={styles.image}
+                />
+                <canvas ref={canvasRef} className={styles.canvas}></canvas>
+              </div>
+            </div>
           </Card.Body>
+          <Card.Footer className={styles.footer}>
+            <span className="text-muted">
+              {formatValue(new Date(values[index][0]))}
+            </span>
+            <JsonPopover json={values[index][1]} />
+          </Card.Footer>
         </Card>
       );
-    } else if (options[0].value === "row") {
+    } else if (viewOption === "row") {
       return (
         <div className={styles.row}>
           {values.map((v, index) => (
             <Card key={v[0]} bg={"light"} className={"shadow-sm"}>
               <Card.Body>
-                <ListGroup>
-                  <ListGroup.Item>
-                    <img src={imgSrc || undefined} />
-                  </ListGroup.Item>
-                  <ListGroup.Item>
+                <Card.Body>
+                  <div className={styles.annotatedImageContainer}>
+                    <div className={styles.annotatedImage}>
+                      <img
+                        ref={imageRef}
+                        src={imgSrc || undefined}
+                        className={styles.image}
+                      />
+                      <canvas
+                        ref={canvasRef}
+                        className={styles.canvas}
+                      ></canvas>
+                    </div>
                     {formatValue(new Date(values[index][0]))}
-                  </ListGroup.Item>
-                  <ListGroup.Item>
-                    {JSON.stringify(values[index][1])}
-                  </ListGroup.Item>
-                </ListGroup>
+                    <JsonPopover json={values[index][1]} />
+                  </div>
+                </Card.Body>
               </Card.Body>
             </Card>
           ))}

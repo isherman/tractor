@@ -4,5 +4,9 @@ $theme-colors: (
   "danger": teal
 );
 
+$popover-max-width: 600px;
+
+@import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.scss";
+
 /* import bootstrap to set changes */
 @import "~bootstrap/scss/bootstrap";

@@ -3,7 +3,7 @@ import { EventType, EventTypeId } from "../registry/events";
 
 type Timestamp = number;
 
-type TimestampedEvent<T extends EventType = EventType> = [Timestamp, T];
+export type TimestampedEvent<T extends EventType = EventType> = [Timestamp, T];
 
 export type TimestampedEventVector<
   T extends EventType = EventType

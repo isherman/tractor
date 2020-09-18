@@ -77,15 +77,12 @@ export const LogChooser: React.FC = () => {
   return useObserver(() => {
     return (
       <div className={styles.logChooser}>
-        <label>
-          Log
-          <input
-            type="file"
-            id="file"
-            ref={fileInputRef}
-            onChange={handleOnLogSelect}
-          />
-        </label>
+        <input
+          type="file"
+          id="file"
+          ref={fileInputRef}
+          onChange={handleOnLogSelect}
+        />
         <span>{store.bufferLoadProgress}</span>
       </div>
     );
