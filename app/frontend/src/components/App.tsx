@@ -34,8 +34,8 @@ export const App: React.FC = () => {
             <Nav.Link as={Link} to="/debug">
               Debug
             </Nav.Link>
-            <Nav.Link as={Link} to="/viz">
-              Viz
+            <Nav.Link as={Link} to="/scope">
+              Scope
             </Nav.Link>
           </Nav>
         </Navbar.Collapse>
@@ -47,7 +47,7 @@ export const App: React.FC = () => {
         <Route exact path="/video" component={Video} />
         <Route exact path="/map" component={Map} />
         <Route exact path="/debug" component={Debug} />
-        <Route exact path="/viz" component={Viz} />
+        <Route exact path="/scope" component={Viz} />
         <Route render={() => <p>Not found</p>} />
       </Switch>
     </div>
