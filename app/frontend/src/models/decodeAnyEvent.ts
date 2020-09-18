@@ -4,7 +4,7 @@ import { Event as BusAnyEvent } from "../../genproto/farm_ng_proto/tractor/v1/io
 // https://github.com/stephenh/ts-proto/issues/108
 import * as protobuf from "protobufjs/minimal";
 import * as Long from "long";
-import { eventRegistry, EventType } from "../registry/events";
+import { eventRegistry, EventType, EventTypeId } from "../registry/events";
 import { Message } from "../types/common";
 
 if (protobuf.util.Long !== Long) {
@@ -17,6 +17,8 @@ export function decodeAnyEvent<T extends EventType>(
 ): T | null {
   const { data } = event;
   if (!data || !data.value) return null;
-  const decoder = (eventRegistry[data.typeUrl] as Message<T>).decode;
+  const decoder = (eventRegistry[
+    (data.typeUrl as unknown) as EventTypeId
+  ] as Message<T>).decode;
   return decoder(data.value);
 }

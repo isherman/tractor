@@ -1,0 +1,16 @@
+.row {
+  display: flex;
+  overflow-x: auto;
+
+  :global(.card) {
+    width: 24rem;
+    min-width: 24rem;
+    margin-right: 1rem;
+    max-height: 50rem;
+    overflow-y: scroll;
+  }
+
+  img {
+    width: 100%;
+  }
+}

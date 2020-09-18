@@ -26,8 +26,8 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
       panel.tagFilter = e.target.value;
     };
 
+    let { eventType } = panel;
     const {
-      eventType,
       tagFilter,
       selectedVisualizer,
       visualizers,
@@ -51,6 +51,9 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
     const bufferEmpty = Object.keys(store.buffer).length === 0;
     if (!bufferEmpty && !Object.keys(store.buffer).includes(eventType)) {
       panel.setEventType(Object.keys(store.buffer)[0] as EventTypeId);
+
+      // TODO: Figure out why this is necessary
+      eventType = (Object.keys(store.buffer) as EventTypeId[])[0];
     }
 
     return (

@@ -22,5 +22,5 @@ message Resource {
   string content_type = 3;
 
   // (Optional) The uncompressed size of the resource in bytes.
-  google.protobuf.Int64Value length = 4;
+  google.protobuf.UInt32Value length = 4;
 }

@@ -120,6 +120,10 @@ export class VisualizationStore {
     }
   }
 
+  setBuffer(buffer: Buffer): void {
+    this.buffer = buffer;
+  }
+
   deletePanel(id: string): void {
     this.panels.delete(id);
   }

@@ -26,7 +26,13 @@ export type EventType =
   | Vec2
   | Image;
 
-export const eventRegistry: { [k: string]: Message<EventType> } = {
+// Infer the keys, but restrict values to Message<EventType>
+// https://stackoverflow.com/a/54598743
+const inferKeys = <T>(
+  o: { [K in keyof T]: Message<EventType> }
+): { [K in keyof T]: Message<EventType> } => o;
+
+export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand": SteeringCommand,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraPoseFrame": TrackingCameraPoseFrame,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraMotionFrame": TrackingCameraMotionFrame,
@@ -37,6 +43,9 @@ export const eventRegistry: { [k: string]: Message<EventType> } = {
   "type.googleapis.com/farm_ng_proto.tractor.v1.Announce": Announce,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": Vec2,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Image": Image
-};
-export const eventTypeIds = Object.keys(eventRegistry);
+});
+
+export const eventTypeIds = Object.keys(
+  eventRegistry
+) as (keyof typeof eventRegistry)[];
 export type EventTypeId = typeof eventTypeIds[number];

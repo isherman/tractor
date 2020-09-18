@@ -65,7 +65,9 @@ export const LogChooser: React.FC = () => {
           await new Promise((r) => setTimeout(r, 0));
         }
       }
-      store.buffer = { ...store.buffer, ...eventBuffer.data };
+
+      // TODO: Encapsulate in single setter
+      store.setBuffer(eventBuffer.data);
       store.bufferSize = file.size / 1e6;
       store.bufferStart = eventBuffer.bufferStart;
       store.bufferEnd = eventBuffer.bufferEnd;
