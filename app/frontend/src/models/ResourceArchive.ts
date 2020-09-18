@@ -20,6 +20,10 @@ export class ResourceArchive {
     this.tarReader = new TarReader(file);
   }
 
+  public async getFileInfo(): Promise<string[]> {
+    return await this.tarReader.getFileInfo();
+  }
+
   public async getBlob(path: string): Promise<Blob> {
     return await this.tarReader.getFileBlob(path);
   }

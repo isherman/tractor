@@ -41,7 +41,12 @@ export const LogChooser: React.FC = () => {
     if (file) {
       store.resourceArchive = new ResourceArchive(file);
       const eventBuffer = new UploadBuffer();
-      const blob = await store.resourceArchive.getBlob("log.log");
+      const fileInfo = await store.resourceArchive.getFileInfo();
+      const logFilePath = fileInfo.find((_) => _.endsWith(".log"));
+      if (!logFilePath) {
+        throw Error("No .log file in archive");
+      }
+      const blob = await store.resourceArchive.getBlob(logFilePath);
       const fileBuffer = await blob.arrayBuffer();
       let offset = 0;
       while (offset < fileBuffer.byteLength) {

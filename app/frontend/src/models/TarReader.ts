@@ -117,17 +117,20 @@ export class TarReader {
     blobProperties?: BlobPropertyBag
   ): Promise<Blob> {
     const { buffer, fileInfo } = await this.data;
-    console.log({ fileName, fileInfo });
     const info = fileInfo.find((_) => fileName === normalizeName(_.name));
     if (!info) {
       return Promise.reject(`${fileName} not found in tar directory`);
     }
-    console.log("Reading: ", info.headerOffset + 512, info.size);
     return readFileBlob(
       buffer,
       info.headerOffset + 512,
       info.size,
       blobProperties
     );
+  }
+
+  public async getFileInfo(): Promise<string[]> {
+    const { fileInfo } = await this.data;
+    return fileInfo.map((_) => _.name);
   }
 }
