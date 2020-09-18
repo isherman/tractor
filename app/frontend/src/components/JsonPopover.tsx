@@ -1,7 +1,7 @@
 import * as React from "react";
 import ReactJson from "react-json-view";
 import { Button, OverlayTrigger, Popover } from "react-bootstrap";
-import styles from "./JSONPopover.module.scss";
+import styles from "./JsonPopover.module.scss";
 
 interface IProps {
   title?: string;

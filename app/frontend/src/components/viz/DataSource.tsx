@@ -9,13 +9,9 @@ import { ChangeEvent } from "react";
 export const DataSource: React.FC = () => {
   const { visualizationStore: store } = useStores();
 
-  const setDataSource = (d: DataSourceType): void => {
-    store.dataSource = d;
-  };
-
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>): void => {
     e.currentTarget.checked &&
-      setDataSource(e.currentTarget.value as DataSourceType);
+      store.setDataSource(e.currentTarget.value as DataSourceType);
   };
 
   return useObserver(() => {

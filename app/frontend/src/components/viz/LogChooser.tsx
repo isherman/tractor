@@ -1,33 +1,11 @@
 import * as React from "react";
 import { ChangeEvent, useRef } from "react";
-import { decodeAnyEvent } from "../../models/decodeAnyEvent";
-import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
-import { Buffer } from "../../types/common";
-import { EventTypeId } from "../../registry/events";
 import styles from "./LogChooser.module.scss";
 import { useObserver } from "mobx-react-lite";
 import { useStores } from "../../hooks/useStores";
 import { ResourceArchive } from "../../models/ResourceArchive";
-
-class UploadBuffer {
-  public bufferStart: Date | null = null;
-  public bufferEnd: Date | null = null;
-  public data: Buffer = {};
-
-  public add(event: BusAnyEvent): void {
-    if (!event || !event.data || !event.stamp) return;
-    this.bufferStart = this.bufferStart || event.stamp;
-    this.bufferEnd = event.stamp;
-    const typeUrl = event.data.typeUrl as EventTypeId;
-    if (!this.data[typeUrl]) this.data[typeUrl] = {};
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (!this.data[typeUrl]![event.name]) this.data[typeUrl]![event.name] = [];
-    const decodedEvent = decodeAnyEvent(event);
-    if (!decodedEvent) return;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    this.data[typeUrl]![event.name].push([event.stamp.getTime(), decodedEvent]);
-  }
-}
+import { UploadBuffer } from "../../models/UploadBuffer";
+import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 
 export const LogChooser: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);

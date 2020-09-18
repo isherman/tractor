@@ -1,7 +1,9 @@
 import { observable, computed, ObservableMap } from "mobx";
 import { Image } from "../../genproto/farm_ng_proto/tractor/v1/image";
 import { Resource } from "../../genproto/farm_ng_proto/tractor/v1/resource";
+import { BusEventEmitter } from "../models/BusEventEmitter";
 import { ResourceArchive } from "../models/ResourceArchive";
+import { UploadBuffer } from "../models/UploadBuffer";
 import { EventTypeId } from "../registry/events";
 import {
   Visualizer,
@@ -97,15 +99,60 @@ export class VisualizationStore {
 
   @observable panels: ObservableMap<string, Panel>;
 
-  constructor() {
+  private streamingBuffer: UploadBuffer = new UploadBuffer();
+  private streamingUpdatePeriod = 1000;
+
+  constructor(public busEventEmitter: BusEventEmitter) {
     const p = new Panel();
     this.panels = new ObservableMap<string, Panel>([[p.id, p]]);
     this.buffer = testBuffer();
+
+    this.busEventEmitter.on("*", (event) => {
+      if (this.dataSource !== "live") {
+        return;
+      }
+      this.streamingBuffer.add(event);
+    });
+    setInterval(() => {
+      if (this.dataSource !== "live") {
+        return;
+      }
+      // this.buffer = this.streamingBuffer.data;
+      Object.entries(this.streamingBuffer.data).forEach(
+        ([typeKey, streams]) => {
+          this.buffer[typeKey as EventTypeId] =
+            this.buffer[typeKey as EventTypeId] || {};
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          Object.entries(streams!).forEach(([streamKey, values]) => {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            this.buffer[typeKey as EventTypeId]![streamKey] =
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              [
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                ...(this.buffer[typeKey as EventTypeId]![streamKey] || []),
+                ...values
+              ] || values;
+          });
+        }
+      );
+      this.bufferStart = this.bufferStart || this.streamingBuffer.bufferStart;
+      this.bufferEnd = this.streamingBuffer.bufferEnd;
+      this.streamingBuffer = new UploadBuffer();
+    }, this.streamingUpdatePeriod);
   }
 
   addPanel(): void {
     const panel = new Panel();
     this.panels.set(panel.id, panel);
+  }
+
+  setDataSource(d: DataSourceType): void {
+    this.dataSource = d;
+    this.buffer = {};
+    this.setBufferRangeStart(0);
+    this.setBufferRangeEnd(1);
+    this.bufferLoadProgress = 0;
+    this.bufferSize = 0;
   }
 
   setBufferRangeStart(value: number): void {
