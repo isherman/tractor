@@ -9,7 +9,7 @@ class IpcLogger {
  public:
   IpcLogger(boost::asio::io_service& io_service)
       : bus_(GetEventBus(io_service, "ipc-logger")),
-        log_writer_("/tmp/farm-ng-event.log"),
+        log_writer_(bus_.GetUniqueResource("ipc", "log", "")),
         log_timer_(io_service),
         announce_timer_(io_service) {
     bus_.GetEventSignal()->connect(

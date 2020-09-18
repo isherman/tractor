@@ -8,6 +8,7 @@
 #include <boost/signals2.hpp>
 
 #include "farm_ng_proto/tractor/v1/io.pb.h"
+#include "farm_ng_proto/tractor/v1/resource.pb.h"
 
 namespace farm_ng {
 
@@ -40,6 +41,12 @@ class EventBus : public boost::asio::io_service::service {
 
   void SetName(const std::string& name);
 
+  // returns a resource that can be written to that will have a unique file
+  // name, in the active logging directory.
+  farm_ng_proto::tractor::v1::Resource GetUniqueResource(
+      const std::string& prefix, const std::string& ext,
+      const std::string& mime_type);
+
  private:
   std::unique_ptr<EventBusImpl> impl_;
 };
@@ -56,7 +63,8 @@ farm_ng_proto::tractor::v1::Event MakeEvent(std::string name,
   return event;
 }
 
-inline EventBus& GetEventBus(boost::asio::io_service& io_service, const std::string& service_name) {
+inline EventBus& GetEventBus(boost::asio::io_service& io_service,
+                             const std::string& service_name) {
   auto& service = boost::asio::use_service<EventBus>(io_service);
   service.SetName(service_name);
   return service;

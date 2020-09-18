@@ -4,11 +4,14 @@
 #include <string>
 
 #include "farm_ng_proto/tractor/v1/io.pb.h"
+#include "farm_ng_proto/tractor/v1/resource.pb.h"
+
 namespace farm_ng {
 class EventLogWriterImpl;
 class EventLogWriter {
  public:
-  EventLogWriter(std::string log_path);
+  EventLogWriter(const std::string& log_path);
+  EventLogWriter(const farm_ng_proto::tractor::v1::Resource& log_resource);
   ~EventLogWriter();
   void Write(const farm_ng_proto::tractor::v1::Event& event);
 

@@ -5,15 +5,14 @@
 
 #include <glog/logging.h>
 #include <google/protobuf/util/time_util.h>
-#include <librealsense2/rs.hpp>
 #include <librealsense2/rsutil.h>
+#include <librealsense2/rs.hpp>
 
 #include <opencv2/opencv.hpp>
 
 #include "apriltag.h"
 #include "apriltag_pose.h"
 #include "tag36h11.h"
-
 
 #include <farm_ng/ipc.h>
 #include <farm_ng/sophus_protobuf.h>
@@ -71,6 +70,28 @@ void SetQuatFromRs(farm_ng_proto::tractor::v1::Quaternion* out,
   out->set_x(vec.x);
   out->set_y(vec.y);
   out->set_z(vec.z);
+}
+
+void SetCameraModelFromRs(farm_ng_proto::tractor::v1::CameraModel* out,
+                          const rs2_intrinsics& intrinsics) {
+  out->set_image_width(intrinsics.width);
+  out->set_image_height(intrinsics.height);
+  out->set_cx(intrinsics.ppx);
+  out->set_cy(intrinsics.ppy);
+  out->set_fx(intrinsics.fx);
+  out->set_fy(intrinsics.fy);
+  switch (intrinsics.model) {
+    case RS2_DISTORTION_KANNALA_BRANDT4:
+      out->set_distortion_model(farm_ng_proto::tractor::v1::CameraModel::
+                                    DISTORTION_MODEL_KANNALA_BRANDT4);
+      break;
+    default:
+      CHECK(false) << "Unhandled intrinsics model: "
+                   << rs2_distortion_to_string(intrinsics.model);
+  }
+  for (int i = 0; i < 5; ++i) {
+    out->add_distortion_coefficients(intrinsics.coeffs[i]);
+  }
 }
 
 TrackingCameraPoseFrame::Confidence ToConfidence(int x) {
@@ -136,242 +157,244 @@ Event ToNamedPoseEvent(const rs2::pose_frame& rs_pose_frame) {
   return event;
 }
 
-
-
 //
-// Re-compute homography between ideal standard tag image and undistorted tag corners for estimage_tag_pose().
+// Re-compute homography between ideal standard tag image and undistorted tag
+// corners for estimage_tag_pose().
 //
-// @param[in]  c is 4 pairs of tag corners on ideal image and undistorted input image.
-// @param[out] H is the output homography between ideal and undistorted input image.
+// @param[in]  c is 4 pairs of tag corners on ideal image and undistorted input
+// image.
+// @param[out] H is the output homography between ideal and undistorted input
+// image.
 // @see        static void apriltag_manager::undistort(...)
 //
-void homography_compute2(const double c[4][4], matd_t* H) {
-    double A[] =  {
-        c[0][0], c[0][1], 1,       0,       0, 0, -c[0][0]*c[0][2], -c[0][1]*c[0][2], c[0][2],
-        0,       0, 0, c[0][0], c[0][1], 1, -c[0][0]*c[0][3], -c[0][1]*c[0][3], c[0][3],
-        c[1][0], c[1][1], 1,       0,       0, 0, -c[1][0]*c[1][2], -c[1][1]*c[1][2], c[1][2],
-        0,       0, 0, c[1][0], c[1][1], 1, -c[1][0]*c[1][3], -c[1][1]*c[1][3], c[1][3],
-        c[2][0], c[2][1], 1,       0,       0, 0, -c[2][0]*c[2][2], -c[2][1]*c[2][2], c[2][2],
-        0,       0, 0, c[2][0], c[2][1], 1, -c[2][0]*c[2][3], -c[2][1]*c[2][3], c[2][3],
-        c[3][0], c[3][1], 1,       0,       0, 0, -c[3][0]*c[3][2], -c[3][1]*c[3][2], c[3][2],
-        0,       0, 0, c[3][0], c[3][1], 1, -c[3][0]*c[3][3], -c[3][1]*c[3][3], c[3][3],
-    };
+bool homography_compute2(const double c[4][4], matd_t* H) {
+  double A[] = {
+      c[0][0],
+      c[0][1],
+      1,
+      0,
+      0,
+      0,
+      -c[0][0] * c[0][2],
+      -c[0][1] * c[0][2],
+      c[0][2],
+      0,
+      0,
+      0,
+      c[0][0],
+      c[0][1],
+      1,
+      -c[0][0] * c[0][3],
+      -c[0][1] * c[0][3],
+      c[0][3],
+      c[1][0],
+      c[1][1],
+      1,
+      0,
+      0,
+      0,
+      -c[1][0] * c[1][2],
+      -c[1][1] * c[1][2],
+      c[1][2],
+      0,
+      0,
+      0,
+      c[1][0],
+      c[1][1],
+      1,
+      -c[1][0] * c[1][3],
+      -c[1][1] * c[1][3],
+      c[1][3],
+      c[2][0],
+      c[2][1],
+      1,
+      0,
+      0,
+      0,
+      -c[2][0] * c[2][2],
+      -c[2][1] * c[2][2],
+      c[2][2],
+      0,
+      0,
+      0,
+      c[2][0],
+      c[2][1],
+      1,
+      -c[2][0] * c[2][3],
+      -c[2][1] * c[2][3],
+      c[2][3],
+      c[3][0],
+      c[3][1],
+      1,
+      0,
+      0,
+      0,
+      -c[3][0] * c[3][2],
+      -c[3][1] * c[3][2],
+      c[3][2],
+      0,
+      0,
+      0,
+      c[3][0],
+      c[3][1],
+      1,
+      -c[3][0] * c[3][3],
+      -c[3][1] * c[3][3],
+      c[3][3],
+  };
 
-    double epsilon = 1e-10;
+  double epsilon = 1e-10;
 
-    // Eliminate.
-    for (int col = 0; col < 8; col++) {
-        // Find best row to swap with.
-        double max_val = 0;
-        int max_val_idx = -1;
-        for (int row = col; row < 8; row++) {
-            double val = fabs(A[row*9 + col]);
-            if (val > max_val) {
-                max_val = val;
-                max_val_idx = row;
-            }
-        }
-
-        if (max_val < epsilon) {
-            fprintf(stderr, "WRN: Matrix is singular.\n");
-        }
-
-        // Swap to get best row.
-        if (max_val_idx != col) {
-            for (int i = col; i < 9; i++) {
-                double tmp = A[col*9 + i];
-                A[col*9 + i] = A[max_val_idx*9 + i];
-                A[max_val_idx*9 + i] = tmp;
-            }
-        }
-
-        // Do eliminate.
-        for (int i = col + 1; i < 8; i++) {
-            double f = A[i*9 + col]/A[col*9 + col];
-            A[i*9 + col] = 0;
-            for (int j = col + 1; j < 9; j++) {
-                A[i*9 + j] -= f*A[col*9 + j];
-            }
-        }
+  // Eliminate.
+  for (int col = 0; col < 8; col++) {
+    // Find best row to swap with.
+    double max_val = 0;
+    int max_val_idx = -1;
+    for (int row = col; row < 8; row++) {
+      double val = fabs(A[row * 9 + col]);
+      if (val > max_val) {
+        max_val = val;
+        max_val_idx = row;
+      }
     }
 
-    // Back solve.
-    for (int col = 7; col >=0; col--) {
-        double sum = 0;
-        for (int i = col + 1; i < 8; i++) {
-            sum += A[col*9 + i]*A[i*9 + 8];
-        }
-        A[col*9 + 8] = (A[col*9 + 8] - sum)/A[col*9 + col];
+    if (max_val < epsilon) {
+      return false;
     }
-    H->data[0] = A[8];
-    H->data[1] = A[17];
-    H->data[2] = A[26];
-    H->data[3] = A[35];
-    H->data[4] = A[44];
-    H->data[5] = A[53];
-    H->data[6] = A[62];
-    H->data[7] = A[71];
-    H->data[8] = 1;
+
+    // Swap to get best row.
+    if (max_val_idx != col) {
+      for (int i = col; i < 9; i++) {
+        double tmp = A[col * 9 + i];
+        A[col * 9 + i] = A[max_val_idx * 9 + i];
+        A[max_val_idx * 9 + i] = tmp;
+      }
+    }
+
+    // Do eliminate.
+    for (int i = col + 1; i < 8; i++) {
+      double f = A[i * 9 + col] / A[col * 9 + col];
+      A[i * 9 + col] = 0;
+      for (int j = col + 1; j < 9; j++) {
+        A[i * 9 + j] -= f * A[col * 9 + j];
+      }
+    }
+  }
+
+  // Back solve.
+  for (int col = 7; col >= 0; col--) {
+    double sum = 0;
+    for (int i = col + 1; i < 8; i++) {
+      sum += A[col * 9 + i] * A[i * 9 + 8];
+    }
+    A[col * 9 + 8] = (A[col * 9 + 8] - sum) / A[col * 9 + col];
+  }
+  H->data[0] = A[8];
+  H->data[1] = A[17];
+  H->data[2] = A[26];
+  H->data[3] = A[35];
+  H->data[4] = A[44];
+  H->data[5] = A[53];
+  H->data[6] = A[62];
+  H->data[7] = A[71];
+  H->data[8] = 1;
+  return true;
 }
 
-typedef rs2_extrinsics transformation;
-transformation to_transform(const double R[9], const double t[3]) {
-    transformation tf;
-    for(int r=0; r<9; ++r){ tf.rotation[r] = static_cast<float>(R[r]); }
-    for(int i=0; i<3; ++i){ tf.translation[i] = static_cast<float>(t[i]); }
-    return tf;
+class TagLibrary {
+ public:
+  double TagSize(int tag_id) const { return 0.16; }
+};
+
+void deproject(double pt[2], const rs2_intrinsics& intr, const double px[2]) {
+  float fpt[3], fpx[2] = {(float)px[0], (float)px[1]};
+  rs2_deproject_pixel_to_point(fpt, &intr, fpx, 1.0f);
+  pt[0] = fpt[0];
+  pt[1] = fpt[1];
 }
 
-transformation to_transform(const rs2_quaternion& q, const rs2_vector& t) {
-    transformation tf;
-    tf.rotation[0] = q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z;
-    tf.rotation[1] = 2 * (q.x * q.y - q.w * q.z);
-    tf.rotation[2] = 2 * (q.x * q.z + q.w * q.y);
-    tf.rotation[3] = 2 * (q.x * q.y + q.w * q.z);
-    tf.rotation[4] = q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z;
-    tf.rotation[5] = 2 * (q.y * q.z - q.w * q.x);
-    tf.rotation[6] = 2 * (q.x * q.z - q.w * q.y);
-    tf.rotation[7] = 2 * (q.y * q.z + q.w * q.x);
-    tf.rotation[8] = q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z;
-    tf.translation[0] = t.x;
-    tf.translation[1] = t.y;
-    tf.translation[2] = t.z;
-    return tf;
+bool undistort(apriltag_detection_t& src, const rs2_intrinsics& intr) {
+  deproject(src.c, intr, src.c);
+
+  double corr_arr[4][4];
+  for (int c = 0; c < 4; ++c) {
+    deproject(src.p[c], intr, src.p[c]);
+
+    corr_arr[c][0] =
+        (c == 0 || c == 3) ? -1 : 1;  // tag corners in an ideal image
+    corr_arr[c][1] =
+        (c == 0 || c == 1) ? -1 : 1;  // tag corners in an ideal image
+    corr_arr[c][2] =
+        src.p[c][0];  // tag corners in undistorted image focal length = 1
+    corr_arr[c][3] =
+        src.p[c][1];  // tag corners in undistorted image focal length = 1
+  }
+  if (src.H == nullptr) {
+    src.H = matd_create(3, 3);
+  }
+  return homography_compute2(corr_arr, src.H);
 }
 
-transformation operator*(const transformation& a, const transformation& b) {
-    transformation tf;
-    tf.rotation[0] = a.rotation[0] * b.rotation[0] + a.rotation[1] * b.rotation[3] + a.rotation[2] * b.rotation[6];
-    tf.rotation[1] = a.rotation[0] * b.rotation[1] + a.rotation[1] * b.rotation[4] + a.rotation[2] * b.rotation[7];
-    tf.rotation[2] = a.rotation[0] * b.rotation[2] + a.rotation[1] * b.rotation[5] + a.rotation[2] * b.rotation[8];
-    tf.rotation[3] = a.rotation[3] * b.rotation[0] + a.rotation[4] * b.rotation[3] + a.rotation[5] * b.rotation[6];
-    tf.rotation[4] = a.rotation[3] * b.rotation[1] + a.rotation[4] * b.rotation[4] + a.rotation[5] * b.rotation[7];
-    tf.rotation[5] = a.rotation[3] * b.rotation[2] + a.rotation[4] * b.rotation[5] + a.rotation[5] * b.rotation[8];
-    tf.rotation[6] = a.rotation[6] * b.rotation[0] + a.rotation[7] * b.rotation[3] + a.rotation[8] * b.rotation[6];
-    tf.rotation[7] = a.rotation[6] * b.rotation[1] + a.rotation[7] * b.rotation[4] + a.rotation[8] * b.rotation[7];
-    tf.rotation[8] = a.rotation[6] * b.rotation[2] + a.rotation[7] * b.rotation[5] + a.rotation[8] * b.rotation[8];
-
-    tf.translation[0] = a.rotation[0] * b.translation[0] + a.rotation[1] * b.translation[1] + a.rotation[2] * b.translation[2] + a.translation[0];
-    tf.translation[1] = a.rotation[3] * b.translation[0] + a.rotation[4] * b.translation[1] + a.rotation[5] * b.translation[2] + a.translation[1];
-    tf.translation[2] = a.rotation[6] * b.translation[0] + a.rotation[7] * b.translation[1] + a.rotation[8] * b.translation[2] + a.translation[2];
-    return tf;
+void apriltag_pose_destroy(apriltag_pose_t* p) {
+  matd_destroy(p->R);
+  matd_destroy(p->t);
+  delete p;
 }
 
-#define FORMAT_VALUE     std::fixed << std::right << std::setprecision(3) << std::setw(6)
+Sophus::SE3d ApriltagPoseToSE3d(const apriltag_pose_t& pose) {
+  typedef Eigen::Map<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>>
+      Map33RowMajor;
+  return Sophus::SE3d(
+      Map33RowMajor(pose.R->data),
+      Eigen::Vector3d(pose.t->data[0], pose.t->data[1], pose.t->data[2]));
+}
+Event GenerateExtrinsicPoseEvent() {
+  NamedSE3Pose base_pose_t265;
+  base_pose_t265.set_frame_a("odometry/wheel");
+  base_pose_t265.set_frame_b("tracking_camera/front/left");
+  Sophus::SE3d se3(Sophus::SE3d::rotZ(-M_PI / 2.0));
+  se3 = se3 * Sophus::SE3d::rotX(M_PI / 2.0);
+  // se3 = se3 * Sophus::SE3d::rotZ(M_PI);
+  se3.translation().x() = -1.0;
+  se3.translation().z() = 1.0;
+  // for good diagram of t265:
+  // https://github.com/IntelRealSense/librealsense/blob/development/doc/t265.md
 
-std::string print(const transformation& tf) {
-    std::stringstream ss; ss << "R:";
-    for(const auto& r : tf.rotation){ ss << FORMAT_VALUE << r << ","; }
-    ss << "|t:";
-    for(const auto& t : tf.translation){ ss << FORMAT_VALUE << t << ","; }
-    return ss.str();
+  SophusToProto(se3, base_pose_t265.mutable_a_pose_b());
+  Event event = farm_ng::MakeEvent("pose/extrinsic_calibrator", base_pose_t265);
+  return event;
 }
 
 // https://github.com/IntelRealSense/librealsense/blob/master/examples/pose-apriltag/rs-pose-apriltag.cpp
-class apriltag_manager {
-public:
-    apriltag_manager(const rs2_intrinsics& _intr,  const rs2_extrinsics _extr_b2f, double tagsize)
-    : intr(_intr), tf_body_to_fisheye(_extr_b2f) {
-        tf = tag36h11_create();
-        td = apriltag_detector_create();
-        apriltag_detector_add_family(td, tf);
-
-        td->quad_decimate = 1.0;
-        td->quad_sigma    = 0.0;
-        td->nthreads      = 1;
-        td->debug         = 0;
-        td->refine_edges  = 1;
-
-        info.tagsize      = tagsize;
-        info.fx = info.fy = 1;       //undistorted image with focal length = 1
-        info.cx = info.cy = 0;       //undistorted image with principal point at (0,0)
-    }
-    ~apriltag_manager() {
-        apriltag_detector_destroy(td);
-        tag36h11_destroy(tf);
-    }
-
-    struct apriltag_array_t {
-        std::shared_ptr<zarray_t>                     det;
-        std::vector<std::shared_ptr<apriltag_pose_t>> pose_raw;       //tag pose from library
-        std::vector<transformation>                   pose_in_camera; //tag pose in camera coordinate
-        std::vector<transformation>                   pose_in_world;  //tag pose in world coordinate
-
-        apriltag_detection_t* get(int t) const { apriltag_detection_t* ptr; zarray_get(det.get(), t, &ptr); return ptr; }
-        int get_id(int t) const { return get(t)->id; }
-        int size() const { return pose_in_camera.size(); }
-    };
-
-    static void apriltag_pose_destroy(apriltag_pose_t* p){ matd_destroy(p->R); matd_destroy(p->t); delete p;}
-
-    apriltag_array_t detect(std::shared_ptr<zarray_t> detections) const {
-        apriltag_array_t tags;
-        tags.det = detections;
-        tags.pose_in_camera.resize(zarray_size(tags.det.get()));
-        tags.pose_raw.resize(tags.size());
-
-        auto info_ = info;
-        for(int t=0, num_of_tags=(int)tags.size(); t<num_of_tags; ++t)
-        {
-            tags.pose_raw[t] = std::shared_ptr<apriltag_pose_t>(new apriltag_pose_t(), apriltag_pose_destroy);
-
-            undistort(*(info_.det = tags.get(t)), intr);                      //recompute tag corners on an undistorted image focal length = 1
-            //estimate_tag_pose(&info_, tags.pose_raw[t].get());              //(alternative) estimate tag pose in camera coordinate
-            estimate_pose_for_tag_homography(&info_, tags.pose_raw[t].get()); //estimate tag pose in camera coordinate
-            for(auto c : {1,2,4,5,7,8}){ tags.pose_raw[t]->R->data[c] *= -1; }
-
-            tags.pose_in_camera[t] = to_transform(tags.pose_raw[t]->R->data, tags.pose_raw[t]->t->data);
-        }
-
-        if(camera_pose){ compute_tag_pose_in_world(tags, *camera_pose); }
-        return tags;
-    }
-
-protected:
-    apriltag_family_t        *tf;
-    apriltag_detector_t      *td;
-    apriltag_detection_info_t info;
-    rs2_intrinsics            intr;
-    transformation            tf_body_to_fisheye;
-
-    void compute_tag_pose_in_world(apriltag_array_t& tags, const rs2_pose& camera_world_pose) const {
-        tags.pose_in_world.resize(tags.size());
-        for(int t=0, num_of_tags=tags.size(); t<num_of_tags; ++t){
-            auto tf_fisheye_to_tag = tags.pose_in_camera[t];
-            auto tf_world_to_body = to_transform(camera_world_pose.rotation, camera_world_pose.translation);
-            tags.pose_in_world[t] = tf_world_to_body * tf_body_to_fisheye * tf_fisheye_to_tag;
-        }
-    }
-
-    static void undistort(apriltag_detection_t& src, const rs2_intrinsics& intr) {
-        deproject(src.c, intr, src.c);
-
-        double corr_arr[4][4];
-        for(int c=0; c<4; ++c){
-            deproject(src.p[c], intr, src.p[c]);
-
-            corr_arr[c][0] = (c==0 || c==3) ? -1 : 1; // tag corners in an ideal image
-            corr_arr[c][1] = (c==0 || c==1) ? -1 : 1; // tag corners in an ideal image
-            corr_arr[c][2] = src.p[c][0];             // tag corners in undistorted image focal length = 1
-            corr_arr[c][3] = src.p[c][1];             // tag corners in undistorted image focal length = 1
-        }
-        if(src.H == nullptr) { src.H = matd_create(3, 3); }
-        homography_compute2(corr_arr, src.H);
-    }
-
-    static void deproject(double pt[2], const rs2_intrinsics& intr, const double px[2]) {
-        float fpt[3], fpx[2] = { (float)px[0], (float)px[1] };
-        rs2_deproject_pixel_to_point(fpt, &intr, fpx, 1.0f);
-        pt[0] = fpt[0];
-        pt[1] = fpt[1];
-    }
-};
+// Note this function mutates detection, by undistorting the points and
+// populating the homography
+boost::optional<Sophus::SE3d> EstimateCameraPoseTag(
+    const rs2_intrinsics& intr, const TagLibrary& tag_library,
+    apriltag_detection_t* detection) {
+  apriltag_detection_info_t info;
+  info.fx = info.fy = 1;  // undistorted image with focal length = 1
+  info.cx = info.cy = 0;  // undistorted image with principal point at (0,0)
+  info.det = detection;
+  info.tagsize = tag_library.TagSize(info.det->id);
+  // recompute tag corners on an undistorted image focal length = 1
+  if (!undistort(*info.det, intr)) {
+    LOG(WARNING) << "Tag with id: " << info.det->id << " can not compute pose.";
+    return boost::none;
+  }
+  auto pose = std::shared_ptr<apriltag_pose_t>(new apriltag_pose_t(),
+                                               apriltag_pose_destroy);
+  // estimate tag pose in camera coordinate
+  estimate_pose_for_tag_homography(&info, pose.get());
+  return ApriltagPoseToSE3d(*pose);
+}
 
 class ApriltagDetector {
   // see
   // https://github.com/AprilRobotics/apriltag/blob/master/example/opencv_demo.cc
  public:
-  ApriltagDetector() {
+  ApriltagDetector(rs2_intrinsics intrinsics, EventBus* event_bus = nullptr)
+      : event_bus_(event_bus), intrinsics_(intrinsics) {
+    SetCameraModelFromRs(&camera_model_, intrinsics_);
     tag_family_ = tag36h11_create();
     tag_detector_ = apriltag_detector_create();
     apriltag_detector_add_family(tag_detector_, tag_family_);
@@ -387,7 +410,7 @@ class ApriltagDetector {
     tag36h11_destroy(tag_family_);
   }
 
-  ApriltagDetections Detect(cv::Mat gray) {
+  ApriltagDetections Detect(cv::Mat gray, bool save_image = false) {
     CHECK_EQ(gray.channels(), 1);
     CHECK_EQ(gray.type(), CV_8UC1);
 
@@ -399,12 +422,22 @@ class ApriltagDetector {
                      .stride = gray.cols,
                      .buf = gray.data};
 
-    std::shared_ptr<zarray_t> detections(apriltag_detector_detect(tag_detector_, &im), apriltag_detection_destroy);
-
-
+    std::shared_ptr<zarray_t> detections(
+        apriltag_detector_detect(tag_detector_, &im),
+        apriltag_detections_destroy);
 
     // copy detections into protobuf
     ApriltagDetections pb_out;
+    pb_out.mutable_image()->mutable_camera_model()->CopyFrom(camera_model_);
+    if (event_bus_ && save_image) {
+      pb_out.mutable_image()->mutable_resource()->CopyFrom(
+          event_bus_->GetUniqueResource("tracking_camera_left_apriltag", "png",
+                                        "image/png"));
+      LOG(INFO) << pb_out.image().resource().ShortDebugString();
+      cv::imwrite(pb_out.image().resource().archive_path() + "/" +
+                      pb_out.image().resource().path(),
+                  gray);
+    }
     for (int i = 0; i < zarray_size(detections.get()); i++) {
       apriltag_detection_t* det;
       zarray_get(detections.get(), i, &det);
@@ -420,34 +453,53 @@ class ApriltagDetector {
       detection->set_id(det->id);
       detection->set_hamming(static_cast<uint8_t>(det->hamming));
       detection->set_decision_margin(det->decision_margin);
+      // estimation comes last because this mutates det
+      auto pose = EstimateCameraPoseTag(intrinsics_, TagLibrary(), det);
+      if (pose) {
+        auto* named_pose = detection->mutable_pose();
+        SophusToProto(*pose, named_pose->mutable_a_pose_b());
+        named_pose->set_frame_a("tracking_camera/front/left");
+        named_pose->set_frame_b("tag/" + std::to_string(det->id));
+        if (event_bus_) {
+          event_bus_->Send(MakeEvent(
+              "pose/tracking_camera/front/left/tag/" + std::to_string(det->id),
+              *named_pose));
+        }
+      }
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration =
         std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    LOG_EVERY_N(INFO, 10) << "april tag detection took: " << duration.count()
-                          << " microseconds\n"
-                          << pb_out.ShortDebugString();
+    LOG_EVERY_N(INFO, 100) << "april tag detection took: " << duration.count()
+                           << " microseconds\n"
+                           << pb_out.ShortDebugString();
     return pb_out;
   }
 
  private:
+  EventBus* event_bus_;
+  rs2_intrinsics intrinsics_;
+  farm_ng_proto::tractor::v1::CameraModel camera_model_;
   apriltag_family_t* tag_family_;
   apriltag_detector_t* tag_detector_;
-  apriltag_manager manager_;
 };
 
 class TrackingCameraClient {
  public:
   TrackingCameraClient(boost::asio::io_service& io_service)
-      : io_service_(io_service), event_bus_(GetEventBus(io_service_, "tracking-camera")) {
+      : io_service_(io_service),
+        event_bus_(GetEventBus(io_service_, "tracking-camera")) {
     // TODO(ethanrublee) look up image size from realsense profile.
+
     std::string cmd0 =
         std::string("appsrc !") + " videoconvert ! " +
-        //" x264enc bitrate=600 speed-preset=ultrafast tune=zerolatency
-        // key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue
-        // max-size-time=100000000 ! h264parse ! "
-        " omxh264enc control-rate=1 bitrate=1000000 ! " +
-        " video/x-h264, stream-format=byte-stream !" +
+        " x264enc bitrate=600 speed-preset=ultrafast tune=zerolatency "
+        "key-int-max=15 ! video/x-h264,profile=constrained-baseline ! queue "
+        "max-size-time=100000000 ! h264parse ! "
+        /*
+                " omxh264enc control-rate=1 bitrate=1000000 ! " +
+                " video/x-h264, stream-format=byte-stream !" +
+         */
         " rtph264pay pt=96 mtu=1400 config-interval=10 !" +
         " udpsink host=239.20.20.20 auto-multicast=true port=5000";
     std::cerr << "Running gstreamer with pipeline:\n" << cmd0 << std::endl;
@@ -486,6 +538,7 @@ class TrackingCameraClient {
     auto fisheye_intrinsics =
         fisheye_stream.as<rs2::video_stream_profile>().get_intrinsics();
 
+    detector_.reset(new ApriltagDetector(fisheye_intrinsics, &event_bus_));
     LOG(INFO) << " intrinsics model: "
               << rs2_distortion_to_string(fisheye_intrinsics.model)
               << " width=" << fisheye_intrinsics.width
@@ -546,10 +599,11 @@ class TrackingCameraClient {
             // io_service_.run();
             cv::Mat frame_0 = frame_to_mat(fisheye_frame);
             Event event = farm_ng::MakeEvent("tracking_camera/front/apriltags",
-                                             detector_.Detect(frame_0));
+                                             detector_->Detect(frame_0, true));
             *event.mutable_stamp() = stamp;
 
             event_bus_.Send(event);
+            event_bus_.Send(GenerateExtrinsicPoseEvent());
             // signal that we're done detecting, so can post another frame for
             // detection.
             std::lock_guard<std::mutex> lock(mtx_realsense_state_);
@@ -577,7 +631,7 @@ class TrackingCameraClient {
   std::mutex mtx_realsense_state_;
   int count_ = 0;
   bool detection_in_progress_ = false;
-  ApriltagDetector detector_;
+  std::unique_ptr<ApriltagDetector> detector_;
 };
 }  // namespace farm_ng
 

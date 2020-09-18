@@ -23,8 +23,13 @@ class EventLogWriterImpl {
   std::string log_path_;
   std::ofstream out_;
 };
-EventLogWriter::EventLogWriter(std::string log_path)
+EventLogWriter::EventLogWriter(const std::string& log_path)
     : impl_(new EventLogWriterImpl(log_path)) {}
+
+EventLogWriter::EventLogWriter(
+    const farm_ng_proto::tractor::v1::Resource& log_resource)
+    : impl_(new EventLogWriterImpl(log_resource.archive_path() + "/" +
+                                   log_resource.path())) {}
 EventLogWriter::~EventLogWriter() { impl_.reset(nullptr); }
 
 void EventLogWriter::Write(const farm_ng_proto::tractor::v1::Event& event) {

@@ -1,11 +1,14 @@
 #include "farm_ng/ipc.h"
 
+#include <unistd.h>
 #include <chrono>
+#include <cstdio>
 #include <functional>
 #include <iostream>
 #include <string>
 
 #include <boost/asio.hpp>
+#include <boost/filesystem.hpp>
 
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/util/time_util.h>
@@ -119,7 +122,8 @@ class EventBusImpl {
         socket_(io_service),
         announce_timer_(io_service),
         announce_endpoint_(multicast_address, multicast_port),
-        signal_(new EventSignal) {
+        signal_(new EventSignal),
+        resource_uuids_(0) {
     // Create the socket so that multiple may be bound to the same address.
     boost::asio::ip::udp::endpoint listen_endpoint(listen_address, 0);
     socket_.open(listen_endpoint.protocol());
@@ -189,9 +193,7 @@ class EventBusImpl {
     }
   }
 
-  void set_name(const std::string& name) {
-    service_name_ = name;
-  }
+  void set_name(const std::string& name) { service_name_ = name; }
   boost::asio::io_service& io_service_;
 
   receiver recv_;
@@ -211,6 +213,8 @@ class EventBusImpl {
  public:
   std::map<std::string, farm_ng_proto::tractor::v1::Event> state_;
   EventSignalPtr signal_;
+
+  std::atomic<uint64_t> resource_uuids_;
 };
 
 boost::asio::io_service::id EventBus::id;
@@ -239,9 +243,33 @@ EventBus::GetAnnouncements() const {
 void EventBus::Send(const farm_ng_proto::tractor::v1::Event& event) {
   impl_->io_service_.post([this, event]() { impl_->send_event(event); });
 }
-void EventBus::SetName(const std::string& name) {
-  impl_->set_name(name);
+void EventBus::SetName(const std::string& name) { impl_->set_name(name); }
+
+farm_ng_proto::tractor::v1::Resource EventBus::GetUniqueResource(
+    const std::string& prefix, const std::string& ext,
+    const std::string& content_type) {
+  farm_ng_proto::tractor::v1::Resource resource;
+
+  boost::filesystem::path archive_path("/tmp/farm-ng-log/0001");
+  if (!boost::filesystem::exists(archive_path)) {
+    if (!boost::filesystem::create_directories(archive_path)) {
+      throw std::runtime_error(std::string("Could not create archive path: ") +
+                               archive_path.string());
+    }
+  }
+  resource.set_content_type(content_type);
+  resource.set_archive_path(archive_path.string());
+  pid_t pid = getpid();
+  uint64_t id = impl_->resource_uuids_++;
+  char buffer[1024];
+  if (std::snprintf(buffer, sizeof(buffer), "%s-%05d-%05ld.%s", prefix.c_str(),
+                    pid, id, ext.c_str()) > int(sizeof(buffer) - 1)) {
+    throw std::runtime_error("path is too long.");
+  }
+  resource.set_path(std::string(buffer));
+  return resource;
 }
+
 google::protobuf::Timestamp MakeTimestampNow() {
   return MakeTimestamp(std::chrono::system_clock::now());
 }
