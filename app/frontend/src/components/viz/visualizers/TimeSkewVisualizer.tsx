@@ -42,7 +42,13 @@ export class TimeSkewVisualizer implements Visualizer {
         y: {
           time: true
         }
-      }
+      },
+      axes: [
+        {},
+        {
+          size: 100
+        }
+      ]
     };
 
     return <Plot data={plotData} options={plotOptions} />;

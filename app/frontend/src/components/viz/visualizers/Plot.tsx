@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import uPlot from "uplot";
+import styles from "./Plot.module.scss";
 import "uplot/dist/uPlot.min.css";
 
 interface IProps {
@@ -14,12 +15,11 @@ export const Plot: React.FC<IProps> = ({ data, options }) => {
 
   const resize = (): void => {
     const containerElement = containerRef?.current;
-    console.log("resize", containerElement, uPlotInstance);
 
     if (containerElement && uPlotInstance) {
       uPlotInstance.setSize({
         width: containerElement.clientWidth,
-        height: uPlotInstance.height
+        height: containerElement.clientHeight
       });
     }
   };
@@ -47,5 +47,5 @@ export const Plot: React.FC<IProps> = ({ data, options }) => {
     uPlotInstance.redraw();
   }, [data]);
 
-  return <div ref={containerRef}></div>;
+  return <div className={styles.plot} ref={containerRef}></div>;
 };

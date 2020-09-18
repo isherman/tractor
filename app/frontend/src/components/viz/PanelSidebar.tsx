@@ -3,9 +3,10 @@ import styles from "./PanelSidebar.module.scss";
 import { Button, Form } from "react-bootstrap";
 import { useStores } from "../../hooks/useStores";
 import { useObserver } from "mobx-react-lite";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { EventTypeId, eventTypeIds } from "../../registry/events";
 import { visualizerId } from "../../stores/VisualizationStore";
+import { autorun } from "mobx";
 
 interface IProps {
   id: string;
@@ -14,9 +15,34 @@ interface IProps {
 export const PanelSidebar: React.FC<IProps> = ({ id }) => {
   const { visualizationStore: store } = useStores();
 
+  useEffect(
+    () =>
+      autorun(() => {
+        const panel = store.panels.get(id);
+        if (!panel) return null;
+        const { eventType } = panel;
+        const bufferEmpty = Object.keys(store.buffer).length === 0;
+        if (!bufferEmpty && !Object.keys(store.buffer).includes(eventType)) {
+          panel.setEventType(Object.keys(store.buffer)[0] as EventTypeId);
+        }
+      }),
+    []
+  );
+
   return useObserver(() => {
     const panel = store.panels.get(id);
     if (!panel) return null;
+
+    const bufferEmpty = Object.keys(store.buffer).length === 0;
+
+    const {
+      eventType,
+      tagFilter,
+      selectedVisualizer,
+      visualizers,
+      optionConfigs: optionConfigs,
+      selectedOptions
+    } = panel;
 
     const removePanel = (): void => {
       store.deletePanel(id);
@@ -26,14 +52,6 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
       panel.tagFilter = e.target.value;
     };
 
-    let { eventType } = panel;
-    const {
-      tagFilter,
-      selectedVisualizer,
-      visualizers,
-      optionConfigs: optionConfigs,
-      selectedOptions
-    } = panel;
     const setEventType = (e: ChangeEvent<HTMLSelectElement>): void => {
       if (e.target.value) {
         panel.setEventType(e.target.value as EventTypeId);
@@ -47,14 +65,6 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
     const setOption = (i: number, e: ChangeEvent<HTMLSelectElement>): void => {
       panel.setOption(i, parseInt(e.target.value) as number);
     };
-
-    const bufferEmpty = Object.keys(store.buffer).length === 0;
-    if (!bufferEmpty && !Object.keys(store.buffer).includes(eventType)) {
-      panel.setEventType(Object.keys(store.buffer)[0] as EventTypeId);
-
-      // TODO: Figure out why this is necessary
-      eventType = (Object.keys(store.buffer) as EventTypeId[])[0];
-    }
 
     return (
       <div className={styles.panelSidebar}>
