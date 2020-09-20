@@ -6,7 +6,7 @@ import {
   VisualizerOptionConfig,
   VisualizerProps
 } from "../../../registry/visualization";
-
+import { colorGenerator } from "../../../utils/ColorGenerator";
 import { Plot } from "./Plot";
 
 export class TimeSkewVisualizer implements Visualizer {
@@ -16,12 +16,12 @@ export class TimeSkewVisualizer implements Visualizer {
   options: VisualizerOptionConfig[] = [];
 
   component: React.FC<VisualizerProps<EventType>> = ({ values }) => {
-    if (!values) {
-      return null;
-    }
+    const plotData = [
+      values.map((_, i) => i),
+      values.map(([t, _]) => t / 1000)
+    ];
 
-    const plotData = [values.map((_, i) => i), values.map((v) => v[0] / 1000)];
-
+    const colors = colorGenerator();
     const plotOptions = {
       width: 800,
       height: 600,
@@ -31,7 +31,7 @@ export class TimeSkewVisualizer implements Visualizer {
         },
         {
           label: "t",
-          stroke: "rgb(75,192,192)",
+          stroke: colors.next().value,
           width: 1
         }
       ],

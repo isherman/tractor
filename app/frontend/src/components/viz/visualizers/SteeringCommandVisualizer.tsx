@@ -7,6 +7,7 @@ import {
   VisualizerOptionConfig,
   VisualizerProps
 } from "../../../registry/visualization";
+import { colorGenerator } from "../../../utils/ColorGenerator";
 import { Plot } from "./Plot";
 
 export class SteeringCommandVisualizer implements Visualizer<SteeringCommand> {
@@ -23,18 +24,16 @@ export class SteeringCommandVisualizer implements Visualizer<SteeringCommand> {
     values,
     options
   }) => {
-    if (!values) {
-      return null;
-    }
-
     const plotData = [
-      values.map((v) => v[0] / 1000),
-      values.map((v) => v[1].brake),
-      values.map((v) => v[1].deadman),
-      values.map((v) => v[1].velocity),
-      values.map((v) => v[1].angularVelocity)
+      values.map(([t, _]) => t / 1000),
+      values.map(([_, v]) => v.brake),
+      values.map(([_, v]) => v.deadman),
+      values.map(([_, v]) => v.velocity),
+      values.map(([_, v]) => v.angularVelocity)
     ];
 
+    const strokeWidth = parseInt(options[0].value);
+    const colors = colorGenerator();
     const plotOptions = {
       width: 800,
       height: 600,
@@ -42,26 +41,11 @@ export class SteeringCommandVisualizer implements Visualizer<SteeringCommand> {
         {
           show: false
         },
-        {
-          label: "brake",
-          stroke: "#ff0000",
-          width: parseInt(options[0].value)
-        },
-        {
-          label: "deadman",
-          stroke: "#000000",
-          width: parseInt(options[0].value)
-        },
-        {
-          label: "v",
-          stroke: "#00ff00",
-          width: parseInt(options[0].value)
-        },
-        {
-          label: "ω",
-          stroke: "#0000ff",
-          width: parseInt(options[0].value)
-        }
+        ...["brake", "deadman", "v", "ω"].map((label) => ({
+          label,
+          stroke: colors.next().value,
+          width: strokeWidth
+        }))
       ]
     };
 

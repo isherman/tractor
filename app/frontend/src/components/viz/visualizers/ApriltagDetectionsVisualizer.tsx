@@ -2,9 +2,9 @@
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Card } from "react-bootstrap";
-import RangeSlider from "react-bootstrap-range-slider";
 import styles from "./ApriltagDetectionsVisualizer.module.scss";
 import {
+  SingleElementVisualizerProps,
   Visualizer,
   VisualizerId,
   VisualizerOptionConfig,
@@ -16,6 +16,88 @@ import { EventTypeId } from "../../../registry/events";
 import { autorun } from "mobx";
 import { drawAprilTagDetections } from "../../../utils/drawApriltagDetections";
 import { JsonPopover } from "../../JsonPopover";
+import { Layout } from "./Layout";
+
+const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
+  ApriltagDetections
+>> = ({ value: [timestamp, value], resources }) => {
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const fetchImage = async (): Promise<void> => {
+      const resource = value.image?.resource;
+      if (resources && resource) {
+        try {
+          setImgSrc(await resources.getDataUrl(resource.path));
+        } catch (e) {
+          console.error(`Error loading resource ${resource.path}: ${e}`);
+        }
+      }
+    };
+    fetchImage();
+  }, [value, resources]);
+
+  const resize = (): void => {
+    const imageElement = imageRef?.current;
+    const canvasElement = canvasRef?.current;
+    if (imageElement && canvasElement) {
+      canvasElement.width = imageElement.clientWidth;
+      canvasElement.height = imageElement.clientHeight;
+    }
+  };
+
+  useEffect(
+    () =>
+      autorun(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) {
+          return;
+        }
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          return;
+        }
+
+        resize();
+
+        const { imageWidth: width, imageHeight: height } =
+          value.image?.cameraModel || {};
+
+        drawAprilTagDetections(
+          value,
+          ctx,
+          canvas,
+          width && height ? { width, height } : undefined,
+          2
+        );
+      }),
+    [canvasRef, value, imgSrc]
+  );
+
+  return (
+    <Card bg={"light"} className={[styles.card, "shadow-sm"].join(" ")}>
+      <Card.Body>
+        <div className={styles.annotatedImageContainer}>
+          <div className={styles.annotatedImage}>
+            <img
+              ref={imageRef}
+              src={imgSrc || undefined}
+              className={styles.image}
+            />
+            <canvas ref={canvasRef} className={styles.canvas}></canvas>
+          </div>
+        </div>
+      </Card.Body>
+      <Card.Footer className={styles.footer}>
+        <span className="text-muted">{formatValue(new Date(timestamp))}</span>
+        <JsonPopover json={value} />
+      </Card.Footer>
+    </Card>
+  );
+};
 
 export class ApriltagDetectionsVisualizer
   implements Visualizer<ApriltagDetections> {
@@ -25,140 +107,13 @@ export class ApriltagDetectionsVisualizer
   ];
 
   options: VisualizerOptionConfig[] = [
-    { label: "view", options: ["overlay", "row"] }
+    { label: "view", options: ["overlay", "grid"] }
   ];
 
-  component: React.FC<VisualizerProps<ApriltagDetections>> = ({
-    values,
-    options,
-    resources
-  }) => {
-    if (!values) {
-      return null;
-    }
-
-    const [index, setIndex] = useState(0);
-    const [imgSrc, setImgSrc] = useState<string | null>(null);
-    const imageRef = useRef<HTMLImageElement | null>(null);
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const viewOption = options[0].value as "overlay" | "row";
-
-    useEffect(() => {
-      const fetchImage = async (): Promise<void> => {
-        const resource = values[index][1].image?.resource;
-        if (resources && resource) {
-          try {
-            setImgSrc(await resources.getDataUrl(resource.path));
-          } catch (e) {
-            console.error(`Error loading resource ${resource.path}: ${e}`);
-          }
-        }
-      };
-      fetchImage();
-    }, [values, resources, index]);
-
-    const resize = (): void => {
-      const imageElement = imageRef?.current;
-      const canvasElement = canvasRef?.current;
-      if (imageElement && canvasElement) {
-        canvasElement.width = imageElement.clientWidth;
-        canvasElement.height = imageElement.clientHeight;
-      }
-    };
-
-    useEffect(
-      () =>
-        autorun(() => {
-          const canvas = canvasRef.current;
-          if (!canvas) {
-            return;
-          }
-
-          const ctx = canvas.getContext("2d");
-          if (!ctx) {
-            return;
-          }
-
-          resize();
-
-          const { imageWidth: width, imageHeight: height } =
-            values[index][1].image?.cameraModel || {};
-
-          drawAprilTagDetections(
-            values[index][1],
-            ctx,
-            canvas,
-            width && height ? { width, height } : undefined,
-            2
-          );
-        }),
-      [canvasRef, values, index, imgSrc]
+  component: React.FC<VisualizerProps<ApriltagDetections>> = (props) => {
+    const view = props.options[0].value as "overlay" | "grid";
+    return (
+      <Layout view={view} element={ApriltagDetectionsElement} {...props} />
     );
-
-    if (viewOption === "overlay") {
-      return (
-        <Card bg={"light"} className={[styles.card, "shadow-sm"].join(" ")}>
-          <Card.Body>
-            <RangeSlider
-              value={index}
-              onChange={(e) => setIndex(parseInt(e.target.value))}
-              min={0}
-              max={values.length - 1}
-              step={1}
-              tooltip={"off"}
-            />
-            <div className={styles.annotatedImageContainer}>
-              <div className={styles.annotatedImage}>
-                <img
-                  ref={imageRef}
-                  src={imgSrc || undefined}
-                  className={styles.image}
-                />
-                <canvas ref={canvasRef} className={styles.canvas}></canvas>
-              </div>
-            </div>
-          </Card.Body>
-          <Card.Footer className={styles.footer}>
-            <span className="text-muted">
-              {formatValue(new Date(values[index][0]))}
-            </span>
-            <JsonPopover json={values[index][1]} />
-          </Card.Footer>
-        </Card>
-      );
-    } else if (viewOption === "row") {
-      return (
-        <div className={styles.row}>
-          {values.map((v, index) => (
-            <Card
-              key={v[0]}
-              bg={"light"}
-              className={[styles.card, "shadow-sm"].join(" ")}
-            >
-              <Card.Body>
-                <div className={styles.annotatedImageContainer}>
-                  <div className={styles.annotatedImage}>
-                    <img
-                      ref={imageRef}
-                      src={imgSrc || undefined}
-                      className={styles.image}
-                    />
-                    <canvas ref={canvasRef} className={styles.canvas}></canvas>
-                  </div>
-                </div>
-              </Card.Body>
-              <Card.Footer className={styles.footer}>
-                <span className="text-muted">
-                  {formatValue(new Date(values[index][0]))}
-                </span>
-                <JsonPopover json={values[index][1]} />
-              </Card.Footer>
-            </Card>
-          ))}
-        </div>
-      );
-    } else {
-      return null;
-    }
   };
 }

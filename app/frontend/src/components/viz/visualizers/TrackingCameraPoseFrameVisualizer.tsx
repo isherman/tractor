@@ -10,6 +10,7 @@ import { EventTypeId } from "../../../registry/events";
 import { TrackingCameraPoseFrame } from "../../../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
 import { Plot } from "./Plot";
 import { Vec3 } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
+import { colorGenerator } from "../../../utils/ColorGenerator";
 
 const norm = (v?: Vec3): number => {
   return v
@@ -29,16 +30,13 @@ export class TrackingCameraPoseFrameVisualizer
   component: React.FC<VisualizerProps<TrackingCameraPoseFrame>> = ({
     values
   }) => {
-    if (!values) {
-      return null;
-    }
-
     const plotData = [
-      values.map((v) => v[0] / 1000),
-      values.map((v) => norm(v[1].velocity)),
-      values.map((v) => norm(v[1].acceleration))
+      values.map(([t, _]) => t / 1000),
+      values.map(([_, v]) => norm(v.velocity)),
+      values.map(([_, v]) => norm(v.acceleration))
     ];
 
+    const colors = colorGenerator();
     const plotOptions = {
       width: 800,
       height: 600,
@@ -46,14 +44,10 @@ export class TrackingCameraPoseFrameVisualizer
         {
           show: false
         },
-        {
-          label: "|v|",
-          stroke: "rgb(75,192,192)"
-        },
-        {
-          label: "|a|",
-          stroke: "#742774"
-        }
+        ...["|v|", "|a|"].map((label) => ({
+          label,
+          stroke: colors.next().value
+        }))
       ]
     };
 
