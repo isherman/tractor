@@ -10,7 +10,7 @@ import { EventTypeId } from "../../../registry/events";
 import { TrackingCameraPoseFrame } from "../../../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
 import { Plot } from "./Plot";
 import { Vec3 } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
-import { colorGenerator } from "../../../utils/ColorGenerator";
+import { colorGenerator } from "../../../utils/colorGenerator";
 
 const norm = (v?: Vec3): number => {
   return v

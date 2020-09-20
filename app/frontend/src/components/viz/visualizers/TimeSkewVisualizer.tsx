@@ -6,7 +6,7 @@ import {
   VisualizerOptionConfig,
   VisualizerProps
 } from "../../../registry/visualization";
-import { colorGenerator } from "../../../utils/ColorGenerator";
+import { colorGenerator } from "../../../utils/colorGenerator";
 import { Plot } from "./Plot";
 
 export class TimeSkewVisualizer implements Visualizer {
