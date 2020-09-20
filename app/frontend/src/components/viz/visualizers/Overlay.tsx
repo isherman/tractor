@@ -32,7 +32,7 @@ export const Overlay = <T extends EventType>(
         step={1}
         tooltip={"off"}
       />
-      <Component key={value[0]} value={value} {...props} />
+      <Component value={value} {...props} />
     </div>
   );
 };
