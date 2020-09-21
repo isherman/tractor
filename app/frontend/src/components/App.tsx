@@ -12,7 +12,7 @@ import styles from "./App.module.scss";
 export const App: React.FC = () => {
   return (
     <div className={styles.app}>
-      <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+      <Navbar collapseOnSelect expand="md" bg="dark" variant="dark">
         <Navbar.Brand as={Link} to="/">
           farm-ng
         </Navbar.Brand>

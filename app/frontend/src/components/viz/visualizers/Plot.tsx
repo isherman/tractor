@@ -20,9 +20,6 @@ export const Plot: React.FC<IProps> = ({ data, options }) => {
         existing ||
         new uPlot(options, data, containerRef.current as HTMLElement)
     );
-    return () => {
-      uPlotInstance && uPlotInstance.destroy();
-    };
   }, [containerRef, options]);
 
   // On data change, just update the data
@@ -40,8 +37,8 @@ export const Plot: React.FC<IProps> = ({ data, options }) => {
 
     if (containerElement && uPlotInstance) {
       uPlotInstance.setSize({
-        width: containerElement.clientWidth,
-        height: containerElement.clientHeight
+        width: Math.floor(containerElement.clientWidth),
+        height: Math.floor(containerElement.clientHeight - 25)
       });
     }
   }, [containerRef, uPlotInstance]);

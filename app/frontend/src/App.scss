@@ -4,9 +4,13 @@
   box-sizing: border-box;
 }
 
-body,
+body {
+  height: 100%;
+}
+
 html {
   height: 100%;
+  font-size: 62.5%;
 }
 
 #root {

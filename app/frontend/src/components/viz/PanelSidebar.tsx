@@ -15,14 +15,15 @@ interface IProps {
 export const PanelSidebar: React.FC<IProps> = ({ id }) => {
   const { visualizationStore: store } = useStores();
 
+  // Automatically choose an event type when a buffer is loaded
   useEffect(
     () =>
       autorun(() => {
-        const panel = store.panels.get(id);
-        if (!panel) return null;
-        const { eventType } = panel;
-        const bufferEmpty = Object.keys(store.buffer).length === 0;
-        if (!bufferEmpty && !Object.keys(store.buffer).includes(eventType)) {
+        const panel = store.panels[id];
+        if (!panel) {
+          return null;
+        }
+        if (!panel.eventType && !store.bufferEmpty) {
           panel.setEventType(Object.keys(store.buffer)[0] as EventTypeId);
         }
       }),
@@ -30,19 +31,20 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
   );
 
   return useObserver(() => {
-    const panel = store.panels.get(id);
-    if (!panel) return null;
-
-    const bufferEmpty = Object.keys(store.buffer).length === 0;
+    const panel = store.panels[id];
+    if (!panel) {
+      return null;
+    }
 
     const {
       eventType,
       tagFilter,
       selectedVisualizer,
       visualizers,
-      optionConfigs: optionConfigs,
+      optionConfigs,
       selectedOptions
     } = panel;
+    const { bufferEmpty } = store;
 
     const setTagFilter = (e: ChangeEvent<HTMLInputElement>): void => {
       panel.tagFilter = e.target.value;
@@ -69,7 +71,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
           <Form.Control
             as="select"
             disabled={bufferEmpty}
-            value={bufferEmpty ? "" : eventType}
+            value={!bufferEmpty && eventType ? eventType : ""}
             onChange={setEventType}
           >
             {[...eventTypeIds].map((_) => (

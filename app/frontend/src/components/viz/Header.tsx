@@ -5,7 +5,7 @@ import { useObserver } from "mobx-react-lite";
 import RangeSlider from "react-bootstrap-range-slider";
 import { useStores } from "../../hooks/useStores";
 import { ResourceArchive } from "../../models/ResourceArchive";
-import { UploadBuffer } from "../../models/UploadBuffer";
+import { StreamingBuffer } from "../../models/StreamingBuffer";
 import { formatValue } from "../../utils/formatValue";
 import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import { Icon } from "../Icon";
@@ -15,19 +15,9 @@ export const Header: React.FC = () => {
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [logFilePath, setLogFilePath] = React.useState<string | null>(null);
 
-  const tooltipLabel = (v: number): string => {
-    if (!store.bufferEnd || !store.bufferStart) {
-      return "";
-    }
-    return formatValue(
-      new Date(
-        store.bufferStart.getTime() +
-          (store.bufferEnd.getTime() - store.bufferStart.getTime()) * v
-      )
-    );
-  };
-
-  const handleOnLogClick = (_: React.MouseEvent<HTMLButtonElement>): void => {
+  const handleOnLoadLogClick = (
+    _: React.MouseEvent<HTMLButtonElement>
+  ): void => {
     if (!fileInputRef.current) {
       return;
     }
@@ -37,23 +27,26 @@ export const Header: React.FC = () => {
   const handleOnToggleStreamClick = (
     _: React.MouseEvent<HTMLButtonElement>
   ): void => {
-    store.bufferStreaming = !store.bufferStreaming;
+    store.toggleStreaming();
   };
 
-  const handleOnLogSelect = async (
+  const handleOnLoadLog = async (
     e: React.ChangeEvent<HTMLInputElement>
   ): Promise<void> => {
-    const file = e.target.files?.[0];
+    store.bufferLogLoadProgress = 0;
+    const eventTarget = e.target;
+    const file = eventTarget.files?.[0];
     if (file) {
-      store.resourceArchive = new ResourceArchive(file);
-      const eventBuffer = new UploadBuffer();
-      const fileInfo = await store.resourceArchive.getFileInfo();
+      // TODO: Pull this logic out of the view
+      const resourceArchive = new ResourceArchive(file);
+      const streamingBuffer = new StreamingBuffer();
+      const fileInfo = await resourceArchive.getFileInfo();
       const logFilePath = fileInfo.find((_) => _.endsWith(".log"));
       if (!logFilePath) {
         throw Error("No .log file in archive");
       }
       setLogFilePath(logFilePath);
-      const blob = await store.resourceArchive.getBlob(logFilePath);
+      const blob = await resourceArchive.getBlob(logFilePath);
       const fileBuffer = await blob.arrayBuffer();
       let offset = 0;
       while (offset < fileBuffer.byteLength) {
@@ -62,28 +55,22 @@ export const Header: React.FC = () => {
         offset += 2;
         const record = fileBuffer.slice(offset, offset + length);
         offset += length;
-        eventBuffer.add(BusAnyEvent.decode(new Uint8Array(record)));
+        streamingBuffer.add(BusAnyEvent.decode(new Uint8Array(record)));
 
-        // Update progress bar at a reasonable frequency
+        // Update progress at a reasonable frequency
         const newProgress = Math.round((offset / file.size) * 10) / 10;
-        if (newProgress != store.bufferLoadProgress) {
-          store.bufferLoadProgress = newProgress;
+        if (newProgress != store.bufferLogLoadProgress) {
+          store.bufferLogLoadProgress = newProgress;
           // Yield main thread for UI updates
           await new Promise((r) => setTimeout(r, 0));
         }
       }
-
-      // TODO: Encapsulate in single setter
-      store.setBuffer(eventBuffer.data);
-      store.bufferSize = file.size / 1e6;
-      store.bufferStart = eventBuffer.bufferStart;
-      store.bufferEnd = eventBuffer.bufferEnd;
-      store.bufferLoadProgress = 1;
+      store.setFromStreamingBuffer(streamingBuffer, resourceArchive);
+      eventTarget.value = "";
     }
   };
 
   return useObserver(() => {
-    const progress = store.bufferLoadProgress;
     return (
       <div className={styles.header}>
         <Container fluid>
@@ -103,20 +90,20 @@ export const Header: React.FC = () => {
 
                 <Button
                   disabled={store.bufferStreaming}
-                  onClick={handleOnLogClick}
+                  onClick={handleOnLoadLogClick}
                 >
                   Load log
                 </Button>
                 <input
                   ref={fileInputRef}
-                  onChange={handleOnLogSelect}
+                  onChange={handleOnLoadLog}
                   name="loadLog"
                   type="file"
                   hidden
                 />
               </div>
               <div className={"text-muted"}>
-                {progress === 1 && `${logFilePath}`}
+                {store.bufferLogLoadProgress === 1 && `${logFilePath}`}
               </div>
             </Col>
             <Col xs={8}>
@@ -124,8 +111,9 @@ export const Header: React.FC = () => {
                 step={0.01}
                 max={1}
                 value={store.bufferRangeStart}
+                disabled={store.bufferEmpty}
                 tooltip={store.bufferStart && store.bufferEnd ? "auto" : "off"}
-                tooltipLabel={tooltipLabel}
+                tooltipLabel={() => formatValue(store.bufferRangeStartDate)}
                 onChange={(e) =>
                   store.setBufferRangeStart(parseFloat(e.target.value))
                 }
@@ -134,19 +122,24 @@ export const Header: React.FC = () => {
                 step={0.01}
                 max={1}
                 value={store.bufferRangeEnd}
+                disabled={store.bufferEmpty}
                 tooltip={store.bufferStart && store.bufferEnd ? "auto" : "off"}
-                tooltipLabel={tooltipLabel}
+                tooltipLabel={() => formatValue(store.bufferRangeEndDate)}
                 onChange={(e) =>
                   store.setBufferRangeEnd(parseFloat(e.target.value))
                 }
               />
               <div className={styles.bufferTimestamps}>
-                <span className={"text-muted"}>
-                  {formatValue(store.bufferStart || "")}
-                </span>
-                <span className={"text-muted"}>
-                  {formatValue(store.bufferEnd || "")}
-                </span>
+                {store.bufferStart && (
+                  <span className={"text-muted"}>
+                    {formatValue(store.bufferStart)}
+                  </span>
+                )}
+                {store.bufferEnd && (
+                  <span className={"text-muted"}>
+                    {formatValue(store.bufferEnd)}
+                  </span>
+                )}
               </div>
             </Col>
             <Col xs={1}>
@@ -154,6 +147,7 @@ export const Header: React.FC = () => {
                 <Form.Label>Throttle</Form.Label>
                 <Form.Control
                   as="select"
+                  disabled={store.bufferEmpty}
                   value={store.bufferThrottle}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     (store.bufferThrottle = parseInt(e.target.value))
@@ -172,9 +166,10 @@ export const Header: React.FC = () => {
                 <Form.Label>Expiration</Form.Label>
                 <Form.Control
                   as="select"
-                  value={store.bufferSize}
+                  disabled={store.bufferEmpty || !store.bufferStreaming}
+                  value={store.bufferExpirationWindow}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    (store.bufferSize = parseInt(e.target.value))
+                    (store.bufferExpirationWindow = parseInt(e.target.value))
                   }
                 >
                   <option value={60 * 1000}>1 min</option>

@@ -8,22 +8,20 @@ import { Icon } from "../Icon";
 export const Content: React.FC = () => {
   const { visualizationStore: store } = useStores();
 
+  const addPanel = (): void => store.addPanel();
+
   return useObserver(() => {
-    if (Object.keys(store.buffer).length === 0) {
+    if (store.bufferEmpty) {
       return null;
     }
-    const panels = Object.entries(
-      Object.fromEntries(store.panels.entries())
-    ).map(([_, p]) => <Panel key={p.id} id={p.id} />);
+    const panels = Object.keys(store.panels).map((id) => (
+      <Panel key={id} id={id} />
+    ));
 
     return (
       <div className={styles.content}>
         {panels}
-        <Button
-          className={styles.addButton}
-          variant="light"
-          onClick={() => store.addPanel()}
-        >
+        <Button className={styles.addButton} variant="light" onClick={addPanel}>
           <Icon id="plus" />
         </Button>
       </div>

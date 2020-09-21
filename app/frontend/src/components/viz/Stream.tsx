@@ -10,14 +10,20 @@ interface IProps {
   values: TimestampedEventVector;
 }
 
-const throttle = (
+const filter = (
   values: TimestampedEventVector,
+  start: Date | null,
+  end: Date | null,
   throttle: number
 ): TimestampedEventVector =>
   values.reduce<TimestampedEventVector>((acc, [t, v]) => {
-    if (acc.length === 0 || t - acc[acc.length - 1][0] > throttle) {
-      acc.push([t, v]);
+    if ((start && t < start.getTime()) || (end && t > end.getTime())) {
+      return acc;
     }
+    if (acc.length > 0 && t - acc[acc.length - 1][0] <= throttle) {
+      return acc;
+    }
+    acc.push([t, v]);
     return acc;
   }, []);
 
@@ -25,15 +31,16 @@ export const Stream: React.FC<IProps> = ({ panelId, name, values }) => {
   const { visualizationStore: store } = useStores();
 
   return useObserver(() => {
-    const panel = store.panels.get(panelId);
-    if (!panel) return null;
+    const panel = store.panels[panelId];
+    if (!panel) {
+      return null;
+    }
     const { visualizer, options } = panel;
 
-    const filteredValues = throttle(
-      values.slice(
-        Math.floor(store.bufferRangeStart * values.length),
-        Math.ceil(store.bufferRangeEnd * values.length)
-      ),
+    const filteredValues = filter(
+      values,
+      store.bufferRangeStartDate,
+      store.bufferRangeEndDate,
       store.bufferThrottle
     );
 

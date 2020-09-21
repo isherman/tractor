@@ -1,9 +1,7 @@
-import { observable, computed, ObservableMap } from "mobx";
-import { Image } from "../../genproto/farm_ng_proto/tractor/v1/image";
-import { Resource } from "../../genproto/farm_ng_proto/tractor/v1/resource";
+import { observable, computed } from "mobx";
 import { BusEventEmitter } from "../models/BusEventEmitter";
 import { ResourceArchive } from "../models/ResourceArchive";
-import { UploadBuffer } from "../models/UploadBuffer";
+import { StreamingBuffer } from "../models/StreamingBuffer";
 import { EventTypeId } from "../registry/events";
 import {
   Visualizer,
@@ -18,18 +16,23 @@ export function visualizerId(v: Visualizer): VisualizerId {
   return Object.getPrototypeOf(v).constructor.id;
 }
 
+const mapToDateRange = (value: number, startDate: Date, endDate: Date): Date =>
+  new Date(
+    startDate.getTime() + (endDate.getTime() - startDate.getTime()) * value
+  );
+
 export class Panel {
   public id = Math.random().toString(36).substring(7);
 
   @observable tagFilter = "";
-  @observable eventType: EventTypeId =
-    "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2";
+  @observable eventType: EventTypeId | null = null;
   @observable selectedVisualizer = 0;
   @observable selectedOptions = this.optionConfigs.map((_) => 0);
 
   @computed get visualizers(): Visualizer[] {
     return Object.values(visualizerRegistry).filter(
-      (v) => v.types.includes(this.eventType) || v.types === "*"
+      (v) =>
+        (this.eventType && v.types.includes(this.eventType)) || v.types === "*"
     );
   }
 
@@ -64,62 +67,35 @@ export class Panel {
   }
 }
 
-export type DataSourceType = "live" | "pause" | "log";
-
-function testBuffer(): Buffer {
-  return {
-    "type.googleapis.com/farm_ng_proto.tractor.v1.Image": {
-      foo: new Array(100)
-        .fill([
-          "a.jpg",
-          "b.jpg",
-          "c.jpg",
-          "foo/a.jpg",
-          "foo/bar/a.jpg",
-          "foo/bar/b.jpg",
-          "foo/bar/c.png"
-        ])
-        .flat()
-        .map((path, i) => [
-          i,
-          Image.fromJSON({ resource: Resource.fromJSON({ path }) })
-        ])
-    }
-  };
-}
-console.log(testBuffer());
-
 export class VisualizationStore {
-  @observable dataSource: DataSourceType = "log";
+  @observable bufferStreaming = false;
   @observable bufferStart: Date | null = null;
   @observable bufferEnd: Date | null = null;
   @observable bufferRangeStart = 0;
   @observable bufferRangeEnd = 1;
   @observable bufferThrottle = 0;
-  @observable bufferSize = 0;
   @observable buffer: Buffer = {};
-  @observable bufferLoadProgress = 0;
-  @observable bufferStreaming = false;
+  @observable bufferLogLoadProgress = 0;
+  @observable bufferExpirationWindow = 60 * 1000;
   @observable resourceArchive: ResourceArchive | null = null;
+  @observable panels: { [k: string]: Panel } = {};
 
-  @observable panels: ObservableMap<string, Panel>;
-
-  private streamingBuffer: UploadBuffer = new UploadBuffer();
+  private streamingBuffer: StreamingBuffer = new StreamingBuffer();
   private streamingUpdatePeriod = 1000;
 
   constructor(public busEventEmitter: BusEventEmitter) {
     const p = new Panel();
-    this.panels = new ObservableMap<string, Panel>([[p.id, p]]);
+    this.panels = { [p.id]: p };
     // this.buffer = testBuffer();
 
     this.busEventEmitter.on("*", (event) => {
-      if (this.dataSource !== "live") {
+      if (!this.bufferStreaming) {
         return;
       }
       this.streamingBuffer.add(event);
     });
     setInterval(() => {
-      if (this.dataSource !== "live") {
+      if (!this.bufferStreaming) {
         return;
       }
       // this.buffer = this.streamingBuffer.data;
@@ -142,22 +118,56 @@ export class VisualizationStore {
       );
       this.bufferStart = this.bufferStart || this.streamingBuffer.bufferStart;
       this.bufferEnd = this.streamingBuffer.bufferEnd;
-      this.streamingBuffer = new UploadBuffer();
+      this.streamingBuffer = new StreamingBuffer();
     }, this.streamingUpdatePeriod);
+  }
+
+  @computed get bufferEmpty(): boolean {
+    return Object.keys(this.buffer).length === 0;
+  }
+
+  @computed get bufferRangeStartDate(): Date | null {
+    if (!this.bufferStart || !this.bufferEnd) {
+      return null;
+    }
+    return mapToDateRange(
+      this.bufferRangeStart,
+      this.bufferStart,
+      this.bufferEnd
+    );
+  }
+
+  @computed get bufferRangeEndDate(): Date | null {
+    if (!this.bufferStart || !this.bufferEnd) {
+      return null;
+    }
+    return mapToDateRange(
+      this.bufferRangeEnd,
+      this.bufferStart,
+      this.bufferEnd
+    );
   }
 
   addPanel(): void {
     const panel = new Panel();
-    this.panels.set(panel.id, panel);
+    this.panels[panel.id] = panel;
   }
 
-  setDataSource(d: DataSourceType): void {
-    this.dataSource = d;
-    this.buffer = {};
-    this.setBufferRangeStart(0);
-    this.setBufferRangeEnd(1);
-    this.bufferLoadProgress = 0;
-    this.bufferSize = 0;
+  deletePanel(id: string): void {
+    delete this.panels[id];
+  }
+
+  toggleStreaming(): void {
+    const bufferDirty = this.bufferLogLoadProgress > 0;
+    if (!this.bufferStreaming && bufferDirty) {
+      this.buffer = {};
+      this.setBufferRangeStart(0);
+      this.setBufferRangeEnd(1);
+      this.bufferStart = null;
+      this.bufferEnd = null;
+      this.bufferLogLoadProgress = 0;
+    }
+    this.bufferStreaming = !this.bufferStreaming;
   }
 
   setBufferRangeStart(value: number): void {
@@ -172,11 +182,14 @@ export class VisualizationStore {
     }
   }
 
-  setBuffer(buffer: Buffer): void {
-    this.buffer = buffer;
-  }
-
-  deletePanel(id: string): void {
-    this.panels.delete(id);
+  setFromStreamingBuffer(
+    streamingBuffer: StreamingBuffer,
+    resourceArchive: ResourceArchive
+  ): void {
+    this.buffer = streamingBuffer.data;
+    this.bufferStart = streamingBuffer.bufferStart;
+    this.bufferEnd = streamingBuffer.bufferEnd;
+    this.bufferLogLoadProgress = 1;
+    this.resourceArchive = resourceArchive;
   }
 }
