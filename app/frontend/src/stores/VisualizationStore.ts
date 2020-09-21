@@ -68,59 +68,58 @@ export class Panel {
 }
 
 export class VisualizationStore {
-  @observable bufferStreaming = false;
+  @observable isStreaming = false;
   @observable bufferStart: Date | null = null;
   @observable bufferEnd: Date | null = null;
   @observable bufferRangeStart = 0;
   @observable bufferRangeEnd = 1;
-  @observable bufferThrottle = 0;
+  @observable bufferThrottle = 0; // ms
   @observable buffer: Buffer = {};
   @observable bufferLogLoadProgress = 0;
-  @observable bufferExpirationWindow = 60 * 1000;
+  @observable bufferExpirationWindow = 60 * 1000; // ms
   @observable resourceArchive: ResourceArchive | null = null;
   @observable panels: { [k: string]: Panel } = {};
-
-  private streamingBuffer: StreamingBuffer = new StreamingBuffer();
-  private streamingUpdatePeriod = 1000;
 
   constructor(public busEventEmitter: BusEventEmitter) {
     const p = new Panel();
     this.panels = { [p.id]: p };
-    // this.buffer = testBuffer();
-
-    this.busEventEmitter.on("*", (event) => {
-      if (!this.bufferStreaming) {
-        return;
-      }
-      this.streamingBuffer.add(event);
-    });
-    setInterval(() => {
-      if (!this.bufferStreaming) {
-        return;
-      }
-      // this.buffer = this.streamingBuffer.data;
-      Object.entries(this.streamingBuffer.data).forEach(
-        ([typeKey, streams]) => {
-          this.buffer[typeKey as EventTypeId] =
-            this.buffer[typeKey as EventTypeId] || {};
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          Object.entries(streams!).forEach(([streamKey, values]) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            this.buffer[typeKey as EventTypeId]![streamKey] =
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              [
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                ...(this.buffer[typeKey as EventTypeId]![streamKey] || []),
-                ...values
-              ] || values;
-          });
-        }
-      );
-      this.bufferStart = this.bufferStart || this.streamingBuffer.bufferStart;
-      this.bufferEnd = this.streamingBuffer.bufferEnd;
-      this.streamingBuffer = new StreamingBuffer();
-    }, this.streamingUpdatePeriod);
   }
+
+  // private streamingBuffer: StreamingBuffer = new StreamingBuffer();
+  // private streamingUpdatePeriod = 1000; // ms
+  // private startStreaming(): void {
+  //   this.busEventEmitter.on("*", (event) => {
+  //     if (!this.isStreaming) {
+  //       return;
+  //     }
+  //     this.streamingBuffer.add(event);
+  //   });
+  //   setInterval(() => {
+  //     if (!this.isStreaming) {
+  //       return;
+  //     }
+  //     Object.entries(this.streamingBuffer.data).forEach(
+  //       ([typeKey, streams]) => {
+  //         this.buffer[typeKey as EventTypeId] =
+  //           this.buffer[typeKey as EventTypeId] || {};
+  //         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  //         Object.entries(streams!).forEach(([streamKey, values]) => {
+  //           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  //           this.buffer[typeKey as EventTypeId]![streamKey] =
+  //             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  //             [
+  //               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  //               ...(this.buffer[typeKey as EventTypeId]![streamKey] || []),
+  //               ...values
+  //             ] || values;
+  //         });
+  //       }
+  //     );
+  //     this.bufferStart = this.bufferStart || this.streamingBuffer.bufferStart;
+  //     this.bufferEnd = this.streamingBuffer.bufferEnd;
+  //     this.streamingBuffer = new StreamingBuffer();
+  //   }, this.streamingUpdatePeriod);
+  // }
 
   @computed get bufferEmpty(): boolean {
     return Object.keys(this.buffer).length === 0;
@@ -159,7 +158,7 @@ export class VisualizationStore {
 
   toggleStreaming(): void {
     const bufferDirty = this.bufferLogLoadProgress > 0;
-    if (!this.bufferStreaming && bufferDirty) {
+    if (!this.isStreaming && bufferDirty) {
       this.buffer = {};
       this.setBufferRangeStart(0);
       this.setBufferRangeEnd(1);
@@ -167,7 +166,7 @@ export class VisualizationStore {
       this.bufferEnd = null;
       this.bufferLogLoadProgress = 0;
     }
-    this.bufferStreaming = !this.bufferStreaming;
+    this.isStreaming = !this.isStreaming;
   }
 
   setBufferRangeStart(value: number): void {
@@ -182,7 +181,7 @@ export class VisualizationStore {
     }
   }
 
-  setFromStreamingBuffer(
+  loadLog(
     streamingBuffer: StreamingBuffer,
     resourceArchive: ResourceArchive
   ): void {

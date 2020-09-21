@@ -65,7 +65,7 @@ export const Header: React.FC = () => {
           await new Promise((r) => setTimeout(r, 0));
         }
       }
-      store.setFromStreamingBuffer(streamingBuffer, resourceArchive);
+      store.loadLog(streamingBuffer, resourceArchive);
       eventTarget.value = "";
     }
   };
@@ -81,15 +81,15 @@ export const Header: React.FC = () => {
                   onClick={handleOnToggleStreamClick}
                   className={[
                     styles.streamButton,
-                    store.bufferStreaming && styles.active
+                    store.isStreaming && styles.active
                   ].join(" ")}
                 >
-                  <Icon id={store.bufferStreaming ? "stop" : "play"} />
-                  {store.bufferStreaming ? "Stop" : "Stream"}
+                  <Icon id={store.isStreaming ? "stop" : "play"} />
+                  {store.isStreaming ? "Stop" : "Stream"}
                 </Button>
 
                 <Button
-                  disabled={store.bufferStreaming}
+                  disabled={store.isStreaming}
                   onClick={handleOnLoadLogClick}
                 >
                   Load log
@@ -166,7 +166,7 @@ export const Header: React.FC = () => {
                 <Form.Label>Expiration</Form.Label>
                 <Form.Control
                   as="select"
-                  disabled={store.bufferEmpty || !store.bufferStreaming}
+                  disabled={store.bufferEmpty || !store.isStreaming}
                   value={store.bufferExpirationWindow}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                     (store.bufferExpirationWindow = parseInt(e.target.value))

@@ -15,11 +15,18 @@ export type OverlayProps<T extends EventType> = IProps<T> & VisualizerProps<T>;
 
 export const Overlay = <T extends EventType>(
   props: OverlayProps<T>
-): React.ReactElement<OverlayProps<T>> => {
+): React.ReactElement<OverlayProps<T>> | null => {
   const { element: Component, values } = props;
 
   const [index, setIndex] = useState(0);
   const value = values[index];
+
+  // An external change (e.g. to the throttle), made the current index invalid.
+  if (!value) {
+    setIndex(0);
+    return null;
+  }
+
   const handleChange: RangeSliderProps["onChange"] = (_, v) => setIndex(v);
 
   return (
