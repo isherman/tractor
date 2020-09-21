@@ -1,20 +1,16 @@
 import * as React from "react";
 import styles from "./Content.module.scss";
 import { Panel } from "./Panel";
-import { Button } from "react-bootstrap";
 import { useStores } from "../../hooks/useStores";
 import { useObserver } from "mobx-react-lite";
-import { LogChooser } from "./LogChooser";
+import { Button } from "react-bootstrap";
+import { Icon } from "../Icon";
 export const Content: React.FC = () => {
   const { visualizationStore: store } = useStores();
 
   return useObserver(() => {
-    if (store.dataSource === "log" && store.bufferLoadProgress < 1) {
-      return (
-        <div className={styles.content}>
-          <LogChooser />
-        </div>
-      );
+    if (Object.keys(store.buffer).length === 0) {
+      return null;
     }
     const panels = Object.entries(
       Object.fromEntries(store.panels.entries())
@@ -23,7 +19,13 @@ export const Content: React.FC = () => {
     return (
       <div className={styles.content}>
         {panels}
-        <Button onClick={() => store.addPanel()}>+</Button>
+        <Button
+          className={styles.addButton}
+          variant="light"
+          onClick={() => store.addPanel()}
+        >
+          <Icon id="plus" />
+        </Button>
       </div>
     );
   });

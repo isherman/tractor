@@ -16,7 +16,7 @@ const JSONElement: React.FC<SingleElementVisualizerProps> = ({
   value: [timestamp, value]
 }) => {
   return (
-    <Card bg={"light"} className={"shadow-sm"}>
+    <Card bg={"light"} className={[styles.card, "shadow-sm"].join(" ")}>
       <Card.Body>
         <ListGroup horizontal>
           <ListGroup.Item>

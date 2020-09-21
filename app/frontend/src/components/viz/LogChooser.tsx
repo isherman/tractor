@@ -6,6 +6,8 @@ import { useStores } from "../../hooks/useStores";
 import { ResourceArchive } from "../../models/ResourceArchive";
 import { UploadBuffer } from "../../models/UploadBuffer";
 import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
+// import "bs-custom-file-input";
+import { Form } from "react-bootstrap";
 
 export const LogChooser: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -55,12 +57,15 @@ export const LogChooser: React.FC = () => {
   return useObserver(() => {
     return (
       <div className={styles.logChooser}>
-        <input
-          type="file"
-          id="file"
-          ref={fileInputRef}
-          onChange={handleOnLogSelect}
-        />
+        <Form>
+          <Form.File
+            id="log-file-input"
+            label="Upload"
+            custom
+            ref={fileInputRef}
+            onChange={handleOnLogSelect}
+          />
+        </Form>
         <span>{store.bufferLoadProgress}</span>
       </div>
     );

@@ -1,4 +1,4 @@
-/* make the customizations */
+/* theme customizations */
 $theme-colors: (
   "primary": lightblue,
   "danger": teal
@@ -8,5 +8,5 @@ $popover-max-width: 600px;
 
 @import "react-bootstrap-range-slider/dist/react-bootstrap-range-slider.scss";
 
-/* import bootstrap to set changes */
+/* finally, import bootstrap */
 @import "~bootstrap/scss/bootstrap";

@@ -69,21 +69,25 @@ export type DataSourceType = "live" | "pause" | "log";
 function testBuffer(): Buffer {
   return {
     "type.googleapis.com/farm_ng_proto.tractor.v1.Image": {
-      foo: [
-        "a.jpg",
-        "b.jpg",
-        "c.jpg",
-        "foo/a.jpg",
-        "foo/bar/a.jpg",
-        "foo/bar/b.jpg",
-        "foo/bar/c.png"
-      ].map((path, i) => [
-        i,
-        Image.fromJSON({ resource: Resource.fromJSON({ path }) })
-      ])
+      foo: new Array(100)
+        .fill([
+          "a.jpg",
+          "b.jpg",
+          "c.jpg",
+          "foo/a.jpg",
+          "foo/bar/a.jpg",
+          "foo/bar/b.jpg",
+          "foo/bar/c.png"
+        ])
+        .flat()
+        .map((path, i) => [
+          i,
+          Image.fromJSON({ resource: Resource.fromJSON({ path }) })
+        ])
     }
   };
 }
+console.log(testBuffer());
 
 export class VisualizationStore {
   @observable dataSource: DataSourceType = "log";
@@ -95,6 +99,7 @@ export class VisualizationStore {
   @observable bufferSize = 0;
   @observable buffer: Buffer = {};
   @observable bufferLoadProgress = 0;
+  @observable bufferStreaming = false;
   @observable resourceArchive: ResourceArchive | null = null;
 
   @observable panels: ObservableMap<string, Panel>;
@@ -105,7 +110,7 @@ export class VisualizationStore {
   constructor(public busEventEmitter: BusEventEmitter) {
     const p = new Panel();
     this.panels = new ObservableMap<string, Panel>([[p.id, p]]);
-    this.buffer = testBuffer();
+    // this.buffer = testBuffer();
 
     this.busEventEmitter.on("*", (event) => {
       if (this.dataSource !== "live") {

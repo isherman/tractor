@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { Card } from "react-bootstrap";
-import styles from "./ApriltagDetectionsVisualizer.module.scss";
+import styles from "./NamedSE3PoseVisualizer.module.scss";
 import {
   SingleElementVisualizerProps,
   Visualizer,

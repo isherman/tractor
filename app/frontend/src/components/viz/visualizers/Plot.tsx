@@ -16,7 +16,9 @@ export const Plot: React.FC<IProps> = ({ data, options }) => {
   // On mount, or if options change, instantiate a new uPlot instance
   useEffect(() => {
     setUPlotInstance(
-      new uPlot(options, data, containerRef.current as HTMLElement)
+      (existing) =>
+        existing ||
+        new uPlot(options, data, containerRef.current as HTMLElement)
     );
     return () => {
       uPlotInstance && uPlotInstance.destroy();
@@ -50,5 +52,11 @@ export const Plot: React.FC<IProps> = ({ data, options }) => {
     return () => window.removeEventListener("resize", resize);
   }, [containerRef, uPlotInstance]);
 
-  return <div className={styles.plot} ref={containerRef}></div>;
+  return (
+    <div
+      id={`plot-${Math.random()}`}
+      className={styles.plot}
+      ref={containerRef}
+    ></div>
+  );
 };

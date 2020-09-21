@@ -42,7 +42,7 @@ export class TrackingCameraPoseFrameVisualizer
       height: 600,
       series: [
         {
-          show: false
+          value: "{M}/{DD}/{YY} {h}:{mm}:{ss}.{fff} {aa}"
         },
         ...["|v|", "|a|"].map((label) => ({
           label,

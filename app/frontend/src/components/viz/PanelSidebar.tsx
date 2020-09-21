@@ -1,6 +1,6 @@
 import * as React from "react";
 import styles from "./PanelSidebar.module.scss";
-import { Button, Form } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 import { useStores } from "../../hooks/useStores";
 import { useObserver } from "mobx-react-lite";
 import { ChangeEvent, useEffect } from "react";
@@ -44,10 +44,6 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
       selectedOptions
     } = panel;
 
-    const removePanel = (): void => {
-      store.deletePanel(id);
-    };
-
     const setTagFilter = (e: ChangeEvent<HTMLInputElement>): void => {
       panel.tagFilter = e.target.value;
     };
@@ -68,8 +64,6 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
 
     return (
       <div className={styles.panelSidebar}>
-        <Button onClick={removePanel}>X</Button>
-
         <Form.Group controlId="eventType">
           <Form.Label>Data Type</Form.Label>
           <Form.Control
@@ -79,8 +73,8 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
             onChange={setEventType}
           >
             {[...eventTypeIds].map((_) => (
-              <option disabled={!(_ in store.buffer)} key={_}>
-                {_}
+              <option disabled={!(_ in store.buffer)} value={_} key={_}>
+                {_.split(".").slice(-1)}
               </option>
             ))}
           </Form.Control>
