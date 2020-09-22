@@ -3,8 +3,9 @@ export const formatValue = (value: unknown): string => {
     const day = value.getDate();
     const month = value.getMonth() + 1;
     const year = value.getFullYear().toString().slice(2);
-    const hours = value.getHours() - 12;
-    const suffix = value.getHours() < 12 ? "am" : "pm";
+    const hours24 = value.getHours();
+    const hours = hours24 < 12 ? hours24 : hours24 - 12;
+    const suffix = hours24 < 12 ? "am" : "pm";
     const minutes = value.getMinutes().toString().padStart(2, "0");
     const seconds = value.getSeconds().toString().padStart(2, "0");
     const ms = value.getMilliseconds().toString().padStart(3, "0");
