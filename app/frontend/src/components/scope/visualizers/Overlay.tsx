@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import RangeSlider from "react-bootstrap-range-slider";
+import styles from "./Overlay.module.scss";
 import { EventType } from "../../../registry/events";
 import {
   SingleElementVisualizerProps,
@@ -27,8 +28,9 @@ export const Overlay = <T extends EventType>(
   }
 
   return (
-    <div>
+    <div className={styles.overlay}>
       <RangeSlider
+        className={styles.overlaySlider}
         value={index}
         onChange={(_, v) => setIndex(v)}
         min={0}

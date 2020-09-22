@@ -1,8 +1,7 @@
 .card {
   min-height: 0;
   flex-grow: 1;
-  width: 36rem;
-  max-height: 48rem;
+  height: 100%;
 
   :global(.card-body) {
     height: 100%;
