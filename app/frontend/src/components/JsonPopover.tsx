@@ -22,7 +22,7 @@ export const JsonPopover: React.FC<IProps> = ({ title, json }) => {
   );
 
   return (
-    <OverlayTrigger trigger="click" placement="right" overlay={popover}>
+    <OverlayTrigger trigger="click" placement="auto" overlay={popover}>
       <Button variant={"light"}>{"{}"}</Button>
     </OverlayTrigger>
   );
