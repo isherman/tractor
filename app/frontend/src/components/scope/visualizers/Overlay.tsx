@@ -18,7 +18,7 @@ export const Overlay = <T extends EventType>(
   const { element: Component, values } = props;
 
   const [index, setIndex] = useState(0);
-  const value = values.reverse()[index];
+  const value = values[index];
 
   // An external change (e.g. to the throttle) made the current index invalid.
   if (!value) {
