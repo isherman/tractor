@@ -41,6 +41,8 @@ class EventBus : public boost::asio::io_service::service {
 
   void SetName(const std::string& name);
 
+  void SetArchiveName(const std::string& name);
+
   // returns a resource that can be written to that will have a unique file
   // name, in the active logging directory.
   farm_ng_proto::tractor::v1::Resource GetUniqueResource(
@@ -54,13 +56,20 @@ class EventBus : public boost::asio::io_service::service {
 google::protobuf::Timestamp MakeTimestampNow();
 
 template <typename T>
-farm_ng_proto::tractor::v1::Event MakeEvent(std::string name,
-                                            const T& message) {
+farm_ng_proto::tractor::v1::Event MakeEvent(
+    std::string name, const T& message,
+    const google::protobuf::Timestamp& stamp) {
   farm_ng_proto::tractor::v1::Event event;
-  *event.mutable_stamp() = MakeTimestampNow();
+  *event.mutable_stamp() = stamp;
   *event.mutable_name() = name;
   event.mutable_data()->PackFrom(message);
   return event;
+}
+
+template <typename T>
+farm_ng_proto::tractor::v1::Event MakeEvent(std::string name,
+                                            const T& message) {
+  return MakeEvent(name, message, MakeTimestampNow());
 }
 
 inline EventBus& GetEventBus(boost::asio::io_service& io_service,

@@ -1,6 +1,8 @@
 {
   "clang-format.style": "google",
-  "eslint.workingDirectories": ["./app/frontend"],
+  "eslint.workingDirectories": [
+    "./app/frontend"
+  ],
   "files.exclude": {
     "**/.git": true,
     "**/.DS_Store": true,
@@ -31,7 +33,9 @@
   "editor.formatOnSave": true,
   "protoc": {
     "compile_on_save": false,
-    "options": ["--proto_path=${workspaceRoot}/protos"]
+    "options": [
+      "--proto_path=${workspaceRoot}/protos"
+    ]
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -128,5 +132,6 @@
     "typeinfo": "cpp",
     "valarray": "cpp",
     "variant": "cpp"
-  }
+  },
+  "python.pythonPath": "env/bin/python"
 }

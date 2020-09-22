@@ -28,8 +28,7 @@ EventLogWriter::EventLogWriter(const std::string& log_path)
 
 EventLogWriter::EventLogWriter(
     const farm_ng_proto::tractor::v1::Resource& log_resource)
-    : impl_(new EventLogWriterImpl(log_resource.archive_path() + "/" +
-                                   log_resource.path())) {}
+    : impl_(new EventLogWriterImpl(log_resource.archive_path())) {}
 EventLogWriter::~EventLogWriter() { impl_.reset(nullptr); }
 
 void EventLogWriter::Write(const farm_ng_proto::tractor::v1::Event& event) {

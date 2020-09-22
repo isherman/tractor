@@ -6,15 +6,17 @@ import "farm_ng_proto/tractor/v1/geometry.proto";
 package farm_ng_proto.tractor.v1;
 option go_package = "github.com/farm_ng/genproto";
 
+enum ApriltagFamily {
+  APRILTAG_FAMILY_UNSPECIFIED = 0;
+  APRILTAG_FAMILY_TAG36H11 = 1;
+}
+
 // protobuf copy of the ApriltagDetection struct from apriltag library.
 // source: https://github.com/AprilRobotics/apriltag/blob/master/apriltag.h#L196
 // comments copied for reference.
 message ApriltagDetection {
-  enum Family {
-    FAMILY_UNSPECIFIED = 0;
-    FAMILY_TAG36H11 = 1;
-  }
-  Family tag_family = 1;
+  ApriltagFamily tag_family = 1;
+
   // The decoded ID of the tag
   int32 id = 2;
 
@@ -48,9 +50,26 @@ message ApriltagDetection {
   // The corners of the tag in image pixel coordinates. These always
   // wrap counter-clock wise around the tag.
   repeated Vec2 p = 7;
+
+  // Size of the tag, outside corner to corner on one side, in meters.
+  double tag_size = 9;
 }
 
 message ApriltagDetections {
   repeated ApriltagDetection detections = 1;
   Image image = 2;
+  double rmse = 3;
+}
+
+message ApriltagRig {
+  message Entry {
+    ApriltagFamily tag_family = 1;
+    int32 id = 2;
+    double tag_size = 4;
+    repeated Vec3 tag_points = 5;
+    NamedSE3Pose pose = 3;
+  }
+  string name = 1;
+  int32 root_tag_id = 2;
+  repeated Entry entries = 3;
 }

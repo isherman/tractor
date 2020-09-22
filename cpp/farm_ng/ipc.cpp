@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <functional>
 #include <iostream>
+#include <mutex>
 #include <string>
 
 #include <boost/asio.hpp>
@@ -13,10 +14,14 @@
 #include <google/protobuf/text_format.h>
 #include <google/protobuf/util/time_util.h>
 
+#include <glog/logging.h>
+
 #include "farm_ng_proto/tractor/v1/io.pb.h"
 
 namespace farm_ng {
+using farm_ng_proto::tractor::v1::LoggingCommand;
 namespace {
+enum { max_length = 65535 };
 const short multicast_port = 10000;
 std::string g_multicast_address = "239.20.20.21";
 
@@ -77,8 +82,10 @@ class receiver {
     *announce.mutable_recv_stamp() = MakeTimestampNow();
 
     // Ignore faulty announcements
-    if (announce.host() != "127.0.0.1" || announce.port() != sender_endpoint_.port()) {
-      std::cerr << "announcement does not match sender... rejecting: " << announce.host() << ":" << announce.port() << std::endl;
+    if (announce.host() != "127.0.0.1" ||
+        announce.port() != sender_endpoint_.port()) {
+      std::cerr << "announcement does not match sender... rejecting: "
+                << announce.host() << ":" << announce.port() << std::endl;
       return;
     }
 
@@ -119,7 +126,7 @@ class receiver {
   boost::asio::ip::udp::endpoint sender_endpoint_;
   std::map<boost::asio::ip::udp::endpoint, farm_ng_proto::tractor::v1::Announce>
       announcements_;
-  enum { max_length = 1024 };
+
   char data_[max_length];
 };
 
@@ -183,7 +190,18 @@ class EventBusImpl {
                            size_t bytes_recvd) {
     if (!error) {
       farm_ng_proto::tractor::v1::Event event;
-      event.ParseFromArray(static_cast<const void*>(data_), bytes_recvd);
+      CHECK(event.ParseFromArray(static_cast<const void*>(data_), bytes_recvd));
+
+      if (event.data().type_url() ==
+          "type.googleapis.com/" + LoggingCommand::descriptor()->full_name()) {
+        LoggingCommand command;
+        CHECK(event.data().UnpackTo(&command));
+        if (command.has_record_start()) {
+          set_archive_name(command.record_start().name());
+        } else {
+          set_archive_name("default");
+        }
+      }
 
       state_[event.name()] = event;
       (*signal_)(event);
@@ -197,6 +215,8 @@ class EventBusImpl {
 
   void send_event(const farm_ng_proto::tractor::v1::Event& event) {
     event.SerializeToString(&event_message_);
+    CHECK_LT(int(event_message_.size()), max_length)
+        << "Event is too big, doesn't fit in one udp packet.";
     for (const auto& it : recv_.announcements()) {
       boost::asio::ip::udp::endpoint ep(
           boost::asio::ip::address::from_string(it.second.host()),
@@ -206,6 +226,13 @@ class EventBusImpl {
   }
 
   void set_name(const std::string& name) { service_name_ = name; }
+
+  void set_archive_name(const std::string& name) {
+    std::lock_guard<std::mutex> lock(archive_path_mtx_);
+    archive_path_ = archive_root_ / name;
+  }
+
+  boost::filesystem::path get_archive_path() const { return archive_path_; }
   boost::asio::io_service& io_service_;
 
   receiver recv_;
@@ -216,11 +243,14 @@ class EventBusImpl {
 
   boost::asio::ip::udp::endpoint announce_endpoint_;
   boost::asio::ip::udp::endpoint sender_endpoint_;
-  enum { max_length = 1024 };
   char data_[max_length];
   std::string announce_message_;
   std::string event_message_;
   std::string service_name_ = "unknown [cpp-ipc]";
+
+  boost::filesystem::path archive_root_ = "/tmp/farm-ng-log/";
+  std::mutex archive_path_mtx_;
+  boost::filesystem::path archive_path_ = archive_root_ / "default";
 
  public:
   std::map<std::string, farm_ng_proto::tractor::v1::Event> state_;
@@ -256,13 +286,16 @@ void EventBus::Send(const farm_ng_proto::tractor::v1::Event& event) {
   impl_->io_service_.post([this, event]() { impl_->send_event(event); });
 }
 void EventBus::SetName(const std::string& name) { impl_->set_name(name); }
+void EventBus::SetArchiveName(const std::string& name) {
+  impl_->set_archive_name(name);
+}
 
 farm_ng_proto::tractor::v1::Resource EventBus::GetUniqueResource(
     const std::string& prefix, const std::string& ext,
     const std::string& content_type) {
   farm_ng_proto::tractor::v1::Resource resource;
 
-  boost::filesystem::path archive_path("/tmp/farm-ng-log/0001");
+  boost::filesystem::path archive_path = impl_->get_archive_path();
   if (!boost::filesystem::exists(archive_path)) {
     if (!boost::filesystem::create_directories(archive_path)) {
       throw std::runtime_error(std::string("Could not create archive path: ") +
@@ -270,7 +303,7 @@ farm_ng_proto::tractor::v1::Resource EventBus::GetUniqueResource(
     }
   }
   resource.set_content_type(content_type);
-  resource.set_archive_path(archive_path.string());
+
   pid_t pid = getpid();
   uint64_t id = impl_->resource_uuids_++;
   char buffer[1024];
@@ -279,6 +312,7 @@ farm_ng_proto::tractor::v1::Resource EventBus::GetUniqueResource(
     throw std::runtime_error("path is too long.");
   }
   resource.set_path(std::string(buffer));
+  resource.set_archive_path((archive_path / resource.path()).string());
   return resource;
 }
 

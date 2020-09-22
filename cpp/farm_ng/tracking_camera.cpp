@@ -1,4 +1,5 @@
 #include <chrono>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <mutex>
@@ -21,12 +22,16 @@
 #include <farm_ng_proto/tractor/v1/geometry.pb.h>
 #include <farm_ng_proto/tractor/v1/tracking_camera.pb.h>
 
-using farm_ng_proto::tractor::v1::Event;
+typedef farm_ng_proto::tractor::v1::Event EventPb;
+
 using farm_ng_proto::tractor::v1::NamedSE3Pose;
 using farm_ng_proto::tractor::v1::Vec2;
 
 using farm_ng_proto::tractor::v1::ApriltagDetection;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
+
+using farm_ng_proto::tractor::v1::CameraModel;
+using farm_ng_proto::tractor::v1::TrackingCameraCommand;
 using farm_ng_proto::tractor::v1::TrackingCameraPoseFrame;
 
 namespace farm_ng {
@@ -72,8 +77,7 @@ void SetQuatFromRs(farm_ng_proto::tractor::v1::Quaternion* out,
   out->set_z(vec.z);
 }
 
-void SetCameraModelFromRs(farm_ng_proto::tractor::v1::CameraModel* out,
-                          const rs2_intrinsics& intrinsics) {
+void SetCameraModelFromRs(CameraModel* out, const rs2_intrinsics& intrinsics) {
   out->set_image_width(intrinsics.width);
   out->set_image_height(intrinsics.height);
   out->set_cx(intrinsics.ppx);
@@ -82,8 +86,7 @@ void SetCameraModelFromRs(farm_ng_proto::tractor::v1::CameraModel* out,
   out->set_fy(intrinsics.fy);
   switch (intrinsics.model) {
     case RS2_DISTORTION_KANNALA_BRANDT4:
-      out->set_distortion_model(farm_ng_proto::tractor::v1::CameraModel::
-                                    DISTORTION_MODEL_KANNALA_BRANDT4);
+      out->set_distortion_model(CameraModel::DISTORTION_MODEL_KANNALA_BRANDT4);
       break;
     default:
       CHECK(false) << "Unhandled intrinsics model: "
@@ -131,7 +134,7 @@ TrackingCameraPoseFrame ToPoseFrame(const rs2::pose_frame& rs_pose_frame) {
   return pose_frame;
 }
 
-Event ToNamedPoseEvent(const rs2::pose_frame& rs_pose_frame) {
+EventPb ToNamedPoseEvent(const rs2::pose_frame& rs_pose_frame) {
   // TODO(ethanrublee) support front and rear cameras.
   NamedSE3Pose vodom_pose_t265;
   // here we distinguish where visual_odom frame by which camera it refers to,
@@ -149,7 +152,7 @@ Event ToNamedPoseEvent(const rs2::pose_frame& rs_pose_frame) {
   ProtoToSophus(vodom_pose_t265.a_pose_b(), &se3);
   SophusToProto(se3.inverse(), vodom_pose_t265.mutable_a_pose_b());
 
-  Event event =
+  EventPb event =
       farm_ng::MakeEvent("pose/tracking_camera/front", vodom_pose_t265);
   *event.mutable_stamp() =
       google::protobuf::util::TimeUtil::MillisecondsToTimestamp(
@@ -348,7 +351,7 @@ Sophus::SE3d ApriltagPoseToSE3d(const apriltag_pose_t& pose) {
       Map33RowMajor(pose.R->data),
       Eigen::Vector3d(pose.t->data[0], pose.t->data[1], pose.t->data[2]));
 }
-Event GenerateExtrinsicPoseEvent() {
+EventPb GenerateExtrinsicPoseEvent() {
   NamedSE3Pose base_pose_t265;
   base_pose_t265.set_frame_a("odometry/wheel");
   base_pose_t265.set_frame_b("tracking_camera/front/left");
@@ -361,7 +364,8 @@ Event GenerateExtrinsicPoseEvent() {
   // https://github.com/IntelRealSense/librealsense/blob/development/doc/t265.md
 
   SophusToProto(se3, base_pose_t265.mutable_a_pose_b());
-  Event event = farm_ng::MakeEvent("pose/extrinsic_calibrator", base_pose_t265);
+  EventPb event =
+      farm_ng::MakeEvent("pose/extrinsic_calibrator", base_pose_t265);
   return event;
 }
 
@@ -377,6 +381,7 @@ boost::optional<Sophus::SE3d> EstimateCameraPoseTag(
   info.det = detection;
   info.tagsize = tag_library.TagSize(info.det->id);
   // recompute tag corners on an undistorted image focal length = 1
+  // this also populates the homography
   if (!undistort(*info.det, intr)) {
     LOG(WARNING) << "Tag with id: " << info.det->id << " can not compute pose.";
     return boost::none;
@@ -395,6 +400,8 @@ class ApriltagDetector {
   ApriltagDetector(rs2_intrinsics intrinsics, EventBus* event_bus = nullptr)
       : event_bus_(event_bus), intrinsics_(intrinsics) {
     SetCameraModelFromRs(&camera_model_, intrinsics_);
+    camera_model_.set_frame_name(
+        "tracking_camera/front/left");  // TODO Pass in constructor.
     tag_family_ = tag36h11_create();
     tag_detector_ = apriltag_detector_create();
     apriltag_detector_add_family(tag_detector_, tag_family_);
@@ -410,7 +417,7 @@ class ApriltagDetector {
     tag36h11_destroy(tag_family_);
   }
 
-  ApriltagDetections Detect(cv::Mat gray, bool save_image = false) {
+  ApriltagDetections Detect(cv::Mat gray) {
     CHECK_EQ(gray.channels(), 1);
     CHECK_EQ(gray.type(), CV_8UC1);
 
@@ -429,15 +436,7 @@ class ApriltagDetector {
     // copy detections into protobuf
     ApriltagDetections pb_out;
     pb_out.mutable_image()->mutable_camera_model()->CopyFrom(camera_model_);
-    if (event_bus_ && save_image) {
-      pb_out.mutable_image()->mutable_resource()->CopyFrom(
-          event_bus_->GetUniqueResource("tracking_camera_left_apriltag", "png",
-                                        "image/png"));
-      LOG(INFO) << pb_out.image().resource().ShortDebugString();
-      cv::imwrite(pb_out.image().resource().archive_path() + "/" +
-                      pb_out.image().resource().path(),
-                  gray);
-    }
+
     for (int i = 0; i < zarray_size(detections.get()); i++) {
       apriltag_detection_t* det;
       zarray_get(detections.get(), i, &det);
@@ -448,6 +447,7 @@ class ApriltagDetector {
         p_j->set_x(det->p[j][0]);
         p_j->set_y(det->p[j][1]);
       }
+      detection->set_tag_size(TagLibrary().TagSize(det->id));
       detection->mutable_c()->set_x(det->c[0]);
       detection->mutable_c()->set_y(det->c[1]);
       detection->set_id(det->id);
@@ -479,9 +479,61 @@ class ApriltagDetector {
  private:
   EventBus* event_bus_;
   rs2_intrinsics intrinsics_;
-  farm_ng_proto::tractor::v1::CameraModel camera_model_;
+  CameraModel camera_model_;
   apriltag_family_t* tag_family_;
   apriltag_detector_t* tag_detector_;
+};
+
+cv::Size GetCvSize(const CameraModel& model) {
+  return cv::Size(model.image_width(), model.image_height());
+}
+
+class ApriltagsFilter {
+ public:
+  ApriltagsFilter() : once_(false) {}
+  void Reset() {
+    mask_ = cv::Mat();
+    once_ = false;
+  }
+  bool AddApriltags(const ApriltagDetections& detections) {
+    const int n_tags = detections.detections_size();
+    if (n_tags == 0) {
+      Reset();
+      return false;
+    }
+
+    if (mask_.empty()) {
+      mask_ =
+          cv::Mat::zeros(GetCvSize(detections.image().camera_model()), CV_8UC1);
+    }
+
+    cv::Mat new_mask = cv::Mat::zeros(mask_.size(), CV_8UC1);
+    const int window_size = 7;
+    double mean_count = 0.0;
+    for (const ApriltagDetection& detection : detections.detections()) {
+      for (const auto& p : detection.p()) {
+        cv::Rect roi(p.x() - 3, p.y() - 3, 7, 7);
+        new_mask(roi) = mask_(roi) + 1;
+        double max_val = 0.0;
+        cv::minMaxLoc(new_mask(roi), nullptr, &max_val);
+        mean_count += max_val / (4 * n_tags);
+      }
+    }
+    mask_ = new_mask;
+    const int kThresh = 5;
+    if (mean_count > kThresh && !once_) {
+      once_ = true;
+      return true;
+    }
+    if (mean_count < kThresh) {
+      once_ = false;
+    }
+    return false;
+  }
+
+ private:
+  cv::Mat mask_;
+  bool once_;
 };
 
 class TrackingCameraClient {
@@ -489,6 +541,8 @@ class TrackingCameraClient {
   TrackingCameraClient(boost::asio::io_service& io_service)
       : io_service_(io_service),
         event_bus_(GetEventBus(io_service_, "tracking-camera")) {
+    event_bus_.GetEventSignal()->connect(std::bind(
+        &TrackingCameraClient::on_event, this, std::placeholders::_1));
     // TODO(ethanrublee) look up image size from realsense profile.
 
     std::string cmd0 =
@@ -569,6 +623,21 @@ class TrackingCameraClient {
                                std::placeholders::_1));
   }
 
+  void on_command(const TrackingCameraCommand& command) {
+    latest_command_ = command;
+    LOG(INFO) << "Got command: " << latest_command_.ShortDebugString();
+  }
+
+  void on_event(const EventPb& event) {
+    if (event.data().type_url() ==
+        "type.googleapis.com/" +
+            TrackingCameraCommand::descriptor()->full_name()) {
+      TrackingCameraCommand command;
+      CHECK(event.data().UnpackTo(&command));
+      on_command(command);
+    }
+  }
+
   // The callback is executed on a sensor thread and can be called
   // simultaneously from multiple sensors Therefore any modification to common
   // memory should be done under lock
@@ -598,11 +667,26 @@ class TrackingCameraClient {
             // note this function is called later, in main thread, via
             // io_service_.run();
             cv::Mat frame_0 = frame_to_mat(fisheye_frame);
-            Event event = farm_ng::MakeEvent("tracking_camera/front/apriltags",
-                                             detector_->Detect(frame_0, true));
-            *event.mutable_stamp() = stamp;
 
-            event_bus_.Send(event);
+            auto apriltags = detector_->Detect(frame_0);
+
+            if (latest_command_.has_record_start() &&
+                latest_command_.record_start().mode() ==
+                    TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE &&
+                tag_filter_.AddApriltags(apriltags)) {
+              apriltags.mutable_image()->mutable_resource()->CopyFrom(
+                  event_bus_.GetUniqueResource("tracking_camera_left_apriltag",
+                                               "png", "image/png"));
+              LOG(INFO) << apriltags.image().resource().ShortDebugString();
+              cv::imwrite(apriltags.image().resource().archive_path(), frame_0);
+
+              event_bus_.Send(farm_ng::MakeEvent(
+                  "calibrator/tracking_camera/front/apriltags", apriltags,
+                  stamp));
+            }
+
+            event_bus_.Send(farm_ng::MakeEvent(
+                "tracking_camera/front/apriltags", apriltags, stamp));
             event_bus_.Send(GenerateExtrinsicPoseEvent());
             // signal that we're done detecting, so can post another frame for
             // detection.
@@ -619,7 +703,8 @@ class TrackingCameraClient {
       // Print the x, y, z values of the translation, relative to initial
       // position
       // std::cout << "\r Device Position: " << std::setprecision(3) <<
-      // std::fixed << pose_data.translation.x << " " << pose_data.translation.y
+      // std::fixed << pose_data.translation.x << " " <<
+     pose_data.translation.y
       // << " " << pose_data.translation.z << " (meters)";
       event_bus_.Send(farm_ng::MakeEvent("tracking_camera/front/pose",
                                          ToPoseFrame(pose_frame)));
@@ -635,6 +720,8 @@ class TrackingCameraClient {
   int count_ = 0;
   bool detection_in_progress_ = false;
   std::unique_ptr<ApriltagDetector> detector_;
+  TrackingCameraCommand latest_command_;
+  ApriltagsFilter tag_filter_;
 };
 }  // namespace farm_ng
 
