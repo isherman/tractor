@@ -1,13 +1,13 @@
-import { TimeSkewVisualizer } from "../components/viz/visualizers/TimeSkewVisualizer";
-import { JSONVisualizer } from "../components/viz/visualizers/JSONVisualizer";
-import { SteeringCommandVisualizer } from "../components/viz/visualizers/SteeringCommandVisualizer";
+import { TimeSkewVisualizer } from "../components/scope/visualizers/TimeSkewVisualizer";
+import { JSONVisualizer } from "../components/scope/visualizers/JSONVisualizer";
+import { SteeringCommandVisualizer } from "../components/scope/visualizers/SteeringCommandVisualizer";
 import { TimestampedEvent, TimestampedEventVector } from "../types/common";
 import { EventType, EventTypeId } from "./events";
 import { ResourceArchive } from "../models/ResourceArchive";
-import { ImageVisualizer } from "../components/viz/visualizers/ImageVisualizer";
-import { ApriltagDetectionsVisualizer } from "../components/viz/visualizers/ApriltagDetectionsVisualizer";
-import { NamedSE3PoseVisualizer } from "../components/viz/visualizers/NamedSE3PoseVisualizer";
-import { TrackingCameraPoseFrameVisualizer } from "../components/viz/visualizers/TrackingCameraPoseFrameVisualizer";
+import { ImageVisualizer } from "../components/scope/visualizers/ImageVisualizer";
+import { ApriltagDetectionsVisualizer } from "../components/scope/visualizers/ApriltagDetectionsVisualizer";
+import { NamedSE3PoseVisualizer } from "../components/scope/visualizers/NamedSE3PoseVisualizer";
+import { TrackingCameraPoseFrameVisualizer } from "../components/scope/visualizers/TrackingCameraPoseFrameVisualizer";
 
 export interface VisualizerOptionConfig {
   label: string;

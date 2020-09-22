@@ -6,7 +6,7 @@ import { State } from "./State";
 import { Video } from "./Video";
 import { Debug } from "./Debug";
 import { Map } from "./Map";
-import { Root as Viz } from "./viz/Root";
+import { Root as Viz } from "./scope/Root";
 import styles from "./App.module.scss";
 
 export const App: React.FC = () => {
