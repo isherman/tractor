@@ -16,8 +16,6 @@ import {
 import { Buffer, TimestampedEvent } from "../types/common";
 import { duration } from "../utils/duration";
 
-const streamingUpdatePeriod = duration.second * 0.2;
-
 export function visualizerId(v: Visualizer): VisualizerId {
   return Object.getPrototypeOf(v).constructor.id;
 }
@@ -88,7 +86,7 @@ export class VisualizationStore {
   @observable bufferThrottle = 0;
   @observable buffer: Buffer = {};
   @observable bufferLogLoadProgress = 0;
-  @observable bufferExpirationWindow = 10 * duration.second;
+  @observable bufferExpirationWindow = 1 * duration.minute;
   @observable resourceArchive: ResourceArchive | null = null;
   @observable panels: { [k: string]: Panel } = {};
 
@@ -187,9 +185,13 @@ export class VisualizationStore {
       this.streamingBuffer?.add(event);
     });
 
-    this.streamingTimerHandle = window.setInterval(() => {
+    const updateLoop = (): void => {
       this.updateBuffer(this.streamingBuffer);
-    }, streamingUpdatePeriod);
+      if (this.streamingTimerHandle) {
+        this.streamingTimerHandle = window.requestAnimationFrame(updateLoop);
+      }
+    };
+    this.streamingTimerHandle = window.requestAnimationFrame(updateLoop);
   }
 
   private stopStreaming(): void {
@@ -198,15 +200,12 @@ export class VisualizationStore {
       this.busEventEmitterHandle = null;
     }
     if (this.streamingTimerHandle) {
-      clearInterval(this.streamingTimerHandle);
+      window.cancelAnimationFrame(this.streamingTimerHandle);
       this.streamingTimerHandle = null;
     }
   }
   /* eslint-disable @typescript-eslint/no-non-null-assertion */
   private updateBuffer(streamingBuffer: StreamingBuffer): void {
-    const t0 = performance.now();
-    let a = 0;
-    let b = 0;
     transaction(() => {
       Object.entries(streamingBuffer.data).forEach(([typeKey, streams]) => {
         const eventType = typeKey as EventTypeId;
@@ -223,17 +222,11 @@ export class VisualizationStore {
           );
         });
       });
-      a = performance.now();
       this.evictExpiredData();
-      b = performance.now();
       this.bufferStart = this.bufferStart || this.streamingBuffer.bufferStart;
-      this.bufferEnd = this.streamingBuffer.bufferEnd;
-      // const t3 = performance.now();
+      this.bufferEnd = this.streamingBuffer.bufferEnd || this.bufferEnd;
       streamingBuffer.clear();
     });
-    const t4 = performance.now();
-    console.log("evictExpiredData: ", b - a);
-    console.log("updateBuffer", t4 - t0);
   }
   /* eslint-enable @typescript-eslint/no-non-null-assertion */
 

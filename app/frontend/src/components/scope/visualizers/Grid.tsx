@@ -48,11 +48,14 @@ export const Grid = <T extends EventType>(
         />
       </div>
       <div className={styles.grid}>
-        {values.slice(page * pageSize, (page + 1) * pageSize).map((v) => (
-          <div key={v[0]} className={styles.gridItem}>
-            <Component value={v} {...props} />
-          </div>
-        ))}
+        {values
+          .reverse()
+          .slice(page * pageSize, (page + 1) * pageSize)
+          .map((v) => (
+            <div key={v[0]} className={styles.gridItem}>
+              <Component value={v} {...props} />
+            </div>
+          ))}
       </div>
     </div>
   );

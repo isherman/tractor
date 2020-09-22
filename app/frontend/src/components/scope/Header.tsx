@@ -80,7 +80,11 @@ export const Header: React.FC = () => {
                 max={1}
                 value={store.bufferRangeStart}
                 disabled={store.bufferEmpty}
-                tooltip={store.bufferStart && store.bufferEnd ? "auto" : "off"}
+                tooltip={
+                  !store.isStreaming && store.bufferStart && store.bufferEnd
+                    ? "auto"
+                    : "off"
+                }
                 tooltipLabel={() => formatValue(store.bufferRangeStartDate)}
                 onChange={(e) =>
                   store.setBufferRangeStart(parseFloat(e.target.value))
@@ -91,7 +95,11 @@ export const Header: React.FC = () => {
                 max={1}
                 value={store.bufferRangeEnd}
                 disabled={store.bufferEmpty}
-                tooltip={store.bufferStart && store.bufferEnd ? "auto" : "off"}
+                tooltip={
+                  !store.isStreaming && store.bufferStart && store.bufferEnd
+                    ? "auto"
+                    : "off"
+                }
                 tooltipLabel={() => formatValue(store.bufferRangeEndDate)}
                 onChange={(e) =>
                   store.setBufferRangeEnd(parseFloat(e.target.value))
@@ -140,6 +148,7 @@ export const Header: React.FC = () => {
                     (store.bufferExpirationWindow = parseInt(e.target.value))
                   }
                 >
+                  <option value={20 * duration.second}>20 s</option>
                   <option value={duration.minute}>1 min</option>
                   <option value={5 * duration.minute}>5min</option>
                   <option value={30 * duration.minute}>30min</option>

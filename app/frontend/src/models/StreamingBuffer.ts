@@ -31,6 +31,7 @@ export class StreamingBuffer {
     if (!event || !event.data || !event.stamp) {
       return;
     }
+    // TODO: Don't assume data is arriving in timestamp order
     this.bufferStart = this.bufferStart || event.stamp;
     this.bufferEnd = event.stamp;
     const typeUrl = event.data.typeUrl as EventTypeId;
