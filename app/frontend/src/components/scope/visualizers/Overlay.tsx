@@ -20,7 +20,7 @@ export const Overlay = <T extends EventType>(
   const [index, setIndex] = useState(0);
   const value = values[index];
 
-  // An external change (e.g. to the throttle), made the current index invalid.
+  // An external change (e.g. to the throttle) made the current index invalid.
   if (!value) {
     setIndex(0);
     return null;

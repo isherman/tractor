@@ -1,5 +1,8 @@
-import { observable, computed } from "mobx";
-import { BusEventEmitter } from "../models/BusEventEmitter";
+import { observable, computed, transaction } from "mobx";
+import {
+  BusEventEmitter,
+  BusEventEmitterHandle
+} from "../models/BusEventEmitter";
 import { ResourceArchive } from "../models/ResourceArchive";
 import { StreamingBuffer } from "../models/StreamingBuffer";
 import { EventTypeId } from "../registry/events";
@@ -10,8 +13,10 @@ import {
   VisualizerOptionConfig,
   visualizerRegistry
 } from "../registry/visualization";
-import { Buffer } from "../types/common";
+import { Buffer, TimestampedEvent } from "../types/common";
 import { duration } from "../utils/duration";
+
+const streamingUpdatePeriod = duration.second * 0.2;
 
 export function visualizerId(v: Visualizer): VisualizerId {
   return Object.getPrototypeOf(v).constructor.id;
@@ -21,6 +26,13 @@ function mapToDateRange(value: number, startDate: Date, endDate: Date): Date {
   return new Date(
     startDate.getTime() + (endDate.getTime() - startDate.getTime()) * value
   );
+}
+
+function timestampedEventComparator(
+  a: TimestampedEvent,
+  b: TimestampedEvent
+): number {
+  return a[0] - b[0];
 }
 
 export class Panel {
@@ -69,7 +81,6 @@ export class Panel {
 }
 
 export class VisualizationStore {
-  @observable isStreaming = false;
   @observable bufferStart: Date | null = null;
   @observable bufferEnd: Date | null = null;
   @observable bufferRangeStart = 0;
@@ -77,50 +88,25 @@ export class VisualizationStore {
   @observable bufferThrottle = 0;
   @observable buffer: Buffer = {};
   @observable bufferLogLoadProgress = 0;
-  @observable bufferExpirationWindow = duration.minute;
+  @observable bufferExpirationWindow = 10 * duration.second;
   @observable resourceArchive: ResourceArchive | null = null;
   @observable panels: { [k: string]: Panel } = {};
+
+  private streamingBuffer: StreamingBuffer = new StreamingBuffer();
+  @observable
+  private busEventEmitterHandle: BusEventEmitterHandle | null = null;
+  @observable private streamingTimerHandle: number | null = null;
 
   constructor(public busEventEmitter: BusEventEmitter) {
     const p = new Panel();
     this.panels = { [p.id]: p };
   }
 
-  // private streamingBuffer: StreamingBuffer = new StreamingBuffer();
-  // private streamingUpdatePeriod = 1000; // ms
-  // private startStreaming(): void {
-  //   this.busEventEmitter.on("*", (event) => {
-  //     if (!this.isStreaming) {
-  //       return;
-  //     }
-  //     this.streamingBuffer.add(event);
-  //   });
-  //   setInterval(() => {
-  //     if (!this.isStreaming) {
-  //       return;
-  //     }
-  //     Object.entries(this.streamingBuffer.data).forEach(
-  //       ([typeKey, streams]) => {
-  //         this.buffer[typeKey as EventTypeId] =
-  //           this.buffer[typeKey as EventTypeId] || {};
-  //         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //         Object.entries(streams!).forEach(([streamKey, values]) => {
-  //           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //           this.buffer[typeKey as EventTypeId]![streamKey] =
-  //             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //             [
-  //               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  //               ...(this.buffer[typeKey as EventTypeId]![streamKey] || []),
-  //               ...values
-  //             ] || values;
-  //         });
-  //       }
-  //     );
-  //     this.bufferStart = this.bufferStart || this.streamingBuffer.bufferStart;
-  //     this.bufferEnd = this.streamingBuffer.bufferEnd;
-  //     this.streamingBuffer = new StreamingBuffer();
-  //   }, this.streamingUpdatePeriod);
-  // }
+  @computed get isStreaming(): boolean {
+    return (
+      this.busEventEmitterHandle !== null && this.streamingTimerHandle !== null
+    );
+  }
 
   @computed get bufferEmpty(): boolean {
     return Object.keys(this.buffer).length === 0;
@@ -167,7 +153,7 @@ export class VisualizationStore {
       this.bufferEnd = null;
       this.bufferLogLoadProgress = 0;
     }
-    this.isStreaming = !this.isStreaming;
+    this.isStreaming ? this.stopStreaming() : this.startStreaming();
   }
 
   setBufferRangeStart(value: number): void {
@@ -182,9 +168,100 @@ export class VisualizationStore {
     }
   }
 
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
   replaceBuffer(streamingBuffer: StreamingBuffer): void {
     this.buffer = streamingBuffer.data;
+    Object.values(this.buffer).forEach((streams) => {
+      Object.values(streams!).forEach((eventVector) => {
+        eventVector.sort(timestampedEventComparator);
+      });
+    });
+
     this.bufferStart = streamingBuffer.bufferStart;
     this.bufferEnd = streamingBuffer.bufferEnd;
   }
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
+
+  private startStreaming(): void {
+    this.busEventEmitterHandle = this.busEventEmitter.on("*", (event) => {
+      this.streamingBuffer?.add(event);
+    });
+
+    this.streamingTimerHandle = window.setInterval(() => {
+      this.updateBuffer(this.streamingBuffer);
+    }, streamingUpdatePeriod);
+  }
+
+  private stopStreaming(): void {
+    if (this.busEventEmitterHandle) {
+      this.busEventEmitterHandle.unsubscribe();
+      this.busEventEmitterHandle = null;
+    }
+    if (this.streamingTimerHandle) {
+      clearInterval(this.streamingTimerHandle);
+      this.streamingTimerHandle = null;
+    }
+  }
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
+  private updateBuffer(streamingBuffer: StreamingBuffer): void {
+    const t0 = performance.now();
+    let a = 0;
+    let b = 0;
+    transaction(() => {
+      Object.entries(streamingBuffer.data).forEach(([typeKey, streams]) => {
+        const eventType = typeKey as EventTypeId;
+        if (!this.buffer[eventType]) {
+          this.buffer[eventType] = {};
+        }
+
+        Object.entries(streams!).forEach(([streamKey, values]) => {
+          if (!this.buffer[eventType]![streamKey]) {
+            this.buffer[eventType]![streamKey] = [];
+          }
+          this.buffer[eventType]![streamKey].push(
+            ...values.sort(timestampedEventComparator)
+          );
+        });
+      });
+      a = performance.now();
+      this.evictExpiredData();
+      b = performance.now();
+      this.bufferStart = this.bufferStart || this.streamingBuffer.bufferStart;
+      this.bufferEnd = this.streamingBuffer.bufferEnd;
+      // const t3 = performance.now();
+      streamingBuffer.clear();
+    });
+    const t4 = performance.now();
+    console.log("evictExpiredData: ", b - a);
+    console.log("updateBuffer", t4 - t0);
+  }
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
+
+  /* eslint-disable @typescript-eslint/no-non-null-assertion */
+  private evictExpiredData(): void {
+    const horizon = Date.now() - this.bufferExpirationWindow;
+    let earliestEvent: number | null = null;
+    Object.entries(this.buffer).forEach(([typeKey, streams]) => {
+      const eventType = typeKey as EventTypeId;
+      Object.entries(streams!).forEach(([streamKey, values]) => {
+        const firstIndexToKeep = values.findIndex(([t, _]) => t >= horizon);
+        if (firstIndexToKeep === -1) {
+          delete this.buffer[eventType]![streamKey];
+        } else {
+          if (firstIndexToKeep > 0) {
+            this.buffer[eventType]![streamKey] = values.slice(firstIndexToKeep);
+          }
+          earliestEvent = Math.min(
+            earliestEvent || Number.MAX_SAFE_INTEGER,
+            values[firstIndexToKeep][0]
+          );
+        }
+      });
+      if (Object.keys(this.buffer[eventType]!).length === 0) {
+        delete this.buffer[eventType];
+      }
+    });
+    this.bufferStart = earliestEvent ? new Date(earliestEvent) : null;
+  }
+  /* eslint-enable @typescript-eslint/no-non-null-assertion */
 }

@@ -73,7 +73,7 @@ export const PoseViz: React.FC = () => {
   const busEventEmitter = busEventStore.transport;
 
   useEffect(() => {
-    busEventEmitter.on(
+    const handle = busEventEmitter.on(
       "type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose",
       (event: BusAnyEvent) => {
         const pose = decodeAnyEvent(event) as NamedSE3Pose;
@@ -90,9 +90,7 @@ export const PoseViz: React.FC = () => {
       }
     );
     return () => {
-      busEventEmitter.off(
-        "type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose"
-      );
+      handle.unsubscribe();
     };
   }, [busEventEmitter]);
 

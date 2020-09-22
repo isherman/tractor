@@ -27,7 +27,7 @@ export class StreamingBuffer {
     }
   }
 
-  private add(event: BusAnyEvent): void {
+  public add(event: BusAnyEvent): void {
     if (!event || !event.data || !event.stamp) {
       return;
     }
@@ -45,5 +45,11 @@ export class StreamingBuffer {
       return;
     }
     this.data[typeUrl]![event.name].push([event.stamp.getTime(), decodedEvent]);
+  }
+
+  public clear(): void {
+    this.data = {};
+    this.bufferStart = null;
+    this.bufferEnd = null;
   }
 }
