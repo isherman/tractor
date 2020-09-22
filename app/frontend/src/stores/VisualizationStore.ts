@@ -182,14 +182,9 @@ export class VisualizationStore {
     }
   }
 
-  loadLog(
-    streamingBuffer: StreamingBuffer,
-    resourceArchive: ResourceArchive
-  ): void {
+  replaceBuffer(streamingBuffer: StreamingBuffer): void {
     this.buffer = streamingBuffer.data;
     this.bufferStart = streamingBuffer.bufferStart;
     this.bufferEnd = streamingBuffer.bufferEnd;
-    this.bufferLogLoadProgress = 1;
-    this.resourceArchive = resourceArchive;
   }
 }

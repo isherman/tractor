@@ -3,13 +3,31 @@ import { decodeAnyEvent } from "./decodeAnyEvent";
 import { Event as BusAnyEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 import { Buffer } from "../types/common";
 import { EventTypeId } from "../registry/events";
+import { ResourceArchive } from "./ResourceArchive";
 
 export class StreamingBuffer {
   public bufferStart: Date | null = null;
   public bufferEnd: Date | null = null;
   public data: Buffer = {};
 
-  public add(event: BusAnyEvent): void {
+  public async loadFromLog(
+    resourceArchive: ResourceArchive,
+    logFilePath: string
+  ): Promise<void> {
+    const blob = await resourceArchive.getBlob(logFilePath);
+    const fileBuffer = await blob.arrayBuffer();
+    let offset = 0;
+    while (offset < fileBuffer.byteLength) {
+      const header = fileBuffer.slice(offset, offset + 2);
+      const length = new Uint16Array(header)[0];
+      offset += 2;
+      const record = fileBuffer.slice(offset, offset + length);
+      offset += length;
+      this.add(BusAnyEvent.decode(new Uint8Array(record)));
+    }
+  }
+
+  private add(event: BusAnyEvent): void {
     if (!event || !event.data || !event.stamp) {
       return;
     }

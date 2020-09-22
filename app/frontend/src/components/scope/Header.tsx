@@ -7,7 +7,6 @@ import { useStores } from "../../hooks/useStores";
 import { ResourceArchive } from "../../models/ResourceArchive";
 import { StreamingBuffer } from "../../models/StreamingBuffer";
 import { formatValue } from "../../utils/formatValue";
-import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import { Icon } from "../Icon";
 import { duration } from "../../utils/duration";
 
@@ -23,35 +22,18 @@ export const Header: React.FC = () => {
     const eventTarget = e.target;
     const file = eventTarget.files?.[0];
     if (file) {
-      // TODO: Pull this logic out of the view
       const resourceArchive = new ResourceArchive(file);
-      const streamingBuffer = new StreamingBuffer();
       const fileInfo = await resourceArchive.getFileInfo();
       const logFilePath = fileInfo.find((_) => _.endsWith(".log"));
       if (!logFilePath) {
         throw Error("No .log file in archive");
       }
       setLogFilePath(logFilePath);
-      const blob = await resourceArchive.getBlob(logFilePath);
-      const fileBuffer = await blob.arrayBuffer();
-      let offset = 0;
-      while (offset < fileBuffer.byteLength) {
-        const header = fileBuffer.slice(offset, offset + 2);
-        const length = new Uint16Array(header)[0];
-        offset += 2;
-        const record = fileBuffer.slice(offset, offset + length);
-        offset += length;
-        streamingBuffer.add(BusAnyEvent.decode(new Uint8Array(record)));
-
-        // Update progress at a reasonable frequency
-        const newProgress = Math.round((offset / file.size) * 10) / 10;
-        if (newProgress != store.bufferLogLoadProgress) {
-          store.bufferLogLoadProgress = newProgress;
-          // Yield main thread for UI updates
-          await new Promise((r) => setTimeout(r, 0));
-        }
-      }
-      store.loadLog(streamingBuffer, resourceArchive);
+      const streamingBuffer = new StreamingBuffer();
+      await streamingBuffer.loadFromLog(resourceArchive, logFilePath);
+      store.replaceBuffer(streamingBuffer);
+      store.resourceArchive = resourceArchive;
+      store.bufferLogLoadProgress = 1;
       eventTarget.value = "";
     }
   };
