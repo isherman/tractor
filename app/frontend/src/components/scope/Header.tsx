@@ -9,26 +9,12 @@ import { StreamingBuffer } from "../../models/StreamingBuffer";
 import { formatValue } from "../../utils/formatValue";
 import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import { Icon } from "../Icon";
+import { duration } from "../../utils/duration";
 
 export const Header: React.FC = () => {
   const { visualizationStore: store } = useStores();
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [logFilePath, setLogFilePath] = React.useState<string | null>(null);
-
-  const handleOnLoadLogClick = (
-    _: React.MouseEvent<HTMLButtonElement>
-  ): void => {
-    if (!fileInputRef.current) {
-      return;
-    }
-    fileInputRef.current.click();
-  };
-
-  const handleOnToggleStreamClick = (
-    _: React.MouseEvent<HTMLButtonElement>
-  ): void => {
-    store.toggleStreaming();
-  };
 
   const handleOnLoadLog = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -78,7 +64,7 @@ export const Header: React.FC = () => {
             <Col xs={2}>
               <div className={styles.dataSourceButtons}>
                 <Button
-                  onClick={handleOnToggleStreamClick}
+                  onClick={() => store.toggleStreaming()}
                   className={[
                     styles.streamButton,
                     store.isStreaming && styles.active
@@ -90,7 +76,7 @@ export const Header: React.FC = () => {
 
                 <Button
                   disabled={store.isStreaming}
-                  onClick={handleOnLoadLogClick}
+                  onClick={() => fileInputRef.current?.click()}
                 >
                   Load log
                 </Button>
@@ -157,7 +143,7 @@ export const Header: React.FC = () => {
                   <option value={1}>1 ms</option>
                   <option value={100}>100 ms</option>
                   <option value={500}>500 ms</option>
-                  <option value={1000}>1 s</option>
+                  <option value={duration.second}>1 s</option>
                 </Form.Control>
               </Form.Group>
             </Col>
@@ -172,9 +158,9 @@ export const Header: React.FC = () => {
                     (store.bufferExpirationWindow = parseInt(e.target.value))
                   }
                 >
-                  <option value={60 * 1000}>1 min</option>
-                  <option value={5 * 60 * 1000}>5min</option>
-                  <option value={30 * 60 * 1000}>30min</option>
+                  <option value={duration.minute}>1 min</option>
+                  <option value={5 * duration.minute}>5min</option>
+                  <option value={30 * duration.minute}>30min</option>
                 </Form.Control>
               </Form.Group>
             </Col>

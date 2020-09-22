@@ -1,4 +1,4 @@
-const filenameMaxLength = 100;
+const filenameMaxLength = 1024;
 const fileSizeOffset = 124;
 const fileTypeOffset = 156;
 
@@ -9,19 +9,15 @@ interface FileInfo {
   headerOffset: number;
 }
 
-function readString(
-  buffer: ArrayBuffer,
-  strOffset: number,
-  size: number
-): string {
-  const strView = new Uint8Array(buffer, strOffset, size);
+function readString(buffer: ArrayBuffer, offset: number, size: number): string {
+  const view = new Uint8Array(buffer, offset, size);
   let i = 0;
-  let rtnStr = "";
-  while (strView[i] != 0) {
-    rtnStr += String.fromCharCode(strView[i]);
+  let result = "";
+  while (view[i] != 0) {
+    result += String.fromCharCode(view[i]);
     i++;
   }
-  return rtnStr;
+  return result;
 }
 
 function readFileName(buffer: ArrayBuffer, headerOffset: number): string {
@@ -29,24 +25,24 @@ function readFileName(buffer: ArrayBuffer, headerOffset: number): string {
 }
 
 function readFileType(buffer: ArrayBuffer, headerOffset: number): string {
-  const typeView = new Uint8Array(buffer, headerOffset + fileTypeOffset, 1);
-  const typeStr = String.fromCharCode(typeView[0]);
-  if (typeStr == "0") {
+  const view = new Uint8Array(buffer, headerOffset + fileTypeOffset, 1);
+  const typeChar = String.fromCharCode(view[0]);
+  if (typeChar == "0") {
     return "file";
-  } else if (typeStr == "5") {
+  } else if (typeChar == "5") {
     return "directory";
   } else {
-    return typeStr;
+    return typeChar;
   }
 }
 
 function readFileSize(buffer: ArrayBuffer, headerOffset: number): number {
-  const szView = new Uint8Array(buffer, headerOffset + fileSizeOffset, 12);
-  let szStr = "";
+  const view = new Uint8Array(buffer, headerOffset + fileSizeOffset, 12);
+  let result = "";
   for (let i = 0; i < 11; i++) {
-    szStr += String.fromCharCode(szView[i]);
+    result += String.fromCharCode(view[i]);
   }
-  return parseInt(szStr, 8);
+  return parseInt(result, 8);
 }
 
 function readFileInfo(buffer: ArrayBuffer): FileInfo[] {
@@ -80,11 +76,11 @@ function readFileInfo(buffer: ArrayBuffer): FileInfo[] {
 
 function readFileBlob(
   buffer: ArrayBuffer,
-  fileOffset: number,
+  offset: number,
   size: number,
   blobProperties?: BlobPropertyBag
 ): Blob {
-  const view = new Uint8Array(buffer, fileOffset, size);
+  const view = new Uint8Array(buffer, offset, size);
   const blob = new Blob([view], blobProperties);
   return blob;
 }

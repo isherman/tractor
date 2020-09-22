@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
 import RangeSlider from "react-bootstrap-range-slider";
-import { RangeSliderProps } from "react-bootstrap-range-slider";
 import { EventType } from "../../../registry/events";
 import {
   SingleElementVisualizerProps,
@@ -25,9 +24,6 @@ export const Grid = <T extends EventType>(
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(props.pageSize || defaultPageSize);
   const numPages = values.length / pageSize;
-  const handleSetPage: RangeSliderProps["onChange"] = (_, v) => setPage(v);
-  const handleSetPageSize: RangeSliderProps["onChange"] = (_, v) =>
-    setPageSize(v);
 
   return (
     <div>
@@ -35,7 +31,7 @@ export const Grid = <T extends EventType>(
         <span>Page</span>
         <RangeSlider
           value={page}
-          onChange={handleSetPage}
+          onChange={(_, v) => setPage(v)}
           min={0}
           max={numPages}
           step={1}
@@ -45,7 +41,7 @@ export const Grid = <T extends EventType>(
         <span>Page Size</span>
         <RangeSlider
           value={pageSize}
-          onChange={handleSetPageSize}
+          onChange={(_, v) => setPageSize(v)}
           min={1}
           max={24}
           step={1}

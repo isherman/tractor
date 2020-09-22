@@ -11,15 +11,17 @@ import {
   visualizerRegistry
 } from "../registry/visualization";
 import { Buffer } from "../types/common";
+import { duration } from "../utils/duration";
 
 export function visualizerId(v: Visualizer): VisualizerId {
   return Object.getPrototypeOf(v).constructor.id;
 }
 
-const mapToDateRange = (value: number, startDate: Date, endDate: Date): Date =>
-  new Date(
+function mapToDateRange(value: number, startDate: Date, endDate: Date): Date {
+  return new Date(
     startDate.getTime() + (endDate.getTime() - startDate.getTime()) * value
   );
+}
 
 export class Panel {
   public id = Math.random().toString(36).substring(7);
@@ -53,8 +55,7 @@ export class Panel {
 
   setEventType(d: EventTypeId): void {
     this.eventType = d;
-    this.selectedVisualizer = 0;
-    this.selectedOptions = this.optionConfigs.map((_) => 0);
+    this.setVisualizer(0);
   }
 
   setVisualizer(index: number): void {
@@ -73,10 +74,10 @@ export class VisualizationStore {
   @observable bufferEnd: Date | null = null;
   @observable bufferRangeStart = 0;
   @observable bufferRangeEnd = 1;
-  @observable bufferThrottle = 0; // ms
+  @observable bufferThrottle = 0;
   @observable buffer: Buffer = {};
   @observable bufferLogLoadProgress = 0;
-  @observable bufferExpirationWindow = 60 * 1000; // ms
+  @observable bufferExpirationWindow = duration.minute;
   @observable resourceArchive: ResourceArchive | null = null;
   @observable panels: { [k: string]: Panel } = {};
 

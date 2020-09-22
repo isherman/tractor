@@ -8,8 +8,6 @@ import { Icon } from "../Icon";
 export const Content: React.FC = () => {
   const { visualizationStore: store } = useStores();
 
-  const addPanel = (): void => store.addPanel();
-
   return useObserver(() => {
     if (store.bufferEmpty) {
       return null;
@@ -21,7 +19,11 @@ export const Content: React.FC = () => {
     return (
       <div className={styles.content}>
         {panels}
-        <Button className={styles.addButton} variant="light" onClick={addPanel}>
+        <Button
+          className={styles.addButton}
+          variant="light"
+          onClick={() => store.addPanel()}
+        >
           <Icon id="plus" />
         </Button>
       </div>

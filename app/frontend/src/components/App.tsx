@@ -6,7 +6,7 @@ import { State } from "./State";
 import { Video } from "./Video";
 import { Debug } from "./Debug";
 import { Map } from "./Map";
-import { Root as Viz } from "./scope/Root";
+import { Root as Scope } from "./scope/Root";
 import styles from "./App.module.scss";
 
 export const App: React.FC = () => {
@@ -47,7 +47,7 @@ export const App: React.FC = () => {
         <Route exact path="/video" component={Video} />
         <Route exact path="/map" component={Map} />
         <Route exact path="/debug" component={Debug} />
-        <Route exact path="/scope" component={Viz} />
+        <Route exact path="/scope" component={Scope} />
         <Route render={() => <p>Not found</p>} />
       </Switch>
     </div>

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useState } from "react";
 import RangeSlider from "react-bootstrap-range-slider";
-import { RangeSliderProps } from "react-bootstrap-range-slider";
 import { EventType } from "../../../registry/events";
 import {
   SingleElementVisualizerProps,
@@ -27,13 +26,11 @@ export const Overlay = <T extends EventType>(
     return null;
   }
 
-  const handleChange: RangeSliderProps["onChange"] = (_, v) => setIndex(v);
-
   return (
     <div>
       <RangeSlider
         value={index}
-        onChange={handleChange}
+        onChange={(_, v) => setIndex(v)}
         min={0}
         max={values.length - 1}
         step={1}

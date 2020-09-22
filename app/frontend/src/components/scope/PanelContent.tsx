@@ -16,17 +16,20 @@ export const PanelContent: React.FC<IProps> = ({ id }) => {
     if (!panel) {
       return null;
     }
-    const filter = new RegExp(panel.tagFilter);
     const { eventType } = panel;
-    const eventTypeData = eventType ? store.buffer[eventType] : null;
-    const streams =
-      eventType && eventTypeData
-        ? Object.entries(eventTypeData)
-            .filter(([name, _]) => filter.test(name))
-            .map(([name, values]) => (
-              <Stream key={name} panelId={id} name={name} values={values} />
-            ))
-        : null;
+    if (!eventType) {
+      return null;
+    }
+    const eventTypeData = store.buffer[eventType];
+    if (!eventTypeData) {
+      return null;
+    }
+    const filter = new RegExp(panel.tagFilter);
+    const streams = Object.entries(eventTypeData)
+      .filter(([name, _]) => filter.test(name))
+      .map(([name, values]) => (
+        <Stream key={name} panelId={id} name={name} values={values} />
+      ));
     return <div className={styles.panelContent}>{streams}</div>;
   });
 };

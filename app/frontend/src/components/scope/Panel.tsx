@@ -13,14 +13,12 @@ interface IProps {
 export const Panel: React.FC<IProps> = ({ id }) => {
   const { visualizationStore: store } = useStores();
 
-  const deletePanel = (): void => store.deletePanel(id);
-
   return (
     <div className={styles.panel}>
       <Button
         className={styles.removeButton}
         variant="light"
-        onClick={deletePanel}
+        onClick={() => store.deletePanel(id)}
       >
         <Icon id="x" />
       </Button>

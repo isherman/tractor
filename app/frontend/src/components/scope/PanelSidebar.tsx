@@ -46,24 +46,6 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
     } = panel;
     const { bufferEmpty } = store;
 
-    const setTagFilter = (e: ChangeEvent<HTMLInputElement>): void => {
-      panel.tagFilter = e.target.value;
-    };
-
-    const setEventType = (e: ChangeEvent<HTMLSelectElement>): void => {
-      if (e.target.value) {
-        panel.setEventType(e.target.value as EventTypeId);
-      }
-    };
-
-    const setVisualizer = (e: ChangeEvent<HTMLSelectElement>): void => {
-      panel.setVisualizer(parseInt(e.target.value) as number);
-    };
-
-    const setOption = (i: number, e: ChangeEvent<HTMLSelectElement>): void => {
-      panel.setOption(i, parseInt(e.target.value) as number);
-    };
-
     return (
       <div className={styles.panelSidebar}>
         <Form.Group controlId="eventType">
@@ -72,7 +54,11 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
             as="select"
             disabled={bufferEmpty}
             value={!bufferEmpty && eventType ? eventType : ""}
-            onChange={setEventType}
+            onChange={(e: ChangeEvent<HTMLSelectElement>): void => {
+              if (e.target.value) {
+                panel.setEventType(e.target.value as EventTypeId);
+              }
+            }}
           >
             {[...eventTypeIds].map((_) => (
               <option disabled={!(_ in store.buffer)} value={_} key={_}>
@@ -86,7 +72,9 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
           <Form.Label>Tag Filter</Form.Label>
           <Form.Control
             value={tagFilter}
-            onChange={setTagFilter}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+              panel.tagFilter = e.target.value;
+            }}
             disabled={bufferEmpty}
           />
           <Form.Text className="text-muted">
@@ -99,7 +87,9 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
           <Form.Control
             as="select"
             value={selectedVisualizer}
-            onChange={setVisualizer}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+              panel.setVisualizer(parseInt(e.target.value))
+            }
             disabled={bufferEmpty}
           >
             {visualizers.map((v, index) => (
@@ -120,7 +110,7 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
               as="select"
               value={selectedOptions[optionIndex]}
               onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                setOption(optionIndex, e)
+                panel.setOption(optionIndex, parseInt(e.target.value))
               }
               disabled={bufferEmpty}
             >

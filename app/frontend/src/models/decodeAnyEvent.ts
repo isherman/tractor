@@ -16,7 +16,9 @@ export function decodeAnyEvent<T extends EventType>(
   event: BusAnyEvent
 ): T | null {
   const { data } = event;
-  if (!data || !data.value) return null;
+  if (!data || !data.value) {
+    return null;
+  }
   const decoder = (eventRegistry[
     (data.typeUrl as unknown) as EventTypeId
   ] as Message<T>).decode;
