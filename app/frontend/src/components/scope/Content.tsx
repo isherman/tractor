@@ -12,8 +12,8 @@ export const Content: React.FC = () => {
     if (store.bufferEmpty) {
       return null;
     }
-    const panels = Object.keys(store.panels).map((id) => (
-      <Panel key={id} id={id} />
+    const panels = Object.values(store.panels).map((panel) => (
+      <Panel key={panel.id} panel={panel} />
     ));
 
     return (

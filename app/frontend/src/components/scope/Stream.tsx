@@ -3,9 +3,10 @@ import * as React from "react";
 import { TimestampedEventVector } from "../../types/common";
 import { useStores } from "../../hooks/useStores";
 import styles from "./Stream.module.scss";
+import { Panel } from "../../stores/VisualizationStore";
 
 interface IProps {
-  panelId: string;
+  panel: Panel;
   name: string;
   values: TimestampedEventVector;
 }
@@ -27,14 +28,10 @@ const filter = (
     return acc;
   }, []);
 
-export const Stream: React.FC<IProps> = ({ panelId, name, values }) => {
+export const Stream: React.FC<IProps> = ({ panel, name, values }) => {
   const { visualizationStore: store } = useStores();
 
   return useObserver(() => {
-    const panel = store.panels[panelId];
-    if (!panel) {
-      return null;
-    }
     const { visualizer, options } = panel;
 
     const filteredValues = filter(

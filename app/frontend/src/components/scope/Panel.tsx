@@ -5,12 +5,13 @@ import { PanelContent } from "./PanelContent";
 import { useStores } from "../../hooks/useStores";
 import { Button } from "react-bootstrap";
 import { Icon } from "../Icon";
+import { Panel as PanelModel } from "../../stores/VisualizationStore";
 
 interface IProps {
-  id: string;
+  panel: PanelModel;
 }
 
-export const Panel: React.FC<IProps> = ({ id }) => {
+export const Panel: React.FC<IProps> = ({ panel }) => {
   const { visualizationStore: store } = useStores();
 
   return (
@@ -18,12 +19,12 @@ export const Panel: React.FC<IProps> = ({ id }) => {
       <Button
         className={styles.removeButton}
         variant="light"
-        onClick={() => store.deletePanel(id)}
+        onClick={() => store.deletePanel(panel.id)}
       >
         <Icon id="x" />
       </Button>
-      <PanelSidebar id={id} />
-      <PanelContent id={id} />
+      <PanelSidebar panel={panel} />
+      <PanelContent panel={panel} />
     </div>
   );
 };

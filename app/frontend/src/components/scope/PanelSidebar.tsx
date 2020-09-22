@@ -5,24 +5,20 @@ import { useStores } from "../../hooks/useStores";
 import { useObserver } from "mobx-react-lite";
 import { ChangeEvent, useEffect } from "react";
 import { EventTypeId, eventTypeIds } from "../../registry/events";
-import { visualizerId } from "../../stores/VisualizationStore";
+import { Panel, visualizerId } from "../../stores/VisualizationStore";
 import { autorun } from "mobx";
 
 interface IProps {
-  id: string;
+  panel: Panel;
 }
 
-export const PanelSidebar: React.FC<IProps> = ({ id }) => {
+export const PanelSidebar: React.FC<IProps> = ({ panel }) => {
   const { visualizationStore: store } = useStores();
 
   // Automatically choose an event type when a buffer is loaded
   useEffect(
     () =>
       autorun(() => {
-        const panel = store.panels[id];
-        if (!panel) {
-          return null;
-        }
         if (!panel.eventType && !store.bufferEmpty) {
           panel.setEventType(Object.keys(store.buffer)[0] as EventTypeId);
         }
@@ -31,11 +27,6 @@ export const PanelSidebar: React.FC<IProps> = ({ id }) => {
   );
 
   return useObserver(() => {
-    const panel = store.panels[id];
-    if (!panel) {
-      return null;
-    }
-
     const {
       eventType,
       tagFilter,
