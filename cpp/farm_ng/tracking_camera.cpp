@@ -674,11 +674,14 @@ class TrackingCameraClient {
                 latest_command_.record_start().mode() ==
                     TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE &&
                 tag_filter_.AddApriltags(apriltags)) {
+              auto resource_path = GetUniqueResource(
+                  "tracking_camera_left_apriltag", "png", "image/png");
               apriltags.mutable_image()->mutable_resource()->CopyFrom(
-                  event_bus_.GetUniqueResource("tracking_camera_left_apriltag",
-                                               "png", "image/png"));
-              LOG(INFO) << apriltags.image().resource().ShortDebugString();
-              cv::imwrite(apriltags.image().resource().archive_path(), frame_0);
+                  resource_path.first);
+
+              LOG(INFO) << "Writing to : " << resource_path.second;
+              CHECK(cv::imwrite(resource_path.second.string(), frame_0))
+                  << "Failed to write image to: " << resource_path.second;
 
               event_bus_.Send(farm_ng::MakeEvent(
                   "calibrator/tracking_camera/front/apriltags", apriltags,

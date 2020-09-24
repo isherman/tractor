@@ -3,6 +3,7 @@ syntax = "proto3";
 import "farm_ng_proto/tractor/v1/geometry.proto";
 import "farm_ng_proto/tractor/v1/apriltag.proto";
 import "farm_ng_proto/tractor/v1/image.proto";
+import "farm_ng_proto/tractor/v1/resource.proto";
 
 package farm_ng_proto.tractor.v1;
 option go_package = "github.com/farm_ng/genproto";
@@ -25,8 +26,10 @@ enum SolverStatus {
 
 message ApriltagRigTagStats {
   int32 tag_id = 1;
-  double tag_rig_rmse = 2;
-  map<string, double> per_image_rmse = 3;
+  // how many frames was this tag observed in
+  int32 n_frames = 2;
+  double tag_rig_rmse = 3;
+  map<int32, double> per_image_rmse = 4;
 }
 
 message MonocularApriltagRigModel {
@@ -44,6 +47,8 @@ message CalibratorStatus {
   message ApriltagRigProgress {
     int32 num_frames = 1;
     MonocularApriltagRigModel rig_model = 2;
+    // The rig model saved to disk.
+    Resource rig_model_resource = 3;
   }
 
   oneof status {

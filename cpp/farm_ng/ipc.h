@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <boost/asio.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/signals2.hpp>
 
 #include "farm_ng_proto/tractor/v1/io.pb.h"
@@ -41,17 +42,19 @@ class EventBus : public boost::asio::io_service::service {
 
   void SetName(const std::string& name);
 
-  void SetArchiveName(const std::string& name);
-
-  // returns a resource that can be written to that will have a unique file
-  // name, in the active logging directory.
-  farm_ng_proto::tractor::v1::Resource GetUniqueResource(
-      const std::string& prefix, const std::string& ext,
-      const std::string& mime_type);
-
  private:
   std::unique_ptr<EventBusImpl> impl_;
 };
+
+void SetArchiveName(const std::string& name);
+boost::filesystem::path GetArchivePath();
+boost::filesystem::path GetArchiveRoot();
+
+// returns a resource that can be written to that will have a unique file
+// name, in the active logging directory.
+std::pair<farm_ng_proto::tractor::v1::Resource, boost::filesystem::path>
+GetUniqueResource(const std::string& prefix, const std::string& ext,
+                  const std::string& mime_type);
 
 google::protobuf::Timestamp MakeTimestampNow();
 

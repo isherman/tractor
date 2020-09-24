@@ -1,6 +1,7 @@
 # socket_multicast_receiver.py
 import asyncio
 import logging
+import re
 import socket
 import struct
 import sys
@@ -269,6 +270,17 @@ def make_event(name: str, message, stamp: Timestamp = None) -> Event:
     event.name = name
     event.data.Pack(message)
     return event
+
+
+async def get_message(event_queue, name_pattern, message_type):
+    program = re.compile(name_pattern)
+    message = message_type()
+    while True:
+        event = await event_queue.get()
+        if program.match(event.name) is None:
+            continue
+        if event.data.Unpack(message):
+            return message
 
 
 def main():

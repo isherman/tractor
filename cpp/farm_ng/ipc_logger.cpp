@@ -30,12 +30,13 @@ class IpcLogger {
     last_command_.CopyFrom(command);
     switch (last_command_.command_case()) {
       case LoggingCommand::kRecordStart: {
-        log_resource_ = bus_.GetUniqueResource("events", "log", "");
+        auto resource_path = GetUniqueResource("events", "log", "");
+        log_resource_ = resource_path.first;
         LOG(INFO) << "Starting log: " << log_resource_.ShortDebugString();
-        log_writer_.reset(new EventLogWriter(log_resource_));
+        log_writer_.reset(new EventLogWriter(resource_path.second));
         auto recording = logging_status_.mutable_recording();
         recording->set_name(last_command_.record_start().name());
-        recording->set_path(log_resource_.archive_path());
+        recording->set_path(resource_path.second.string());
         recording->set_n_messages(0);
         recording->mutable_stamp_begin()->CopyFrom(MakeTimestampNow());
       } break;

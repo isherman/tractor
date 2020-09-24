@@ -10,6 +10,7 @@
 #include <ceres/local_parameterization.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+#include <google/protobuf/util/json_util.h>
 
 #include "farm_ng/event_log_reader.h"
 #include "farm_ng/sophus_protobuf.h"
@@ -29,6 +30,7 @@ typedef farm_ng_proto::tractor::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::ApriltagDetection;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
 using farm_ng_proto::tractor::v1::ApriltagRig;
+using farm_ng_proto::tractor::v1::ApriltagRigTagStats;
 using farm_ng_proto::tractor::v1::CalibratorCommand;
 using farm_ng_proto::tractor::v1::CalibratorStatus;
 using farm_ng_proto::tractor::v1::CameraModel;
@@ -38,16 +40,20 @@ using farm_ng_proto::tractor::v1::LoggingStatus;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
 using farm_ng_proto::tractor::v1::NamedSE3Pose;
 using farm_ng_proto::tractor::v1::PoseTree;
+using farm_ng_proto::tractor::v1::SolverStatus;
 
 using Sophus::SE3d;
 using Sophus::Vector6d;
 
-std::string NameDashNumber(std::string frame_name, int frame_n) {
-  char buffer[1024];
-  CHECK_LT(std::snprintf(buffer, sizeof(buffer), "%s-%05d", frame_name.c_str(),
-                         frame_n),
-           int(sizeof(buffer)));
-  return std::string(buffer);
+template <typename T>
+void WriteProtobufToJsonFile(boost::filesystem::path path, const T& proto) {
+  google::protobuf::util::JsonPrintOptions print_options;
+  print_options.add_whitespace = true;
+  print_options.always_print_primitive_fields = true;
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(proto, &json_str, print_options);
+  std::ofstream outf(path.string());
+  outf << json_str;
 }
 
 std::string FrameNameNumber(std::string frame_name, int frame_n) {
@@ -191,6 +197,152 @@ std::array<Eigen::Vector2d, 4> ImagePoints(const ApriltagDetection& detection) {
        Eigen::Vector2d(detection.p(3).x(), detection.p(3).y())});
 }
 
+struct ApriltagRigModel {
+  int root_id;
+  std::string rig_name;
+  std::string camera_frame_name;
+  std::vector<ApriltagDetections> all_detections;
+  std::unordered_map<int, SE3d> tag_pose_root;
+  std::unordered_map<int, double> tag_size;
+  std::unordered_map<int, std::array<Eigen::Vector3d, 4>> tag_points;
+  std::vector<Sophus::optional<SE3d>> camera_poses_root;
+
+  std::vector<Image> reprojection_images;
+
+  SolverStatus status;
+  std::unordered_map<int, ApriltagRigTagStats> per_tag_stats;
+  double rmse;
+
+  void ToMonocularApriltagRigModel(MonocularApriltagRigModel* rig) const {
+    rig->Clear();
+    rig->mutable_rig()->set_name(rig_name);
+    rig->mutable_rig()->set_root_tag_id(root_id);
+
+    for (auto id_tag_pose_root : tag_pose_root) {
+      int id = id_tag_pose_root.first;
+      const SE3d& tag_pose_root = id_tag_pose_root.second;
+
+      ApriltagRig::Entry* entry = rig->mutable_rig()->add_entries();
+      entry->set_id(id);
+      entry->set_frame_name(FrameRigTag(rig_name, id));
+      NamedSE3Pose* pose = entry->mutable_pose();
+      pose->set_frame_a(FrameRigTag(rig_name, id));
+      pose->set_frame_b(FrameRigTag(rig_name, root_id));
+      SophusToProto(tag_pose_root, pose->mutable_a_pose_b());
+      entry->set_tag_size(tag_size.at(id));
+      for (const auto& v : tag_points.at(id)) {
+        EigenToProto(v, entry->add_tag_points());
+      }
+    }
+    rig->set_solver_status(status);
+    rig->set_rmse(rmse);
+    for (const auto& stats : per_tag_stats) {
+      rig->add_tag_stats()->CopyFrom(stats.second);
+    }
+    rig->set_camera_frame_name(camera_frame_name);
+    for (const auto& detections : all_detections) {
+      rig->add_detections()->CopyFrom(detections);
+    }
+    for (size_t frame_n = 0; frame_n < camera_poses_root.size(); ++frame_n) {
+      auto o_camera_pose_root = camera_poses_root[frame_n];
+      if (o_camera_pose_root) {
+        NamedSE3Pose* pose = rig->mutable_camera_poses_rig()->add_poses();
+        pose->set_frame_a(FrameNameNumber(camera_frame_name, frame_n));
+        pose->set_frame_b(FrameRigTag(rig_name, root_id));
+        SophusToProto(*o_camera_pose_root, pose->mutable_a_pose_b());
+      }
+    }
+
+    for (const auto& image : reprojection_images) {
+      rig->add_reprojection_images()->CopyFrom(image);
+    }
+  }
+};
+
+void ModelError(ApriltagRigModel& model) {
+  double all_sum_error = 0;
+  double all_error_count = 0;
+  model.per_tag_stats.clear();
+
+  for (size_t frame_n = 0; frame_n < model.camera_poses_root.size();
+       ++frame_n) {
+    auto& o_camera_pose_root = model.camera_poses_root[frame_n];
+    if (!o_camera_pose_root) {
+      continue;
+    }
+
+    const auto& detections = model.all_detections[frame_n];
+    all_error_count += detections.detections_size() * 4;
+    cv::Mat image = cv::imread(
+        (GetArchiveRoot() / detections.image().resource().path()).string(),
+        cv::IMREAD_COLOR);
+
+    // compute reprojection error.
+    for (const auto& detection : detections.detections()) {
+      auto& per_tag_stats = model.per_tag_stats[detection.id()];
+      per_tag_stats.set_tag_id(detection.id());
+      per_tag_stats.set_n_frames(per_tag_stats.n_frames() + 1);
+
+      auto tag_points = TagPoints(detection);
+      auto image_points = ImagePoints(detection);
+      SE3d camera_pose_tag = (*o_camera_pose_root) *
+                             model.tag_pose_root.at(detection.id()).inverse();
+
+      double tag_error = 0;
+      for (int i = 0; i < 4; ++i) {
+        Eigen::Vector2d rp = ProjectPointToPixel(
+            detections.image().camera_model(), camera_pose_tag * tag_points[i]);
+
+        cv::circle(image, cv::Point(image_points[i].x(), image_points[i].y()),
+                   5, cv::Scalar(255, 0, 0));
+
+        double norm = (image_points[i] - rp).squaredNorm();
+        tag_error += norm / 4;
+        all_sum_error += norm;
+      }
+      per_tag_stats.set_tag_rig_rmse(per_tag_stats.tag_rig_rmse() + tag_error);
+      per_tag_stats.mutable_per_image_rmse()->insert(
+          {int(frame_n), std::sqrt(tag_error)});
+    }
+    // Reproject all tag points for visualization
+    for (auto tag_id_tag_points : model.tag_points) {
+      int tag_id = tag_id_tag_points.first;
+      auto tag_points = tag_id_tag_points.second;
+      SE3d camera_pose_tag =
+          (*o_camera_pose_root) * model.tag_pose_root.at(tag_id).inverse();
+      for (int i = 0; i < 4; ++i) {
+        Eigen::Vector3d camera_point = camera_pose_tag * tag_points[i];
+        if (camera_point.z() < 0.1) {  // point not in field of view.
+          continue;
+        }
+        Eigen::Vector2d rp = ProjectPointToPixel(
+            detections.image().camera_model(), camera_point);
+
+        cv::circle(image, cv::Point(rp.x(), rp.y()), 3, cv::Scalar(0, 0, 255),
+                   -1);
+      }
+    }
+    Image reprojection_image;
+    reprojection_image.CopyFrom(detections.image());
+    auto resource_path = GetUniqueResource(
+        FrameNameNumber("reprojection", frame_n), "png", "image/png");
+    reprojection_image.mutable_resource()->CopyFrom(resource_path.first);
+
+    CHECK(cv::imwrite(resource_path.second.string(), image))
+        << "Could not write: " << resource_path.second;
+    model.reprojection_images.push_back(reprojection_image);
+  }
+  model.rmse = std::sqrt(all_sum_error / all_error_count);
+  LOG(INFO) << "RMSE for all frames: " << model.rmse;
+  for (auto& it : model.per_tag_stats) {
+    it.second.set_tag_rig_rmse(
+        std::sqrt(it.second.tag_rig_rmse() / it.second.n_frames()));
+    LOG(INFO) << "tag: " << it.second.tag_id()
+              << " n_frames: " << it.second.n_frames()
+              << " rig_rmse: " << it.second.tag_rig_rmse();
+  }
+}
+
 class ApriltagRigCalibrator {
  public:
   ApriltagRigCalibrator(EventBus* bus,
@@ -267,51 +419,6 @@ class ApriltagRigCalibrator {
     }
   }
 
-  struct ApriltagRigModel {
-    int root_id;
-    std::string rig_name;
-    std::string camera_frame_name;
-    std::unordered_map<int, SE3d> tag_pose_root;
-    std::unordered_map<int, std::array<Eigen::Vector3d, 4>> tag_points;
-    std::vector<Sophus::optional<SE3d>> camera_poses_root;
-
-    std::vector<Image> reprojection_images;
-
-    enum SolverStatus {
-      SOLVER_STATUS_INITIAL = 1,
-      SOLVER_STATUS_CONVERGED = 2,
-      SOLVER_STATUS_FAILED = 3
-    };
-    SolverStatus status;
-    std::unordered_map<size_t, double> per_frame_rmse;
-    double rmse;
-
-    void ToPoseTree(PoseTree* out) const {
-      out->Clear();
-      for (size_t frame_n = 0; frame_n < camera_poses_root.size(); ++frame_n) {
-        auto o_camera_pose_root = camera_poses_root[frame_n];
-        if (o_camera_pose_root) {
-          NamedSE3Pose* pose = out->add_poses();
-          pose->set_frame_a(FrameNameNumber(camera_frame_name, frame_n));
-          pose->set_frame_b(FrameRigTag(rig_name, root_id));
-          SophusToProto(*o_camera_pose_root, pose->mutable_a_pose_b());
-        }
-      }
-      for (auto id_tag_pose_root : tag_pose_root) {
-        int id = id_tag_pose_root.first;
-        if (id == root_id) {
-          continue;  // don't add the root-> root identity to the tree.
-        }
-        NamedSE3Pose* pose = out->add_poses();
-
-        SE3d tag_pose_root = id_tag_pose_root.second;
-        pose->set_frame_a(FrameRigTag(rig_name, id));
-        pose->set_frame_b(FrameRigTag(rig_name, root_id));
-        SophusToProto(tag_pose_root, pose->mutable_a_pose_b());
-      }
-    }
-  };
-
   ApriltagRigModel PoseInitialization() {
     std::vector<std::unordered_map<int, SE3d>> frames;
 
@@ -359,158 +466,20 @@ class ApriltagRigCalibrator {
 
     PoseInit(frames, tag_mean_pose_root, camera_poses_root);
 
-    return {root_id_,
-            rig_name_,
-            camera_frame_name,
-            tag_mean_pose_root,
-            tag_points,
-            camera_poses_root,
-            {},
-            ApriltagRigModel::SOLVER_STATUS_INITIAL,
-            {},
-            0.0};
-  }
-
-  void ModelError(ApriltagRigModel& model) {
-    double all_sum_error = 0;
-    double all_error_count = 0;
-    for (size_t frame_n = 0; frame_n < model.camera_poses_root.size();
-         ++frame_n) {
-      auto& o_camera_pose_root = model.camera_poses_root[frame_n];
-      if (!o_camera_pose_root) {
-        continue;
-      }
-
-      const auto& detections = all_detections_[frame_n];
-      double mean_square = 0;
-      double err_count = detections.detections_size() * 4;
-      all_error_count += err_count;
-      cv::Mat image = cv::imread(detections.image().resource().archive_path(),
-                                 cv::IMREAD_COLOR);
-      // compute reprojection error.
-      for (const auto& detection : detections.detections()) {
-        auto tag_points = TagPoints(detection);
-        auto image_points = ImagePoints(detection);
-        SE3d camera_pose_tag = (*o_camera_pose_root) *
-                               model.tag_pose_root.at(detection.id()).inverse();
-
-        for (int i = 0; i < 4; ++i) {
-          Eigen::Vector2d rp =
-              ProjectPointToPixel(detections.image().camera_model(),
-                                  camera_pose_tag * tag_points[i]);
-
-          cv::circle(image, cv::Point(image_points[i].x(), image_points[i].y()),
-                     5, cv::Scalar(255, 0, 0));
-
-          double norm = (image_points[i] - rp).squaredNorm();
-          all_sum_error += norm;
-          mean_square += norm / err_count;
-        }
-      }
-      // Reproject all tag points
-      for (auto tag_id_tag_points : model.tag_points) {
-        int tag_id = tag_id_tag_points.first;
-        auto tag_points = tag_id_tag_points.second;
-        SE3d camera_pose_tag =
-            (*o_camera_pose_root) * model.tag_pose_root.at(tag_id).inverse();
-        for (int i = 0; i < 4; ++i) {
-          Eigen::Vector3d camera_point = camera_pose_tag * tag_points[i];
-          if (camera_point.z() < 0.1) {  // point not in field of view.
-            continue;
-          }
-          Eigen::Vector2d rp = ProjectPointToPixel(
-              detections.image().camera_model(), camera_point);
-
-          cv::circle(image, cv::Point(rp.x(), rp.y()), 3, cv::Scalar(0, 0, 255),
-                     -1);
-        }
-      }
-      Image reprojection_image;
-      reprojection_image.CopyFrom(detections.image());
-      reprojection_image.mutable_resource()->CopyFrom(bus_->GetUniqueResource(
-          NameDashNumber("reprojection", frame_n), "png", "image/png"));
-
-      //      LOG(INFO) << reprojection_image.ShortDebugString();
-      cv::imwrite(reprojection_image.resource().archive_path(), image);
-      model.reprojection_images.push_back(reprojection_image);
-      model.per_frame_rmse[frame_n] = std::sqrt(mean_square);
-      LOG(INFO) << "RMSE for frame " << frame_n << " - "
-                << model.per_frame_rmse[frame_n];
-    }
-    model.rmse = std::sqrt(all_sum_error / all_error_count);
-    LOG(INFO) << "RMSE for all frames: " << model.rmse;
-  }
-
-  bool Solve() {
-    ApriltagRigModel model = PoseInitialization();
-    LOG(INFO) << "Initial reprojection error vvvvvvvv";
+    ApriltagRigModel model({root_id_,
+                            rig_name_,
+                            camera_frame_name,
+                            all_detections_,
+                            tag_mean_pose_root,
+                            tag_size,
+                            tag_points,
+                            camera_poses_root,
+                            {},
+                            SolverStatus::SOLVER_STATUS_INITIAL,
+                            {},
+                            0.0});
     ModelError(model);
-    LOG(INFO) << "Initial reprojection error ^^^^^^^";
-
-    ceres::Problem problem;
-
-    for (auto& id_tag_pose_root : model.tag_pose_root) {
-      int tag_id = id_tag_pose_root.first;
-      SE3d& tag_pose_root = id_tag_pose_root.second;
-      // Specify local update rule for our parameter
-      problem.AddParameterBlock(tag_pose_root.data(), SE3d::num_parameters,
-                                new LocalParameterizationSE3);
-      if (tag_id == root_id_) {
-        problem.SetParameterBlockConstant(tag_pose_root.data());
-      }
-    }
-
-    for (size_t frame_n = 0; frame_n < model.camera_poses_root.size();
-         ++frame_n) {
-      auto& o_camera_pose_root = model.camera_poses_root[frame_n];
-      if (!o_camera_pose_root) {
-        continue;
-      }
-      // Specify local update rule for our parameter
-      problem.AddParameterBlock(o_camera_pose_root->data(),
-                                SE3d::num_parameters,
-                                new LocalParameterizationSE3);
-
-      const auto& detections = all_detections_[frame_n];
-      for (const auto& detection : detections.detections()) {
-        ceres::CostFunction* cost_function1 =
-            new ceres::AutoDiffCostFunction<CameraApriltagRigCostFunctor, 8,
-                                            Sophus::SE3d::num_parameters,
-                                            Sophus::SE3d::num_parameters>(
-                new CameraApriltagRigCostFunctor(
-                    detections.image().camera_model(), TagPoints(detection),
-                    ImagePoints(detection)));
-        problem.AddResidualBlock(cost_function1, new ceres::HuberLoss(1.0),
-                                 o_camera_pose_root->data(),
-                                 model.tag_pose_root.at(detection.id()).data());
-      }
-    }
-
-    // Set solver options (precision / method)
-    ceres::Solver::Options options;
-    options.linear_solver_type = ceres::DENSE_SCHUR;
-    options.gradient_tolerance = 1e-18;
-    options.function_tolerance = 1e-18;
-    options.parameter_tolerance = 1e-18;
-    options.max_num_iterations = 2000;
-
-    // Solve
-    ceres::Solver::Summary summary;
-    options.logging_type = ceres::PER_MINIMIZER_ITERATION;
-    options.minimizer_progress_to_stdout = true;
-    ceres::Solve(options, &problem, &summary);
-    LOG(INFO) << summary.FullReport() << std::endl;
-    if (summary.termination_type == ceres::CONVERGENCE) {
-      model.status = ApriltagRigModel::SOLVER_STATUS_CONVERGED;
-    } else {
-      model.status = ApriltagRigModel::SOLVER_STATUS_FAILED;
-    }
-
-    LOG(INFO) << "root mean of residual error: "
-              << std::sqrt(summary.final_cost / summary.num_residuals);
-    ModelError(model);
-
-    return true;
+    return model;
   }
 
   void AddFrame(ApriltagDetections detections) {
@@ -528,7 +497,6 @@ class ApriltagRigCalibrator {
     all_detections_.push_back(std::move(detections));
   }
 
-  const MonocularApriltagRigModel& rig_model() const { return rig_model_; }
   int NumFrames() const { return static_cast<int>(all_detections_.size()); }
 
   EventBus* bus_;
@@ -536,9 +504,73 @@ class ApriltagRigCalibrator {
   int root_id_;
   std::unordered_set<int> ids_;
   std::vector<ApriltagDetections> all_detections_;
-
-  MonocularApriltagRigModel rig_model_;
 };  // namespace farm_ng
+
+bool Solve(ApriltagRigModel& model) {
+  ceres::Problem problem;
+
+  for (auto& id_tag_pose_root : model.tag_pose_root) {
+    int tag_id = id_tag_pose_root.first;
+    SE3d& tag_pose_root = id_tag_pose_root.second;
+    // Specify local update rule for our parameter
+    problem.AddParameterBlock(tag_pose_root.data(), SE3d::num_parameters,
+                              new LocalParameterizationSE3);
+    if (tag_id == model.root_id) {
+      problem.SetParameterBlockConstant(tag_pose_root.data());
+    }
+  }
+
+  for (size_t frame_n = 0; frame_n < model.camera_poses_root.size();
+       ++frame_n) {
+    auto& o_camera_pose_root = model.camera_poses_root[frame_n];
+    if (!o_camera_pose_root) {
+      continue;
+    }
+    // Specify local update rule for our parameter
+    problem.AddParameterBlock(o_camera_pose_root->data(), SE3d::num_parameters,
+                              new LocalParameterizationSE3);
+
+    const auto& detections = model.all_detections[frame_n];
+    for (const auto& detection : detections.detections()) {
+      ceres::CostFunction* cost_function1 =
+          new ceres::AutoDiffCostFunction<CameraApriltagRigCostFunctor, 8,
+                                          Sophus::SE3d::num_parameters,
+                                          Sophus::SE3d::num_parameters>(
+              new CameraApriltagRigCostFunctor(
+                  detections.image().camera_model(), TagPoints(detection),
+                  ImagePoints(detection)));
+      problem.AddResidualBlock(cost_function1, new ceres::HuberLoss(1.0),
+                               o_camera_pose_root->data(),
+                               model.tag_pose_root.at(detection.id()).data());
+    }
+  }
+
+  // Set solver options (precision / method)
+  ceres::Solver::Options options;
+  options.linear_solver_type = ceres::DENSE_SCHUR;
+  options.gradient_tolerance = 1e-18;
+  options.function_tolerance = 1e-18;
+  options.parameter_tolerance = 1e-18;
+  options.max_num_iterations = 2000;
+
+  // Solve
+  ceres::Solver::Summary summary;
+  options.logging_type = ceres::PER_MINIMIZER_ITERATION;
+  options.minimizer_progress_to_stdout = true;
+  ceres::Solve(options, &problem, &summary);
+  LOG(INFO) << summary.FullReport() << std::endl;
+  if (summary.termination_type == ceres::CONVERGENCE) {
+    model.status = SolverStatus::SOLVER_STATUS_CONVERGED;
+  } else {
+    model.status = SolverStatus::SOLVER_STATUS_FAILED;
+  }
+
+  LOG(INFO) << "root mean of residual error: "
+            << std::sqrt(summary.final_cost / summary.num_residuals);
+  ModelError(model);
+
+  return true;
+}
 
 class Calibrator {
  public:
@@ -571,17 +603,32 @@ class Calibrator {
     return s.rfind("calibrator/", 0) == 0;
   }
 
-  void update_apriltag_rig_status() {
-    status_.mutable_apriltag_rig()->set_num_frames(
-        apriltag_rig_calibrator_.NumFrames());
-    status_.mutable_apriltag_rig()->mutable_rig_model()->CopyFrom(
-        apriltag_rig_calibrator_.rig_model());
-    send_status();
-  }
-
   void Solve() {
-    apriltag_rig_calibrator_.Solve();
-    update_apriltag_rig_status();
+    LOG(INFO) << "Initial reprojection error vvvvvvvv";
+    ApriltagRigModel model = apriltag_rig_calibrator_.PoseInitialization();
+    model.ToMonocularApriltagRigModel(
+        status_.mutable_apriltag_rig()->mutable_rig_model());
+
+    auto resource_path =
+        GetUniqueResource("apriltag_rig_model/initial", "json", "text/json");
+    WriteProtobufToJsonFile(resource_path.second,
+                            status_.apriltag_rig().rig_model());
+    status_.mutable_apriltag_rig()->mutable_rig_model_resource()->CopyFrom(
+        resource_path.first);
+    send_status();
+    LOG(INFO) << "Initial reprojection error ^^^^^^^";
+
+    farm_ng::Solve(model);
+    model.ToMonocularApriltagRigModel(
+        status_.mutable_apriltag_rig()->mutable_rig_model());
+
+    resource_path =
+        GetUniqueResource("apriltag_rig_model/solved", "json", "text/json");
+    WriteProtobufToJsonFile(resource_path.second,
+                            status_.apriltag_rig().rig_model());
+    status_.mutable_apriltag_rig()->mutable_rig_model_resource()->CopyFrom(
+        resource_path.first);
+    send_status();
   }
 
   bool on_calibrator_command(const EventPb& event) {
@@ -591,7 +638,8 @@ class Calibrator {
     if (command_.has_apriltag_rig_start()) {
       apriltag_rig_calibrator_ =
           ApriltagRigCalibrator(&bus_, command_.apriltag_rig_start());
-      update_apriltag_rig_status();
+      status_.mutable_apriltag_rig()->Clear();
+      send_status();
     }
     if (command_.stop()) {
       Solve();
@@ -608,7 +656,9 @@ class Calibrator {
     // check if we're calibrating a rig?
     if (status_.has_apriltag_rig()) {
       apriltag_rig_calibrator_.AddFrame(detections);
-      update_apriltag_rig_status();
+      status_.mutable_apriltag_rig()->set_num_frames(
+          apriltag_rig_calibrator_.NumFrames());
+      send_status();
     }
     return true;
   }

@@ -6,6 +6,7 @@ import sys
 from farm_ng.ipc import AnnouceQueue
 from farm_ng.ipc import EventBus
 from farm_ng.ipc import EventBusQueue
+from farm_ng.ipc import get_message
 from farm_ng.ipc import make_event
 from farm_ng_proto.tractor.v1.calibrator_pb2 import CalibratorCommand
 from farm_ng_proto.tractor.v1.io_pb2 import LoggingCommand
@@ -65,11 +66,8 @@ async def send_logging_command():
             event_bus.send(make_event('tracking_camera/command', camera_command))
             event_bus.send(make_event('logger/command', command))
 
-        status = LoggingStatus()
-        while True:
-            event = await event_queue.get()
-            if event.data.Unpack(status):
-                print(MessageToString(status, as_one_line=True))
-                break
+        status = await get_message(event_queue, 'logger/status', LoggingStatus)
+        print(MessageToString(status, as_one_line=True))
+
 
 asyncio.get_event_loop().run_until_complete(send_logging_command())
