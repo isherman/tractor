@@ -1,11 +1,12 @@
 import { observable, computed, transaction } from "mobx";
+import { TimeSkewVisualizer } from "../components/scope/visualizers/TimeSkewVisualizer";
 import {
   BusEventEmitter,
   BusEventEmitterHandle
 } from "../models/BusEventEmitter";
 import { ResourceArchive } from "../models/ResourceArchive";
 import { StreamingBuffer } from "../models/StreamingBuffer";
-import { EventTypeId } from "../registry/events";
+import { EventTypeId, eventTypeIds } from "../registry/events";
 import {
   Visualizer,
   VisualizerId,
@@ -42,10 +43,28 @@ export class Panel {
   @observable selectedOptions = this.optionConfigs.map((_) => 0);
 
   @computed get visualizers(): Visualizer[] {
-    return Object.values(visualizerRegistry).filter(
-      (v) =>
-        (this.eventType && v.types.includes(this.eventType)) || v.types === "*"
-    );
+    const result = Object.entries(visualizerRegistry)
+      .filter(([k, v]) => {
+        // This visualizer explicitly supports this event type
+        if (this.eventType && v.types.includes(this.eventType)) {
+          return true;
+        }
+        // This visualizer supports all known event types
+        if (
+          this.eventType &&
+          v.types === "*" &&
+          eventTypeIds.includes(this.eventType)
+        ) {
+          return true;
+        }
+        // This is an unknown event type, but at least we can visualize its timestamp
+        if (k === TimeSkewVisualizer.id) {
+          return true;
+        }
+        return false;
+      })
+      .map(([_, v]) => v);
+    return result;
   }
 
   @computed get visualizer(): Visualizer {

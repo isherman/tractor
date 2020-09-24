@@ -85,8 +85,8 @@ function readFileBlob(
   return blob;
 }
 
-function normalizeName(name: string): string {
-  return name.substring(name.indexOf("/") + 1);
+export function normalizeTarPath(path: string): string {
+  return path.substring(path.indexOf("/") + 1);
 }
 
 export class TarReader {
@@ -113,8 +113,9 @@ export class TarReader {
     blobProperties?: BlobPropertyBag
   ): Promise<Blob> {
     const { buffer, fileInfo } = await this.data;
-    const info = fileInfo.find((_) => fileName === normalizeName(_.name));
+    const info = fileInfo.find((_) => fileName === normalizeTarPath(_.name));
     if (!info) {
+      console.log(fileName, fileInfo);
       return Promise.reject(`${fileName} not found in tar directory`);
     }
     return readFileBlob(
