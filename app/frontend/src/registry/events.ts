@@ -3,13 +3,22 @@ import {
   NamedSE3Pose,
   Vec2
 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
-import { Announce } from "../../genproto/farm_ng_proto/tractor/v1/io";
+import {
+  CalibratorCommand,
+  CalibratorStatus
+} from "../../genproto/farm_ng_proto/tractor/v1/calibrator";
+import {
+  Announce,
+  LoggingCommand,
+  LoggingStatus
+} from "../../genproto/farm_ng_proto/tractor/v1/io";
 import { Image } from "../../genproto/farm_ng_proto/tractor/v1/image";
 import { MotorControllerState } from "../../genproto/farm_ng_proto/tractor/v1/motor";
 import { SteeringCommand } from "../../genproto/farm_ng_proto/tractor/v1/steering";
 import {
   TrackingCameraPoseFrame,
-  TrackingCameraMotionFrame
+  TrackingCameraMotionFrame,
+  TrackingCameraCommand
 } from "../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
 import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { Message } from "../types/common";
@@ -24,7 +33,12 @@ export type EventType =
   | TractorState
   | Announce
   | Vec2
-  | Image;
+  | Image
+  | LoggingCommand
+  | TrackingCameraCommand
+  | CalibratorCommand
+  | CalibratorStatus
+  | LoggingStatus;
 
 // Infer the keys, but restrict values to Message<EventType>
 // https://stackoverflow.com/a/54598743
@@ -42,7 +56,12 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.TractorState": TractorState,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Announce": Announce,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": Vec2,
-  "type.googleapis.com/farm_ng_proto.tractor.v1.Image": Image
+  "type.googleapis.com/farm_ng_proto.tractor.v1.Image": Image,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.LoggingCommand": LoggingCommand,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraCommand": TrackingCameraCommand,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.CalibratorCommand": CalibratorCommand,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.CalibratorStatus": CalibratorStatus,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.LoggingStatus": LoggingStatus
 });
 
 export const eventTypeIds = Object.keys(
