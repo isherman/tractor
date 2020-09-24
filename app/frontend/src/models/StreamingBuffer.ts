@@ -41,11 +41,18 @@ export class StreamingBuffer {
     if (!this.data[typeUrl]![event.name]) {
       this.data[typeUrl]![event.name] = [];
     }
-    const decodedEvent = decodeAnyEvent(event);
-    if (!decodedEvent) {
-      return;
+    try {
+      const decodedEvent = decodeAnyEvent(event);
+      if (decodedEvent) {
+        this.data[typeUrl]![event.name].push([
+          event.stamp.getTime(),
+          decodedEvent
+        ]);
+      }
+    } catch {
+      // eslint-disable-next-line no-console
+      console.error(`No decoder registered for type: ${typeUrl}`);
     }
-    this.data[typeUrl]![event.name].push([event.stamp.getTime(), decodedEvent]);
   }
 
   public clear(): void {
