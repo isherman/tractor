@@ -5,7 +5,7 @@ import { getWebRTCEmitters } from "../models/getWebRTCEmitters";
 import { VisualizationStore } from "../stores/VisualizationStore";
 
 const [busEventEmitter, mediaStreamEmitter] = getWebRTCEmitters(
-  `http://${window.location.hostname}/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`
+  `http://${window.location.host}/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`
 );
 
 export const storesContext = React.createContext({
