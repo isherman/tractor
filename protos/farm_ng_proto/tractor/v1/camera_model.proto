@@ -30,4 +30,7 @@ message CameraModel {
   DistortionModel distortion_model = 7;
   // Distorion model coeffecients, typically has 5 values, some may be 0.0.
   repeated double distortion_coefficients = 8;
+
+  // Frame name
+  string frame_name = 9;
 };
