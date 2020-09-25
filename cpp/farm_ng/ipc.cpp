@@ -50,7 +50,7 @@ ArchiveManager& get_archive() {
   return manager_;
 }
 
-enum { max_length = 65535 };
+enum { max_datagram_size = 65507 };
 const short multicast_port = 10000;
 std::string g_multicast_address = "239.20.20.21";
 
@@ -86,7 +86,7 @@ class receiver {
         boost::asio::ip::multicast::join_group(multicast_address));
 
     socket_.async_receive_from(
-        boost::asio::buffer(data_, max_length), sender_endpoint_,
+        boost::asio::buffer(data_, max_datagram_size), sender_endpoint_,
         std::bind(&receiver::handle_receive_from, this, std::placeholders::_1,
                   std::placeholders::_2));
   }
@@ -122,7 +122,7 @@ class receiver {
     announcements_[sender_endpoint_] = announce;
 
     socket_.async_receive_from(
-        boost::asio::buffer(data_, max_length), sender_endpoint_,
+        boost::asio::buffer(data_, max_datagram_size), sender_endpoint_,
         std::bind(&receiver::handle_receive_from, this, std::placeholders::_1,
                   std::placeholders::_2));
   }
@@ -156,7 +156,7 @@ class receiver {
   std::map<boost::asio::ip::udp::endpoint, farm_ng_proto::tractor::v1::Announce>
       announcements_;
 
-  char data_[max_length];
+  char data_[max_datagram_size];
 };
 
 }  // namespace
@@ -182,7 +182,7 @@ class EventBusImpl {
     socket_.bind(listen_endpoint);
 
     socket_.async_receive_from(
-        boost::asio::buffer(data_, max_length), sender_endpoint_,
+        boost::asio::buffer(data_, max_datagram_size), sender_endpoint_,
         std::bind(&EventBusImpl::handle_receive_from, this,
                   std::placeholders::_1, std::placeholders::_2));
 
@@ -235,7 +235,7 @@ class EventBusImpl {
       (*signal_)(event);
 
       socket_.async_receive_from(
-          boost::asio::buffer(data_, max_length), sender_endpoint_,
+          boost::asio::buffer(data_, max_datagram_size), sender_endpoint_,
           std::bind(&EventBusImpl::handle_receive_from, this,
                     std::placeholders::_1, std::placeholders::_2));
     }
@@ -243,7 +243,7 @@ class EventBusImpl {
 
   void send_event(const farm_ng_proto::tractor::v1::Event& event) {
     event.SerializeToString(&event_message_);
-    CHECK_LT(int(event_message_.size()), max_length)
+    CHECK_LT(int(event_message_.size()), max_datagram_size)
         << "Event is too big, doesn't fit in one udp packet.";
     for (const auto& it : recv_.announcements()) {
       boost::asio::ip::udp::endpoint ep(
@@ -265,7 +265,7 @@ class EventBusImpl {
 
   boost::asio::ip::udp::endpoint announce_endpoint_;
   boost::asio::ip::udp::endpoint sender_endpoint_;
-  char data_[max_length];
+  char data_[max_datagram_size];
   std::string announce_message_;
   std::string event_message_;
   std::string service_name_ = "unknown [cpp-ipc]";

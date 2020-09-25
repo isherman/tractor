@@ -24,6 +24,8 @@ logger.setLevel(logging.INFO)
 # adminstratively scoped: 239.0.0.0 to 239.255.255.255
 _g_multicast_group = ('239.20.20.21', 10000)
 
+_g_datagram_size = 65507
+
 
 def host_is_local(hostname, port):
     # https://gist.github.com/bennr01/7043a460155e8e763b3a9061c95faaa0
@@ -50,7 +52,7 @@ class EventBusQueue:
         self._queue = self._event_bus._queue()
         return self._queue
 
-    def __exit__(self, type, vlaue, traceback):
+    def __exit__(self, type, value, traceback):
         logger.info('removing event queue')
         self._event_bus._remove_queue(self._queue)
 
@@ -64,7 +66,7 @@ class AnnounceQueue:
         self._queue = self._event_bus._announce_queue()
         return self._queue
 
-    def __exit__(self, type, vlaue, traceback):
+    def __exit__(self, type, value, traceback):
         logger.info('removing announce queue')
         self._event_bus._remove_announce_queue(self._queue)
 
@@ -167,7 +169,7 @@ class EventBus:
             self._mc_send_sock.sendto(buff, (service.host, service.port))
 
     def _send_recv(self):
-        data, server = self._mc_send_sock.recvfrom(65535)
+        data, server = self._mc_send_sock.recvfrom(_g_datagram_size)
         if self._recv_raw:
             for q in self._subscribers:
                 q.put_nowait(data)
@@ -183,7 +185,7 @@ class EventBus:
             q.put_nowait(event)
 
     def _announce_recv(self):
-        data, address = self._mc_recv_sock.recvfrom(65535)
+        data, address = self._mc_recv_sock.recvfrom(_g_datagram_size)
 
         # Ignore self-announcements
         if address[1] == self._mc_send_sock.getsockname()[1]:
