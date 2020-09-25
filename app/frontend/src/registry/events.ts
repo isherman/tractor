@@ -22,6 +22,11 @@ import {
 } from "../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
 import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { Message } from "../types/common";
+import {
+  ProgramSupervisorStatus,
+  StartProgramRequest,
+  StopProgramRequest
+} from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
 
 export type EventType =
   | SteeringCommand
@@ -38,7 +43,10 @@ export type EventType =
   | TrackingCameraCommand
   | CalibratorCommand
   | CalibratorStatus
-  | LoggingStatus;
+  | LoggingStatus
+  | ProgramSupervisorStatus
+  | StartProgramRequest
+  | StopProgramRequest;
 
 // Infer the keys, but restrict values to Message<EventType>
 // https://stackoverflow.com/a/54598743
@@ -61,7 +69,10 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraCommand": TrackingCameraCommand,
   "type.googleapis.com/farm_ng_proto.tractor.v1.CalibratorCommand": CalibratorCommand,
   "type.googleapis.com/farm_ng_proto.tractor.v1.CalibratorStatus": CalibratorStatus,
-  "type.googleapis.com/farm_ng_proto.tractor.v1.LoggingStatus": LoggingStatus
+  "type.googleapis.com/farm_ng_proto.tractor.v1.LoggingStatus": LoggingStatus,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.ProgramSupervisorStatus": ProgramSupervisorStatus,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.StartProgramRequest": StartProgramRequest,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.StopProgramRequest": StopProgramRequest
 });
 
 export const eventTypeIds = Object.keys(
