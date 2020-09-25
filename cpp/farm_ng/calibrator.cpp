@@ -112,9 +112,9 @@ Eigen::Matrix<T, 2, 1> ProjectPointToPixel(
 
 struct CameraApriltagRigCostFunctor {
   CameraApriltagRigCostFunctor(const CameraModel& camera,
-                               std::array<Eigen::Vector3d, 4> tag_points,
-                               std::array<Eigen::Vector2d, 4> image_points)
-      : camera_(camera), tag_points_(tag_points), image_points_(image_points) {}
+                               std::array<Eigen::Vector3d, 4> points_tag,
+                               std::array<Eigen::Vector2d, 4> points_image)
+      : camera_(camera), points_tag_(points_tag), points_image_(points_image) {}
 
   template <class T>
   bool operator()(T const* const raw_camera_pose_root,
@@ -128,15 +128,15 @@ struct CameraApriltagRigCostFunctor {
 
     for (int i = 0; i < 4; ++i) {
       residuals.row(i) =
-          image_points_[i].cast<T>() -
+          points_image_[i].cast<T>() -
           ProjectPointToPixel(camera_,
-                              camera_pose_tag * tag_points_[i].cast<T>());
+                              camera_pose_tag * points_tag_[i].cast<T>());
     }
     return true;
   }
   CameraModel camera_;
-  std::array<Eigen::Vector3d, 4> tag_points_;
-  std::array<Eigen::Vector2d, 4> image_points_;
+  std::array<Eigen::Vector3d, 4> points_tag_;
+  std::array<Eigen::Vector2d, 4> points_image_;
 };
 
 // https://github.com/strasdat/Sophus/blob/master/test/ceres/local_parameterization_se3.hpp
@@ -179,7 +179,7 @@ bool StartsWith(const std::string& x, const std::string& prefix) {
   return x.rfind(prefix, 0) == 0;
 }
 
-std::array<Eigen::Vector3d, 4> TagPoints(const ApriltagDetection& detection) {
+std::array<Eigen::Vector3d, 4> PointsTag(const ApriltagDetection& detection) {
   CHECK(detection.tag_size() > 0.0);
   double half_size = detection.tag_size() / 2.0;
   return std::array<Eigen::Vector3d, 4>(
@@ -189,7 +189,7 @@ std::array<Eigen::Vector3d, 4> TagPoints(const ApriltagDetection& detection) {
        Eigen::Vector3d(-half_size, half_size, 0.0)});
 }
 
-std::array<Eigen::Vector2d, 4> ImagePoints(const ApriltagDetection& detection) {
+std::array<Eigen::Vector2d, 4> PointsImage(const ApriltagDetection& detection) {
   return std::array<Eigen::Vector2d, 4>(
       {Eigen::Vector2d(detection.p(0).x(), detection.p(0).y()),
        Eigen::Vector2d(detection.p(1).x(), detection.p(1).y()),
@@ -204,7 +204,7 @@ struct ApriltagRigModel {
   std::vector<ApriltagDetections> all_detections;
   std::unordered_map<int, SE3d> tag_pose_root;
   std::unordered_map<int, double> tag_size;
-  std::unordered_map<int, std::array<Eigen::Vector3d, 4>> tag_points;
+  std::unordered_map<int, std::array<Eigen::Vector3d, 4>> points_tag;
   std::vector<Sophus::optional<SE3d>> camera_poses_root;
 
   std::vector<Image> reprojection_images;
@@ -230,8 +230,8 @@ struct ApriltagRigModel {
       pose->set_frame_b(FrameRigTag(rig_name, root_id));
       SophusToProto(tag_pose_root, pose->mutable_a_pose_b());
       entry->set_tag_size(tag_size.at(id));
-      for (const auto& v : tag_points.at(id)) {
-        EigenToProto(v, entry->add_tag_points());
+      for (const auto& v : points_tag.at(id)) {
+        EigenToProto(v, entry->add_points_tag());
       }
     }
     rig->set_solver_status(status);
@@ -283,20 +283,20 @@ void ModelError(ApriltagRigModel& model) {
       per_tag_stats.set_tag_id(detection.id());
       per_tag_stats.set_n_frames(per_tag_stats.n_frames() + 1);
 
-      auto tag_points = TagPoints(detection);
-      auto image_points = ImagePoints(detection);
+      auto points_tag = PointsTag(detection);
+      auto points_image = PointsImage(detection);
       SE3d camera_pose_tag = (*o_camera_pose_root) *
                              model.tag_pose_root.at(detection.id()).inverse();
 
       double tag_error = 0;
       for (int i = 0; i < 4; ++i) {
         Eigen::Vector2d rp = ProjectPointToPixel(
-            detections.image().camera_model(), camera_pose_tag * tag_points[i]);
+            detections.image().camera_model(), camera_pose_tag * points_tag[i]);
 
-        cv::circle(image, cv::Point(image_points[i].x(), image_points[i].y()),
+        cv::circle(image, cv::Point(points_image[i].x(), points_image[i].y()),
                    5, cv::Scalar(255, 0, 0));
 
-        double norm = (image_points[i] - rp).squaredNorm();
+        double norm = (points_image[i] - rp).squaredNorm();
         tag_error += norm / 4;
         all_sum_error += norm;
       }
@@ -305,18 +305,18 @@ void ModelError(ApriltagRigModel& model) {
           {int(frame_n), std::sqrt(tag_error)});
     }
     // Reproject all tag points for visualization
-    for (auto tag_id_tag_points : model.tag_points) {
-      int tag_id = tag_id_tag_points.first;
-      auto tag_points = tag_id_tag_points.second;
+    for (auto tag_id_points_tag : model.points_tag) {
+      int tag_id = tag_id_points_tag.first;
+      auto points_tag = tag_id_points_tag.second;
       SE3d camera_pose_tag =
           (*o_camera_pose_root) * model.tag_pose_root.at(tag_id).inverse();
       for (int i = 0; i < 4; ++i) {
-        Eigen::Vector3d camera_point = camera_pose_tag * tag_points[i];
-        if (camera_point.z() < 0.1) {  // point not in field of view.
+        Eigen::Vector3d point_camera = camera_pose_tag * points_tag[i];
+        if (point_camera.z() < 0.1) {  // point not in field of view.
           continue;
         }
         Eigen::Vector2d rp = ProjectPointToPixel(
-            detections.image().camera_model(), camera_point);
+            detections.image().camera_model(), point_camera);
 
         cv::circle(image, cv::Point(rp.x(), rp.y()), 3, cv::Scalar(0, 0, 255),
                    -1);
@@ -425,7 +425,7 @@ class ApriltagRigCalibrator {
     std::string camera_frame_name;
 
     std::unordered_map<int, double> tag_size;
-    std::unordered_map<int, std::array<Eigen::Vector3d, 4>> tag_points;
+    std::unordered_map<int, std::array<Eigen::Vector3d, 4>> points_tag;
 
     for (const auto& detections : all_detections_) {
       std::unordered_map<int, SE3d> camera_pose_tags;
@@ -442,7 +442,7 @@ class ApriltagRigCalibrator {
           CHECK_EQ(tag_size.at(detection.id()), detection.tag_size());
         } else {
           tag_size[detection.id()] = detection.tag_size();
-          tag_points[detection.id()] = TagPoints(detection);
+          points_tag[detection.id()] = PointsTag(detection);
         }
         SE3d a_pose_b;
         ProtoToSophus(detection.pose().a_pose_b(), &a_pose_b);
@@ -472,7 +472,7 @@ class ApriltagRigCalibrator {
                             all_detections_,
                             tag_mean_pose_root,
                             tag_size,
-                            tag_points,
+                            points_tag,
                             camera_poses_root,
                             {},
                             SolverStatus::SOLVER_STATUS_INITIAL,
@@ -537,8 +537,8 @@ bool Solve(ApriltagRigModel& model) {
                                           Sophus::SE3d::num_parameters,
                                           Sophus::SE3d::num_parameters>(
               new CameraApriltagRigCostFunctor(
-                  detections.image().camera_model(), TagPoints(detection),
-                  ImagePoints(detection)));
+                  detections.image().camera_model(), PointsTag(detection),
+                  PointsImage(detection)));
       problem.AddResidualBlock(cost_function1, new ceres::HuberLoss(1.0),
                                o_camera_pose_root->data(),
                                model.tag_pose_root.at(detection.id()).data());

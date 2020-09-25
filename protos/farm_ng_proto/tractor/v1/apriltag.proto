@@ -58,7 +58,6 @@ message ApriltagDetection {
 message ApriltagDetections {
   repeated ApriltagDetection detections = 1;
   Image image = 2;
-  double rmse = 3;
 }
 
 message ApriltagRig {
@@ -66,7 +65,7 @@ message ApriltagRig {
     int32 id = 1;
     string frame_name = 2;
     double tag_size = 3;
-    repeated Vec3 tag_points = 4;
+    repeated Vec3 points_tag = 4;
     NamedSE3Pose pose = 5;
   }
   string name = 1;
