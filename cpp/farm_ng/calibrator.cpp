@@ -44,23 +44,29 @@ using farm_ng_proto::tractor::v1::SolverStatus;
 using Sophus::SE3d;
 using Sophus::Vector6d;
 
-std::string FrameNameNumber(std::string frame_name, int frame_n) {
+namespace farm_ng {
+
+// Constructs a frame name, using the convention <name>/<number %05d>
+std::string FrameNameNumber(const std::string& name, int number) {
   char buffer[1024];
-  CHECK_LT(std::snprintf(buffer, sizeof(buffer), "%s/%05d", frame_name.c_str(),
-                         frame_n),
-           int(sizeof(buffer)));
+  CHECK_LT(
+      std::snprintf(buffer, sizeof(buffer), "%s/%05d", name.c_str(), number),
+      int(sizeof(buffer)));
   return std::string(buffer);
 }
 
-std::string FrameRigTag(std::string rig_name, int tag_id) {
+// Constructs a frame name of a tag associated with a rig in the form
+// <rig_name>/tag/<tag_id %05d>
+std::string FrameRigTag(const std::string& rig_name, int tag_id) {
   return FrameNameNumber(rig_name + "/tag", tag_id);
 }
 
-namespace farm_ng {
-
-/* Given a point in 3D space, compute the corresponding pixel coordinates in an
- * image with no distortion or forward distortion coefficients produced by the
- * same camera */
+// Given a point in 3D space, compute the corresponding pixel coordinates in an
+//  image with no distortion or forward distortion coefficients produced by the
+//  same camera
+//
+//  This is compatable with autodiff using ceres jet types, except that it will
+//  not support solving for the camera model itself.
 template <class T>
 Eigen::Matrix<T, 2, 1> ProjectPointToPixel(
     const CameraModel& camera, const Eigen::Matrix<T, 3, 1>& point) {
@@ -75,6 +81,8 @@ Eigen::Matrix<T, 2, 1> ProjectPointToPixel(
            CameraModel::DISTORTION_MODEL_KANNALA_BRANDT4);
   if (camera.distortion_model() ==
       CameraModel::DISTORTION_MODEL_KANNALA_BRANDT4) {
+    // Model copied from librealsense:
+    // https://github.com/IntelRealSense/librealsense/blob/0adceb9dc6fce63c348346e1aef1b63c052a1db9/include/librealsense2/rsutil.h#L63
     T r = sqrt(x * x + y * y);
     if (r < eps) {
       r = eps;
@@ -704,7 +712,8 @@ LoggingStatus WaitForLoggerStatus(
   }
 }
 
-LoggingStatus WaitForLoggerStart(EventBus& bus, std::string archive_name) {
+LoggingStatus WaitForLoggerStart(EventBus& bus,
+                                 const std::string& archive_name) {
   return WaitForLoggerStatus(bus, [archive_name](const LoggingStatus& status) {
     return (status.has_recording() &&
             status.recording().name() == archive_name);

@@ -38,7 +38,7 @@ namespace farm_ng {
 
 // Convert rs2::frame to cv::Mat
 // https://raw.githubusercontent.com/IntelRealSense/librealsense/master/wrappers/opencv/cv-helpers.hpp
-cv::Mat frame_to_mat(const rs2::frame& f) {
+cv::Mat RS2FrameToMat(const rs2::frame& f) {
   using namespace cv;
   using namespace rs2;
 
@@ -170,7 +170,7 @@ EventPb ToNamedPoseEvent(const rs2::pose_frame& rs_pose_frame) {
 // image.
 // @see        static void apriltag_manager::undistort(...)
 //
-bool homography_compute2(const double c[4][4], matd_t* H) {
+bool ComputeHomography(const double c[4][4], matd_t* H) {
   double A[] = {
       c[0][0],
       c[0][1],
@@ -335,7 +335,7 @@ bool undistort(apriltag_detection_t& src, const rs2_intrinsics& intr) {
   if (src.H == nullptr) {
     src.H = matd_create(3, 3);
   }
-  return homography_compute2(corr_arr, src.H);
+  return ComputeHomography(corr_arr, src.H);
 }
 
 void apriltag_pose_destroy(apriltag_pose_t* p) {
@@ -488,6 +488,27 @@ cv::Size GetCvSize(const CameraModel& model) {
   return cv::Size(model.image_width(), model.image_height());
 }
 
+// This class is meant to help filter apriltags, returning true once after the
+// camera becomes relatively stationary.  To allow for a capture program which
+// automatically captures a sparse set of unique view points for calibration
+// after person or robot moves to position and stops for some reasonable period
+// and then continues. It uses a simple 2d accumulated mask based hueristic.
+//
+//   1. for each detected apriltag point, define a small ROI (e.g. 7x7)
+//       1. Construct a new mask the size of the detection image,
+//          which is set to 0 everywhere except for in the ROI
+//            mask = 0
+//            mask(ROI) = previous_mask(ROI) + 1
+//       2. Find the max count in the ROI, this is essentially the number of
+//       frames where this tag point has kept roughly within the ROI.
+//   2. Compute the mean of the max counts.
+//   3. If the mean is moves above a threshold, determined experimentally to
+//   mean stable, 5 at my desk lab, then this detection is considered stable. If
+//   the camera stays still, we're only interested in the transition, because we
+//   don't want duplicate frames.
+//
+//   NOTE If the camera moves slowly but constantly, this tends to capture every
+//   other frame.
 class ApriltagsFilter {
  public:
   ApriltagsFilter() : once_(false) {}
@@ -512,7 +533,8 @@ class ApriltagsFilter {
     double mean_count = 0.0;
     for (const ApriltagDetection& detection : detections.detections()) {
       for (const auto& p : detection.p()) {
-        cv::Rect roi(p.x() - 3, p.y() - 3, 7, 7);
+        cv::Rect roi(p.x() - window_size / 2, p.y() - window_size / 2,
+                     window_size, window_size);
         new_mask(roi) = mask_(roi) + 1;
         double max_val = 0.0;
         cv::minMaxLoc(new_mask(roi), nullptr, &max_val);
@@ -647,7 +669,7 @@ class TrackingCameraClient {
       // Add a reference to fisheye_frame, cause we're scheduling
       // april tag detection for later.
       fisheye_frame.keep();
-      cv::Mat frame_0 = frame_to_mat(fisheye_frame);
+      cv::Mat frame_0 = RS2FrameToMat(fisheye_frame);
 
       // lock for rest of scope, so we can edit some member state.
       std::lock_guard<std::mutex> lock(mtx_realsense_state_);
@@ -666,7 +688,7 @@ class TrackingCameraClient {
           io_service_.post([this, fisheye_frame, stamp] {
             // note this function is called later, in main thread, via
             // io_service_.run();
-            cv::Mat frame_0 = frame_to_mat(fisheye_frame);
+            cv::Mat frame_0 = RS2FrameToMat(fisheye_frame);
 
             auto apriltags = detector_->Detect(frame_0);
 
