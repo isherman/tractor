@@ -1,6 +1,6 @@
 import asyncio
-import copy
 import logging
+import os
 import re
 from collections import namedtuple
 
@@ -15,6 +15,8 @@ event_bus = EventBus('program_supervisor')
 
 logger = logging.getLogger('program_supervisor')
 logger.setLevel(logging.INFO)
+
+farm_ng_root = os.environ['FARM_NG_ROOT']
 
 
 async def get_message(event_queue, name_pattern, message_type):
@@ -32,7 +34,11 @@ async def get_message(event_queue, name_pattern, message_type):
 ProgramInfo = namedtuple("ProgramInfo", "path args name description")
 
 library = {
-    1000: ProgramInfo(path="python", args=["-m", "farm_ng.calibrator_program"], name="Apriltag Rig Calibration", description="Lorem ipsum"),
+    1000: ProgramInfo(path=f"{farm_ng_root}/build/cpp/farm_ng/farm-ng-log-playback",
+                      args=["-send", "-log", f"{farm_ng_root}/../tractor-data/cal01/events-02498-00000.log"],
+                      name="Apriltag Rig Calibration Playback",
+                      description="Log playback"),
+    # 1010: ProgramInfo(path="python", args=["-m", "farm_ng.calibrator_program"], name="Apriltag Rig Calibration", description="Lorem ipsum"),
     1100: ProgramInfo(path="sleep", args=["5"], name="Sleep 5", description="Take a nap"),
     1110: ProgramInfo(path="sleep", args=["100"], name="Sleep 100", description="Take a looong nap")
 }
