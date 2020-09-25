@@ -39,7 +39,6 @@ using farm_ng_proto::tractor::v1::LoggingCommand;
 using farm_ng_proto::tractor::v1::LoggingStatus;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
 using farm_ng_proto::tractor::v1::NamedSE3Pose;
-using farm_ng_proto::tractor::v1::PoseTree;
 using farm_ng_proto::tractor::v1::SolverStatus;
 
 using Sophus::SE3d;
@@ -222,16 +221,16 @@ struct ApriltagRigModel {
       int id = id_tag_pose_root.first;
       const SE3d& tag_pose_root = id_tag_pose_root.second;
 
-      ApriltagRig::Entry* entry = rig->mutable_rig()->add_entries();
-      entry->set_id(id);
-      entry->set_frame_name(FrameRigTag(rig_name, id));
-      NamedSE3Pose* pose = entry->mutable_pose();
+      ApriltagRig::Node* node = rig->mutable_rig()->add_nodes();
+      node->set_id(id);
+      node->set_frame_name(FrameRigTag(rig_name, id));
+      NamedSE3Pose* pose = node->mutable_pose();
       pose->set_frame_a(FrameRigTag(rig_name, id));
       pose->set_frame_b(FrameRigTag(rig_name, root_id));
       SophusToProto(tag_pose_root, pose->mutable_a_pose_b());
-      entry->set_tag_size(tag_size.at(id));
+      node->set_tag_size(tag_size.at(id));
       for (const auto& v : points_tag.at(id)) {
-        EigenToProto(v, entry->add_points_tag());
+        EigenToProto(v, node->add_points_tag());
       }
     }
     rig->set_solver_status(status);
@@ -246,7 +245,7 @@ struct ApriltagRigModel {
     for (size_t frame_n = 0; frame_n < camera_poses_root.size(); ++frame_n) {
       auto o_camera_pose_root = camera_poses_root[frame_n];
       if (o_camera_pose_root) {
-        NamedSE3Pose* pose = rig->mutable_camera_poses_rig()->add_poses();
+        NamedSE3Pose* pose = rig->add_camera_poses_rig();
         pose->set_frame_a(FrameNameNumber(camera_frame_name, frame_n));
         pose->set_frame_b(FrameRigTag(rig_name, root_id));
         SophusToProto(*o_camera_pose_root, pose->mutable_a_pose_b());
@@ -641,7 +640,7 @@ class Calibrator {
       status_.mutable_apriltag_rig()->Clear();
       send_status();
     }
-    if (command_.stop()) {
+    if (command_.has_stop()) {
       Solve();
     }
     return true;

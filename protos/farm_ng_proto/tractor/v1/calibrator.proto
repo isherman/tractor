@@ -9,12 +9,14 @@ package farm_ng_proto.tractor.v1;
 option go_package = "github.com/farm_ng/genproto";
 
 message CalibratorCommand {
+  message Stop {
+  }
   message ApriltagRigStart {
     repeated int32 tag_ids = 1;
   }
   oneof command {
-    bool stop = 1;
     ApriltagRigStart apriltag_rig_start = 2;
+    Stop stop = 3;
   }
 }
 enum SolverStatus {
@@ -39,7 +41,7 @@ message MonocularApriltagRigModel {
   repeated ApriltagRigTagStats tag_stats = 4;
   string camera_frame_name = 5;
   repeated ApriltagDetections detections = 6;
-  PoseTree camera_poses_rig = 7;
+  repeated NamedSE3Pose camera_poses_rig = 7;
   repeated Image reprojection_images = 8;
 }
 
