@@ -48,8 +48,8 @@ message MonocularApriltagRigModel {
 message CalibratorStatus {
   message ApriltagRigProgress {
     int32 num_frames = 1;
-    MonocularApriltagRigModel rig_model = 2;
     // The rig model saved to disk.
+    // Will be a json encoded protobuf with type MonocularApriltagRigModel.
     Resource rig_model_resource = 3;
   }
 

@@ -44,17 +44,6 @@ using farm_ng_proto::tractor::v1::SolverStatus;
 using Sophus::SE3d;
 using Sophus::Vector6d;
 
-template <typename T>
-void WriteProtobufToJsonFile(boost::filesystem::path path, const T& proto) {
-  google::protobuf::util::JsonPrintOptions print_options;
-  print_options.add_whitespace = true;
-  print_options.always_print_primitive_fields = true;
-  std::string json_str;
-  google::protobuf::util::MessageToJsonString(proto, &json_str, print_options);
-  std::ofstream outf(path.string());
-  outf << json_str;
-}
-
 std::string FrameNameNumber(std::string frame_name, int frame_n) {
   char buffer[1024];
   CHECK_LT(std::snprintf(buffer, sizeof(buffer), "%s/%05d", frame_name.c_str(),
@@ -605,28 +594,20 @@ class Calibrator {
   void Solve() {
     LOG(INFO) << "Initial reprojection error vvvvvvvv";
     ApriltagRigModel model = apriltag_rig_calibrator_.PoseInitialization();
-    model.ToMonocularApriltagRigModel(
-        status_.mutable_apriltag_rig()->mutable_rig_model());
+    MonocularApriltagRigModel model_pb;
+    model.ToMonocularApriltagRigModel(&model_pb);
 
-    auto resource_path =
-        GetUniqueResource("apriltag_rig_model/initial", "json", "text/json");
-    WriteProtobufToJsonFile(resource_path.second,
-                            status_.apriltag_rig().rig_model());
     status_.mutable_apriltag_rig()->mutable_rig_model_resource()->CopyFrom(
-        resource_path.first);
+        WriteProtobufToJsonResource("apriltag_rig_model/initial", model_pb));
+
     send_status();
     LOG(INFO) << "Initial reprojection error ^^^^^^^";
 
     farm_ng::Solve(model);
-    model.ToMonocularApriltagRigModel(
-        status_.mutable_apriltag_rig()->mutable_rig_model());
-
-    resource_path =
-        GetUniqueResource("apriltag_rig_model/solved", "json", "text/json");
-    WriteProtobufToJsonFile(resource_path.second,
-                            status_.apriltag_rig().rig_model());
+    model.ToMonocularApriltagRigModel(&model_pb);
     status_.mutable_apriltag_rig()->mutable_rig_model_resource()->CopyFrom(
-        resource_path.first);
+        WriteProtobufToJsonResource("apriltag_rig_model/solved", model_pb));
+
     send_status();
   }
 

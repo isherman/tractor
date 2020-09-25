@@ -8,6 +8,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/signals2.hpp>
 
+#include <google/protobuf/util/json_util.h>
+
 #include "farm_ng_proto/tractor/v1/io.pb.h"
 #include "farm_ng_proto/tractor/v1/resource.pb.h"
 
@@ -50,11 +52,35 @@ void SetArchiveName(const std::string& name);
 boost::filesystem::path GetArchivePath();
 boost::filesystem::path GetArchiveRoot();
 
+template <typename ProtobufT>
+void WriteProtobufToJsonFile(const boost::filesystem::path& path,
+                             const ProtobufT& proto) {
+  google::protobuf::util::JsonPrintOptions print_options;
+  print_options.add_whitespace = true;
+  print_options.always_print_primitive_fields = true;
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(proto, &json_str, print_options);
+  std::ofstream outf(path.string());
+  outf << json_str;
+}
+
 // returns a resource that can be written to that will have a unique file
 // name, in the active logging directory.
 std::pair<farm_ng_proto::tractor::v1::Resource, boost::filesystem::path>
 GetUniqueResource(const std::string& prefix, const std::string& ext,
                   const std::string& mime_type);
+
+template <typename ProtobufT>
+farm_ng_proto::tractor::v1::Resource WriteProtobufToJsonResource(
+    const std::string& prefix, const ProtobufT& message) {
+  auto resource_path =
+      GetUniqueResource(prefix, "json",
+                        "application/json; type=type.googleapis.com/" +
+                            ProtobufT::descriptor()->full_name());
+
+  WriteProtobufToJsonFile(resource_path.second, message);
+  return resource_path.first;
+}
 
 google::protobuf::Timestamp MakeTimestampNow();
 
