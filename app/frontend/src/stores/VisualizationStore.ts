@@ -4,7 +4,10 @@ import {
   BusEventEmitter,
   BusEventEmitterHandle
 } from "../models/BusEventEmitter";
-import { ResourceArchive } from "../models/ResourceArchive";
+import {
+  HttpResourceArchive,
+  ResourceArchive
+} from "../models/ResourceArchive";
 import { StreamingBuffer } from "../models/StreamingBuffer";
 import { EventTypeId, eventTypeIds } from "../registry/events";
 import {
@@ -106,7 +109,9 @@ export class VisualizationStore {
   @observable buffer: Buffer = {};
   @observable bufferLogLoadProgress = 0;
   @observable bufferExpirationWindow = 1 * duration.minute;
-  @observable resourceArchive: ResourceArchive | null = null;
+  @observable resourceArchive: ResourceArchive = new HttpResourceArchive(
+    `http://${window.location.hostname}:8081/blobstore`
+  );
   @observable panels: { [k: string]: Panel } = {};
 
   private streamingBuffer: StreamingBuffer = new StreamingBuffer();

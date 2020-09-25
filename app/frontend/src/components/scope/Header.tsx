@@ -4,7 +4,7 @@ import { Button, Col, Container, Form } from "react-bootstrap";
 import { useObserver } from "mobx-react-lite";
 import RangeSlider from "react-bootstrap-range-slider";
 import { useStores } from "../../hooks/useStores";
-import { ResourceArchive } from "../../models/ResourceArchive";
+import { TarResourceArchive } from "../../models/ResourceArchive";
 import { StreamingBuffer } from "../../models/StreamingBuffer";
 import { formatValue } from "../../utils/formatValue";
 import { Icon } from "../Icon";
@@ -23,7 +23,7 @@ export const Header: React.FC = () => {
     const eventTarget = e.target;
     const file = eventTarget.files?.[0];
     if (file) {
-      const resourceArchive = new ResourceArchive(file);
+      const resourceArchive = new TarResourceArchive(file);
       const fileInfo = await resourceArchive.getFileInfo();
       const logFilePath = fileInfo.find((_) => _.endsWith(".log"));
       if (!logFilePath) {

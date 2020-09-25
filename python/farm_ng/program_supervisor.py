@@ -9,7 +9,7 @@ from farm_ng_proto.tractor.v1.program_supervisor_pb2 import (
     StopProgramRequest)
 from google.protobuf.text_format import MessageToString
 
-from farm_ng.ipc import EventBus, EventBusQueue, make_event
+from farm_ng.ipc import EventBus, EventBusQueue, get_message, make_event
 
 event_bus = EventBus('program_supervisor')
 
@@ -17,19 +17,6 @@ logger = logging.getLogger('program_supervisor')
 logger.setLevel(logging.INFO)
 
 farm_ng_root = os.environ['FARM_NG_ROOT']
-
-
-async def get_message(event_queue, name_pattern, message_type):
-    regex = re.compile(name_pattern)
-    message = message_type()
-    while True:
-        event = await event_queue.get()
-        if regex.match(event.name) is None:
-            continue
-        if event.data.Unpack(message):
-            print(MessageToString(message, as_one_line=True))
-            return message
-
 
 ProgramInfo = namedtuple("ProgramInfo", "path args name description")
 

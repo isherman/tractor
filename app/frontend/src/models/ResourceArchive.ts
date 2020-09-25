@@ -14,7 +14,24 @@ function mimeType(filename: string): string | undefined {
   return mimeTypes[extension(filename)];
 }
 
-export class ResourceArchive {
+export interface ResourceArchive {
+  getFileInfo(): Promise<string[]>;
+  getDataUrl(path: string): Promise<string>;
+}
+
+export class HttpResourceArchive {
+  constructor(private endpoint: string) {}
+
+  public async getFileInfo(): Promise<string[]> {
+    return [];
+  }
+
+  public async getDataUrl(path: string): Promise<string> {
+    return `${this.endpoint}/${path}`;
+  }
+}
+
+export class TarResourceArchive {
   tarReader: TarReader;
   constructor(file: File) {
     this.tarReader = new TarReader(file);
