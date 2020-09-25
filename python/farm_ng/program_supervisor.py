@@ -46,8 +46,7 @@ class ProgramSupervisor:
         self.child_process = None
 
     async def run(self):
-        with EventBusQueue(event_bus) as event_queue:
-            await asyncio.gather(self.send_status(), self.handle_start(event_queue), self.handle_stop(event_queue))
+        await asyncio.gather(self.send_status(), self.handle_start(), self.handle_stop())
 
     async def send_status(self):
         while not self.shutdown:
@@ -56,33 +55,35 @@ class ProgramSupervisor:
             event_bus.send(event)
             await asyncio.sleep(1)
 
-    async def handle_stop(self, event_queue):
-        while not self.shutdown:
-            stop_request: StopProgramRequest = await get_message(event_queue,
-                                                                 "program_supervisor/StopProgramRequest",
-                                                                 StopProgramRequest)
-            if self.status.WhichOneof("status") != "running":
-                logger.info(f"StopProgramRequest received while program status was {self.status.WhichOneof('status')}")
-                continue
+    async def handle_stop(self):
+        with EventBusQueue(event_bus) as event_queue:
+            while not self.shutdown:
+                stop_request: StopProgramRequest = await get_message(event_queue,
+                                                                     "program_supervisor/StopProgramRequest",
+                                                                     StopProgramRequest)
+                if self.status.WhichOneof("status") != "running":
+                    logger.info(f"StopProgramRequest received while program status was {self.status.WhichOneof('status')}")
+                    continue
 
-            if stop_request.id != self.status.running.program.id:
-                logger.info(f"StopProgramRequest received for program {stop_request.id} while program {self.status.running.program.id} was running")
-                continue
+                if stop_request.id != self.status.running.program.id:
+                    logger.info(f"StopProgramRequest received for program {stop_request.id} while program {self.status.running.program.id} was running")
+                    continue
 
-            self.child_process.terminate()
+                self.child_process.terminate()
 
-    async def handle_start(self, event_queue):
-        while not self.shutdown:
-            start_request: StartProgramRequest = await get_message(event_queue, "program_supervisor/StartProgramRequest", StartProgramRequest)
-            if self.status.WhichOneof("status") != "stopped":
-                logger.info(f"StartProgramRequest received while program status was {self.status.WhichOneof('status')}")
-                continue
-            program_info = library.get(start_request.id)
-            if not program_info:
-                logger.info(f"StartProgramRequest received for program {start_request.id} which does not exist.")
-                continue
-            self.status.running.program.id = start_request.id
-            asyncio.get_event_loop().create_task(self.launch_child_process(program_info))
+    async def handle_start(self):
+        with EventBusQueue(event_bus) as event_queue:
+            while not self.shutdown:
+                start_request: StartProgramRequest = await get_message(event_queue, "program_supervisor/StartProgramRequest", StartProgramRequest)
+                if self.status.WhichOneof("status") != "stopped":
+                    logger.info(f"StartProgramRequest received while program status was {self.status.WhichOneof('status')}")
+                    continue
+                program_info = library.get(start_request.id)
+                if not program_info:
+                    logger.info(f"StartProgramRequest received for program {start_request.id} which does not exist.")
+                    continue
+                self.status.running.program.id = start_request.id
+                asyncio.get_event_loop().create_task(self.launch_child_process(program_info))
 
     async def launch_child_process(self, program_info):
         self.child_process = await asyncio.create_subprocess_exec(program_info.path, *program_info.args)
