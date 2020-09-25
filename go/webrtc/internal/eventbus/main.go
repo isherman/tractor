@@ -133,13 +133,6 @@ func (bus *EventBus) Start() {
 
 // SendBytes sends a serialized event on the eventbus
 func (bus *EventBus) SendBytes(bytes []byte) {
-	event := &pb.Event{}
-	err := proto.Unmarshal(bytes, event)
-
-	if err != nil {
-		log.Fatalln("event parsing failed:", err, event, bytes)
-	}
-
 	bus.announcementsMutex.Lock()
 	for _, a := range bus.Announcements {
 		bus.sendConn.WriteToUDP(bytes, &net.UDPAddr{

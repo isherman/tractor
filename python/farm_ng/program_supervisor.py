@@ -30,7 +30,6 @@ async def get_message(event_queue, name_pattern, message_type):
 
 
 ProgramInfo = namedtuple("ProgramInfo", "path args name description")
-ActiveProgram = namedtuple("ActiveProgram", "child_process metadata")
 
 library = {
     1000: ProgramInfo(path="python", args=["-m", "farm_ng.calibrator_program"], name="Apriltag Rig Calibration", description="Lorem ipsum"),
