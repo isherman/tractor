@@ -23,7 +23,7 @@ class IpcLogger {
         std::bind(&IpcLogger::on_event, this, std::placeholders::_1));
     log_state(boost::system::error_code());
     log_announce(boost::system::error_code());
-    logging_status_.set_stopped(true);
+    logging_status_.mutable_stopped();
   }
 
   void on_command(const LoggingCommand& command) {
@@ -35,7 +35,8 @@ class IpcLogger {
         LOG(INFO) << "Starting log: " << log_resource_.ShortDebugString();
         log_writer_.reset(new EventLogWriter(resource_path.second));
         auto recording = logging_status_.mutable_recording();
-        recording->set_name(last_command_.record_start().name());
+        recording->set_archive_path(
+            last_command_.record_start().archive_path());
         recording->set_path(resource_path.second.string());
         recording->set_n_messages(0);
         recording->mutable_stamp_begin()->CopyFrom(MakeTimestampNow());
@@ -45,7 +46,7 @@ class IpcLogger {
         LOG(INFO) << "Stopping log: " << log_resource_.ShortDebugString() << " "
                   << logging_status_.ShortDebugString();
         log_writer_.reset();
-        logging_status_.set_stopped(true);
+        logging_status_.mutable_stopped();
         break;
 
       case LoggingCommand::COMMAND_NOT_SET:

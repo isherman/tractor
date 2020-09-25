@@ -6,7 +6,7 @@
 namespace farm_ng {
 class EventLogWriterImpl {
  public:
-  EventLogWriterImpl(boost::filesystem::path log_path)
+  EventLogWriterImpl(const boost::filesystem::path& log_path)
       : log_path_(log_path), out_(log_path_.string(), std::ofstream::binary) {}
   void Write(const farm_ng_proto::tractor::v1::Event& event) {
     std::string packet;

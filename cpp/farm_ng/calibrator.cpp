@@ -600,6 +600,7 @@ class Calibrator {
   }
 
   void Solve() {
+    status_.mutable_apriltag_rig()->set_finished(false);
     LOG(INFO) << "Initial reprojection error vvvvvvvv";
     ApriltagRigModel model = apriltag_rig_calibrator_.PoseInitialization();
     MonocularApriltagRigModel model_pb;
@@ -616,6 +617,7 @@ class Calibrator {
     status_.mutable_apriltag_rig()->mutable_rig_model_resource()->CopyFrom(
         WriteProtobufToJsonResource("apriltag_rig_model/solved", model_pb));
 
+    status_.mutable_apriltag_rig()->set_finished(true);
     send_status();
   }
 
@@ -629,7 +631,7 @@ class Calibrator {
       status_.mutable_apriltag_rig()->Clear();
       send_status();
     }
-    if (command_.has_stop()) {
+    if (command_.has_solve()) {
       Solve();
     }
     return true;
@@ -713,10 +715,10 @@ LoggingStatus WaitForLoggerStatus(
 }
 
 LoggingStatus WaitForLoggerStart(EventBus& bus,
-                                 const std::string& archive_name) {
-  return WaitForLoggerStatus(bus, [archive_name](const LoggingStatus& status) {
+                                 const std::string& archive_path) {
+  return WaitForLoggerStatus(bus, [archive_path](const LoggingStatus& status) {
     return (status.has_recording() &&
-            status.recording().name() == archive_name);
+            status.recording().archive_path() == archive_path);
   });
 }
 
@@ -726,17 +728,17 @@ LoggingStatus WaitForLoggerStop(EventBus& bus) {
   });
 }
 
-LoggingStatus StartLogging(EventBus& bus, const std::string& archive_name) {
+LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path) {
   WaitForLoggerStop(bus);
   LoggingCommand command;
-  command.mutable_record_start()->set_name(archive_name);
+  command.mutable_record_start()->set_archive_path(archive_path);
   bus.Send(farm_ng::MakeEvent("logger/command", command));
-  return WaitForLoggerStart(bus, archive_name);
+  return WaitForLoggerStart(bus, archive_path);
 }
 
 LoggingStatus StopLogging(EventBus& bus) {
   LoggingCommand command;
-  command.set_record_stop(true);
+  command.mutable_record_stop();
   bus.Send(farm_ng::MakeEvent("logger/command", command));
   return WaitForLoggerStop(bus);
 }

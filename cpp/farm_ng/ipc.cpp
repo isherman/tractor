@@ -30,7 +30,7 @@ class ArchiveManager {
     return path_;
   }
 
-  void set_name(const std::string& name) {
+  void SetPath(const std::string& name) {
     std::lock_guard<std::mutex> lock(path_mtx_);
     path_ = name;
   }
@@ -225,9 +225,9 @@ class EventBusImpl {
         LoggingCommand command;
         CHECK(event.data().UnpackTo(&command));
         if (command.has_record_start()) {
-          SetArchiveName(command.record_start().name());
+          SetArchivePath(command.record_start().archive_path());
         } else {
-          SetArchiveName("default");
+          SetArchivePath("default");
         }
       }
 
@@ -303,7 +303,7 @@ void EventBus::Send(const farm_ng_proto::tractor::v1::Event& event) {
 }
 void EventBus::SetName(const std::string& name) { impl_->set_name(name); }
 
-void SetArchiveName(const std::string& name) { get_archive().set_name(name); }
+void SetArchivePath(const std::string& name) { get_archive().SetPath(name); }
 
 boost::filesystem::path GetArchivePath() { return get_archive().path(); }
 boost::filesystem::path GetArchiveRoot() { return get_archive().root(); }

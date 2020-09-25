@@ -12,7 +12,7 @@ option go_package = "github.com/farm_ng/genproto";
 message CalibratorCommand {
   // This finishes (runs the solver) calibration if it is currently running and
   // puts the process into a more or less idle state.
-  message Stop {
+  message Solve {
   }
 
   // TODO Solve command for incremental solutions while capturing.
@@ -28,7 +28,7 @@ message CalibratorCommand {
   // This oneof is parsed via switch statement inside the calibration process to
   // determine what action to take.
   oneof command {
-    Stop stop = 3;
+    Solve solve = 3;
     ApriltagRigStart apriltag_rig_start = 2;
   }
 }
@@ -109,6 +109,7 @@ message CalibratorStatus {
     // The rig model saved to disk.
     // Will be a json encoded protobuf with type MonocularApriltagRigModel.
     Resource rig_model_resource = 3;
+    bool finished = 4;
   }
 
   oneof status {

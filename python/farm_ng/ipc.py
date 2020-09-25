@@ -55,7 +55,7 @@ class EventBusQueue:
         self._event_bus._remove_queue(self._queue)
 
 
-class AnnouceQueue:
+class AnnounceQueue:
     def __init__(self, event_bus):
         self._event_bus = event_bus
 

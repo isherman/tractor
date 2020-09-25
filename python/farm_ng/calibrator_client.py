@@ -3,12 +3,13 @@ import asyncio
 import logging
 import sys
 
-from farm_ng.ipc import AnnouceQueue
+from farm_ng.ipc import AnnounceQueue
 from farm_ng.ipc import EventBus
 from farm_ng.ipc import EventBusQueue
 from farm_ng.ipc import get_message
 from farm_ng.ipc import make_event
 from farm_ng_proto.tractor.v1.calibrator_pb2 import CalibratorCommand
+from farm_ng_proto.tractor.v1.calibrator_pb2 import CalibratorStatus
 from farm_ng_proto.tractor.v1.io_pb2 import LoggingCommand
 from farm_ng_proto.tractor.v1.io_pb2 import LoggingStatus
 from farm_ng_proto.tractor.v1.tracking_camera_pb2 import TrackingCameraCommand
@@ -17,57 +18,121 @@ from google.protobuf.text_format import MessageToString
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('command', choices=('start', 'stop', 'status'))
 parser.add_argument('name')
-
+parser.add_argument('--tag_ids', nargs='+', default=[221, 226, 225, 218, 222])
+parser.add_argument('--num_frames', type=int, default=2)
 args = parser.parse_args()
 
 event_bus = EventBus('logging_client')
 
-command = LoggingCommand()
-camera_command = TrackingCameraCommand()
-calibrator_command = CalibratorCommand()
 
-if args.command == 'start':
-    command.record_start.CopyFrom(LoggingCommand.RecordStart())
-    command.record_start.name = args.name
-    camera_command.record_start.mode = TrackingCameraCommand.RecordStart.MODE_APRILTAG_STABLE
-    calibrator_command.apriltag_rig_start.tag_ids[:] = [221, 226, 225, 218, 222]
-elif args.command == 'stop':
-    command.record_stop = True
-    camera_command.record_stop = True
-    calibrator_command.stop = True
+async def wait_for_services(event_bus, desired_services: set):
+    logging.info('Waiting for services: %s', desired_services)
+    services = set()
+    with AnnounceQueue(event_bus) as announce_queue:
 
-
-async def send_logging_command():
-    has_logger = False
-    has_tracking_camera = False
-    has_calibrator = False
-    with AnnouceQueue(event_bus) as announce_queue:
         while True:
             announce = await announce_queue.get()
-            print(MessageToString(announce, as_one_line=True))
-            if announce.service == 'ipc-logger':
-                has_logger = True
-            if announce.service == 'tracking-camera':
-                has_tracking_camera = True
-            if announce.service == 'calibrator':
-                has_calibrator = True
-            if has_logger and has_tracking_camera and has_calibrator:
+            services.add(announce.service)
+            if services.issuperset(desired_services):
                 break
-
-    with EventBusQueue(event_bus) as event_queue:
-        if args.command == 'start':
-            event_bus.send(make_event('logger/command', command))
-            event_bus.send(make_event('tracking_camera/command', camera_command))
-            event_bus.send(make_event('calibrator/command', calibrator_command))
-        if args.command == 'stop':
-            event_bus.send(make_event('calibrator/command', calibrator_command))
-            event_bus.send(make_event('tracking_camera/command', camera_command))
-            event_bus.send(make_event('logger/command', command))
-
-        status = await get_message(event_queue, 'logger/status', LoggingStatus)
-        print(MessageToString(status, as_one_line=True))
+    logging.info('Have services: %s', services)
 
 
-asyncio.get_event_loop().run_until_complete(send_logging_command())
+async def wait_for_predicate(event_queue, name, message_type, predicate):
+    while True:
+        message = await get_message(event_queue, name, message_type)
+        logging.info('message: %s', MessageToString(message, as_one_line=True))
+        if predicate(message):
+            return message
+
+
+async def start_recording(event_queue):
+    await wait_for_services(event_bus, ['ipc-logger', 'tracking-camera', 'calibrator'])
+    event_bus.send(
+        make_event(
+            'logger/command',
+            LoggingCommand(
+                record_start=dict(
+                    archive_path=args.name,
+                    mode=LoggingCommand.RecordStart.MODE_ALL_MESSAGES,
+                ),
+            ),
+        ),
+    )
+
+    await wait_for_predicate(
+        event_queue, 'logger/status', LoggingStatus,
+        lambda status: status.HasField('recording'),
+    )
+
+    event_bus.send(
+        make_event(
+            'tracking_camera/command',
+            TrackingCameraCommand(record_start=dict(mode=TrackingCameraCommand.RecordStart.MODE_APRILTAG_STABLE)),
+        ),
+    )
+
+
+async def stop_recording(event_queue):
+    event_bus.send(
+        make_event(
+            'tracking_camera/command',
+            TrackingCameraCommand(record_stop={}),
+        ),
+    )
+
+    event_bus.send(
+        make_event(
+            'logger/command',
+            LoggingCommand(record_stop={}),
+        ),
+    )
+
+    await wait_for_predicate(
+        event_queue, 'logger/status', LoggingStatus,
+        lambda status: status.HasField('stopped'),
+    )
+
+
+async def calibrate(event_queue):
+
+    event_bus.send(
+        make_event(
+            'calibrator/command',
+            CalibratorCommand(apriltag_rig_start=dict(tag_ids=args.tag_ids)),
+        ),
+    )
+
+    await wait_for_predicate(
+        event_queue, 'calibrator/status', CalibratorStatus,
+        lambda status: (
+            status.HasField('apriltag_rig') and
+            status.apriltag_rig.num_frames >= args.num_frames
+        ),
+    )
+
+    event_bus.send(
+        make_event(
+            'calibrator/command',
+            CalibratorCommand(solve={}),
+        ),
+    )
+
+    return await wait_for_predicate(
+        event_queue, 'calibrator/status', CalibratorStatus,
+        lambda status: (
+            status.HasField('apriltag_rig') and
+            status.apriltag_rig.HasField('rig_model_resource') and
+            status.apriltag_rig.finished
+        ),
+    )
+
+
+with EventBusQueue(event_bus) as event_queue:
+    try:
+        event_loop = asyncio.get_event_loop()
+        event_loop.run_until_complete(start_recording(event_queue))
+        event_loop.run_until_complete(calibrate(event_queue))
+    finally:
+        event_loop.run_until_complete(stop_recording(event_queue))

@@ -48,7 +48,7 @@ class EventBus : public boost::asio::io_service::service {
   std::unique_ptr<EventBusImpl> impl_;
 };
 
-void SetArchiveName(const std::string& name);
+void SetArchivePath(const std::string& name);
 boost::filesystem::path GetArchivePath();
 boost::filesystem::path GetArchiveRoot();
 
