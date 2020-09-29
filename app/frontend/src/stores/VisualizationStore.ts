@@ -1,5 +1,4 @@
 import { observable, computed, transaction } from "mobx";
-import { CalibratorStatus } from "../../genproto/farm_ng_proto/tractor/v1/calibrator";
 import {
   BusEventEmitter,
   BusEventEmitterHandle
