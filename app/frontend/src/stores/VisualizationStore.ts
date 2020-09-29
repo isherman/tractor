@@ -1,5 +1,5 @@
 import { observable, computed, transaction } from "mobx";
-import { TimeSkewVisualizer } from "../components/scope/visualizers/TimeSkewVisualizer";
+import { CalibratorStatus } from "../../genproto/farm_ng_proto/tractor/v1/calibrator";
 import {
   BusEventEmitter,
   BusEventEmitterHandle
@@ -9,13 +9,13 @@ import {
   ResourceArchive
 } from "../models/ResourceArchive";
 import { StreamingBuffer } from "../models/StreamingBuffer";
-import { EventTypeId, eventTypeIds } from "../registry/events";
+import { EventTypeId } from "../registry/events";
 import {
   Visualizer,
   VisualizerId,
   VisualizerOption,
   VisualizerOptionConfig,
-  visualizerRegistry
+  visualizersForEventType
 } from "../registry/visualization";
 import { Buffer, TimestampedEvent } from "../types/common";
 import { duration } from "../utils/duration";
@@ -46,28 +46,7 @@ export class Panel {
   @observable selectedOptions = this.optionConfigs.map((_) => 0);
 
   @computed get visualizers(): Visualizer[] {
-    const result = Object.entries(visualizerRegistry)
-      .filter(([k, v]) => {
-        // This visualizer explicitly supports this event type
-        if (this.eventType && v.types.includes(this.eventType)) {
-          return true;
-        }
-        // This visualizer supports all known event types
-        if (
-          this.eventType &&
-          v.types === "*" &&
-          eventTypeIds.includes(this.eventType)
-        ) {
-          return true;
-        }
-        // This is an unknown event type, but at least we can visualize its timestamp
-        if (k === TimeSkewVisualizer.id) {
-          return true;
-        }
-        return false;
-      })
-      .map(([_, v]) => v);
-    return result;
+    return visualizersForEventType(this.eventType);
   }
 
   @computed get visualizer(): Visualizer {
@@ -100,13 +79,34 @@ export class Panel {
   }
 }
 
+const testBuffer: Buffer = {
+  "type.googleapis.com/farm_ng_proto.tractor.v1.CalibratorStatus": {
+    test: [
+      [
+        0,
+        CalibratorStatus.fromJSON({
+          apriltagRig: {
+            numFrames: 10,
+            rigModelResource: {
+              path: "cal01/apriltag_rig_model/solved-02807-00021.json",
+              archivePath: "",
+              contentType:
+                "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.MonocularApriltagRigModel"
+            }
+          }
+        })
+      ]
+    ]
+  }
+};
+
 export class VisualizationStore {
   @observable bufferStart: Date | null = null;
   @observable bufferEnd: Date | null = null;
   @observable bufferRangeStart = 0;
   @observable bufferRangeEnd = 1;
   @observable bufferThrottle = 0;
-  @observable buffer: Buffer = {};
+  @observable buffer: Buffer = testBuffer;
   @observable bufferLogLoadProgress = 0;
   @observable bufferExpirationWindow = 1 * duration.minute;
   @observable resourceArchive: ResourceArchive = new HttpResourceArchive(

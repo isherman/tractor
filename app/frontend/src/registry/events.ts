@@ -1,4 +1,7 @@
-import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
+import {
+  ApriltagDetections,
+  ApriltagRig
+} from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
 import {
   NamedSE3Pose,
   Vec2
@@ -46,6 +49,7 @@ export type EventType =
   | LoggingStatus
   | ProgramSupervisorStatus
   | StartProgramRequest
+  | ApriltagRig
   | StopProgramRequest;
 
 // Infer the keys, but restrict values to Message<EventType>
@@ -61,6 +65,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose": NamedSE3Pose,
   "type.googleapis.com/farm_ng_proto.tractor.v1.MotorControllerState": MotorControllerState,
   "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections": ApriltagDetections,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagRig": ApriltagRig,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TractorState": TractorState,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Announce": Announce,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": Vec2,

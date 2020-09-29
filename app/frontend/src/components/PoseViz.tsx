@@ -47,7 +47,7 @@ export const ReferenceFrameViz: React.FC<ReferenceFrameNode> = (state) => {
       </line>
       <group position={position} quaternion={rotation}>
         <axesHelper>
-          <Html scaleFactor={10}>
+          <Html scaleFactor={1}>
             <div>{state.pose.frameB}</div>
           </Html>
         </axesHelper>

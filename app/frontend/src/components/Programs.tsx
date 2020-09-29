@@ -8,6 +8,8 @@ import {
 import { useObserver } from "mobx-react-lite";
 import { useEffect } from "react";
 import { formatValue } from "../utils/formatValue";
+import { RigCalibration } from "./RigCalibration";
+import styles from "./Programs.module.scss";
 
 export const Programs: React.FC = () => {
   const { programsStore: store } = useStores();
@@ -88,7 +90,7 @@ export const Programs: React.FC = () => {
       )
     );
     return (
-      <div>
+      <div className={styles.programList}>
         <Table striped bordered size="sm" responsive="md">
           <thead>
             <tr>
@@ -105,6 +107,8 @@ export const Programs: React.FC = () => {
           </thead>
           <tbody>{rows}</tbody>
         </Table>
+        {(store.runningProgram?.id === 1000 ||
+          store.lastProgram?.id === 1000) && <RigCalibration />}
       </div>
     );
   });
