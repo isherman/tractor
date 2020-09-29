@@ -105,15 +105,12 @@ const CalibratorStatusElement: React.FC<SingleElementVisualizerProps<
     nodePoses.push(cameraPoseRig);
   }
 
-  // console.log({ nodePoses });
-
   // 3D markers for each rig node
   const markers = rig?.nodes.map((entry) => {
     if (!nodes) {
       return undefined;
     }
     const aPoseB = getDagTransform(nodePoses, entry.frameName);
-    console.log(JSON.stringify({ aPoseB }));
     if (!rigRootName || !aPoseB) {
       return undefined;
     }
@@ -147,6 +144,24 @@ const CalibratorStatusElement: React.FC<SingleElementVisualizerProps<
         // eslint-disable-next-line react/no-children-prop
         children={[]}
       />
+    );
+  }
+
+  if (value.apriltagRig?.numFrames && !value.apriltagRig?.finished) {
+    return (
+      <Card>
+        <Card.Header>Summary</Card.Header>
+        <Card.Body>
+          <Table bordered size="sm" responsive="md">
+            <tbody>
+              <tr>
+                <td> Frames captured </td>
+                <td>{value.apriltagRig?.numFrames}</td>
+              </tr>
+            </tbody>
+          </Table>
+        </Card.Body>
+      </Card>
     );
   }
 
@@ -214,53 +229,58 @@ const CalibratorStatusElement: React.FC<SingleElementVisualizerProps<
           </Card>
         )}
 
-        <Card>
-          <Card.Header>Details</Card.Header>
-          <Card.Body>
-            <RangeSlider
-              value={index}
-              onChange={(_, v) => setIndex(v)}
-              min={0}
-              max={
-                rigModel?.detections.length
-                  ? rigModel?.detections.length - 1
-                  : 0
-              }
-              step={1}
-            />
-            <div className={styles.detailRow}>
-              {detection && (
-                // Unfortunately we don't have the timestamp for these detections
-                <ApriltagDetectionsElement {...props} value={[0, detection]} />
-              )}
-              {reprojectionImage && (
-                <ImageElement {...props} value={[0, reprojectionImage]} />
-              )}
-            </div>
-            <Card className={styles.card}>
-              <Card.Body>
-                {Object.keys(tagRmses).length > 0 && (
-                  <Table striped bordered size="sm" responsive="md">
-                    <thead>
-                      <tr>
-                        <th>Tag Id</th>
-                        <th>RMSE</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(tagRmses).map(([tagId, rmse]) => (
-                        <tr key={tagId}>
-                          <td>{tagId}</td>
-                          <td>{formatValue(rmse)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
+        {(detection || reprojectionImage || tagRmses) && (
+          <Card>
+            <Card.Header>Details</Card.Header>
+            <Card.Body>
+              <RangeSlider
+                value={index}
+                onChange={(_, v) => setIndex(v)}
+                min={0}
+                max={
+                  rigModel?.detections.length
+                    ? rigModel?.detections.length - 1
+                    : 0
+                }
+                step={1}
+              />
+              <div className={styles.detailRow}>
+                {detection && (
+                  // Unfortunately we don't have the timestamp for these detections
+                  <ApriltagDetectionsElement
+                    {...props}
+                    value={[0, detection]}
+                  />
                 )}
-              </Card.Body>
-            </Card>
-          </Card.Body>
-        </Card>
+                {reprojectionImage && (
+                  <ImageElement {...props} value={[0, reprojectionImage]} />
+                )}
+              </div>
+              <Card className={styles.card}>
+                <Card.Body>
+                  {Object.keys(tagRmses).length > 0 && (
+                    <Table striped bordered size="sm" responsive="md">
+                      <thead>
+                        <tr>
+                          <th>Tag Id</th>
+                          <th>RMSE</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(tagRmses).map(([tagId, rmse]) => (
+                          <tr key={tagId}>
+                            <td>{tagId}</td>
+                            <td>{formatValue(rmse)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  )}
+                </Card.Body>
+              </Card>
+            </Card.Body>
+          </Card>
+        )}
       </Card.Body>
       <Card.Footer className={styles.footer}>
         <span className="text-muted">{formatValue(new Date(timestamp))}</span>

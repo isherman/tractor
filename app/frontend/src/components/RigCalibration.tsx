@@ -35,7 +35,7 @@ const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
   });
 };
 export const RigCalibration: React.FC = () => {
-  const { rigCalibrationStore: store } = useStores();
+  const { rigCalibrationStore: store, visualizationStore } = useStores();
 
   useEffect(() => {
     store.startStreaming();
@@ -63,8 +63,10 @@ export const RigCalibration: React.FC = () => {
           selectedEvent.stamp &&
           React.createElement(component, {
             values: [[selectedEvent.stamp.getTime(), selectedEvent.event]],
-            options: [],
-            resources: null
+            options: [
+              { label: "view", options: ["overlay", "grid"], value: "overlay" }
+            ],
+            resources: visualizationStore.resourceArchive
           })}
       </div>
     );

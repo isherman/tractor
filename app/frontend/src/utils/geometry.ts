@@ -66,7 +66,6 @@ export function getDagTransform(
     }))
   ];
   const path = getDagPath(nodes, target);
-  // console.log({ nodes, target, path });
   if (!path) {
     return null;
   }
@@ -80,19 +79,7 @@ export function getDagTransform(
     if (!parent?.aPoseB) {
       return null;
     }
-    // console.log(
-    //   "Accumulating before: ",
-    //   parentIndex,
-    //   JSON.stringify(matrix4ToSE3Pose(transform)),
-    //   JSON.stringify(parent.aPoseB)
-    // );
     transform.multiply(se3PoseToMatrix4(parent.aPoseB));
-    // console.log(
-    //   "Accumulating after: ",
-    //   parentIndex,
-    //   JSON.stringify(matrix4ToSE3Pose(transform)),
-    //   JSON.stringify(parent.aPoseB)
-    // );
   }
   return matrix4ToSE3Pose(transform);
 }
