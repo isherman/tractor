@@ -115,7 +115,6 @@ export class TarReader {
     const { buffer, fileInfo } = await this.data;
     const info = fileInfo.find((_) => fileName === normalizeTarPath(_.name));
     if (!info) {
-      console.log(fileName, fileInfo);
       return Promise.reject(`${fileName} not found in tar directory`);
     }
     return readFileBlob(

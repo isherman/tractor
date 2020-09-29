@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-import re
 from collections import namedtuple
 
 from farm_ng.ipc import EventBus
@@ -9,7 +8,6 @@ from farm_ng.ipc import EventBusQueue
 from farm_ng.ipc import get_message
 from farm_ng.ipc import make_event
 from farm_ng_proto.tractor.v1.program_supervisor_pb2 import Program
-from farm_ng_proto.tractor.v1.program_supervisor_pb2 import ProgramExecution
 from farm_ng_proto.tractor.v1.program_supervisor_pb2 import ProgramSupervisorStatus
 from farm_ng_proto.tractor.v1.program_supervisor_pb2 import StartProgramRequest
 from farm_ng_proto.tractor.v1.program_supervisor_pb2 import StopProgramRequest
