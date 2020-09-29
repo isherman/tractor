@@ -79,26 +79,26 @@ export class Panel {
   }
 }
 
-const testBuffer: Buffer = {
-  "type.googleapis.com/farm_ng_proto.tractor.v1.CalibratorStatus": {
-    test: [
-      [
-        0,
-        CalibratorStatus.fromJSON({
-          apriltagRig: {
-            numFrames: 10,
-            rigModelResource: {
-              path: "cal01/apriltag_rig_model/solved-02807-00021.json",
-              archivePath: "",
-              contentType:
-                "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.MonocularApriltagRigModel"
-            }
-          }
-        })
-      ]
-    ]
-  }
-};
+// const testBuffer: Buffer = {
+//   "type.googleapis.com/farm_ng_proto.tractor.v1.CalibratorStatus": {
+//     test: [
+//       [
+//         0,
+//         CalibratorStatus.fromJSON({
+//           apriltagRig: {
+//             numFrames: 10,
+//             rigModelResource: {
+//               path: "cal01/apriltag_rig_model/solved-02807-00021.json",
+//               archivePath: "",
+//               contentType:
+//                 "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.MonocularApriltagRigModel"
+//             }
+//           }
+//         })
+//       ]
+//     ]
+//   }
+// };
 
 export class VisualizationStore {
   @observable bufferStart: Date | null = null;
@@ -106,7 +106,7 @@ export class VisualizationStore {
   @observable bufferRangeStart = 0;
   @observable bufferRangeEnd = 1;
   @observable bufferThrottle = 0;
-  @observable buffer: Buffer = testBuffer;
+  @observable buffer: Buffer = {};
   @observable bufferLogLoadProgress = 0;
   @observable bufferExpirationWindow = 1 * duration.minute;
   @observable resourceArchive: ResourceArchive = new HttpResourceArchive(
