@@ -13,9 +13,10 @@
 #include "farm_ng_proto/tractor/v1/tracking_camera.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
-DEFINE_uint32(num_frames, 16, "number of frames to capture");
 DEFINE_string(tag_ids, "221, 226, 225, 218, 222",
               "comma-separated list of tag ids to capture detections of");
+DEFINE_uint32(num_frames, 16, "number of frames to capture");
+DEFINE_double(apriltag_size, 0.16, "apriltag width/height (in m)");
 DEFINE_string(log, "", "log file to use as input (not supported in interactive mode)");
 DEFINE_string(out_archive, "default", "archive name to write to (not supported in interactive mode)");
 
@@ -29,13 +30,14 @@ using farm_ng_proto::tractor::v1::TrackingCameraCommand;
 namespace farm_ng {
 class CaptureCalibrationDatasetProgram {
  public:
-  CaptureCalibrationDatasetProgram(EventBus& bus, const std::unordered_set<int> tag_ids, int num_frames)
+  CaptureCalibrationDatasetProgram(EventBus& bus, const std::unordered_set<int> tag_ids, size_t num_frames, double apriltag_size)
       : bus_(bus),
         bus_connection_(bus_.GetEventSignal()->connect(
             std::bind(&CaptureCalibrationDatasetProgram::on_event, this, std::placeholders::_1))),
         timer_(bus_.get_io_service()),
         tag_ids_(tag_ids),
-        num_frames_(num_frames) {
+        num_frames_(num_frames),
+        apriltag_size_(apriltag_size) {
     on_timer(boost::system::error_code());
   }
 
@@ -68,7 +70,7 @@ class CaptureCalibrationDatasetProgram {
     for (auto it = detections.mutable_detections()->begin();
          it != detections.mutable_detections()->end();) {
       if (it->tag_size() == 0.0) {
-        it->set_tag_size(0.16);
+        it->set_tag_size(apriltag_size_);
       }
       // Skip any detections of tag ids we don't care about
       if (tag_ids_.count(it->id()) == 0) {
@@ -108,6 +110,9 @@ class CaptureCalibrationDatasetProgram {
 
   // Number of frames to capture
   size_t num_frames_;
+
+  // Width/height of apriltags
+  double apriltag_size_;
 
   // Captured frames
   std::vector<ApriltagDetections> all_detections_;
@@ -212,19 +217,22 @@ int main(int argc, char* argv[]) {
   farm_ng::EventBus& bus =
       farm_ng::GetEventBus(io_service, "capture_calibration_dataset");
 
-  int num_frames;
   std::unordered_set<int> tag_ids;
+  int num_frames;
+  double apriltag_size;
   if (FLAGS_interactive) {
     // TODO: Get initialization event on eventbus
-    // num_frames =
     // tag_ids =
+    // num_frames =
+    // apriltag_size =
   } else {
     num_frames = FLAGS_num_frames;
     // TODO: Parse FLAGS_tag_ids
     tag_ids = {221, 226, 225, 218, 222};
+    apriltag_size = FLAGS_apriltag_size;
   }
 
-  farm_ng::CaptureCalibrationDatasetProgram program(bus, tag_ids, num_frames);
+  farm_ng::CaptureCalibrationDatasetProgram program(bus, tag_ids, num_frames, apriltag_size);
 
   // We're reading from a log, so block eventbus events
   if (!FLAGS_log.empty()) {
