@@ -112,6 +112,19 @@ void WaitForServices(EventBus& bus,
   }
 }
 
+CaptureCalibrationDatasetConfiguration WaitForConfiguration(EventBus& bus) {
+  CaptureCalibrationDatasetConfiguration configuration;
+  std::string event_name = bus.GetName() + "/configure";
+  while (true) {
+    bus.get_io_service().run_one();
+    if (bus.GetState().count(event_name) &&
+        bus.GetState().at(event_name).data().UnpackTo(&configuration)) {
+          LOG(INFO) << "Configuration received: " << configuration.ShortDebugString();
+          return configuration;
+    }
+  }
+}
+
 // TODO: Move somewhere re-usable
 LoggingStatus WaitForLoggerStatus(
     EventBus& bus, std::function<bool(const LoggingStatus&)> predicate) {
@@ -182,13 +195,11 @@ int main(int argc, char* argv[]) {
   google::InstallFailureSignalHandler();
 
   boost::asio::io_service io_service;
-  farm_ng::EventBus& bus =
-      farm_ng::GetEventBus(io_service, "capture_calibration_dataset");
+  auto& bus = farm_ng::GetEventBus(io_service, "capture_calibration_dataset");
 
   CaptureCalibrationDatasetConfiguration configuration;
   if (FLAGS_interactive) {
-    // TODO: Get configuration on eventbus
-    // configuration=
+    configuration = WaitForConfiguration(bus);
   } else {
     configuration.set_num_frames(FLAGS_num_frames);
     configuration.set_name(FLAGS_name);
