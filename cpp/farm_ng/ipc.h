@@ -4,11 +4,11 @@
 #include <map>
 #include <memory>
 
+#include <glog/logging.h>
+#include <google/protobuf/util/json_util.h>
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/signals2.hpp>
-
-#include <google/protobuf/util/json_util.h>
 
 #include "farm_ng_proto/tractor/v1/io.pb.h"
 #include "farm_ng_proto/tractor/v1/resource.pb.h"
@@ -135,6 +135,7 @@ template <typename Configuration>
 Configuration WaitForConfiguration(EventBus& bus) {
   Configuration configuration;
   std::string event_name = bus.GetName() + "/configure";
+  LOG(INFO) << "Waiting for configuration at " << event_name;
   while (true) {
     bus.get_io_service().run_one();
     if (bus.GetState().count(event_name) &&

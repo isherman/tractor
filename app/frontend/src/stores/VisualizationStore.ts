@@ -109,7 +109,7 @@ export class VisualizationStore {
   @observable bufferLogLoadProgress = 0;
   @observable bufferExpirationWindow = 1 * duration.minute;
   @observable resourceArchive: ResourceArchive = new HttpResourceArchive(
-    `http://${window.location.host}/resources`
+    `http://${window.location.hostname}:8081/resources`
   );
   @observable panels: { [k: string]: Panel } = {};
 

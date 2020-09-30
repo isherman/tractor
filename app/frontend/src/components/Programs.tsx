@@ -8,18 +8,18 @@ import {
 import { useObserver } from "mobx-react-lite";
 import { useEffect } from "react";
 import { formatValue } from "../utils/formatValue";
-import { RigCalibration } from "./RigCalibration";
+import { ProgramDetail } from "./ProgramDetail";
 import styles from "./Programs.module.scss";
 
 export const Programs: React.FC = () => {
   const { programsStore: store } = useStores();
 
   useEffect(() => {
-    store.startStreaming();
-    return () => store.stopStreaming();
+    store.startSupervisor();
+    return () => store.stopSupervisor();
   }, []);
 
-  const handleStart = (id: number): void => {
+  const handleStart = (id: string): void => {
     store.busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.StartProgramRequest",
       "program_supervisor/request",
@@ -27,7 +27,7 @@ export const Programs: React.FC = () => {
     );
   };
 
-  const handleStop = (id: number): void => {
+  const handleStop = (id: string): void => {
     store.busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.StopProgramRequest",
       "program_supervisor/request",
@@ -36,7 +36,7 @@ export const Programs: React.FC = () => {
   };
 
   return useObserver(() => {
-    const rows = store.programSupervisorStatus?.library.map(
+    const rows = store.supervisorStatus?.library.map(
       ({ id, name, description }) => (
         <tr key={id}>
           <td>{name}</td>
@@ -107,8 +107,7 @@ export const Programs: React.FC = () => {
           </thead>
           <tbody>{rows}</tbody>
         </Table>
-        {(store.runningProgram?.id === 1000 ||
-          store.lastProgram?.id === 1000) && <RigCalibration />}
+        <ProgramDetail />
       </div>
     );
   });

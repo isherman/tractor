@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { computed, observable } from "mobx";
 import { decodeAnyEvent } from "../models/decodeAnyEvent";
 import { Event as BusAnyEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
@@ -5,16 +6,27 @@ import {
   BusEventEmitter,
   BusEventEmitterHandle
 } from "../models/BusEventEmitter";
-import { EventTypeId } from "../registry/events";
+import { EventType, EventTypeId } from "../registry/events";
 import {
   ProgramExecution,
   ProgramSupervisorStatus
 } from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
 import { BusClient } from "../models/BusClient";
+import { Visualizer, visualizersForEventType } from "../registry/visualization";
+
+interface EventLogEntry {
+  stamp: Date | undefined;
+  name: string;
+  typeUrl: EventTypeId;
+  event: EventType;
+}
 
 export class ProgramsStore {
-  private busEventEmitterHandle: BusEventEmitterHandle | null = null;
-  @observable programSupervisorStatus: ProgramSupervisorStatus | null = null;
+  private supervisorBusHandle: BusEventEmitterHandle | null = null;
+  @observable supervisorStatus: ProgramSupervisorStatus | null = null;
+  private programBusHandle: BusEventEmitterHandle | null = null;
+  @observable eventLog: EventLogEntry[] = [];
+  @observable selectedEntry: number | null = null;
 
   constructor(
     public busClient: BusClient,
@@ -22,17 +34,28 @@ export class ProgramsStore {
   ) {}
 
   @computed get runningProgram(): ProgramExecution | null {
-    return this.programSupervisorStatus?.running?.program || null;
+    return this.supervisorStatus?.running?.program || null;
   }
 
   @computed get lastProgram(): ProgramExecution | null {
-    return this.programSupervisorStatus?.stopped?.lastProgram || null;
+    return this.supervisorStatus?.stopped?.lastProgram || null;
   }
 
-  public startStreaming(): void {
+  @computed get selectedEvent(): EventLogEntry | null {
+    return this.selectedEntry ? this.eventLog[this.selectedEntry] : null;
+  }
+
+  @computed get visualizer(): Visualizer | null {
+    if (!this.selectedEvent) {
+      return null;
+    }
+    return visualizersForEventType(this.selectedEvent.typeUrl)[0];
+  }
+
+  public startSupervisor(): void {
     const statusTypeId =
       "type.googleapis.com/farm_ng_proto.tractor.v1.ProgramSupervisorStatus";
-    this.busEventEmitterHandle = this.busEventEmitter.on(
+    this.supervisorBusHandle = this.busEventEmitter.on(
       statusTypeId,
       (event: BusAnyEvent) => {
         if (!event || !event.data) {
@@ -50,15 +73,48 @@ export class ProgramsStore {
           );
           return;
         }
-        this.programSupervisorStatus = decodeAnyEvent(event);
+        this.supervisorStatus = decodeAnyEvent(event);
       }
     );
   }
 
-  public stopStreaming(): void {
-    if (this.busEventEmitterHandle) {
-      this.busEventEmitterHandle.unsubscribe();
-      this.busEventEmitterHandle = null;
+  public stopSupervisor(): void {
+    if (this.supervisorBusHandle) {
+      this.supervisorBusHandle.unsubscribe();
+      this.supervisorBusHandle = null;
+    }
+  }
+
+  public startProgram(): void {
+    this.programBusHandle = this.busEventEmitter.on(
+      "*",
+      (anyEvent: BusAnyEvent) => {
+        if (!anyEvent || !anyEvent.data) {
+          console.error(`ProgramsStore received incomplete event ${anyEvent}`);
+          return;
+        }
+        if (!anyEvent.name.startsWith("calibrator")) {
+          return;
+        }
+        const event = decodeAnyEvent(anyEvent);
+        if (!event) {
+          console.error(`ProgramsStore could not decode event ${anyEvent}`);
+          return;
+        }
+        this.eventLog.push({
+          stamp: anyEvent.stamp,
+          name: anyEvent.name,
+          typeUrl: anyEvent.data.typeUrl as EventTypeId,
+          event
+        });
+      }
+    );
+  }
+
+  public stopProgram(): void {
+    if (this.programBusHandle) {
+      this.programBusHandle.unsubscribe();
+      this.programBusHandle = null;
     }
   }
 }

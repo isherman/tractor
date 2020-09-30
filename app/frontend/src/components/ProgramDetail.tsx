@@ -5,10 +5,10 @@ import { ListChildComponentProps, FixedSizeList as List } from "react-window";
 
 import { useStores } from "../hooks/useStores";
 import { formatValue } from "../utils/formatValue";
-import styles from "./RigCalibration.module.scss";
+import styles from "./ProgramDetail.module.scss";
 
 const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
-  const { rigCalibrationStore: store } = useStores();
+  const { programsStore: store } = useStores();
 
   return useObserver(() => {
     const stableIndex = store.eventLog.length - 1 - index;
@@ -34,19 +34,19 @@ const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
     );
   });
 };
-export const RigCalibration: React.FC = () => {
-  const { rigCalibrationStore: store, visualizationStore } = useStores();
+export const ProgramDetail: React.FC = () => {
+  const { programsStore: store, visualizationStore } = useStores();
 
   useEffect(() => {
-    store.startStreaming();
-    return () => store.stopStreaming();
+    store.startProgram();
+    return () => store.stopProgram();
   }, []);
 
   return useObserver(() => {
     const component = store.visualizer?.component;
     const selectedEvent = store.selectedEvent;
     return (
-      <div className={styles.rigCalibration}>
+      <div className={styles.programDetail}>
         {store.eventLog.length > 0 && (
           <List
             height={600}

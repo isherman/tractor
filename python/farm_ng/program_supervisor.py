@@ -23,14 +23,20 @@ farm_ng_root = os.environ['FARM_NG_ROOT']
 ProgramInfo = namedtuple('ProgramInfo', 'path args name description')
 
 library = {
-    1000: ProgramInfo(
+    'rig-calibration-playback': ProgramInfo(
         path=f'{farm_ng_root}/build/cpp/farm_ng/farm-ng-log-playback',
         args=['-send', '-log', f'{farm_ng_root}/../tractor-data/cal01/events-02498-00000.log'],
         name='Apriltag Rig Calibration Playback',
         description='Log playback',
     ),
-    1100: ProgramInfo(path='sleep', args=['5'], name='Sleep 5', description='Take a nap'),
-    1110: ProgramInfo(path='sleep', args=['100'], name='Sleep 100', description='Take a looong nap'),
+    'capture-calibration-dataset': ProgramInfo(
+        path=f'{farm_ng_root}/build/cpp/farm_ng/farm-ng-capture_calibration_dataset',
+        args=['-interactive'],
+        name='Capture Calibration Dataset',
+        description='Capture apriltag detections, for use in other calibration programs',
+    ),
+    'sleep-5': ProgramInfo(path='sleep', args=['5'], name='Sleep 5', description='Take a nap'),
+    'sleep-100': ProgramInfo(path='sleep', args=['100'], name='Sleep 100', description='Take a looong nap'),
 }
 libraryPb = [Program(id=_id, name=p.name, description=p.description) for _id, p in library.items()]
 
@@ -84,6 +90,7 @@ class ProgramSupervisor:
                 asyncio.get_event_loop().create_task(self.launch_child_process(program_info))
 
     async def launch_child_process(self, program_info):
+        logger.info('Launching ', program_info.path, program_info.args)
         self.child_process = await asyncio.create_subprocess_exec(program_info.path, *program_info.args)
         self.status.running.program.pid = self.child_process.pid
         self.status.running.program.stamp_start.GetCurrentTime()
