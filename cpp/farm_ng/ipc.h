@@ -14,6 +14,7 @@
 #include "farm_ng_proto/tractor/v1/resource.pb.h"
 
 namespace farm_ng {
+using farm_ng_proto::tractor::v1::LoggingStatus;
 
 typedef boost::signals2::signal<void(const farm_ng_proto::tractor::v1::Event&)>
     EventSignal;
@@ -138,10 +139,17 @@ Configuration WaitForConfiguration(EventBus& bus) {
     bus.get_io_service().run_one();
     if (bus.GetState().count(event_name) &&
         bus.GetState().at(event_name).data().UnpackTo(&configuration)) {
-          return configuration;
+      return configuration;
     }
   }
 }
+
+void WaitForServices(EventBus& bus,
+                     const std::vector<std::string>& service_names_in);
+LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path);
+LoggingStatus StopLogging(EventBus& bus);
+void StartCapturing(EventBus& bus);
+void StopCapturing(EventBus& bus);
 
 }  // namespace farm_ng
 

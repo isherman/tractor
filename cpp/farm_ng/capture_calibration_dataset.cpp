@@ -3,45 +3,35 @@
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include <google/protobuf/util/json_util.h>
 
-#include "farm_ng/event_log_reader.h"
 #include "farm_ng/ipc.h"
 
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
 #include "farm_ng_proto/tractor/v1/capture_calibration_dataset.pb.h"
-#include "farm_ng_proto/tractor/v1/io.pb.h"
-#include "farm_ng_proto/tractor/v1/tracking_camera.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
-DEFINE_string(name, "default", "a dataset name, used in the output archive name");
+DEFINE_string(name, "default",
+              "a dataset name, used in the output archive name");
 DEFINE_int32(num_frames, 16, "number of frames to capture");
 
 typedef farm_ng_proto::tractor::v1::Event EventPb;
-using farm_ng_proto::tractor::v1::ApriltagDetection;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetConfiguration;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetStatus;
-using farm_ng_proto::tractor::v1::LoggingCommand;
-using farm_ng_proto::tractor::v1::LoggingStatus;
-using farm_ng_proto::tractor::v1::TrackingCameraCommand;
 
 namespace farm_ng {
 class CaptureCalibrationDatasetProgram {
  public:
   CaptureCalibrationDatasetProgram(EventBus& bus)
-      : bus_(bus),
-        timer_(bus_.get_io_service()) {
-        on_timer(boost::system::error_code());
+      : bus_(bus), timer_(bus_.get_io_service()) {
+    on_timer(boost::system::error_code());
   }
 
   void send_status() {
     bus_.Send(MakeEvent("capture_calibration_dataset/status", status_));
   }
 
-  CaptureCalibrationDatasetStatus get_status() {
-    return status_;
-  }
+  CaptureCalibrationDatasetStatus get_status() { return status_; }
 
   void on_timer(const boost::system::error_code& error) {
     if (error) {
@@ -82,98 +72,6 @@ class CaptureCalibrationDatasetProgram {
   CaptureCalibrationDatasetStatus status_;
 };
 
-// TODO: Move somewhere re-usable
-void WaitForServices(EventBus& bus,
-                     const std::vector<std::string>& service_names_in) {
-  std::vector<std::string> service_names(service_names_in.begin(), service_names_in.end());
-
-  // Wait on ourself too
-  service_names.push_back(bus.GetName());
-
-  LOG(INFO) << "Waiting for services: ";
-  for (const auto& name : service_names) {
-    LOG(INFO) << "   " << name;
-  }
-  bool has_all = false;
-  while (!has_all) {
-    std::vector<bool> has_service(service_names.size(), false);
-    for (const auto& announce : bus.GetAnnouncements()) {
-      for (size_t i = 0; i < service_names.size(); ++i) {
-        if (announce.second.service() == service_names[i]) {
-          has_service[i] = true;
-        }
-      }
-    }
-    has_all = true;
-    for (auto x : has_service) {
-      has_all &= x;
-    }
-    bus.get_io_service().poll();
-  }
-}
-
-// TODO: Move somewhere re-usable
-LoggingStatus WaitForLoggerStatus(
-    EventBus& bus, std::function<bool(const LoggingStatus&)> predicate) {
-  LoggingStatus status;
-  while (true) {
-    bus.get_io_service().run_one();
-    if (bus.GetState().count("logger/status") &&
-        bus.GetState().at("logger/status").data().UnpackTo(&status) &&
-        predicate(status)) {
-      LOG(INFO) << "Logger status: " << status.ShortDebugString();
-      return status;
-    }
-  }
-}
-
-// TODO: Move somewhere re-usable
-LoggingStatus WaitForLoggerStart(EventBus& bus,
-                                 const std::string& archive_path) {
-  return WaitForLoggerStatus(bus, [archive_path](const LoggingStatus& status) {
-    return (status.has_recording() &&
-            status.recording().archive_path() == archive_path);
-  });
-}
-
-// TODO: Move somewhere re-usable
-LoggingStatus WaitForLoggerStop(EventBus& bus) {
-  return WaitForLoggerStatus(bus, [](const LoggingStatus& status) {
-    return (status.state_case() == LoggingStatus::kStopped);
-  });
-}
-
-// TODO: Move somewhere re-usable
-LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path) {
-  WaitForLoggerStop(bus);
-  LoggingCommand command;
-  command.mutable_record_start()->set_archive_path(archive_path);
-  bus.Send(farm_ng::MakeEvent("logger/command", command));
-  return WaitForLoggerStart(bus, archive_path);
-}
-
-// TODO: Move somewhere re-usable
-LoggingStatus StopLogging(EventBus& bus) {
-  LoggingCommand command;
-  command.mutable_record_stop();
-  bus.Send(farm_ng::MakeEvent("logger/command", command));
-  return WaitForLoggerStop(bus);
-}
-
-// TODO: Move somewhere re-usable
-void StartCapturing(EventBus& bus) {
-  TrackingCameraCommand command;
-  command.mutable_record_start()->set_mode(TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE);
-  bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
-}
-
-// TODO: Move somewhere re-usable
-void StopCapturing(EventBus& bus) {
-  TrackingCameraCommand command;
-  command.mutable_record_stop();
-  bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
-}
-
 }  // namespace farm_ng
 
 int main(int argc, char* argv[]) {
@@ -188,7 +86,9 @@ int main(int argc, char* argv[]) {
 
   CaptureCalibrationDatasetConfiguration configuration;
   if (FLAGS_interactive) {
-    configuration = farm_ng::WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(bus);
+    configuration =
+        farm_ng::WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(
+            bus);
   } else {
     configuration.set_num_frames(FLAGS_num_frames);
     configuration.set_name(FLAGS_name);

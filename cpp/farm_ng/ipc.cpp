@@ -17,9 +17,12 @@
 #include <glog/logging.h>
 
 #include "farm_ng_proto/tractor/v1/io.pb.h"
+#include "farm_ng_proto/tractor/v1/tracking_camera.pb.h"
 
 namespace farm_ng {
 using farm_ng_proto::tractor::v1::LoggingCommand;
+using farm_ng_proto::tractor::v1::LoggingStatus;
+using farm_ng_proto::tractor::v1::TrackingCameraCommand;
 namespace {
 
 class ArchiveManager {
@@ -303,7 +306,7 @@ void EventBus::Send(const farm_ng_proto::tractor::v1::Event& event) {
   impl_->io_service_.post([this, event]() { impl_->send_event(event); });
 }
 void EventBus::SetName(const std::string& name) { impl_->set_name(name); }
-std::string EventBus::GetName() {return impl_->get_name(); }
+std::string EventBus::GetName() { return impl_->get_name(); }
 
 void SetArchivePath(const std::string& name) { get_archive().SetPath(name); }
 
@@ -339,6 +342,92 @@ GetUniqueResource(const std::string& prefix, const std::string& ext,
 
 google::protobuf::Timestamp MakeTimestampNow() {
   return MakeTimestamp(std::chrono::system_clock::now());
+}
+
+void WaitForServices(EventBus& bus,
+                     const std::vector<std::string>& service_names_in) {
+  std::vector<std::string> service_names(service_names_in.begin(),
+                                         service_names_in.end());
+
+  // Wait on ourself too
+  service_names.push_back(bus.GetName());
+
+  LOG(INFO) << "Waiting for services: ";
+  for (const auto& name : service_names) {
+    LOG(INFO) << "   " << name;
+  }
+  bool has_all = false;
+  while (!has_all) {
+    std::vector<bool> has_service(service_names.size(), false);
+    for (const auto& announce : bus.GetAnnouncements()) {
+      for (size_t i = 0; i < service_names.size(); ++i) {
+        if (announce.second.service() == service_names[i]) {
+          has_service[i] = true;
+        }
+      }
+    }
+    has_all = true;
+    for (auto x : has_service) {
+      has_all &= x;
+    }
+    bus.get_io_service().poll();
+  }
+}
+
+LoggingStatus WaitForLoggerStatus(
+    EventBus& bus, std::function<bool(const LoggingStatus&)> predicate) {
+  LoggingStatus status;
+  while (true) {
+    bus.get_io_service().run_one();
+    if (bus.GetState().count("logger/status") &&
+        bus.GetState().at("logger/status").data().UnpackTo(&status) &&
+        predicate(status)) {
+      LOG(INFO) << "Logger status: " << status.ShortDebugString();
+      return status;
+    }
+  }
+}
+
+LoggingStatus WaitForLoggerStart(EventBus& bus,
+                                 const std::string& archive_path) {
+  return WaitForLoggerStatus(bus, [archive_path](const LoggingStatus& status) {
+    return (status.has_recording() &&
+            status.recording().archive_path() == archive_path);
+  });
+}
+
+LoggingStatus WaitForLoggerStop(EventBus& bus) {
+  return WaitForLoggerStatus(bus, [](const LoggingStatus& status) {
+    return (status.state_case() == LoggingStatus::kStopped);
+  });
+}
+
+LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path) {
+  WaitForLoggerStop(bus);
+  LoggingCommand command;
+  command.mutable_record_start()->set_archive_path(archive_path);
+  bus.Send(farm_ng::MakeEvent("logger/command", command));
+  return WaitForLoggerStart(bus, archive_path);
+}
+
+LoggingStatus StopLogging(EventBus& bus) {
+  LoggingCommand command;
+  command.mutable_record_stop();
+  bus.Send(farm_ng::MakeEvent("logger/command", command));
+  return WaitForLoggerStop(bus);
+}
+
+void StartCapturing(EventBus& bus) {
+  TrackingCameraCommand command;
+  command.mutable_record_start()->set_mode(
+      TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE);
+  bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
+}
+
+void StopCapturing(EventBus& bus) {
+  TrackingCameraCommand command;
+  command.mutable_record_stop();
+  bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
 }
 
 }  // namespace farm_ng
