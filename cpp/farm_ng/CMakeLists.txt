@@ -19,6 +19,8 @@ target_link_libraries(farm-ng-log-playback farm-ng-ipc farm-ng-protobuf ${Boost_
 add_executable(farm-ng-tracking_camera tracking_camera.cpp)
 target_link_libraries(farm-ng-tracking_camera farm-ng-ipc farm-ng-protobuf apriltag::apriltag ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${realsense2_LIBRARY}  ${OpenCV_LIBS} Sophus::Sophus ${GLOG_LIBRARIES})
 
+add_executable(farm-ng-capture_calibration_dataset capture_calibration_dataset.cpp)
+target_link_libraries(farm-ng-capture_calibration_dataset farm-ng-ipc farm-ng-protobuf gflags)
 
 add_executable(farm-ng-calibrator calibrator.cpp)
 target_link_libraries(farm-ng-calibrator farm-ng-ipc farm-ng-protobuf farm-ng-calibration gflags)
