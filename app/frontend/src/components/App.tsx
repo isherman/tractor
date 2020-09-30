@@ -12,7 +12,13 @@ import { Programs } from "./Programs";
 export const App: React.FC = () => {
   return (
     <div className={styles.app}>
-      <Navbar collapseOnSelect expand="md" bg="dark" variant="dark">
+      <Navbar
+        collapseOnSelect
+        expand="md"
+        bg="dark"
+        variant="dark"
+        className={styles.navbar}
+      >
         <Navbar.Brand as={Link} to="/">
           farm-ng
         </Navbar.Brand>
