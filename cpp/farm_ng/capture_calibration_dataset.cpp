@@ -112,19 +112,6 @@ void WaitForServices(EventBus& bus,
   }
 }
 
-CaptureCalibrationDatasetConfiguration WaitForConfiguration(EventBus& bus) {
-  CaptureCalibrationDatasetConfiguration configuration;
-  std::string event_name = bus.GetName() + "/configure";
-  while (true) {
-    bus.get_io_service().run_one();
-    if (bus.GetState().count(event_name) &&
-        bus.GetState().at(event_name).data().UnpackTo(&configuration)) {
-          LOG(INFO) << "Configuration received: " << configuration.ShortDebugString();
-          return configuration;
-    }
-  }
-}
-
 // TODO: Move somewhere re-usable
 LoggingStatus WaitForLoggerStatus(
     EventBus& bus, std::function<bool(const LoggingStatus&)> predicate) {
@@ -173,12 +160,14 @@ LoggingStatus StopLogging(EventBus& bus) {
   return WaitForLoggerStop(bus);
 }
 
+// TODO: Move somewhere re-usable
 void StartCapturing(EventBus& bus) {
   TrackingCameraCommand command;
   command.mutable_record_start()->set_mode(TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE);
   bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
 }
 
+// TODO: Move somewhere re-usable
 void StopCapturing(EventBus& bus) {
   TrackingCameraCommand command;
   command.mutable_record_stop();
@@ -199,7 +188,7 @@ int main(int argc, char* argv[]) {
 
   CaptureCalibrationDatasetConfiguration configuration;
   if (FLAGS_interactive) {
-    configuration = WaitForConfiguration(bus);
+    configuration = farm_ng::WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(bus);
   } else {
     configuration.set_num_frames(FLAGS_num_frames);
     configuration.set_name(FLAGS_name);

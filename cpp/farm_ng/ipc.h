@@ -130,6 +130,19 @@ inline EventBus& GetEventBus(boost::asio::io_service& io_service,
   return service;
 }
 
+template <typename Configuration>
+Configuration WaitForConfiguration(EventBus& bus) {
+  Configuration configuration;
+  std::string event_name = bus.GetName() + "/configure";
+  while (true) {
+    bus.get_io_service().run_one();
+    if (bus.GetState().count(event_name) &&
+        bus.GetState().at(event_name).data().UnpackTo(&configuration)) {
+          return configuration;
+    }
+  }
+}
+
 }  // namespace farm_ng
 
 #endif
