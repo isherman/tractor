@@ -9,8 +9,8 @@
 #include "farm_ng/ipc.h"
 
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
+#include "farm_ng_proto/tractor/v1/capture_calibration_dataset.pb.h"
 #include "farm_ng_proto/tractor/v1/io.pb.h"
-#include "farm_ng_proto/tractor/v1/programs.pb.h"
 #include "farm_ng_proto/tractor/v1/tracking_camera.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
@@ -196,24 +196,13 @@ int main(int argc, char* argv[]) {
 
   farm_ng::CaptureCalibrationDatasetProgram program(bus);
 
-  // Wait for dependencies to be ready
   farm_ng::WaitForServices(bus, {"ipc-logger", "tracking-camera"});
-
-  // Ask the logger to start logging and block until it does
   farm_ng::StartLogging(bus, configuration.name());
-
-  // Ask the camera to start capturing
   farm_ng::StartCapturing(bus);
-
-  // Count the number of apriltag detections
   while (program.get_status().num_frames() > configuration.num_frames()) {
     io_service.run_one();
   }
-
-  // Ask the camera to stop capturing
   farm_ng::StopCapturing(bus);
-
-  // Ask the logger to stop logging and block until it does
   farm_ng::StopLogging(bus);
 
   return 0;

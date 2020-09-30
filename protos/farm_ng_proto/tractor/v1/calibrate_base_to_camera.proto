@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "farm_ng_proto/tractor/v1/resource.proto";
+
+package farm_ng_proto.tractor.v1;
+option go_package = "github.com/farm_ng/genproto";
+
+message CalibrateBaseToCameraConfiguration {
+  // TODO
+}
+
+message CalibrateBaseToCameraStatus {
+  // TODO: Some sort of iteration counter?
+
+  // The base-to-camera model saved to disk.
+  // Will be a json encoded protobuf with type BaseToCameraModel.
+  Resource resource = 1;
+  bool finished = 2;
+}

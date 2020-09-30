@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "farm_ng_proto/tractor/v1/resource.proto";
+
+package farm_ng_proto.tractor.v1;
+option go_package = "github.com/farm_ng/genproto";
+
+message CalibrateApriltagRigConfiguration {
+  // TODO
+}
+
+message CalibrateApriltagRigStatus {
+  // TODO: Some sort of iteration counter?
+
+  // The rig model saved to disk.
+  // Will be a json encoded protobuf with type MonocularApriltagRigModel.
+  Resource resource = 1;
+  bool finished = 2;
+}

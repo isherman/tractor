@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "farm_ng_proto/tractor/v1/resource.proto";
+
+package farm_ng_proto.tractor.v1;
+option go_package = "github.com/farm_ng/genproto";
+
+message CaptureCalibrationDatasetConfiguration {
+  // Number of frames to capture
+  int32 num_frames = 1;
+  string name = 2;
+}
+
+message CaptureCalibrationDatasetStatus {
+  // Number of frames captured
+  int32 num_frames = 1;
+
+  // The calibration dataset saved to disk.
+  // Will be a ...
+  Resource resource = 2;
+
+  bool finished = 3;
+}
