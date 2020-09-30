@@ -48,12 +48,12 @@ export const ReferenceFrameViz: React.FC<ReferenceFrameNode> = (props) => {
       </line>
       <group position={position} quaternion={rotation}>
         <axesHelper>
-          <Html scaleFactor={props.textScale || 10}>
+          <Html scaleFactor={props.textScale || 1}>
             <div>{props.pose.frameB}</div>
           </Html>
         </axesHelper>
         {props.children.map((x: ReferenceFrameNode, item: number) => (
-          <ReferenceFrameViz {...x} key={item} />
+          <ReferenceFrameViz {...x} textScale={10} key={item} />
         ))}
       </group>
     </group>
@@ -95,5 +95,5 @@ export const PoseViz: React.FC = () => {
     };
   }, [busEventEmitter]);
 
-  return <ReferenceFrameViz {...root} />;
+  return <ReferenceFrameViz {...root} textScale={10} />;
 };

@@ -150,9 +150,12 @@ const CalibratorStatusElement: React.FC<SingleElementVisualizerProps<
     );
   }
 
-  if (value.apriltagRig?.numFrames && !value.apriltagRig?.finished) {
+  if (
+    value.apriltagRig?.numFrames !== undefined &&
+    !value.apriltagRig?.rigModelResource
+  ) {
     return (
-      <Card>
+      <Card bg={"light"} className={"shadow-sm"}>
         <Card.Header>Summary</Card.Header>
         <Card.Body>
           <Table bordered size="sm" responsive="md">
@@ -164,6 +167,10 @@ const CalibratorStatusElement: React.FC<SingleElementVisualizerProps<
             </tbody>
           </Table>
         </Card.Body>
+        <Card.Footer className={styles.footer}>
+          <span className="text-muted">{formatValue(new Date(timestamp))}</span>
+          <JsonPopover json={value} />
+        </Card.Footer>
       </Card>
     );
   }
