@@ -3,7 +3,7 @@ syntax = "proto3";
 package farm_ng_proto.tractor.v1;
 option go_package = "github.com/farm_ng/genproto";
 
-// QUESTION: Reasonable to put all program configuration messages in programs.proto?
+// QUESTION: Reasonable to put all program configuration and status messages in programs.proto?
 
 message CaptureCalibrationDatasetConfiguration {
   repeated int32 tag_ids = 1;
@@ -11,10 +11,39 @@ message CaptureCalibrationDatasetConfiguration {
   double apriltag_size = 3;
 }
 
+message CaptureCalibrationDatasetStatus {
+  // Number of frames captured
+  int32 num_frames = 1;
+
+  // The calibration dataset saved to disk.
+  // Will be a ...
+  Resource resource = 2;
+
+  bool finished = 3;
+}
+
 message CalibrateApriltagRigConfiguration {
   // TODO
 }
 
+message CalibrateApriltagRigStatus {
+  // TODO: Some sort of iteration counter?
+
+  // The rig model saved to disk.
+  // Will be a json encoded protobuf with type MonocularApriltagRigModel.
+  Resource resource = 1;
+  bool finished = 2;
+}
+
 message CalibrateBaseToCameraConfiguration {
   // TODO
+}
+
+message CalibrateBaseToCameraStatus {
+  // TODO: Some sort of iteration counter?
+
+  // The base-to-camera model saved to disk.
+  // Will be a json encoded protobuf with type BaseToCameraModel.
+  Resource resource = 1;
+  bool finished = 2;
 }
