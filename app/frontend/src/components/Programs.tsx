@@ -22,7 +22,7 @@ export const Programs: React.FC = () => {
   const handleStart = (id: number): void => {
     store.busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.StartProgramRequest",
-      "program_supervisor/StartProgramRequest",
+      "program_supervisor/request",
       StartProgramRequest.encode(StartProgramRequest.fromJSON({ id })).finish()
     );
   };
@@ -30,7 +30,7 @@ export const Programs: React.FC = () => {
   const handleStop = (id: number): void => {
     store.busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.StopProgramRequest",
-      "program_supervisor/StopProgramRequest",
+      "program_supervisor/request",
       StopProgramRequest.encode(StopProgramRequest.fromJSON({ id })).finish()
     );
   };

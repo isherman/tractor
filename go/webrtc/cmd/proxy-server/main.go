@@ -84,7 +84,7 @@ func main() {
 	}
 	router := mux.NewRouter()
 	router.PathPrefix("/twirp/").Handler(api)
-	router.PathPrefix("/blobstore/").Handler(http.StripPrefix("/blobstore", blobstore))
+	router.PathPrefix("/resources/").Handler(http.StripPrefix("/resources", blobstore))
 	router.PathPrefix("/").Handler(spa)
 	srv := &http.Server{
 		Handler:      router,

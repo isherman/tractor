@@ -29,7 +29,6 @@ library = {
         name='Apriltag Rig Calibration Playback',
         description='Log playback',
     ),
-    # 1010: ProgramInfo(path="python", args=["-m", "farm_ng.calibrator_program"], name="Apriltag Rig Calibration", description="Lorem ipsum"),
     1100: ProgramInfo(path='sleep', args=['5'], name='Sleep 5', description='Take a nap'),
     1110: ProgramInfo(path='sleep', args=['100'], name='Sleep 100', description='Take a looong nap'),
 }
@@ -57,7 +56,7 @@ class ProgramSupervisor:
             while not self.shutdown:
                 stop_request: StopProgramRequest = await get_message(
                     event_queue,
-                    'program_supervisor/StopProgramRequest',
+                    'program_supervisor/request',
                     StopProgramRequest,
                 )
                 if self.status.WhichOneof('status') != 'running':
@@ -73,7 +72,7 @@ class ProgramSupervisor:
     async def handle_start(self):
         with EventBusQueue(event_bus) as event_queue:
             while not self.shutdown:
-                start_request: StartProgramRequest = await get_message(event_queue, 'program_supervisor/StartProgramRequest', StartProgramRequest)
+                start_request: StartProgramRequest = await get_message(event_queue, 'program_supervisor/request', StartProgramRequest)
                 if self.status.WhichOneof('status') != 'stopped':
                     logger.info(f"StartProgramRequest received while program status was {self.status.WhichOneof('status')}")
                     continue

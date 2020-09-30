@@ -7,7 +7,7 @@ import { ProgramsStore } from "../stores/ProgramsStore";
 import { RigCalibrationStore } from "../stores/RigCalibrationStore";
 
 const [busEventEmitter, mediaStreamEmitter, busClient] = getWebRTCEmitters(
-  `http://${window.location.hostname}:8081/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`
+  `http://${window.location.host}/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`
 );
 
 export const storesContext = React.createContext({
