@@ -84,8 +84,11 @@ const CalibratorStatusElement: React.FC<SingleElementVisualizerProps<
   // Per-tag RMSE, by tag ID, for the currently selected image index
   const tagRmses = (tagStats || []).reduce<{ [key: number]: number }>(
     (acc, tagStat) => {
-      if (tagStat.perImageRmse[index]) {
-        acc[tagStat.tagId] = tagStat.perImageRmse[index];
+      const rmseEntry = tagStat.perImageRmse.find(
+        (_) => _.frameNumber === index
+      );
+      if (rmseEntry) {
+        acc[tagStat.tagId] = rmseEntry.rmse;
       }
       return acc;
     },
