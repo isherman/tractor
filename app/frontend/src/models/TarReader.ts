@@ -1,3 +1,5 @@
+// TODO: Support common tarball extensions: UStar, PaxHeaders, etc.
+
 const filenameMaxLength = 1024;
 const fileSizeOffset = 124;
 const fileTypeOffset = 156;

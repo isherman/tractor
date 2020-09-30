@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as React from "react";
 import styles from "./Header.module.scss";
 import { Button, Col, Container, Form } from "react-bootstrap";
@@ -25,7 +26,12 @@ export const Header: React.FC = () => {
     if (file) {
       const resourceArchive = new TarResourceArchive(file);
       const fileInfo = await resourceArchive.getFileInfo();
-      const logFilePath = fileInfo.find((_) => _.endsWith(".log"));
+      // As a heuristic, find the shortest filename ending in .log
+      const logFilePath = fileInfo
+        .filter((_) => _.endsWith(".log"))
+        .sort((a, b) => a.length - b.length)[0];
+      console.log("Log file path: ", logFilePath);
+      console.log("Tarball contents: ", fileInfo);
       if (!logFilePath) {
         throw Error("No .log file in archive");
       }

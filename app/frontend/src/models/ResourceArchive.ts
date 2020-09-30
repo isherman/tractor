@@ -79,7 +79,7 @@ export class TarResourceArchive {
           reject(`failed to readAsDataURL ${path}`);
         }
       };
-      reader.readAsDataURL(blob);
+      reader.readAsText(blob);
     });
   }
 
