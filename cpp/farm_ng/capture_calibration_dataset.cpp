@@ -95,7 +95,7 @@ class CaptureCalibrationDatasetProgram {
   }
 
   void on_event(const EventPb& event) {
-    if (!event.name().rfind("capture_calibration_dataset/", 0) == 0) {
+    if (!event.name().rfind("calibrator/", 0) == 0) {
       return;
     }
     if (on_apriltag_detections(event)) {
