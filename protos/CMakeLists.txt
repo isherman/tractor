@@ -8,6 +8,7 @@ set(PROTO_FILES
   ./farm_ng_proto/tractor/v1/image.proto
   ./farm_ng_proto/tractor/v1/io.proto
   ./farm_ng_proto/tractor/v1/motor.proto
+  ./farm_ng_proto/tractor/v1/programs.proto
   ./farm_ng_proto/tractor/v1/resource.proto
   ./farm_ng_proto/tractor/v1/steering.proto
   ./farm_ng_proto/tractor/v1/tracking_camera.proto

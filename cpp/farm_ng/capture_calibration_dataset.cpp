@@ -10,12 +10,13 @@
 
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
 #include "farm_ng_proto/tractor/v1/io.pb.h"
+#include "farm_ng_proto/tractor/v1/programs.pb.h"
 #include "farm_ng_proto/tractor/v1/tracking_camera.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(tag_ids, "221, 226, 225, 218, 222",
               "comma-separated list of tag ids to capture detections of");
-DEFINE_uint32(num_frames, 16, "number of frames to capture");
+DEFINE_int32(num_frames, 16, "number of frames to capture");
 DEFINE_double(apriltag_size, 0.16, "apriltag width/height (in m)");
 DEFINE_string(log, "", "log file to use as input (not supported in interactive mode)");
 DEFINE_string(out_archive, "default", "archive name to write to (not supported in interactive mode)");
@@ -23,6 +24,8 @@ DEFINE_string(out_archive, "default", "archive name to write to (not supported i
 typedef farm_ng_proto::tractor::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::ApriltagDetection;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
+using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetConfiguration;
+using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetStatus;
 using farm_ng_proto::tractor::v1::LoggingCommand;
 using farm_ng_proto::tractor::v1::LoggingStatus;
 using farm_ng_proto::tractor::v1::TrackingCameraCommand;
@@ -30,7 +33,7 @@ using farm_ng_proto::tractor::v1::TrackingCameraCommand;
 namespace farm_ng {
 class CaptureCalibrationDatasetProgram {
  public:
-  CaptureCalibrationDatasetProgram(EventBus& bus, const std::unordered_set<int> tag_ids, size_t num_frames, double apriltag_size)
+  CaptureCalibrationDatasetProgram(EventBus& bus, const std::unordered_set<int> tag_ids, int num_frames, double apriltag_size)
       : bus_(bus),
         bus_connection_(bus_.GetEventSignal()->connect(
             std::bind(&CaptureCalibrationDatasetProgram::on_event, this, std::placeholders::_1))),
@@ -44,8 +47,7 @@ class CaptureCalibrationDatasetProgram {
   boost::signals2::connection& bus_connection() { return bus_connection_; }
 
   void send_status() {
-    // TODO: Define a status message
-    // bus_.Send(MakeEvent("capture_calibration_dataset/status", status_));
+    bus_.Send(MakeEvent("capture_calibration_dataset/status", status_));
   }
 
   void on_timer(const boost::system::error_code& error) {
@@ -81,9 +83,10 @@ class CaptureCalibrationDatasetProgram {
     }
     all_detections_.push_back(std::move(detections));
 
+    status_.set_num_frames(all_detections_.size());
     send_status();
 
-    if (all_detections_.size() >= num_frames_) {
+    if (status_.num_frames() >= num_frames_) {
       // TODO: Write dataset to disk
       // TODO: Exit event loop
     }
@@ -104,12 +107,13 @@ class CaptureCalibrationDatasetProgram {
   EventBus& bus_;
   boost::signals2::connection bus_connection_;
   boost::asio::deadline_timer timer_;
+  CaptureCalibrationDatasetStatus status_;
 
   // Tag IDs we wish to capture detections of
   std::unordered_set<int> tag_ids_;
 
   // Number of frames to capture
-  size_t num_frames_;
+  int num_frames_;
 
   // Width/height of apriltags
   double apriltag_size_;
