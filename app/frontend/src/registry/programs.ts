@@ -1,5 +1,6 @@
 import { Event as BusAnyEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
-import { CaptureCalibrationDataset } from "../components/programs/CalibrateApriltagRig";
+import { CaptureCalibrationDataset } from "../components/programs/CaptureCalibrationDataset";
+import { CalibrateApriltagRig } from "../components/programs/CalibrateApriltagRig";
 import { EventType } from "./events";
 
 export interface ProgramUIProps<ConfigType extends EventType = EventType> {
@@ -13,7 +14,8 @@ export interface ProgramUI<ConfigType extends EventType = EventType> {
 }
 
 export const programRegistry: { [k: string]: ProgramUI } = {
-  [CaptureCalibrationDataset.id]: new CaptureCalibrationDataset() as ProgramUI
+  [CaptureCalibrationDataset.id]: new CaptureCalibrationDataset() as ProgramUI,
+  [CalibrateApriltagRig.id]: new CalibrateApriltagRig() as ProgramUI
 };
 export const programIds = Object.keys(programRegistry);
 export type ProgramId = typeof programIds[number];

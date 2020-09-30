@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { computed, observable } from "mobx";
+import { computed, observable, reaction } from "mobx";
 import { decodeAnyEvent } from "../models/decodeAnyEvent";
 import { Event as BusAnyEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 import {
@@ -12,8 +12,8 @@ import {
   ProgramSupervisorStatus
 } from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
 import { BusClient } from "../models/BusClient";
-import { Visualizer, visualizersForEventType } from "../registry/visualization";
 import { ProgramUI, programUIForProgramId } from "../registry/programs";
+import { Visualizer, visualizersForEventType } from "../registry/visualization";
 
 interface EventLogEntry {
   stamp: Date | undefined;
@@ -32,7 +32,17 @@ export class ProgramsStore {
   constructor(
     public busClient: BusClient,
     private busEventEmitter: BusEventEmitter
-  ) {}
+  ) {
+    // Whenever the program UI changes, update the program bus subscription
+    reaction(
+      () => this.programUI,
+      () => {
+        this.eventLog = [];
+        this.selectedEntry = null;
+        this.updateProgramBusSubscription();
+      }
+    );
+  }
 
   @computed get runningProgram(): ProgramExecution | null {
     return this.supervisorStatus?.running?.program || null;
@@ -94,7 +104,16 @@ export class ProgramsStore {
     }
   }
 
-  public startProgram(): void {
+  private updateProgramBusSubscription(): void {
+    if (this.programBusHandle) {
+      this.programBusHandle.unsubscribe();
+      this.programBusHandle = null;
+    }
+
+    if (!this.programUI) {
+      return;
+    }
+
     this.programBusHandle = this.busEventEmitter.on(
       "*",
       (anyEvent: BusAnyEvent) => {
@@ -102,9 +121,11 @@ export class ProgramsStore {
           console.error(`ProgramsStore received incomplete event ${anyEvent}`);
           return;
         }
-        if (!anyEvent.name.startsWith("calibrator")) {
+
+        if (!this.programUI?.eventLogPredicate(anyEvent)) {
           return;
         }
+
         const event = decodeAnyEvent(anyEvent);
         if (!event) {
           console.error(`ProgramsStore could not decode event ${anyEvent}`);
@@ -118,12 +139,5 @@ export class ProgramsStore {
         });
       }
     );
-  }
-
-  public stopProgram(): void {
-    if (this.programBusHandle) {
-      this.programBusHandle.unsubscribe();
-      this.programBusHandle = null;
-    }
   }
 }

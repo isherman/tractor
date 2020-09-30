@@ -1,6 +1,6 @@
+/* eslint-disable no-console */
 import { useObserver } from "mobx-react-lite";
 import * as React from "react";
-import { useEffect } from "react";
 import { ListChildComponentProps, FixedSizeList as List } from "react-window";
 
 import { useStores } from "../hooks/useStores";
@@ -37,13 +37,9 @@ const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
 export const ProgramDetail: React.FC = () => {
   const { programsStore: store, visualizationStore } = useStores();
 
-  useEffect(() => {
-    store.startProgram();
-    return () => store.stopProgram();
-  }, []);
-
   return useObserver(() => {
-    const component = store.visualizer?.component;
+    const configurator = store.programUI?.configurator;
+    const visualizer = store.visualizer?.component;
     const selectedEvent = store.selectedEvent;
     return (
       <div className={styles.programDetail}>
@@ -58,10 +54,16 @@ export const ProgramDetail: React.FC = () => {
             {Row}
           </List>
         )}
-        {component &&
+        {configurator &&
+          React.createElement(configurator, {
+            onSubmitConfig: (config) => {
+              console.log("Submitting: ", config);
+            }
+          })}
+        {visualizer &&
           selectedEvent &&
           selectedEvent.stamp &&
-          React.createElement(component, {
+          React.createElement(visualizer, {
             values: [[selectedEvent.stamp.getTime(), selectedEvent.event]],
             options: [
               { label: "view", options: ["overlay", "grid"], value: "overlay" }
