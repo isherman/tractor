@@ -13,6 +13,7 @@ import {
 } from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
 import { BusClient } from "../models/BusClient";
 import { Visualizer, visualizersForEventType } from "../registry/visualization";
+import { ProgramUI, programUIForProgramId } from "../registry/programs";
 
 interface EventLogEntry {
   stamp: Date | undefined;
@@ -43,6 +44,14 @@ export class ProgramsStore {
 
   @computed get selectedEvent(): EventLogEntry | null {
     return this.selectedEntry ? this.eventLog[this.selectedEntry] : null;
+  }
+
+  @computed get programUI(): ProgramUI | null {
+    const programId =
+      this.supervisorStatus?.running?.program?.id ||
+      this.supervisorStatus?.stopped?.lastProgram?.id ||
+      null;
+    return programId ? programUIForProgramId(programId) : null;
   }
 
   @computed get visualizer(): Visualizer | null {

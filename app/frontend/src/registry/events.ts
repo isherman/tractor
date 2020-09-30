@@ -30,6 +30,7 @@ import {
   StartProgramRequest,
   StopProgramRequest
 } from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
+import { CaptureCalibrationDatasetConfiguration } from "../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 
 export type EventType =
   | SteeringCommand
@@ -50,7 +51,8 @@ export type EventType =
   | ProgramSupervisorStatus
   | StartProgramRequest
   | ApriltagRig
-  | StopProgramRequest;
+  | StopProgramRequest
+  | CaptureCalibrationDatasetConfiguration;
 
 // Infer the keys, but restrict values to Message<EventType>
 // https://stackoverflow.com/a/54598743
@@ -77,7 +79,8 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.LoggingStatus": LoggingStatus,
   "type.googleapis.com/farm_ng_proto.tractor.v1.ProgramSupervisorStatus": ProgramSupervisorStatus,
   "type.googleapis.com/farm_ng_proto.tractor.v1.StartProgramRequest": StartProgramRequest,
-  "type.googleapis.com/farm_ng_proto.tractor.v1.StopProgramRequest": StopProgramRequest
+  "type.googleapis.com/farm_ng_proto.tractor.v1.StopProgramRequest": StopProgramRequest,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetConfiguration": CaptureCalibrationDatasetConfiguration
 });
 
 export const eventTypeIds = Object.keys(
