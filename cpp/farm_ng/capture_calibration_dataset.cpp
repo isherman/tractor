@@ -197,8 +197,7 @@ LoggingStatus StopLogging(EventBus& bus) {
 
 void StartCapturing(EventBus& bus) {
   TrackingCameraCommand command;
-  // TODO:
-  // TrackingCameraCommand(record_start=dict(mode=TrackingCameraCommand.RecordStart.MODE_APRILTAG_STABLE)),
+  command.mutable_record_start()->set_mode(TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE);
   bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
 }
 
