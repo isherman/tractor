@@ -254,6 +254,7 @@ class EventBusImpl {
   }
 
   void set_name(const std::string& name) { service_name_ = name; }
+  std::string get_name() { return service_name_; }
 
   boost::asio::io_service& io_service_;
 
@@ -302,6 +303,7 @@ void EventBus::Send(const farm_ng_proto::tractor::v1::Event& event) {
   impl_->io_service_.post([this, event]() { impl_->send_event(event); });
 }
 void EventBus::SetName(const std::string& name) { impl_->set_name(name); }
+std::string EventBus::GetName() {return impl_->get_name(); }
 
 void SetArchivePath(const std::string& name) { get_archive().SetPath(name); }
 

@@ -8,9 +8,8 @@ option go_package = "github.com/farm_ng/genproto";
 // QUESTION: Reasonable to put all program configuration and status messages in programs.proto?
 
 message CaptureCalibrationDatasetConfiguration {
-  repeated int32 tag_ids = 1;
-  int32 num_frames = 2;
-  double apriltag_size = 3;
+  int32 num_frames = 1;
+  string name = 2;
 }
 
 message CaptureCalibrationDatasetStatus {

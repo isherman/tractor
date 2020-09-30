@@ -43,6 +43,7 @@ class EventBus : public boost::asio::io_service::service {
   void Send(const farm_ng_proto::tractor::v1::Event& event);
 
   void SetName(const std::string& name);
+  std::string GetName();
 
  private:
   std::unique_ptr<EventBusImpl> impl_;

@@ -14,12 +14,8 @@
 #include "farm_ng_proto/tractor/v1/tracking_camera.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
-DEFINE_string(tag_ids, "221, 226, 225, 218, 222",
-              "comma-separated list of tag ids to capture detections of");
+DEFINE_string(name, "default", "a dataset name, used in the output archive name");
 DEFINE_int32(num_frames, 16, "number of frames to capture");
-DEFINE_double(apriltag_size, 0.16, "apriltag width/height (in m)");
-DEFINE_string(log, "", "log file to use as input (not supported in interactive mode)");
-DEFINE_string(out_archive, "default", "archive name to write to (not supported in interactive mode)");
 
 typedef farm_ng_proto::tractor::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::ApriltagDetection;
@@ -33,21 +29,18 @@ using farm_ng_proto::tractor::v1::TrackingCameraCommand;
 namespace farm_ng {
 class CaptureCalibrationDatasetProgram {
  public:
-  CaptureCalibrationDatasetProgram(EventBus& bus, const std::unordered_set<int> tag_ids, int num_frames, double apriltag_size)
+  CaptureCalibrationDatasetProgram(EventBus& bus)
       : bus_(bus),
-        bus_connection_(bus_.GetEventSignal()->connect(
-            std::bind(&CaptureCalibrationDatasetProgram::on_event, this, std::placeholders::_1))),
-        timer_(bus_.get_io_service()),
-        tag_ids_(tag_ids),
-        num_frames_(num_frames),
-        apriltag_size_(apriltag_size) {
-    on_timer(boost::system::error_code());
+        timer_(bus_.get_io_service()) {
+        on_timer(boost::system::error_code());
   }
-
-  boost::signals2::connection& bus_connection() { return bus_connection_; }
 
   void send_status() {
     bus_.Send(MakeEvent("capture_calibration_dataset/status", status_));
+  }
+
+  CaptureCalibrationDatasetStatus get_status() {
+    return status_;
   }
 
   void on_timer(const boost::system::error_code& error) {
@@ -69,28 +62,8 @@ class CaptureCalibrationDatasetProgram {
     }
     VLOG(2) << detections.ShortDebugString();
 
-    for (auto it = detections.mutable_detections()->begin();
-         it != detections.mutable_detections()->end();) {
-      if (it->tag_size() == 0.0) {
-        it->set_tag_size(apriltag_size_);
-      }
-      // Skip any detections of tag ids we don't care about
-      if (tag_ids_.count(it->id()) == 0) {
-        it = detections.mutable_detections()->erase(it);
-      } else {
-        ++it;
-      }
-    }
-    all_detections_.push_back(std::move(detections));
-
-    status_.set_num_frames(all_detections_.size());
+    status_.set_num_frames(status_.num_frames() + 1);
     send_status();
-
-    if (status_.num_frames() >= num_frames_) {
-      // TODO: Write dataset to disk
-      // TODO: Exit event loop
-    }
-
     return true;
   }
 
@@ -105,26 +78,18 @@ class CaptureCalibrationDatasetProgram {
 
  private:
   EventBus& bus_;
-  boost::signals2::connection bus_connection_;
   boost::asio::deadline_timer timer_;
   CaptureCalibrationDatasetStatus status_;
-
-  // Tag IDs we wish to capture detections of
-  std::unordered_set<int> tag_ids_;
-
-  // Number of frames to capture
-  int num_frames_;
-
-  // Width/height of apriltags
-  double apriltag_size_;
-
-  // Captured frames
-  std::vector<ApriltagDetections> all_detections_;
 };
 
 // TODO: Move somewhere re-usable
 void WaitForServices(EventBus& bus,
-                     const std::vector<std::string>& service_names) {
+                     const std::vector<std::string>& service_names_in) {
+  std::vector<std::string> service_names(service_names_in.begin(), service_names_in.end());
+
+  // Wait on ourself too
+  service_names.push_back(bus.GetName());
+
   LOG(INFO) << "Waiting for services: ";
   for (const auto& name : service_names) {
     LOG(INFO) << "   " << name;
@@ -220,66 +185,36 @@ int main(int argc, char* argv[]) {
   farm_ng::EventBus& bus =
       farm_ng::GetEventBus(io_service, "capture_calibration_dataset");
 
-  std::unordered_set<int> tag_ids;
-  int num_frames;
-  double apriltag_size;
+  CaptureCalibrationDatasetConfiguration configuration;
   if (FLAGS_interactive) {
-    // TODO: Get initialization event on eventbus
-    // tag_ids =
-    // num_frames =
-    // apriltag_size =
+    // TODO: Get configuration on eventbus
+    // configuration=
   } else {
-    num_frames = FLAGS_num_frames;
-    std::stringstream tag_ids_stream(FLAGS_tag_ids);
-    while (tag_ids_stream.good()) {
-      std::string tag_id;
-      std::getline(tag_ids_stream, tag_id, ',');
-      tag_ids.insert(stoi(tag_id));
-    }
-    apriltag_size = FLAGS_apriltag_size;
+    configuration.set_num_frames(FLAGS_num_frames);
+    configuration.set_name(FLAGS_name);
   }
 
-  farm_ng::CaptureCalibrationDatasetProgram program(bus, tag_ids, num_frames, apriltag_size);
-
-  // We're reading from a log, so block eventbus events
-  if (!FLAGS_log.empty()) {
-    boost::signals2::shared_connection_block block_external_events(
-        program.bus_connection(), true);
-  }
+  farm_ng::CaptureCalibrationDatasetProgram program(bus);
 
   // Wait for dependencies to be ready
-  // QUESTION: Is there a convention of waiting for our own service?
-  farm_ng::WaitForServices(bus, {"ipc-logger", "tracking-camera", "capture_calibration_dataset"});
+  farm_ng::WaitForServices(bus, {"ipc-logger", "tracking-camera"});
 
   // Ask the logger to start logging and block until it does
-  farm_ng::StartLogging(bus, FLAGS_out_archive);
+  farm_ng::StartLogging(bus, configuration.name());
 
-  if (!FLAGS_log.empty()) {
-    LOG(INFO) << "Using log : " << FLAGS_log;
-    farm_ng::EventLogReader log_reader(FLAGS_log);
-    while (true) {
-      EventPb event;
-      try {
-        io_service.poll();
-        event = log_reader.ReadNext();
-        program.on_event(event);
-      } catch (std::runtime_error& e) {
-        break;
-      }
-    }
-  } else {
-    // Ask the camera to start capturing
-    farm_ng::StartCapturing(bus);
+  // Ask the camera to start capturing
+  farm_ng::StartCapturing(bus);
 
-    // Record images detections as they arrive
-    // Write this dataset to disk after num_frames
-    io_service.run();
-
-    // Ask the camera to stop capturing
-    farm_ng::StopCapturing(bus);
+  // Count the number of apriltag detections
+  while (program.get_status().num_frames() > configuration.num_frames()) {
+    io_service.run_one();
   }
+
+  // Ask the camera to stop capturing
+  farm_ng::StopCapturing(bus);
 
   // Ask the logger to stop logging and block until it does
   farm_ng::StopLogging(bus);
+
   return 0;
 }
