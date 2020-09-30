@@ -1,5 +1,5 @@
-#include <future>
 #include <iostream>
+#include <sstream>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -230,8 +230,12 @@ int main(int argc, char* argv[]) {
     // apriltag_size =
   } else {
     num_frames = FLAGS_num_frames;
-    // TODO: Parse FLAGS_tag_ids
-    tag_ids = {221, 226, 225, 218, 222};
+    std::stringstream tag_ids_stream(FLAGS_tag_ids);
+    while (tag_ids_stream.good()) {
+      std::string tag_id;
+      std::getline(tag_ids_stream, tag_id, ',');
+      tag_ids.insert(stoi(tag_id));
+    }
     apriltag_size = FLAGS_apriltag_size;
   }
 
@@ -268,7 +272,7 @@ int main(int argc, char* argv[]) {
     farm_ng::StartCapturing(bus);
 
     // Record images detections as they arrive
-    // Write this dataset to disk after FLAGS_num_frames
+    // Write this dataset to disk after num_frames
     io_service.run();
 
     // Ask the camera to stop capturing
