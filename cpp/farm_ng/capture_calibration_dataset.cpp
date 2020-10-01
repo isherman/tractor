@@ -30,15 +30,15 @@ class CaptureCalibrationDatasetProgram {
     if (configuration.has_value()) {
       set_configuration(configuration.value());
     } else {
-      status_.set_input_required(
-          CaptureCalibrationDatasetStatus::INPUT_REQUIRED_CONFIGURATION);
+      status_.mutable_input_required_configuration()->set_name(FLAGS_name);
+      status_.mutable_input_required_configuration()->set_num_frames(
+          FLAGS_num_frames);
     }
     on_timer(boost::system::error_code());
   }
 
   int run() {
-    if (status_.input_required() ==
-        CaptureCalibrationDatasetStatus::INPUT_REQUIRED_CONFIGURATION) {
+    if (status_.has_input_required_configuration()) {
       set_configuration(
           farm_ng::WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(
               bus_));
@@ -96,8 +96,7 @@ class CaptureCalibrationDatasetProgram {
 
   void set_configuration(CaptureCalibrationDatasetConfiguration configuration) {
     configuration_ = configuration;
-    status_.set_input_required(
-        CaptureCalibrationDatasetStatus::INPUT_REQUIRED_NONE);
+    status_.clear_input_required_configuration();
     send_status();
   }
 

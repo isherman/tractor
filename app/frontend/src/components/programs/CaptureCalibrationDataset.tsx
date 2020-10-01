@@ -8,8 +8,7 @@ import { useEffect, useState } from "react";
 import { Button, Collapse, Form } from "react-bootstrap";
 import {
   CaptureCalibrationDatasetConfiguration as Configuration,
-  CaptureCalibrationDatasetStatus as Status,
-  CaptureCalibrationDatasetStatus_InputRequired as InputRequired
+  CaptureCalibrationDatasetStatus as Status
 } from "../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { ProgramLogVisualizer } from "./ProgramLogVisualizer";
 import { ProgramForm } from "./ProgramForm";
@@ -44,17 +43,19 @@ const Component: React.FC = () => {
   };
 
   return useObserver(() => {
-    const configurationRequired =
+    const requestedConfiguration =
       store.runningProgram &&
       store.latestEvent &&
       store.latestEvent.name.startsWith("calibrator/status") &&
-      store.latestEvent.typeUrl.endsWith("CaptureCalibrationDatasetStatus") &&
-      (store.latestEvent.event as Status).inputRequired >
-        InputRequired.INPUT_REQUIRED_NONE;
+      store.latestEvent.typeUrl.endsWith("CaptureCalibrationDatasetStatus")
+        ? (store.latestEvent.event as Status).inputRequiredConfiguration
+        : null;
+
+    const { numFrames, name } = requestedConfiguration || {};
 
     return (
       <div className={commonStyles.programDetail}>
-        <Collapse in={configurationRequired}>
+        <Collapse in={Boolean(requestedConfiguration)}>
           <div>
             <ProgramForm>
               <Form onSubmit={handleConfigurationSubmit}>
@@ -62,7 +63,7 @@ const Component: React.FC = () => {
                   <Form.Label>Number of Frames</Form.Label>
                   <Form.Control
                     type="number"
-                    defaultValue={16}
+                    defaultValue={numFrames}
                     onChange={handleConfigurationChange}
                   />
                 </Form.Group>
@@ -71,7 +72,7 @@ const Component: React.FC = () => {
                   <Form.Label>Name</Form.Label>
                   <Form.Control
                     type="text"
-                    placeholder="default"
+                    defaultValue={name}
                     onChange={handleConfigurationChange}
                   />
                   <Form.Text className="text-muted">
