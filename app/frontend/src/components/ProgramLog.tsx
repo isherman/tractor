@@ -2,10 +2,9 @@
 import { useObserver } from "mobx-react-lite";
 import * as React from "react";
 import { ListChildComponentProps, FixedSizeList as List } from "react-window";
-
 import { useStores } from "../hooks/useStores";
 import { formatValue } from "../utils/formatValue";
-import styles from "./ProgramDetail.module.scss";
+import styles from "./ProgramLog.module.scss";
 
 const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
   const { programsStore: store } = useStores();
@@ -34,15 +33,12 @@ const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
     );
   });
 };
-export const ProgramDetail: React.FC = () => {
-  const { programsStore: store, visualizationStore } = useStores();
+export const ProgramLog: React.FC = () => {
+  const { programsStore: store } = useStores();
 
   return useObserver(() => {
-    const configurator = store.programUI?.configurator;
-    const visualizer = store.visualizer?.component;
-    const selectedEvent = store.selectedEvent;
     return (
-      <div className={styles.programDetail}>
+      <>
         {store.eventLog.length > 0 && (
           <List
             height={600}
@@ -54,23 +50,7 @@ export const ProgramDetail: React.FC = () => {
             {Row}
           </List>
         )}
-        {configurator &&
-          React.createElement(configurator, {
-            onSubmitConfig: (config) => {
-              console.log("Submitting: ", config);
-            }
-          })}
-        {visualizer &&
-          selectedEvent &&
-          selectedEvent.stamp &&
-          React.createElement(visualizer, {
-            values: [[selectedEvent.stamp.getTime(), selectedEvent.event]],
-            options: [
-              { label: "view", options: ["overlay", "grid"], value: "overlay" }
-            ],
-            resources: visualizationStore.resourceArchive
-          })}
-      </div>
+      </>
     );
   });
 };

@@ -8,15 +8,14 @@ import {
 import { useObserver } from "mobx-react-lite";
 import { useEffect } from "react";
 import { formatValue } from "../utils/formatValue";
-import { ProgramDetail } from "./ProgramDetail";
 import styles from "./Programs.module.scss";
 
 export const Programs: React.FC = () => {
   const { programsStore: store } = useStores();
 
   useEffect(() => {
-    store.startSupervisor();
-    return () => store.stopSupervisor();
+    store.startStreaming();
+    return () => store.stopStreaming();
   }, []);
 
   const handleStart = (id: string): void => {
@@ -36,6 +35,8 @@ export const Programs: React.FC = () => {
   };
 
   return useObserver(() => {
+    const programUI = store.programUI?.component;
+
     const rows = store.supervisorStatus?.library.map(
       ({ id, name, description }) => (
         <tr key={id}>
@@ -107,7 +108,7 @@ export const Programs: React.FC = () => {
           </thead>
           <tbody>{rows}</tbody>
         </Table>
-        <ProgramDetail />
+        {programUI && React.createElement(programUI, {})}
       </div>
     );
   });

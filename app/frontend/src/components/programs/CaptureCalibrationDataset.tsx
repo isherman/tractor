@@ -1,21 +1,43 @@
 import * as React from "react";
-import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
-import { CaptureCalibrationDatasetConfiguration } from "../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 
-import { ProgramUI, ProgramId, ProgramUIProps } from "../../registry/programs";
+import { ProgramUI, ProgramId } from "../../registry/programs";
+import { ProgramLog } from "../ProgramLog";
+import { useStores } from "../../hooks/useStores";
+import { useObserver } from "mobx-react-lite";
+import commonStyles from "./common.module.scss";
+import { useEffect } from "react";
 
-export class CaptureCalibrationDataset
-  implements ProgramUI<CaptureCalibrationDatasetConfiguration> {
+const Component: React.FC = () => {
+  const { programsStore: store, visualizationStore } = useStores();
+  useEffect(() => {
+    store.eventLogPredicate = (e) => e.name.startsWith("calibrator/");
+    return () => store.reset();
+  }, []);
+
+  return useObserver(() => {
+    const visualizer = store.visualizer?.component;
+    const selectedEvent = store.selectedEvent;
+    return (
+      <div className={commonStyles.programDetail}>
+        <ProgramLog />
+        <h1> CaptureCalibrationDataset </h1>
+        {visualizer &&
+          selectedEvent &&
+          selectedEvent.stamp &&
+          React.createElement(visualizer, {
+            values: [[selectedEvent.stamp.getTime(), selectedEvent.event]],
+            options: [
+              { label: "view", options: ["overlay", "grid"], value: "overlay" }
+            ],
+            resources: visualizationStore.resourceArchive
+          })}
+      </div>
+    );
+  });
+};
+
+export class CaptureCalibrationDataset implements ProgramUI {
   static id: ProgramId = "capture-calibration-dataset";
-
   programIds = ["capture-calibration-dataset"] as const;
-
-  eventLogPredicate = (anyEvent: BusAnyEvent): boolean =>
-    anyEvent.name.startsWith("calibrator");
-
-  configurator: React.FC<
-    ProgramUIProps<CaptureCalibrationDatasetConfiguration>
-  > = () => {
-    return <h1>CaptureCalibrationDataset Configurator</h1>;
-  };
+  component = Component;
 }

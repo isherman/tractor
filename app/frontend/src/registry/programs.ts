@@ -1,16 +1,9 @@
-import { Event as BusAnyEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 import { CaptureCalibrationDataset } from "../components/programs/CaptureCalibrationDataset";
 import { CalibrateApriltagRig } from "../components/programs/CalibrateApriltagRig";
-import { EventType } from "./events";
 
-export interface ProgramUIProps<ConfigType extends EventType = EventType> {
-  onSubmitConfig: (config: ConfigType) => void;
-}
-
-export interface ProgramUI<ConfigType extends EventType = EventType> {
+export interface ProgramUI {
   programIds: readonly string[];
-  eventLogPredicate: (anyEvent: BusAnyEvent) => boolean;
-  configurator: React.FC<ProgramUIProps<ConfigType>>;
+  component: React.FC;
 }
 
 export const programRegistry: { [k: string]: ProgramUI } = {
