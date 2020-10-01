@@ -88,7 +88,7 @@ export class ProgramsStore {
       if (eventLogPredicate(anyEvent)) {
         const event = decodeAnyEvent(anyEvent);
         if (!event) {
-          console.error(`ProgramsStore could not decode event`, anyEvent);
+          console.error(`ProgramsStore could not decode Any event`, anyEvent);
           return;
         }
         const logEntry = {

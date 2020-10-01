@@ -18,6 +18,7 @@ DEFINE_int32(num_frames, 16, "number of frames to capture");
 typedef farm_ng_proto::tractor::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetConfiguration;
+using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetStatus;
 
 namespace farm_ng {
@@ -40,18 +41,25 @@ class CaptureCalibrationDatasetProgram {
   int run() {
     if (status_.has_input_required_configuration()) {
       set_configuration(
-          farm_ng::WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(
-              bus_));
+          WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(bus_));
     }
     WaitForServices(bus_, {"ipc-logger", "tracking-camera"});
-    StartLogging(bus_, configuration_.name());
+    LoggingStatus log = StartLogging(bus_, configuration_.name());
     StartCapturing(bus_);
     while (status_.num_frames() < configuration_.num_frames()) {
       bus_.get_io_service().run_one();
     }
-    farm_ng::StopCapturing(bus_);
-    farm_ng::StopLogging(bus_);
-    status_.set_finished(true);
+    StopCapturing(bus_);
+    StopLogging(bus_);
+
+    status_.mutable_result()->set_num_frames(status_.num_frames());
+    status_.mutable_result()->mutable_tag_ids()->CopyFrom(status_.tag_ids());
+    status_.mutable_result()->mutable_stamp_end()->CopyFrom(MakeTimestampNow());
+    status_.mutable_result()->mutable_dataset()->set_path(
+        log.recording().archive_path() + "/" + log.recording().path());
+    status_.mutable_result()->mutable_resource()->CopyFrom(
+        WriteProtobufToJsonResource(
+            "calibration_datasets/" + configuration_.name(), status_.result()));
     send_status();
 
     return 0;
@@ -80,6 +88,14 @@ class CaptureCalibrationDatasetProgram {
     VLOG(2) << detections.ShortDebugString();
 
     status_.set_num_frames(status_.num_frames() + 1);
+    for (auto detection : detections.detections()) {
+      int tag_id = detection.id();
+      if (std::find(status_.tag_ids().begin(), status_.tag_ids().end(),
+                    tag_id) == status_.tag_ids().end()) {
+        status_.add_tag_ids(tag_id);
+      }
+    }
+
     send_status();
     return true;
   }
@@ -118,6 +134,7 @@ class CaptureCalibrationDatasetProgram {
   boost::asio::deadline_timer timer_;
   CaptureCalibrationDatasetConfiguration configuration_;
   CaptureCalibrationDatasetStatus status_;
+  CaptureCalibrationDatasetResult result_;
 };
 
 }  // namespace farm_ng
