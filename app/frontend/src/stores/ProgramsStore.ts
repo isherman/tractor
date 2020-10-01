@@ -22,20 +22,14 @@ interface EventLogEntry {
   event: EventType;
 }
 
-const nullPredicate = (): boolean => false;
-
 export class ProgramsStore {
   private busHandle: BusEventEmitterHandle | null = null;
 
-  // The latest supervisor status, automatically managed by the store
+  // The latest supervisor status
   @observable supervisorStatus: ProgramSupervisorStatus | null = null;
 
-  // Specifies events that should be added to the inputRequired buffer (of length 1)
-  public inputRequiredPredicate: (e: BusAnyEvent) => boolean = nullPredicate;
-  @observable inputRequired: EventLogEntry | null = null;
-
-  // Specifies events that should be added to the eventLog buffer (of unlimited length)
-  public eventLogPredicate: (e: BusAnyEvent) => boolean = nullPredicate;
+  // Should return true for events that should be added to the eventLog buffer
+  public eventLogPredicate: (e: BusAnyEvent) => boolean = () => false;
   @observable eventLog: EventLogEntry[] = [];
 
   // A user-selected element in the eventLog buffer
@@ -56,6 +50,12 @@ export class ProgramsStore {
 
   @computed get selectedEvent(): EventLogEntry | null {
     return this.selectedEntry ? this.eventLog[this.selectedEntry] : null;
+  }
+
+  @computed get latestEvent(): EventLogEntry | null {
+    return this.eventLog.length > 0
+      ? this.eventLog[this.eventLog.length - 1]
+      : null;
   }
 
   @computed get programUI(): ProgramUI | null {
@@ -83,8 +83,7 @@ export class ProgramsStore {
       }
       // TODO: ugly
       const eventLogPredicate = (() => this.eventLogPredicate)();
-      const inputRequiredPredicate = (() => this.inputRequiredPredicate)();
-      if (eventLogPredicate(anyEvent) || inputRequiredPredicate(anyEvent)) {
+      if (eventLogPredicate(anyEvent)) {
         const event = decodeAnyEvent(anyEvent);
         if (!event) {
           console.error(`ProgramsStore could not decode event ${anyEvent}`);
@@ -99,9 +98,6 @@ export class ProgramsStore {
         if (eventLogPredicate(anyEvent)) {
           this.eventLog.push(logEntry);
         }
-        if (inputRequiredPredicate(anyEvent)) {
-          this.inputRequired = logEntry;
-        }
       }
     });
   }
@@ -113,11 +109,9 @@ export class ProgramsStore {
     }
   }
 
-  public reset(): void {
-    this.eventLogPredicate = nullPredicate;
+  public resetEventLog(): void {
+    this.eventLogPredicate = () => false;
     this.eventLog = [];
     this.selectedEntry = null;
-    this.inputRequiredPredicate = nullPredicate;
-    this.inputRequired = null;
   }
 }

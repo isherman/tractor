@@ -16,8 +16,16 @@ message CaptureCalibrationDatasetStatus {
   int32 num_frames = 1;
 
   // The calibration dataset saved to disk.
-  // Will be a ...
+  // Will be an IPC log in protobuf binary format.
   Resource resource = 2;
 
-  bool finished = 3;
+  enum InputRequired {
+    INPUT_REQUIRED_UNSPECIFIED = 0;
+    INPUT_REQUIRED_NONE = 1;
+    INPUT_REQUIRED_CONFIGURATION = 2;
+  };
+
+  InputRequired input_required = 3;
+
+  bool finished = 4;
 }

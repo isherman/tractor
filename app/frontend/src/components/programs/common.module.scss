@@ -1,5 +1,10 @@
 .programDetail {
   display: flex;
-  flex-direction: horizontal;
+  flex-direction: column;
+}
+
+.programLog {
+  display: flex;
+  flex-direction: row;
   height: 600px;
 }

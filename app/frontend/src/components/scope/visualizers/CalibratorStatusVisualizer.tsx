@@ -139,6 +139,7 @@ const CalibratorStatusElement: React.FC<SingleElementVisualizerProps<
     const cameraTransform = getDagTransform(nodePoses, cameraPoseRig.frameA);
     markers.push(
       <ReferenceFrameViz
+        key={rigRootName}
         pose={{
           frameA: rigRootName,
           frameB: cameraPoseRig.frameA,
