@@ -14,8 +14,9 @@ import {
 import { BusClient } from "../models/BusClient";
 import { ProgramUI, programUIForProgramId } from "../registry/programs";
 import { Visualizer, visualizersForEventType } from "../registry/visualization";
+import { ResourceArchive } from "../models/ResourceArchive";
 
-interface EventLogEntry {
+export interface EventLogEntry {
   stamp: Date | undefined;
   name: string;
   typeUrl: EventTypeId;
@@ -37,7 +38,8 @@ export class ProgramsStore {
 
   constructor(
     public busClient: BusClient,
-    private busEventEmitter: BusEventEmitter
+    private busEventEmitter: BusEventEmitter,
+    public resourceArchive: ResourceArchive
   ) {}
 
   @computed get runningProgram(): ProgramExecution | null {

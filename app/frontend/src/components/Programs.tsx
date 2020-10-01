@@ -91,7 +91,7 @@ export const Programs: React.FC = () => {
       )
     );
     return (
-      <div className={styles.programList}>
+      <div className={styles.programs}>
         <Table striped bordered size="sm" responsive="md">
           <thead>
             <tr>

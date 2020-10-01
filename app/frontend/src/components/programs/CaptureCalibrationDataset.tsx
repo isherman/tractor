@@ -1,7 +1,6 @@
 import * as React from "react";
 
 import { ProgramUI, ProgramId } from "../../registry/programs";
-import { ProgramLog } from "../ProgramLog";
 import { useStores } from "../../hooks/useStores";
 import { useObserver } from "mobx-react-lite";
 import commonStyles from "./common.module.scss";
@@ -12,9 +11,11 @@ import {
   CaptureCalibrationDatasetStatus as Status,
   CaptureCalibrationDatasetStatus_InputRequired as InputRequired
 } from "../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
+import { ProgramLogVisualizer } from "./ProgramLogVisualizer";
+import { ProgramForm } from "./ProgramForm";
 
 const Component: React.FC = () => {
-  const { programsStore: store, visualizationStore } = useStores();
+  const { programsStore: store } = useStores();
   useEffect(() => {
     store.eventLogPredicate = (e) => e.name.startsWith("calibrator/");
     return () => store.resetEventLog();
@@ -43,7 +44,6 @@ const Component: React.FC = () => {
   };
 
   return useObserver(() => {
-    const visualizer = store.visualizer?.component;
     const configurationRequired =
       store.runningProgram &&
       store.latestEvent &&
@@ -51,55 +51,48 @@ const Component: React.FC = () => {
       store.latestEvent.typeUrl.endsWith("CaptureCalibrationDatasetStatus") &&
       (store.latestEvent.event as Status).inputRequired >
         InputRequired.INPUT_REQUIRED_NONE;
-    const selectedEvent = store.selectedEvent;
 
     return (
       <div className={commonStyles.programDetail}>
         <Collapse in={configurationRequired}>
-          <Form onSubmit={handleConfigurationSubmit}>
-            <Form.Group controlId="numFrames">
-              <Form.Label>Number of Frames</Form.Label>
-              <Form.Control
-                type="number"
-                defaultValue={16}
-                onChange={handleConfigurationChange}
-              />
-            </Form.Group>
+          <div>
+            <ProgramForm>
+              <Form onSubmit={handleConfigurationSubmit}>
+                <Form.Group controlId="numFrames">
+                  <Form.Label>Number of Frames</Form.Label>
+                  <Form.Control
+                    type="number"
+                    defaultValue={16}
+                    onChange={handleConfigurationChange}
+                  />
+                </Form.Group>
 
-            <Form.Group controlId="formBasicPassword">
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="default"
-                onChange={handleConfigurationChange}
-              />
-              <Form.Text className="text-muted">
-                A name for the dataset, used to name the output archive.
-              </Form.Text>
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Submit
-            </Button>
-          </Form>
+                <Form.Group controlId="formBasicPassword">
+                  <Form.Label>Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="default"
+                    onChange={handleConfigurationChange}
+                  />
+                  <Form.Text className="text-muted">
+                    A name for the dataset, used to name the output archive.
+                  </Form.Text>
+                </Form.Group>
+                <Button variant="primary" type="submit">
+                  Submit
+                </Button>
+              </Form>
+            </ProgramForm>
+          </div>
         </Collapse>
 
-        <div className={commonStyles.programLog}>
-          <ProgramLog />
-          {visualizer &&
-            selectedEvent &&
-            selectedEvent.stamp &&
-            React.createElement(visualizer, {
-              values: [[selectedEvent.stamp.getTime(), selectedEvent.event]],
-              options: [
-                {
-                  label: "view",
-                  options: ["overlay", "grid"],
-                  value: "overlay"
-                }
-              ],
-              resources: visualizationStore.resourceArchive
-            })}
-        </div>
+        <ProgramLogVisualizer
+          eventLog={store.eventLog}
+          selectedEntry={store.selectedEntry}
+          onSelectEntry={(e) => (store.selectedEntry = e)}
+          visualizer={store.visualizer?.component || null}
+          resources={store.resourceArchive}
+        />
       </div>
     );
   });

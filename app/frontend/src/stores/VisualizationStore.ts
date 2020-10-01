@@ -3,10 +3,7 @@ import {
   BusEventEmitter,
   BusEventEmitterHandle
 } from "../models/BusEventEmitter";
-import {
-  HttpResourceArchive,
-  ResourceArchive
-} from "../models/ResourceArchive";
+import { ResourceArchive } from "../models/ResourceArchive";
 import { StreamingBuffer } from "../models/StreamingBuffer";
 import { EventTypeId } from "../registry/events";
 import {
@@ -108,9 +105,7 @@ export class VisualizationStore {
   @observable buffer: Buffer = {};
   @observable bufferLogLoadProgress = 0;
   @observable bufferExpirationWindow = 1 * duration.minute;
-  @observable resourceArchive: ResourceArchive = new HttpResourceArchive(
-    `http://${window.location.hostname}:8081/resources`
-  );
+  @observable resourceArchive: ResourceArchive;
   @observable panels: { [k: string]: Panel } = {};
 
   private streamingBuffer: StreamingBuffer = new StreamingBuffer();
@@ -118,9 +113,13 @@ export class VisualizationStore {
   private busEventEmitterHandle: BusEventEmitterHandle | null = null;
   @observable private streamingTimerHandle: number | null = null;
 
-  constructor(public busEventEmitter: BusEventEmitter) {
+  constructor(
+    public busEventEmitter: BusEventEmitter,
+    resourceArchive: ResourceArchive
+  ) {
     const p = new Panel();
     this.panels = { [p.id]: p };
+    this.resourceArchive = resourceArchive;
   }
 
   @computed get isStreaming(): boolean {
