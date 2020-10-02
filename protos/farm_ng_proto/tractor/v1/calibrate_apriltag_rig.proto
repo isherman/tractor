@@ -26,6 +26,8 @@ message CalibrateApriltagRigStatus {
   }
   // Serialized CalibrateApriltagRigResult
   Resource result = 2;
+
+  SolverIterationSummary iteration_summary = 3;
 }
 
 message CalibrateApriltagRigResult {
