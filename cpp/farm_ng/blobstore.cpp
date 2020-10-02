@@ -8,7 +8,6 @@ const std::map<BucketId, std::string> kBucketPaths{
     {BucketId::kCalibrationDatasets, "calibration-datasets"},
     {BucketId::kApriltagRigModels, "apriltag_rig_models"},
     {BucketId::kBaseToCameraModels, "base_to_camera_models"}};
-};  // namespace farm_ng
 
 boost::filesystem::path GetBlobstoreRoot() {
   boost::filesystem::path root;

@@ -71,8 +71,7 @@ class CalibrateBaseToCameraProgram {
       set_configuration(configuration.value());
     } else {
       status_.mutable_input_required_configuration()->set_name(FLAGS_name);
-      status_.mutable_input_required_configuration()->set_root_tag_id(
-          FLAGS_root_tag_id);
+      // TODO: Populate configuration
     }
     bus_.GetEventSignal()->connect(std::bind(
         &CalibrateBaseToCameraProgram::on_event, this, std::placeholders::_1));
@@ -90,7 +89,7 @@ class CalibrateBaseToCameraProgram {
     LOG(INFO) << "Ran " << n_jobs << " jobs.";
   }
 
-  void OnLogEvent(const EventPb& event, MonocularApriltagRigModel* model) {}
+  // void OnLogEvent(const EventPb& event, MonocularApriltagRigModel* model) {}
 
   // reads the event log from the CalibrationDatasetResult, and
   // populates a MonocularApriltagRigModel to be solved.
@@ -106,7 +105,8 @@ class CalibrateBaseToCameraProgram {
       try {
         bus_.get_io_service().poll();
         event = log_reader.ReadNext();
-        OnLogEvent(event, &model);
+        // TODO
+        // OnLogEvent(event, &model);
       } catch (std::runtime_error& e) {
         break;
       }
@@ -126,7 +126,9 @@ class CalibrateBaseToCameraProgram {
     WaitForServices(bus_, {"ipc-logger"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
 
-    MonocularApriltagRigModel rig_model = LoadRigModel();
+    // TODO
+    MonocularApriltagRigModel rig_model;
+    // MonocularApriltagRigModel rig_model = LoadRigModel();
     BaseToCameraModel initial_model = LoadCalibrationDataset();
 
     CalibrateBaseToCameraResult result =
@@ -140,7 +142,8 @@ class CalibrateBaseToCameraProgram {
   }
 
   void send_status() {
-    bus_.Send(MakeEvent(CalibrateBaseToCameraProgram::id + "/status", status_));
+    bus_.Send(MakeEvent(
+        std::string(CalibrateBaseToCameraProgram::id) + "/status", status_));
   }
 
   void on_timer(const boost::system::error_code& error) {
@@ -172,7 +175,8 @@ class CalibrateBaseToCameraProgram {
   }
 
   void on_event(const EventPb& event) {
-    if (!event.name().rfind(CalibrateBaseToCameraProgram::id + "/", 0) == 0) {
+    if (!event.name().rfind(std::string(CalibrateBaseToCameraProgram::id) + "/",
+                            0) == 0) {
       return;
     }
     if (on_configuration(event)) {
