@@ -33,13 +33,15 @@ sudo apt-get install -y \
      dirmngr \
      git \
      git-lfs \
+     gstreamer1.0-libav \
      libatlas-base-dev \
      libboost-filesystem-dev \
      libboost-regex-dev \
      libboost-system-dev \
      libeigen3-dev \
      libgoogle-glog-dev \
-     libopencv-dev \
+     libgstreamer-plugins-base1.0-dev \
+     libgstreamer1.0-dev \
      libprotobuf-dev \
      librealsense2-dev \
      librealsense2-utils \
