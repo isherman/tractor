@@ -149,8 +149,9 @@ void WaitForServices(EventBus& bus,
                      const std::vector<std::string>& service_names_in);
 LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path);
 LoggingStatus StopLogging(EventBus& bus);
-void StartCapturing(EventBus& bus);
-void StopCapturing(EventBus& bus);
+void RequestStopLogging(EventBus& bus);
+void RequestStartCapturing(EventBus& bus);
+void RequestStopCapturing(EventBus& bus);
 
 }  // namespace farm_ng
 

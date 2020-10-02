@@ -411,20 +411,24 @@ LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path) {
 }
 
 LoggingStatus StopLogging(EventBus& bus) {
-  LoggingCommand command;
-  command.mutable_record_stop();
-  bus.Send(farm_ng::MakeEvent("logger/command", command));
+  RequestStopLogging(bus);
   return WaitForLoggerStop(bus);
 }
 
-void StartCapturing(EventBus& bus) {
+void RequestStopLogging(EventBus& bus) {
+  LoggingCommand command;
+  command.mutable_record_stop();
+  bus.Send(farm_ng::MakeEvent("logger/command", command));
+}
+
+void RequestStartCapturing(EventBus& bus) {
   TrackingCameraCommand command;
   command.mutable_record_start()->set_mode(
       TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE);
   bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
 }
 
-void StopCapturing(EventBus& bus) {
+void RequestStopCapturing(EventBus& bus) {
   TrackingCameraCommand command;
   command.mutable_record_stop();
   bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));

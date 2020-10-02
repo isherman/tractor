@@ -38,18 +38,38 @@ class CaptureCalibrationDatasetProgram {
     on_timer(boost::system::error_code());
   }
 
+  void handle_signal(const boost::system::error_code& error,
+                     int signal_number) {
+    std::cout << "Received (error, signal) " << error << " , " << signal_number
+              << std::endl;
+    bus_.get_io_service().stop();
+    bus_.get_io_service().reset();
+    RequestStopCapturing(bus_);
+    std::cout << "Requested stop capturing" << std::endl;
+    RequestStopLogging(bus_);
+    std::cout << "Requested stop logging" << std::endl;
+    exit(1);
+  }
+
   int run() {
+    boost::asio::signal_set signals(bus_.get_io_service(), SIGTERM, SIGINT);
+    signals.async_wait(
+        std::bind(&CaptureCalibrationDatasetProgram::handle_signal, this,
+                  std::placeholders::_1, std::placeholders::_2));
+
     if (status_.has_input_required_configuration()) {
       set_configuration(
           WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(bus_));
     }
     WaitForServices(bus_, {"ipc-logger", "tracking-camera"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
-    StartCapturing(bus_);
+    RequestStartCapturing(bus_);
     while (status_.num_frames() < configuration_.num_frames()) {
       bus_.get_io_service().run_one();
+      VLOG(2) << "loop";
     }
-    StopCapturing(bus_);
+
+    RequestStopCapturing(bus_);
     StopLogging(bus_);
 
     status_.mutable_result()->set_num_frames(status_.num_frames());
@@ -57,6 +77,8 @@ class CaptureCalibrationDatasetProgram {
     status_.mutable_result()->mutable_stamp_end()->CopyFrom(MakeTimestampNow());
     status_.mutable_result()->mutable_dataset()->set_path(
         log.recording().archive_path() + "/" + log.recording().path());
+    VLOG(2) << "Writing to: "
+            << "calibration_datasets/" << configuration_.name();
     status_.mutable_result()->mutable_resource()->CopyFrom(
         WriteProtobufToJsonResource(
             "calibration_datasets/" + configuration_.name(), status_.result()));
@@ -86,6 +108,10 @@ class CaptureCalibrationDatasetProgram {
       return false;
     }
     VLOG(2) << detections.ShortDebugString();
+
+    if (detections.detections().size() == 0) {
+      return true;
+    }
 
     status_.set_num_frames(status_.num_frames() + 1);
     for (auto detection : detections.detections()) {
