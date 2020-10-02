@@ -42,26 +42,20 @@ class CaptureCalibrationDatasetProgram {
     on_timer(boost::system::error_code());
   }
 
-  // TODO: This doesn't work yet
-  void handle_signal(const boost::system::error_code& error,
-                     int signal_number) {
-    std::cout << "Received (error, signal) " << error << " , " << signal_number
-              << std::endl;
-    bus_.get_io_service().stop();
-    bus_.get_io_service().reset();
-    RequestStopCapturing(bus_);
-    std::cout << "Requested stop capturing" << std::endl;
-    RequestStopLogging(bus_);
-    std::cout << "Requested stop logging" << std::endl;
-    exit(1);
+  ~CaptureCalibrationDatasetProgram() {
+    if (bus_.get_io_service().stopped()) {
+      LOG(INFO) << "bus was stopped for some reason...";
+      bus_.get_io_service().reset();
+    }
+    farm_ng::RequestStopCapturing(bus_);
+    LOG(INFO) << "Requested stop capturing";
+    farm_ng::RequestStopLogging(bus_);
+    LOG(INFO) << "Requested Stop logging";
+    int n_jobs = bus_.get_io_service().poll();
+    LOG(INFO) << "Ran " << n_jobs << " jobs.";
   }
 
   int run() {
-    boost::asio::signal_set signals(bus_.get_io_service(), SIGTERM, SIGINT);
-    signals.async_wait(
-        std::bind(&CaptureCalibrationDatasetProgram::handle_signal, this,
-                  std::placeholders::_1, std::placeholders::_2));
-
     if (status_.has_input_required_configuration()) {
       set_configuration(
           WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(bus_));
@@ -84,10 +78,6 @@ class CaptureCalibrationDatasetProgram {
     VLOG(1) << resource.ShortDebugString();
     status_.mutable_result()->mutable_resource()->CopyFrom(resource);
     send_status();
-
-    RequestStopCapturing(bus_);
-    StopLogging(bus_);
-
     return 0;
   }
 
@@ -176,17 +166,32 @@ int main(int argc, char* argv[]) {
   google::InstallFailureSignalHandler();
 
   boost::asio::io_service io_service;
-  farm_ng::EventBus& bus = farm_ng::GetEventBus(
-      io_service,
-      "calibrator");  // using 'calibrator' for compatibility w/ existing code
 
-  std::optional<CaptureCalibrationDatasetConfiguration> configuration;
-  if (!FLAGS_interactive) {
-    CaptureCalibrationDatasetConfiguration flags_config;
-    flags_config.set_num_frames(FLAGS_num_frames);
-    flags_config.set_name(FLAGS_name);
-    configuration = flags_config;
+  boost::asio::signal_set signals(io_service, SIGTERM, SIGINT);
+  signals.async_wait([&io_service](const boost::system::error_code& error,
+                                   int signal_number) {
+    std::cout << "Received (error, signal) " << error << " , " << signal_number
+              << std::endl;
+    io_service.stop();
+    throw std::runtime_error("signal caught: " + std::to_string(signal_number));
+  });
+
+  try {
+    farm_ng::EventBus& bus = farm_ng::GetEventBus(
+        io_service,
+        "calibrator");  // using 'calibrator' for compatibility w/ existing code
+    std::optional<CaptureCalibrationDatasetConfiguration> configuration;
+    if (!FLAGS_interactive) {
+      CaptureCalibrationDatasetConfiguration flags_config;
+      flags_config.set_num_frames(FLAGS_num_frames);
+      flags_config.set_name(FLAGS_name);
+      configuration = flags_config;
+    }
+    farm_ng::CaptureCalibrationDatasetProgram program(bus, configuration);
+    return program.run();
+  } catch (std::runtime_error& e) {
+    LOG(WARNING) << "caught error." << e.what()
+                 << " stopped: " << io_service.stopped();
+    return 1;
   }
-  farm_ng::CaptureCalibrationDatasetProgram program(bus, configuration);
-  return program.run();
 }

@@ -579,7 +579,7 @@ class TrackingCameraClient {
         " video/x-h264, stream-format=byte-stream !";
 
     std::string cmd0 = std::string("appsrc !") + " videoconvert ! " +
-                       encoder_omxh264 +
+                       encoder_x264 +
 
                        " rtph264pay pt=96 mtu=1400 config-interval=10 !" +
                        " udpsink port=5000";
