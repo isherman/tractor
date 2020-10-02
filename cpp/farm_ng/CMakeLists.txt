@@ -29,6 +29,3 @@ target_link_libraries(calibrate_apriltag_rig farm-ng-ipc farm-ng-calibration far
 
 add_executable(calibrate_base_to_camera calibrate_base_to_camera.cpp)
 target_link_libraries(calibrate_base_to_camera farm-ng-ipc farm-ng-calibration farm-ng-protobuf gflags)
-
-add_executable(farm-ng-calibrator calibrator.cpp)
-target_link_libraries(farm-ng-calibrator farm-ng-ipc farm-ng-protobuf farm-ng-calibration gflags)

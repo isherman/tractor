@@ -6,6 +6,7 @@
 #include <glog/logging.h>
 
 #include "farm_ng/blobstore.h"
+#include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/event_log_reader.h"
 #include "farm_ng/ipc.h"
 
@@ -34,6 +35,13 @@ using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
 
 namespace farm_ng {
+
+namespace {
+bool is_calibration_event(const std::string& s) {
+  return s.rfind("calibrator/", 0) == 0;
+}
+}  // namespace
+
 class CalibrateApriltagRigProgram {
  public:
   CalibrateApriltagRigProgram(
@@ -63,33 +71,38 @@ class CalibrateApriltagRigProgram {
     LOG(INFO) << "Ran " << n_jobs << " jobs.";
   }
 
-  void OnLogEvent(const EventPb& event, MonocularApriltagRigModel* model) {}
+  void OnLogEvent(const EventPb& event, ApriltagRigCalibrator* calibrator) {
+    if (!is_calibration_event(event.name())) {
+      return;
+    }
+    ApriltagDetections detections;
+    if (!event.data().UnpackTo(&detections)) {
+      return;
+    }
+  }
 
   // reads the event log from the CalibrationDatasetResult, and
   // populates a MonocularApriltagRigModel to be solved.
-  MonocularApriltagRigModel LoadCalibrationDataset() {
+  ApriltagRigModel LoadCalibrationDataset() {
     auto dataset_result =
         ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
             configuration_.calibration_dataset());
 
     EventLogReader log_reader(dataset_result.dataset());
-    MonocularApriltagRigModel model;
+    ApriltagRigCalibrator calibrator(&bus_, configuration_);
     while (true) {
       EventPb event;
       try {
         bus_.get_io_service().poll();
         event = log_reader.ReadNext();
-        OnLogEvent(event, &model);
+        OnLogEvent(event, &calibrator);
       } catch (std::runtime_error& e) {
         break;
       }
     }
-    return model;
+    return calibrator.PoseInitialization();
   }
-  CalibrateApriltagRigResult SolveApriltagRigModel(MonocularApriltagRigModel) {
-    CalibrateApriltagRigResult result;
-    return result;
-  }
+
   int run() {
     if (status_.has_input_required_configuration()) {
       set_configuration(
@@ -98,9 +111,37 @@ class CalibrateApriltagRigProgram {
     WaitForServices(bus_, {"ipc-logger"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
 
-    MonocularApriltagRigModel initial_model = LoadCalibrationDataset();
+    ApriltagRigModel model = LoadCalibrationDataset();
 
-    CalibrateApriltagRigResult result = SolveApriltagRigModel(initial_model);
+    MonocularApriltagRigModel initial_model_pb;
+    model.ToMonocularApriltagRigModel(&initial_model_pb);
+
+    CalibrateApriltagRigResult result;
+    result.mutable_configuration()->CopyFrom(configuration_);
+    result.mutable_monocular_apriltag_rig_initial()->CopyFrom(
+        ArchiveProtobufAsBinaryResource("apriltag_rig_model/initial",
+                                        initial_model_pb));
+    result.set_rmse(model.rmse);
+    result.set_solver_status(model.status);
+    result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
+    if (log.has_recording()) {
+      result.mutable_event_log()->set_path(log.recording().archive_path());
+    }
+    status_.mutable_result()->CopyFrom(ArchiveProtobufAsJsonResource(
+        "apriltag_rig_model/initial_result", result));
+    send_status();
+
+    farm_ng::Solve(&model);
+    MonocularApriltagRigModel final_model_pb;
+    model.ToMonocularApriltagRigModel(&final_model_pb);
+    result.mutable_monocular_apriltag_rig_solved()->CopyFrom(
+        ArchiveProtobufAsBinaryResource("apriltag_rig_model/solved",
+                                        initial_model_pb));
+    result.set_rmse(model.rmse);
+    result.set_solver_status(model.status);
+    result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
+    status_.mutable_result()->CopyFrom(ArchiveProtobufAsJsonResource(
+        "apriltag_rig_model/solved_result", result));
 
     auto result_resource = WriteProtobufAsBinaryResource(
         BucketId::kApriltagRigModels, configuration_.name(), result);
