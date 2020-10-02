@@ -91,29 +91,34 @@ class CalibrateBaseToCameraProgram {
   // void OnLogEvent(const EventPb& event, MonocularApriltagRigModel* model) {}
 
   // reads the event log from the CalibrationDatasetResult, and
-  // populates a MonocularApriltagRigModel to be solved.
+  // populates a BaseToCameraModel to be solved.
   BaseToCameraModel LoadCalibrationDataset() {
     auto dataset_result =
         ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
             configuration_.calibration_dataset());
 
     EventLogReader log_reader(dataset_result.dataset());
-    BaseToCameraModel model;
+    // TODO
+    // BaseToCameraModelCalibrator calibrator(...)
     while (true) {
       EventPb event;
       try {
         bus_.get_io_service().poll();
         event = log_reader.ReadNext();
         // TODO
-        // OnLogEvent(event, &model);
+        // OnLogEvent(event, &calibrator);
       } catch (std::runtime_error& e) {
         break;
       }
     }
-    return model;
+
+    // TODO
+    return BaseToCameraModel();
+    // return calibrator.PoseInitialization();
   }
   CalibrateBaseToCameraResult SolveBaseToCameraModel(MonocularApriltagRigModel,
                                                      BaseToCameraModel) {
+    // TODO
     CalibrateBaseToCameraResult result;
     return result;
   }
