@@ -35,7 +35,7 @@ template <typename ProtobufT>
 farm_ng_proto::tractor::v1::Resource WriteProtobufAsJsonResource(
     BucketId id, const std::string& path, const ProtobufT& message) {
   farm_ng_proto::tractor::v1::Resource resource;
-  resource.set_content_type("application/protobuf; type=type.googleapis.com/" +
+  resource.set_content_type("application/json; type=type.googleapis.com/" +
                             ProtobufT::descriptor()->full_name());
 
   boost::filesystem::path write_path =
@@ -83,7 +83,7 @@ template <typename ProtobufT>
 ProtobufT ReadProtobufFromResource(
     const farm_ng_proto::tractor::v1::Resource& resource) {
   // TODO check the content_type to switch parser between binary or protobuf.
-  CHECK_EQ("application/protobuf; type=type.googleapis.com/" +
+  CHECK_EQ("application/json; type=type.googleapis.com/" +
                ProtobufT::descriptor()->full_name(),
            resource.content_type())
       << resource.DebugString();

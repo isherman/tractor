@@ -111,8 +111,9 @@ class CalibrateApriltagRigProgram {
     return 0;
   }
 
-  // using 'calibrator' for compatibility w/ existing code
-  void send_status() { bus_.Send(MakeEvent("calibrator/status", status_)); }
+  void send_status() {
+    bus_.Send(MakeEvent("calibrate_apriltag_rig/status", status_));
+  }
 
   void on_timer(const boost::system::error_code& error) {
     if (error) {
@@ -180,9 +181,8 @@ int main(int argc, char* argv[]) {
   });
 
   try {
-    farm_ng::EventBus& bus = farm_ng::GetEventBus(
-        io_service,
-        "calibrator");  // using 'calibrator' for compatibility w/ existing code
+    farm_ng::EventBus& bus =
+        farm_ng::GetEventBus(io_service, "calibrate_apriltag_rig");
     std::optional<CalibrateApriltagRigConfiguration> configuration;
     if (!FLAGS_interactive) {
       CalibrateApriltagRigConfiguration flags_config;
