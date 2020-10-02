@@ -11,7 +11,7 @@ const [busEventEmitter, mediaStreamEmitter, busClient] = getWebRTCEmitters(
 );
 
 const httpResourceArchive = new HttpResourceArchive(
-  `http://${window.location.hostname}:8081/resources`
+  `http://${window.location.hostname}:8081/blobstore`
 );
 
 export const storesContext = React.createContext({

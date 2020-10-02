@@ -5,6 +5,7 @@ add_library(farm-ng-ipc SHARED
   event_log.cpp
   event_log_reader.h
   event_log_reader.cpp
+  blobstore.h
   )
 target_link_libraries(farm-ng-ipc farm-ng-protobuf ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${GLOG_LIBRARIES})
 

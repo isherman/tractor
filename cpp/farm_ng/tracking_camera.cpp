@@ -701,7 +701,7 @@ class TrackingCameraClient {
                 latest_command_.record_start().mode() ==
                     TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE &&
                 tag_filter_.AddApriltags(apriltags)) {
-              auto resource_path = GetUniqueResource(
+              auto resource_path = GetUniqueArchiveResource(
                   "tracking_camera_left_apriltag", "png", "image/png");
               apriltags.mutable_image()->mutable_resource()->CopyFrom(
                   resource_path.first);

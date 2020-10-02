@@ -30,7 +30,7 @@ class IpcLogger {
     last_command_.CopyFrom(command);
     switch (last_command_.command_case()) {
       case LoggingCommand::kRecordStart: {
-        auto resource_path = GetUniqueResource("events", "log", "");
+        auto resource_path = GetUniqueArchiveResource("events", "log", "");
         log_resource_ = resource_path.first;
         LOG(INFO) << "Starting log: " << log_resource_.ShortDebugString();
         log_writer_.reset(new EventLogWriter(resource_path.second));

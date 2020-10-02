@@ -5,6 +5,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "farm_ng/blobstore.h"
 #include "farm_ng/ipc.h"
 
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
@@ -35,9 +36,13 @@ class CaptureCalibrationDatasetProgram {
       status_.mutable_input_required_configuration()->set_num_frames(
           FLAGS_num_frames);
     }
+    bus_.GetEventSignal()->connect(
+        std::bind(&CaptureCalibrationDatasetProgram::on_event, this,
+                  std::placeholders::_1));
     on_timer(boost::system::error_code());
   }
 
+  // TODO: This doesn't work yet
   void handle_signal(const boost::system::error_code& error,
                      int signal_number) {
     std::cout << "Received (error, signal) " << error << " , " << signal_number
@@ -62,27 +67,26 @@ class CaptureCalibrationDatasetProgram {
           WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(bus_));
     }
     WaitForServices(bus_, {"ipc-logger", "tracking-camera"});
-    LoggingStatus log = StartLogging(bus_, configuration_.name());
     RequestStartCapturing(bus_);
+    LoggingStatus log = StartLogging(bus_, configuration_.name());
     while (status_.num_frames() < configuration_.num_frames()) {
       bus_.get_io_service().run_one();
-      VLOG(2) << "loop";
     }
-
-    RequestStopCapturing(bus_);
-    StopLogging(bus_);
 
     status_.mutable_result()->set_num_frames(status_.num_frames());
     status_.mutable_result()->mutable_tag_ids()->CopyFrom(status_.tag_ids());
     status_.mutable_result()->mutable_stamp_end()->CopyFrom(MakeTimestampNow());
     status_.mutable_result()->mutable_dataset()->set_path(
-        log.recording().archive_path() + "/" + log.recording().path());
-    VLOG(2) << "Writing to: "
-            << "calibration_datasets/" << configuration_.name();
-    status_.mutable_result()->mutable_resource()->CopyFrom(
-        WriteProtobufToJsonResource(
-            "calibration_datasets/" + configuration_.name(), status_.result()));
+        log.recording().archive_path());
+    auto resource =
+        WriteProtobufAsJsonResource(BucketId::kCalibrationDatasets,
+                                    configuration_.name(), status_.result());
+    VLOG(1) << resource.ShortDebugString();
+    status_.mutable_result()->mutable_resource()->CopyFrom(resource);
     send_status();
+
+    RequestStopCapturing(bus_);
+    StopLogging(bus_);
 
     return 0;
   }
@@ -107,7 +111,6 @@ class CaptureCalibrationDatasetProgram {
     if (!event.data().UnpackTo(&detections)) {
       return false;
     }
-    VLOG(2) << detections.ShortDebugString();
 
     if (detections.detections().size() == 0) {
       return true;

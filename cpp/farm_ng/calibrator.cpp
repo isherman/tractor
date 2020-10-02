@@ -81,7 +81,7 @@ class Calibrator {
     model.ToMonocularApriltagRigModel(&model_pb);
 
     status_.mutable_apriltag_rig()->mutable_rig_model_resource()->CopyFrom(
-        WriteProtobufToJsonResource("apriltag_rig_model/initial", model_pb));
+        ArchiveProtobufAsJsonResource("apriltag_rig_model/initial", model_pb));
 
     send_status();
     LOG(INFO) << "Initial reprojection error ^^^^^^^";
@@ -89,7 +89,7 @@ class Calibrator {
     farm_ng::Solve(model);
     model.ToMonocularApriltagRigModel(&model_pb);
     status_.mutable_apriltag_rig()->mutable_rig_model_resource()->CopyFrom(
-        WriteProtobufToJsonResource("apriltag_rig_model/solved", model_pb));
+        ArchiveProtobufAsJsonResource("apriltag_rig_model/solved", model_pb));
 
     status_.mutable_apriltag_rig()->set_finished(true);
     send_status();

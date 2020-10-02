@@ -177,7 +177,7 @@ void ModelError(ApriltagRigModel& model) {
     }
     Image reprojection_image;
     reprojection_image.CopyFrom(detections.image());
-    auto resource_path = GetUniqueResource(
+    auto resource_path = GetUniqueArchiveResource(
         FrameNameNumber("reprojection", frame_n), "png", "image/png");
     reprojection_image.mutable_resource()->CopyFrom(resource_path.first);
 

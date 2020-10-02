@@ -417,9 +417,9 @@ int main(int argc, char** argv) {
     }
   }
   auto initial_resource_pb =
-      farm_ng::WriteProtobufToBinaryResource("base_to_camera/initial", model);
+      farm_ng::ArchiveProtobufAsBinaryResource("base_to_camera/initial", model);
   auto solved_model = farm_ng::SolveBasePoseCamera(model, false);
-  auto solved_resource_pb = farm_ng::WriteProtobufToBinaryResource(
+  auto solved_resource_pb = farm_ng::ArchiveProtobufAsBinaryResource(
       "base_to_camera/solved", solved_model);
 
   LOG(INFO) << "Wrote results to:\n"

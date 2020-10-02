@@ -10,6 +10,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/signals2.hpp>
 
+#include "farm_ng/blobstore.h"
 #include "farm_ng_proto/tractor/v1/io.pb.h"
 #include "farm_ng_proto/tractor/v1/resource.pb.h"
 
@@ -54,52 +55,33 @@ void SetArchivePath(const std::string& name);
 boost::filesystem::path GetArchivePath();
 boost::filesystem::path GetArchiveRoot();
 
-template <typename ProtobufT>
-void WriteProtobufToJsonFile(const boost::filesystem::path& path,
-                             const ProtobufT& proto) {
-  google::protobuf::util::JsonPrintOptions print_options;
-  print_options.add_whitespace = true;
-  print_options.always_print_primitive_fields = true;
-  std::string json_str;
-  google::protobuf::util::MessageToJsonString(proto, &json_str, print_options);
-  std::ofstream outf(path.string());
-  outf << json_str;
-}
-
-template <typename ProtobufT>
-void WriteProtobufToBinaryFile(const boost::filesystem::path& path,
-                               const ProtobufT& proto) {
-  std::string binary_str;
-  proto.SerializeToString(&binary_str);
-  std::ofstream outf(path.string(), std::ofstream::binary);
-  outf << binary_str;
-}
-
 // returns a resource that can be written to that will have a unique file
 // name, in the active logging directory.
 std::pair<farm_ng_proto::tractor::v1::Resource, boost::filesystem::path>
-GetUniqueResource(const std::string& prefix, const std::string& ext,
-                  const std::string& mime_type);
+GetUniqueArchiveResource(const std::string& prefix, const std::string& ext,
+                         const std::string& mime_type);
 
+// writes a protobuf, as json, to the active logging directory
 template <typename ProtobufT>
-farm_ng_proto::tractor::v1::Resource WriteProtobufToJsonResource(
+farm_ng_proto::tractor::v1::Resource ArchiveProtobufAsJsonResource(
     const std::string& prefix, const ProtobufT& message) {
   auto resource_path =
-      GetUniqueResource(prefix, "json",
-                        "application/json; type=type.googleapis.com/" +
-                            ProtobufT::descriptor()->full_name());
+      GetUniqueArchiveResource(prefix, "json",
+                               "application/json; type=type.googleapis.com/" +
+                                   ProtobufT::descriptor()->full_name());
 
   WriteProtobufToJsonFile(resource_path.second, message);
   return resource_path.first;
 }
 
+// writes a protobuf, as binary, to the active logging directory
 template <typename ProtobufT>
-farm_ng_proto::tractor::v1::Resource WriteProtobufToBinaryResource(
+farm_ng_proto::tractor::v1::Resource ArchiveProtobufAsBinaryResource(
     const std::string& prefix, const ProtobufT& message) {
-  auto resource_path =
-      GetUniqueResource(prefix, "pb",
-                        "application/protobuf; type=type.googleapis.com/" +
-                            ProtobufT::descriptor()->full_name());
+  auto resource_path = GetUniqueArchiveResource(
+      prefix, "pb",
+      "application/protobuf; type=type.googleapis.com/" +
+          ProtobufT::descriptor()->full_name());
 
   WriteProtobufToBinaryFile(resource_path.second, message);
   return resource_path.first;

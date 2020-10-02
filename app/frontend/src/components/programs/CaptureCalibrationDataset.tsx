@@ -20,15 +20,18 @@ const Component: React.FC = () => {
     return () => store.resetEventLog();
   }, []);
 
-  const [configuration, setConfiguration] = useState<Configuration>({
-    numFrames: 0,
-    name: ""
-  });
+  const [configuration, setConfiguration] = useState<Configuration | null>(
+    null
+  );
 
   const handleConfigurationChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    setConfiguration({ ...configuration, [e.target.name]: e.target.value });
+    console.log("handleConfigurationChange: ", e.target.name, e.target.value);
+    setConfiguration({
+      ...(configuration || {}),
+      [e.target.name]: e.target.value
+    } as Configuration);
   };
 
   const handleConfigurationSubmit = (
@@ -51,7 +54,9 @@ const Component: React.FC = () => {
         ? (store.latestEvent.event as Status).inputRequiredConfiguration
         : null;
 
-    const { numFrames, name } = requestedConfiguration || {};
+    if (requestedConfiguration && !configuration) {
+      setConfiguration(requestedConfiguration);
+    }
 
     return (
       <div className={commonStyles.programDetail}>
@@ -63,16 +68,18 @@ const Component: React.FC = () => {
                   <Form.Label>Number of Frames</Form.Label>
                   <Form.Control
                     type="number"
-                    defaultValue={numFrames}
+                    name="numFrames"
+                    value={configuration?.numFrames || 0}
                     onChange={handleConfigurationChange}
                   />
                 </Form.Group>
 
-                <Form.Group controlId="formBasicPassword">
+                <Form.Group controlId="name">
                   <Form.Label>Name</Form.Label>
                   <Form.Control
                     type="text"
-                    defaultValue={name}
+                    name="name"
+                    value={configuration?.name || ""}
                     onChange={handleConfigurationChange}
                   />
                   <Form.Text className="text-muted">

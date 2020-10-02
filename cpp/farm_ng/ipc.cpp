@@ -16,6 +16,7 @@
 
 #include <glog/logging.h>
 
+#include "farm_ng/blobstore.h"
 #include "farm_ng_proto/tractor/v1/io.pb.h"
 #include "farm_ng_proto/tractor/v1/tracking_camera.pb.h"
 
@@ -27,7 +28,7 @@ namespace {
 
 class ArchiveManager {
  public:
-  ArchiveManager() : resource_uuids_(0) {}
+  ArchiveManager() : resource_uuids_(0) { root_ = GetBlobstoreRoot(); }
   boost::filesystem::path path() const {
     std::lock_guard<std::mutex> lock(path_mtx_);
     return path_;
@@ -42,7 +43,7 @@ class ArchiveManager {
   uint64_t NewResourceId() { return resource_uuids_++; }
 
  private:
-  boost::filesystem::path root_ = "/tmp/farm-ng-log/";
+  boost::filesystem::path root_;
   mutable std::mutex path_mtx_;
   boost::filesystem::path path_ = "default";
   std::atomic<uint64_t> resource_uuids_;
@@ -314,8 +315,8 @@ boost::filesystem::path GetArchivePath() { return get_archive().path(); }
 boost::filesystem::path GetArchiveRoot() { return get_archive().root(); }
 
 std::pair<farm_ng_proto::tractor::v1::Resource, boost::filesystem::path>
-GetUniqueResource(const std::string& prefix, const std::string& ext,
-                  const std::string& content_type) {
+GetUniqueArchiveResource(const std::string& prefix, const std::string& ext,
+                         const std::string& content_type) {
   farm_ng_proto::tractor::v1::Resource resource;
   resource.set_content_type(content_type);
 
@@ -405,9 +406,12 @@ LoggingStatus WaitForLoggerStop(EventBus& bus) {
 LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path) {
   WaitForLoggerStop(bus);
   LoggingCommand command;
-  command.mutable_record_start()->set_archive_path(archive_path);
+  std::string full_archive_path = (GetBucketRelativePath(BucketId::kLogs) /
+                                   boost::filesystem::path(archive_path))
+                                      .string();
+  command.mutable_record_start()->set_archive_path(full_archive_path);
   bus.Send(farm_ng::MakeEvent("logger/command", command));
-  return WaitForLoggerStart(bus, archive_path);
+  return WaitForLoggerStart(bus, full_archive_path);
 }
 
 LoggingStatus StopLogging(EventBus& bus) {
@@ -425,6 +429,9 @@ void RequestStartCapturing(EventBus& bus) {
   TrackingCameraCommand command;
   command.mutable_record_start()->set_mode(
       TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE);
+  LOG(INFO) << "RequestStartCapturing: "
+            << farm_ng::MakeEvent("tracking_camera/command", command)
+                   .ShortDebugString();
   bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
 }
 
