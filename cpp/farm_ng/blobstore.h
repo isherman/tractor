@@ -15,7 +15,12 @@ namespace farm_ng {
 using farm_ng_proto::tractor::v1::Resource;
 
 // TODO use proto enum here.
-enum class BucketId { kLogs, kCalibrationDatasets, kApriltagRigModels };
+enum class BucketId {
+  kLogs,
+  kCalibrationDatasets,
+  kApriltagRigModels,
+  kBaseToCameraModels
+};
 
 boost::filesystem::path GetBlobstoreRoot();
 boost::filesystem::path GetBucketRelativePath(BucketId id);
