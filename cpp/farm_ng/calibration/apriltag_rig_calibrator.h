@@ -8,6 +8,7 @@
 #include <sophus/se3.hpp>
 
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
+#include "farm_ng_proto/tractor/v1/calibrate_apriltag_rig.pb.h"
 #include "farm_ng_proto/tractor/v1/calibrator.pb.h"
 #include "farm_ng_proto/tractor/v1/image.pb.h"
 
@@ -15,7 +16,7 @@ namespace farm_ng {
 using farm_ng_proto::tractor::v1::ApriltagDetections;
 using farm_ng_proto::tractor::v1::ApriltagRig;
 using farm_ng_proto::tractor::v1::ApriltagRigTagStats;
-using farm_ng_proto::tractor::v1::CalibratorCommand;
+using farm_ng_proto::tractor::v1::CalibrateApriltagRigConfiguration;
 using farm_ng_proto::tractor::v1::Image;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
 using farm_ng_proto::tractor::v1::NamedSE3Pose;
@@ -52,7 +53,7 @@ Sophus::optional<NamedSE3Pose> EstimateCameraPoseRig(
 class ApriltagRigCalibrator {
  public:
   ApriltagRigCalibrator(EventBus* bus,
-                        const CalibratorCommand::ApriltagRigStart& rig_start);
+                        const CalibrateApriltagRigConfiguration& config);
 
   void PoseInit(const std::vector<std::unordered_map<int, SE3d>>& frames,
                 std::unordered_map<int, SE3d>& tag_mean_pose_root,
@@ -70,7 +71,7 @@ class ApriltagRigCalibrator {
   std::vector<ApriltagDetections> all_detections_;
 };  // namespace farm_ng
 
-bool Solve(ApriltagRigModel& model);
+bool Solve(ApriltagRigModel* model);
 
 }  // namespace farm_ng
 #endif
