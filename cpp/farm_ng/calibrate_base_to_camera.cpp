@@ -63,15 +63,14 @@ DEFINE_string(name, "base_to_camera", "Name of the calibration.");
 namespace farm_ng {
 class CalibrateBaseToCameraProgram {
  public:
-  CalibrateBaseToCameraProgram(
-      EventBus& bus,
-      std::optional<CalibrateBaseToCameraConfiguration> configuration)
+  CalibrateBaseToCameraProgram(EventBus& bus,
+                               CalibrateBaseToCameraConfiguration configuration,
+                               bool interactive)
       : bus_(bus), timer_(bus_.get_io_service()) {
-    if (configuration.has_value()) {
-      set_configuration(configuration.value());
+    if (interactive) {
+      status_.mutable_input_required_configuration()->CopyFrom(configuration);
     } else {
-      status_.mutable_input_required_configuration()->set_name(FLAGS_name);
-      // TODO: Populate configuration
+      set_configuration(configuration);
     }
     bus_.GetEventSignal()->connect(std::bind(
         &CalibrateBaseToCameraProgram::on_event, this, std::placeholders::_1));
@@ -219,46 +218,33 @@ int main(int argc, char* argv[]) {
   try {
     farm_ng::EventBus& bus = farm_ng::GetEventBus(
         io_service, farm_ng::CalibrateBaseToCameraProgram::id);
-    std::optional<CalibrateBaseToCameraConfiguration> configuration;
-    if (!FLAGS_interactive) {
-      CalibrateBaseToCameraConfiguration flags_config;
-      flags_config.mutable_calibration_dataset()->set_path(
-          FLAGS_calibration_dataset);
-      flags_config.mutable_calibration_dataset()->set_path(
-          FLAGS_apriltag_rig_result);
-      flags_config.mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline);
-      flags_config.mutable_wheel_baseline()->set_constant(
-          FLAGS_wheel_baseline_constant);
-      flags_config.mutable_wheel_radius()->set_value(FLAGS_wheel_radius);
-      flags_config.mutable_wheel_radius()->set_constant(
-          FLAGS_wheel_radius_constant);
-      flags_config.mutable_base_pose_camera_initialization()
-          ->mutable_x()
-          ->set_value(FLAGS_base_pose_camera_tx);
-      flags_config.mutable_base_pose_camera_initialization()
-          ->mutable_x()
-          ->set_constant(FLAGS_base_pose_camera_tx_constant);
-      flags_config.mutable_base_pose_camera_initialization()
-          ->mutable_y()
-          ->set_value(FLAGS_base_pose_camera_ty);
-      flags_config.mutable_base_pose_camera_initialization()
-          ->mutable_y()
-          ->set_constant(FLAGS_base_pose_camera_ty_constant);
-      flags_config.mutable_base_pose_camera_initialization()
-          ->mutable_z()
-          ->set_value(FLAGS_base_pose_camera_tz);
-      flags_config.mutable_base_pose_camera_initialization()
-          ->mutable_z()
-          ->set_constant(FLAGS_base_pose_camera_tz_constant);
-
-      ViewDirection camera_direction;
-      CHECK(ViewDirection_Parse(FLAGS_camera_direction, &camera_direction));
-      flags_config.mutable_base_pose_camera_initialization()
-          ->set_view_direction(camera_direction);
-      flags_config.set_name(FLAGS_name);
-      configuration = flags_config;
-    }
-    farm_ng::CalibrateBaseToCameraProgram program(bus, configuration);
+    CalibrateBaseToCameraConfiguration config;
+    config.mutable_calibration_dataset()->set_path(FLAGS_calibration_dataset);
+    config.mutable_calibration_dataset()->set_path(FLAGS_apriltag_rig_result);
+    config.mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline);
+    config.mutable_wheel_baseline()->set_constant(
+        FLAGS_wheel_baseline_constant);
+    config.mutable_wheel_radius()->set_value(FLAGS_wheel_radius);
+    config.mutable_wheel_radius()->set_constant(FLAGS_wheel_radius_constant);
+    config.mutable_base_pose_camera_initialization()->mutable_x()->set_value(
+        FLAGS_base_pose_camera_tx);
+    config.mutable_base_pose_camera_initialization()->mutable_x()->set_constant(
+        FLAGS_base_pose_camera_tx_constant);
+    config.mutable_base_pose_camera_initialization()->mutable_y()->set_value(
+        FLAGS_base_pose_camera_ty);
+    config.mutable_base_pose_camera_initialization()->mutable_y()->set_constant(
+        FLAGS_base_pose_camera_ty_constant);
+    config.mutable_base_pose_camera_initialization()->mutable_z()->set_value(
+        FLAGS_base_pose_camera_tz);
+    config.mutable_base_pose_camera_initialization()->mutable_z()->set_constant(
+        FLAGS_base_pose_camera_tz_constant);
+    ViewDirection camera_direction;
+    CHECK(ViewDirection_Parse(FLAGS_camera_direction, &camera_direction));
+    config.mutable_base_pose_camera_initialization()->set_view_direction(
+        camera_direction);
+    config.set_name(FLAGS_name);
+    farm_ng::CalibrateBaseToCameraProgram program(bus, config,
+                                                  FLAGS_interactive);
     return program.run();
   } catch (std::runtime_error& e) {
     LOG(WARNING) << "caught error." << e.what()
