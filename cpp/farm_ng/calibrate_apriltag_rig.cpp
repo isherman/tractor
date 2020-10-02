@@ -6,35 +6,46 @@
 #include <glog/logging.h>
 
 #include "farm_ng/blobstore.h"
+#include "farm_ng/event_log_reader.h"
 #include "farm_ng/ipc.h"
 
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
+#include "farm_ng_proto/tractor/v1/calibrate_apriltag_rig.pb.h"
+#include "farm_ng_proto/tractor/v1/calibrator.pb.h"
 #include "farm_ng_proto/tractor/v1/capture_calibration_dataset.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
-DEFINE_string(name, "default",
-              "a dataset name, used in the output archive name");
-DEFINE_int32(num_frames, 16, "number of frames to capture");
+DEFINE_string(calibration_dataset, "",
+              "The path to a serialized CaptureCalibrationDatasetResult");
+
+DEFINE_string(tag_ids, "", "List of tag ids, comma separated list of ints.");
+DEFINE_string(name, "rig", "Name of the rig.");
+
+DEFINE_int32(
+    root_tag_id, -1,
+    "The root tag id, -1 will result in root_tag_id == first value in tag_ids");
 
 typedef farm_ng_proto::tractor::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
-using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetConfiguration;
+using farm_ng_proto::tractor::v1::CalibrateApriltagRigConfiguration;
+using farm_ng_proto::tractor::v1::CalibrateApriltagRigResult;
+using farm_ng_proto::tractor::v1::CalibrateApriltagRigStatus;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
-using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetStatus;
+using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
 
 namespace farm_ng {
 class CalibrateApriltagRigProgram {
  public:
   CalibrateApriltagRigProgram(
       EventBus& bus,
-      std::optional<CaptureCalibrationDatasetConfiguration> configuration)
+      std::optional<CalibrateApriltagRigConfiguration> configuration)
       : bus_(bus), timer_(bus_.get_io_service()) {
     if (configuration.has_value()) {
       set_configuration(configuration.value());
     } else {
       status_.mutable_input_required_configuration()->set_name(FLAGS_name);
-      status_.mutable_input_required_configuration()->set_num_frames(
-          FLAGS_num_frames);
+      status_.mutable_input_required_configuration()->set_root_tag_id(
+          FLAGS_root_tag_id);
     }
     bus_.GetEventSignal()->connect(std::bind(
         &CalibrateApriltagRigProgram::on_event, this, std::placeholders::_1));
@@ -54,28 +65,47 @@ class CalibrateApriltagRigProgram {
     LOG(INFO) << "Ran " << n_jobs << " jobs.";
   }
 
+  void OnLogEvent(const EventPb& event, MonocularApriltagRigModel* model) {}
+
+  // reads the event log from the CalibrationDatasetResult, and
+  // populates a MonocularApriltagRigModel to be solved.
+  MonocularApriltagRigModel LoadCalibrationDataset() {
+    auto dataset_result =
+        ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
+            configuration_.calibration_dataset());
+
+    EventLogReader log_reader(dataset_result.dataset());
+    MonocularApriltagRigModel model;
+    while (true) {
+      EventPb event;
+      try {
+        bus_.get_io_service().poll();
+        event = log_reader.ReadNext();
+        OnLogEvent(event, &model);
+      } catch (std::runtime_error& e) {
+        break;
+      }
+    }
+    return model;
+  }
+  CalibrateApriltagRigResult SolveApriltagRigModel(MonocularApriltagRigModel) {
+    CalibrateApriltagRigResult result;
+    return result;
+  }
   int run() {
     if (status_.has_input_required_configuration()) {
       set_configuration(
-          WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(bus_));
+          WaitForConfiguration<CalibrateApriltagRigConfiguration>(bus_));
     }
-    WaitForServices(bus_, {"ipc-logger", "tracking-camera"});
+    WaitForServices(bus_, {"ipc-logger"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
-    RequestStartCapturing(bus_);
-    while (status_.num_frames() < configuration_.num_frames()) {
-      bus_.get_io_service().run_one();
-    }
 
-    CaptureCalibrationDatasetResult result;
-    result.mutable_configuration()->CopyFrom(configuration_);
-    result.set_num_frames(status_.num_frames());
-    result.mutable_tag_ids()->CopyFrom(status_.tag_ids());
-    result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
-    result.mutable_dataset()->set_path(log.recording().archive_path());
+    MonocularApriltagRigModel initial_model = LoadCalibrationDataset();
 
-    auto result_resource = WriteProtobufAsJsonResource(
-        BucketId::kCalibrationDatasets, configuration_.name(), result);
-    VLOG(1) << result_resource.ShortDebugString();
+    CalibrateApriltagRigResult result = SolveApriltagRigModel(initial_model);
+
+    auto result_resource = WriteProtobufAsBinaryResource(
+        BucketId::kApriltagRigModels, configuration_.name(), result);
     status_.mutable_result()->CopyFrom(result_resource);
     send_status();
     return 0;
@@ -96,31 +126,8 @@ class CalibrateApriltagRigProgram {
     send_status();
   }
 
-  bool on_apriltag_detections(const EventPb& event) {
-    ApriltagDetections detections;
-    if (!event.data().UnpackTo(&detections)) {
-      return false;
-    }
-
-    if (detections.detections().size() == 0) {
-      return true;
-    }
-
-    status_.set_num_frames(status_.num_frames() + 1);
-    for (auto detection : detections.detections()) {
-      int tag_id = detection.id();
-      if (std::find(status_.tag_ids().begin(), status_.tag_ids().end(),
-                    tag_id) == status_.tag_ids().end()) {
-        status_.add_tag_ids(tag_id);
-      }
-    }
-
-    send_status();
-    return true;
-  }
-
   bool on_configuration(const EventPb& event) {
-    CaptureCalibrationDatasetConfiguration configuration;
+    CalibrateApriltagRigConfiguration configuration;
     if (!event.data().UnpackTo(&configuration)) {
       return false;
     }
@@ -129,18 +136,14 @@ class CalibrateApriltagRigProgram {
     return true;
   }
 
-  void set_configuration(CaptureCalibrationDatasetConfiguration configuration) {
+  void set_configuration(CalibrateApriltagRigConfiguration configuration) {
     configuration_ = configuration;
     status_.clear_input_required_configuration();
     send_status();
   }
 
   void on_event(const EventPb& event) {
-    // using 'calibrator' for compatibility w/ existing code
-    if (!event.name().rfind("calibrator/", 0) == 0) {
-      return;
-    }
-    if (on_apriltag_detections(event)) {
+    if (!event.name().rfind("calibrate_apriltag_rig/", 0) == 0) {
       return;
     }
     if (on_configuration(event)) {
@@ -151,8 +154,9 @@ class CalibrateApriltagRigProgram {
  private:
   EventBus& bus_;
   boost::asio::deadline_timer timer_;
-  CaptureCalibrationDatasetConfiguration configuration_;
-  CaptureCalibrationDatasetStatus status_;
+  CalibrateApriltagRigConfiguration configuration_;
+  CalibrateApriltagRigStatus status_;
+  CalibrateApriltagRigResult result_;
 };
 
 }  // namespace farm_ng
@@ -179,10 +183,18 @@ int main(int argc, char* argv[]) {
     farm_ng::EventBus& bus = farm_ng::GetEventBus(
         io_service,
         "calibrator");  // using 'calibrator' for compatibility w/ existing code
-    std::optional<CaptureCalibrationDatasetConfiguration> configuration;
+    std::optional<CalibrateApriltagRigConfiguration> configuration;
     if (!FLAGS_interactive) {
-      CaptureCalibrationDatasetConfiguration flags_config;
-      flags_config.set_num_frames(FLAGS_num_frames);
+      CalibrateApriltagRigConfiguration flags_config;
+      std::stringstream tag_ids_stream(FLAGS_tag_ids);
+      while (tag_ids_stream.good()) {
+        std::string tag_id;
+        std::getline(tag_ids_stream, tag_id, ',');
+        flags_config.add_tag_ids(stoi(tag_id));
+      }
+      flags_config.mutable_calibration_dataset()->set_path(
+          FLAGS_calibration_dataset);
+      flags_config.set_root_tag_id(FLAGS_root_tag_id);
       flags_config.set_name(FLAGS_name);
       configuration = flags_config;
     }

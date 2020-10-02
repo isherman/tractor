@@ -22,22 +22,23 @@ message CaptureCalibrationDatasetStatus {
     CaptureCalibrationDatasetConfiguration input_required_configuration = 3;
   }
 
-  CaptureCalibrationDatasetResult result = 4;
+  // Serialized CaptureCalibrationDatasetResult
+  Resource result = 4;
 }
 
 message CaptureCalibrationDatasetResult {
+  // Configuration which initiated the computation of this result.
+  CaptureCalibrationDatasetConfiguration configuration = 1;
+
   // Number of frames captured
-  int32 num_frames = 1;
+  int32 num_frames = 2;
 
   // The tag ids seen in the course of the capture
-  repeated int32 tag_ids = 2;
+  repeated int32 tag_ids = 3;
 
   // The time the capture completed
-  google.protobuf.Timestamp stamp_end = 3;
+  google.protobuf.Timestamp stamp_end = 4;
 
   // The calibration data, an IPC log, saved to disk in protobuf binary format.
-  Resource dataset = 4;
-
-  // This result, saved to disk in protobuf json format.
-  Resource resource = 5;
+  Resource dataset = 5;
 }

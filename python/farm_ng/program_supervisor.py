@@ -35,6 +35,12 @@ library = {
         name='Capture Calibration Dataset',
         description='Capture apriltag detections, for use in other calibration programs',
     ),
+    'calibrate-apriltag-rig': ProgramInfo(
+        path=f'{farm_ng_root}/build/cpp/farm_ng/calibrate_apriltag_rig',
+        args=['-interactive'],
+        name='Apriltag Rig Calibration',
+        description='Solves an apriltag rig from data collected with capture-calibration-dataset',
+    ),
     'sleep-5': ProgramInfo(path='sleep', args=['5'], name='Sleep 5', description='Take a nap'),
     'sleep-100': ProgramInfo(path='sleep', args=['100'], name='Sleep 100', description='Take a looong nap'),
 }
