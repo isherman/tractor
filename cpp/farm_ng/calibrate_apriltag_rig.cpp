@@ -65,8 +65,6 @@ class CalibrateApriltagRigProgram {
       LOG(INFO) << "bus was stopped for some reason...";
       bus_.get_io_service().reset();
     }
-    farm_ng::RequestStopCapturing(bus_);
-    LOG(INFO) << "Requested stop capturing";
     farm_ng::RequestStopLogging(bus_);
     LOG(INFO) << "Requested Stop logging";
     int n_jobs = bus_.get_io_service().poll();
