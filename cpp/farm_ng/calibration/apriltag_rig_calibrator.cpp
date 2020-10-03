@@ -7,7 +7,7 @@
 
 #include "farm_ng/calibration/apriltag.h"
 #include "farm_ng/calibration/camera_model.h"
-#include "farm_ng/calibration/local_parameterization_se3.h"
+#include "farm_ng/calibration/local_parameterization.h"
 #include "farm_ng/calibration/pose_utils.h"
 
 #include "farm_ng/ipc.h"

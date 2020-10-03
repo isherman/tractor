@@ -4,7 +4,7 @@ foreach(src_prefix
    apriltag_rig_calibrator
    base_to_camera_calibrator
    camera_model
-   local_parameterization_se3
+   local_parameterization
    pose_utils
    solver
 )
