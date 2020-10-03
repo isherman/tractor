@@ -9,6 +9,8 @@
 #include "farm_ng/event_log_reader.h"
 #include "farm_ng/ipc.h"
 
+#include "farm_ng/calibration/base_to_camera_calibrator.h"
+
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
 #include "farm_ng_proto/tractor/v1/calibrate_apriltag_rig.pb.h"
 #include "farm_ng_proto/tractor/v1/calibrate_base_to_camera.pb.h"
@@ -87,41 +89,6 @@ class CalibrateBaseToCameraProgram {
     int n_jobs = bus_.get_io_service().poll();
     LOG(INFO) << "Ran " << n_jobs << " jobs.";
   }
-
-  // void OnLogEvent(const EventPb& event, MonocularApriltagRigModel* model) {}
-
-  // reads the event log from the CalibrationDatasetResult, and
-  // populates a BaseToCameraModel to be solved.
-  BaseToCameraModel LoadCalibrationDataset() {
-    auto dataset_result =
-        ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
-            configuration_.calibration_dataset());
-
-    EventLogReader log_reader(dataset_result.dataset());
-    // TODO
-    // BaseToCameraModelCalibrator calibrator(...)
-    while (true) {
-      EventPb event;
-      try {
-        bus_.get_io_service().poll();
-        event = log_reader.ReadNext();
-        // TODO
-        // OnLogEvent(event, &calibrator);
-      } catch (std::runtime_error& e) {
-        break;
-      }
-    }
-
-    // TODO
-    return BaseToCameraModel();
-    // return calibrator.PoseInitialization();
-  }
-  CalibrateBaseToCameraResult SolveBaseToCameraModel(MonocularApriltagRigModel,
-                                                     BaseToCameraModel) {
-    // TODO
-    CalibrateBaseToCameraResult result;
-    return result;
-  }
   int run() {
     if (status_.has_input_required_configuration()) {
       set_configuration(
@@ -130,17 +97,40 @@ class CalibrateBaseToCameraProgram {
     WaitForServices(bus_, {"ipc-logger"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
 
-    // TODO
-    MonocularApriltagRigModel rig_model;
-    // MonocularApriltagRigModel rig_model = LoadRigModel();
-    BaseToCameraModel initial_model = LoadCalibrationDataset();
+    auto dataset_result =
+        ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
+            configuration_.calibration_dataset());
 
-    CalibrateBaseToCameraResult result =
-        SolveBaseToCameraModel(rig_model, initial_model);
+    auto rig_result = ReadProtobufFromResource<CalibrateApriltagRigResult>(
+        configuration_.apriltag_rig_result());
 
-    auto result_resource = WriteProtobufAsBinaryResource(
-        BucketId::kBaseToCameraModels, configuration_.name(), result);
-    status_.mutable_result()->CopyFrom(result_resource);
+    BaseToCameraModel model = InitialBaseToCameraModelFromEventLog(
+        dataset_result.dataset(), rig_result.monocular_apriltag_rig_solved());
+
+    CalibrateBaseToCameraResult result;
+    result.mutable_configuration()->CopyFrom(configuration_);
+    result.mutable_base_to_camera_model_initial()->CopyFrom(
+        ArchiveProtobufAsBinaryResource("base_to_camera/initial", model));
+    result.set_solver_status(model.solver_status());
+    result.set_rmse(model.rmse());
+    result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
+    result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
+    if (log.has_recording()) {
+      result.mutable_event_log()->set_path(log.recording().archive_path());
+    }
+    status_.mutable_result()->CopyFrom(ArchiveProtobufAsBinaryResource(
+        "base_to_camera/initial_result", result));
+    send_status();
+
+    auto solved_model = SolveBasePoseCamera(model, false);
+    result.mutable_base_to_camera_model_solved()->CopyFrom(
+        ArchiveProtobufAsBinaryResource("base_to_camera/solved", solved_model));
+    result.set_solver_status(model.solver_status());
+    result.set_rmse(model.rmse());
+    result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
+
+    status_.mutable_result()->CopyFrom(WriteProtobufAsBinaryResource(
+        BucketId::kBaseToCameraModels, configuration_.name(), result));
     send_status();
     return 0;
   }

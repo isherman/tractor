@@ -140,8 +140,6 @@ class CalibrateApriltagRigProgram {
     result.set_rmse(model.rmse);
     result.set_solver_status(model.status);
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
-    status_.mutable_result()->CopyFrom(ArchiveProtobufAsJsonResource(
-        "apriltag_rig_model/solved_result", result));
 
     auto result_resource = WriteProtobufAsBinaryResource(
         BucketId::kApriltagRigModels, configuration_.name(), result);

@@ -31,9 +31,3 @@ target_link_libraries(farm_ng_calibration_test
     gtest gmock gtest_main
 )
 gtest_discover_tests(farm_ng_calibration_test)
-
-
-add_executable(base_to_camera_calibrator_driver
-base_to_camera_calibrator_driver.cpp)
-
-target_link_libraries(base_to_camera_calibrator_driver farm-ng-calibration gflags )
