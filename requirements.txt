@@ -7,4 +7,5 @@ linuxfd
 numpy
 protobuf
 tornado
+watchdog
 websockets

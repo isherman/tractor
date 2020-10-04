@@ -10,7 +10,6 @@ import { StreamingBuffer } from "../../models/StreamingBuffer";
 import { formatValue } from "../../utils/formatValue";
 import { Icon } from "../Icon";
 import { duration } from "../../utils/duration";
-import { normalizeTarPath } from "../../models/TarReader";
 
 export const Header: React.FC = () => {
   const { visualizationStore: store } = useStores();
@@ -35,10 +34,9 @@ export const Header: React.FC = () => {
       if (!logFilePath) {
         throw Error("No .log file in archive");
       }
-      const normalizedLogFilePath = normalizeTarPath(logFilePath);
-      setLogFilePath(normalizedLogFilePath);
+      setLogFilePath(logFilePath);
       const streamingBuffer = new StreamingBuffer();
-      await streamingBuffer.loadFromLog(resourceArchive, normalizedLogFilePath);
+      await streamingBuffer.loadFromLog(resourceArchive, logFilePath);
       store.replaceBuffer(streamingBuffer);
       store.resourceArchive = resourceArchive;
       store.bufferLogLoadProgress = 1;
