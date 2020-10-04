@@ -4,6 +4,7 @@
 #include <iostream>
 #include <mutex>
 
+#include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <google/protobuf/util/time_util.h>
 #include <librealsense2/rsutil.h>
@@ -34,6 +35,8 @@ using farm_ng_proto::tractor::v1::ApriltagDetections;
 using farm_ng_proto::tractor::v1::CameraModel;
 using farm_ng_proto::tractor::v1::TrackingCameraCommand;
 using farm_ng_proto::tractor::v1::TrackingCameraPoseFrame;
+
+DEFINE_bool(jetson, false, "Use jetson hardware encoding.");
 
 namespace farm_ng {
 
@@ -579,7 +582,7 @@ class TrackingCameraClient {
         " video/x-h264, stream-format=byte-stream !";
 
     std::string cmd0 = std::string("appsrc !") + " videoconvert ! " +
-                       encoder_x264 +
+                       (FLAGS_jetson ? encoder_omxh264 : encoder_x264) +
 
                        " rtph264pay pt=96 mtu=1400 config-interval=10 !" +
                        " udpsink port=5000";
