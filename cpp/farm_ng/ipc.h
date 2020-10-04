@@ -106,10 +106,8 @@ farm_ng_proto::tractor::v1::Event MakeEvent(std::string name,
   return MakeEvent(name, message, MakeTimestampNow());
 }
 
-inline EventBus& GetEventBus(boost::asio::io_service& io_service,
-                             const std::string& service_name) {
+inline EventBus& GetEventBus(boost::asio::io_service& io_service) {
   auto& service = boost::asio::use_service<EventBus>(io_service);
-  service.SetName(service_name);
   return service;
 }
 

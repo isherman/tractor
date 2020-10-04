@@ -68,6 +68,7 @@ farm_ng_proto::tractor::v1::Resource WriteProtobufAsBinaryResource(
 
 template <typename ProtobufT>
 ProtobufT ReadProtobufFromJsonFile(const boost::filesystem::path& path) {
+  LOG(INFO) << "Loading : " << path.string();
   std::ifstream json_in(path.string());
   CHECK(json_in) << "Could not open path: " << path.string();
   std::string json_str((std::istreambuf_iterator<char>(json_in)),
@@ -79,7 +80,7 @@ ProtobufT ReadProtobufFromJsonFile(const boost::filesystem::path& path) {
   ProtobufT message;
   auto status =
       google::protobuf::util::JsonStringToMessage(json_str, &message, options);
-  CHECK(status.ok()) << status;
+  CHECK(status.ok()) << status << " " << path.string();
 
   return message;
 }

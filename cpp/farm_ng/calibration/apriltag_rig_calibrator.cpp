@@ -82,6 +82,8 @@ void ApriltagRigModel::ToMonocularApriltagRigModel(
     pose->set_frame_a(FrameRigTag(rig_name, id));
     pose->set_frame_b(FrameRigTag(rig_name, root_id));
     SophusToProto(tag_pose_root, pose->mutable_a_pose_b());
+    CHECK(tag_size.count(id)) << id;
+    CHECK(points_tag.count(id)) << id;
     node->set_tag_size(tag_size.at(id));
     for (const auto& v : points_tag.at(id)) {
       EigenToProto(v, node->add_points_tag());
@@ -200,11 +202,14 @@ void ModelError(ApriltagRigModel& model) {
 ApriltagRigCalibrator::ApriltagRigCalibrator(
     EventBus* bus, const CalibrateApriltagRigConfiguration& config)
     : bus_(bus), root_id_(0) {
+  LOG(INFO) << "Config: HERRREEE" << config.ShortDebugString();
   if (config.tag_ids_size() > 0) {
     root_id_ = config.tag_ids().Get(0);
   } else if (config.root_tag_id() >= 0) {
     root_id_ = config.root_tag_id();
   }
+  rig_name_ = config.name();
+  LOG(INFO) << "rig name: " << rig_name_ << "  root tag_id : " << root_id_;
   for (auto id : config.tag_ids()) {
     ids_.insert(id);
   }

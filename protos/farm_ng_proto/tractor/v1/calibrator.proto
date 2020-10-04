@@ -5,6 +5,7 @@ import "google/protobuf/timestamp.proto";
 import "farm_ng_proto/tractor/v1/geometry.proto";
 import "farm_ng_proto/tractor/v1/apriltag.proto";
 import "farm_ng_proto/tractor/v1/image.proto";
+import "farm_ng_proto/tractor/v1/resource.proto";
 
 package farm_ng_proto.tractor.v1;
 option go_package = "github.com/farm_ng/genproto";
@@ -16,6 +17,50 @@ enum SolverStatus {
   SOLVER_STATUS_INITIAL = 1;
   SOLVER_STATUS_CONVERGED = 2;
   SOLVER_STATUS_FAILED = 3;
+}
+
+// NOTE: This is deprecated.
+// Commands that the calibrator process listens to.
+message CalibratorCommand {
+  // This finishes (runs the solver) calibration if it is currently running and
+  // puts the process into a more or less idle state.
+  message Solve {
+  }
+
+  // TODO Solve command for incremental solutions while capturing.
+
+  // Start rigid apriltag rig calibration, and listening to ApriltagDetections
+  // messages that are sent to "calibrator/*" and accumulating the detections
+  // until Stop is received.
+  message ApriltagRigStart {
+    // The tag ids to consider rigid, all other tag detections will be ignored.
+    repeated int32 tag_ids = 1;
+  }
+
+  // This oneof is parsed via switch statement inside the calibration process to
+  // determine what action to take.
+  oneof command {
+    Solve solve = 3;
+    ApriltagRigStart apriltag_rig_start = 2;
+  }
+}
+
+// NOTE: This is deprecated.
+// The status message produced by the Calibration process.
+message CalibratorStatus {
+  // Sent periodically, when ever a new frame is added, and once after the Stop
+  // command and the solver has run.
+  message ApriltagRigProgress {
+    int32 num_frames = 1;
+    // The rig model saved to disk.
+    // Will be a json encoded protobuf with type MonocularApriltagRigModel.
+    Resource rig_model_resource = 3;
+    bool finished = 4;
+  }
+
+  oneof status {
+    ApriltagRigProgress apriltag_rig = 1;
+  }
 }
 
 // From ceres::IterationSummary

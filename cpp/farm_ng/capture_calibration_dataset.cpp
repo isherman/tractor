@@ -6,6 +6,7 @@
 #include <glog/logging.h>
 
 #include "farm_ng/blobstore.h"
+#include "farm_ng/init.h"
 #include "farm_ng/ipc.h"
 
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
@@ -23,9 +24,9 @@ using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetStatus;
 
 namespace farm_ng {
-class CalibrateApriltagRigProgram {
+class CaptureCalibrationDatasetProgram {
  public:
-  CalibrateApriltagRigProgram(
+  CaptureCalibrationDatasetProgram(
       EventBus& bus,
       std::optional<CaptureCalibrationDatasetConfiguration> configuration)
       : bus_(bus), timer_(bus_.get_io_service()) {
@@ -36,30 +37,18 @@ class CalibrateApriltagRigProgram {
       status_.mutable_input_required_configuration()->set_num_frames(
           FLAGS_num_frames);
     }
-    bus_.GetEventSignal()->connect(std::bind(
-        &CalibrateApriltagRigProgram::on_event, this, std::placeholders::_1));
+    bus_.GetEventSignal()->connect(
+        std::bind(&CaptureCalibrationDatasetProgram::on_event, this,
+                  std::placeholders::_1));
     on_timer(boost::system::error_code());
   }
 
-  ~CalibrateApriltagRigProgram() {
-    if (bus_.get_io_service().stopped()) {
-      LOG(INFO) << "bus was stopped for some reason...";
-      bus_.get_io_service().reset();
-    }
-    farm_ng::RequestStopCapturing(bus_);
-    LOG(INFO) << "Requested stop capturing";
-    farm_ng::RequestStopLogging(bus_);
-    LOG(INFO) << "Requested Stop logging";
-    int n_jobs = bus_.get_io_service().poll();
-    LOG(INFO) << "Ran " << n_jobs << " jobs.";
-  }
-
   int run() {
-    if (status_.has_input_required_configuration()) {
-      set_configuration(
-          WaitForConfiguration<CaptureCalibrationDatasetConfiguration>(bus_));
+    while (status_.has_input_required_configuration()) {
+      bus_.get_io_service().run_one();
     }
-    WaitForServices(bus_, {"ipc-logger", "tracking-camera"});
+    LOG(INFO) << "Right here! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    WaitForServices(bus_, {"ipc_logger", "tracking_camera"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
     RequestStartCapturing(bus_);
     while (status_.num_frames() < configuration_.num_frames()) {
@@ -82,7 +71,10 @@ class CalibrateApriltagRigProgram {
   }
 
   // using 'calibrator' for compatibility w/ existing code
-  void send_status() { bus_.Send(MakeEvent("calibrator/status", status_)); }
+  void send_status() {
+    LOG(INFO) << status_.ShortDebugString();
+    bus_.Send(MakeEvent("calibrator/status", status_));
+  }
 
   void on_timer(const boost::system::error_code& error) {
     if (error) {
@@ -90,8 +82,8 @@ class CalibrateApriltagRigProgram {
       return;
     }
     timer_.expires_from_now(boost::posix_time::millisec(1000));
-    timer_.async_wait(std::bind(&CalibrateApriltagRigProgram::on_timer, this,
-                                std::placeholders::_1));
+    timer_.async_wait(std::bind(&CaptureCalibrationDatasetProgram::on_timer,
+                                this, std::placeholders::_1));
 
     send_status();
   }
@@ -124,7 +116,7 @@ class CalibrateApriltagRigProgram {
     if (!event.data().UnpackTo(&configuration)) {
       return false;
     }
-    VLOG(2) << configuration.ShortDebugString();
+    LOG(INFO) << event.name() << " " << configuration.ShortDebugString();
     set_configuration(configuration);
     return true;
   }
@@ -133,15 +125,15 @@ class CalibrateApriltagRigProgram {
     configuration_ = configuration;
     status_.clear_input_required_configuration();
     send_status();
+    LOG(INFO) << "Set configuration woot!";
   }
 
   void on_event(const EventPb& event) {
     // using 'calibrator' for compatibility w/ existing code
-    if (!event.name().rfind("calibrator/", 0) == 0) {
-      return;
-    }
-    if (on_apriltag_detections(event)) {
-      return;
+    if (event.name().rfind("calibrator/", 0) == 0) {
+      if (on_apriltag_detections(event)) {
+        return;
+      }
     }
     if (on_configuration(event)) {
       return;
@@ -157,40 +149,24 @@ class CalibrateApriltagRigProgram {
 
 }  // namespace farm_ng
 
-int main(int argc, char* argv[]) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
-  FLAGS_logtostderr = 1;
-
-  google::InitGoogleLogging(argv[0]);
-  google::InstallFailureSignalHandler();
-
-  boost::asio::io_service io_service;
-
-  boost::asio::signal_set signals(io_service, SIGTERM, SIGINT);
-  signals.async_wait([&io_service](const boost::system::error_code& error,
-                                   int signal_number) {
-    std::cout << "Received (error, signal) " << error << " , " << signal_number
-              << std::endl;
-    io_service.stop();
-    throw std::runtime_error("signal caught: " + std::to_string(signal_number));
-  });
-
-  try {
-    farm_ng::EventBus& bus = farm_ng::GetEventBus(
-        io_service,
-        "calibrator");  // using 'calibrator' for compatibility w/ existing code
-    std::optional<CaptureCalibrationDatasetConfiguration> configuration;
-    if (!FLAGS_interactive) {
-      CaptureCalibrationDatasetConfiguration flags_config;
-      flags_config.set_num_frames(FLAGS_num_frames);
-      flags_config.set_name(FLAGS_name);
-      configuration = flags_config;
-    }
-    farm_ng::CalibrateApriltagRigProgram program(bus, configuration);
-    return program.run();
-  } catch (std::runtime_error& e) {
-    LOG(WARNING) << "caught error." << e.what()
-                 << " stopped: " << io_service.stopped();
-    return 1;
+void Cleanup(farm_ng::EventBus& bus) {
+  farm_ng::RequestStopCapturing(bus);
+  LOG(INFO) << "Requested Stop capture";
+  farm_ng::RequestStopLogging(bus);
+  LOG(INFO) << "Requested Stop logging";
+}
+int Main(farm_ng::EventBus& bus) {
+  std::optional<CaptureCalibrationDatasetConfiguration> configuration;
+  if (!FLAGS_interactive) {
+    CaptureCalibrationDatasetConfiguration flags_config;
+    flags_config.set_num_frames(FLAGS_num_frames);
+    flags_config.set_name(FLAGS_name);
+    configuration = flags_config;
   }
+  farm_ng::CaptureCalibrationDatasetProgram program(bus, configuration);
+  return program.run();
+}
+
+int main(int argc, char* argv[]) {
+  return farm_ng::Main(argc, argv, &Main, &Cleanup);
 }

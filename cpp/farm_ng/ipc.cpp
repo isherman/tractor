@@ -123,7 +123,9 @@ class receiver {
     }
 
     // Store the announcement
-    announcements_[sender_endpoint_] = announce;
+    announcements_[boost::asio::ip::udp::endpoint(
+        boost::asio::ip::address::from_string(announce.host()),
+        announce.port())] = announce;
 
     socket_.async_receive_from(
         boost::asio::buffer(data_, max_datagram_size), sender_endpoint_,
@@ -250,10 +252,7 @@ class EventBusImpl {
     CHECK_LT(int(event_message_.size()), max_datagram_size)
         << "Event is too big, doesn't fit in one udp packet.";
     for (const auto& it : recv_.announcements()) {
-      boost::asio::ip::udp::endpoint ep(
-          boost::asio::ip::address::from_string(it.second.host()),
-          it.second.port());
-      socket_.send_to(boost::asio::buffer(event_message_), ep);
+      socket_.send_to(boost::asio::buffer(event_message_), it.first);
     }
   }
 
@@ -304,7 +303,7 @@ EventBus::GetAnnouncements() const {
   return impl_->recv_.announcements();
 }
 void EventBus::Send(const farm_ng_proto::tractor::v1::Event& event) {
-  impl_->io_service_.post([this, event]() { impl_->send_event(event); });
+  impl_->send_event(event);
 }
 void EventBus::SetName(const std::string& name) { impl_->set_name(name); }
 std::string EventBus::GetName() { return impl_->get_name(); }
@@ -373,6 +372,7 @@ void WaitForServices(EventBus& bus,
     }
     bus.get_io_service().poll();
   }
+  LOG(INFO) << "Found all services.";
 }
 
 LoggingStatus WaitForLoggerStatus(
@@ -392,8 +392,11 @@ LoggingStatus WaitForLoggerStatus(
 LoggingStatus WaitForLoggerStart(EventBus& bus,
                                  const std::string& archive_path) {
   return WaitForLoggerStatus(bus, [archive_path](const LoggingStatus& status) {
+    LOG(INFO)
+        << "Waiting for logger status.recording.archive_path starting with:"
+        << archive_path << " status:" << status.ShortDebugString();
     return (status.has_recording() &&
-            status.recording().archive_path() == archive_path);
+            status.recording().archive_path().rfind(archive_path) == 0);
   });
 }
 
@@ -410,6 +413,7 @@ LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path) {
                                    boost::filesystem::path(archive_path))
                                       .string();
   command.mutable_record_start()->set_archive_path(full_archive_path);
+  LOG(INFO) << "start: " << command.ShortDebugString();
   bus.Send(farm_ng::MakeEvent("logger/command", command));
   return WaitForLoggerStart(bus, full_archive_path);
 }

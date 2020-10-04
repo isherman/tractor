@@ -11,7 +11,6 @@ from farm_ng_proto.tractor.v1.program_supervisor_pb2 import Program
 from farm_ng_proto.tractor.v1.program_supervisor_pb2 import ProgramSupervisorStatus
 from farm_ng_proto.tractor.v1.program_supervisor_pb2 import StartProgramRequest
 from farm_ng_proto.tractor.v1.program_supervisor_pb2 import StopProgramRequest
-from google.protobuf.text_format import MessageToString
 
 event_bus = EventBus('program_supervisor')
 
@@ -24,13 +23,13 @@ ProgramInfo = namedtuple('ProgramInfo', 'path args name description')
 
 library = {
     'calibrate-apriltag-rig-playback': ProgramInfo(
-        path=f'{farm_ng_root}/build/cpp/farm_ng/farm-ng-log-playback',
+        path=f'{farm_ng_root}/build/cpp/farm_ng/log_playback',
         args=['-send', '-log', f'{farm_ng_root}/../tractor-data/cal01/events-02498-00000.log'],
         name='Apriltag Rig Calibration Playback',
         description='Log playback',
     ),
     'capture-calibration-dataset': ProgramInfo(
-        path=f'{farm_ng_root}/build/cpp/farm_ng/farm-ng-capture_calibration_dataset',
+        path=f'{farm_ng_root}/build/cpp/farm_ng/capture_calibration_dataset',
         args=['-interactive'],
         name='Capture Calibration Dataset',
         description='Capture apriltag detections, for use in other calibration programs',
@@ -59,7 +58,7 @@ class ProgramSupervisor:
     async def send_status(self):
         while not self.shutdown:
             event = make_event('program_supervisor/status', self.status)
-            print(MessageToString(event, as_one_line=True))
+            # print(MessageToString(event, as_one_line=True))
             event_bus.send(event)
             await asyncio.sleep(1)
 

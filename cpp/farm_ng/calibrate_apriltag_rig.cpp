@@ -1,6 +1,7 @@
 #include <iostream>
 #include <optional>
 #include <sstream>
+#include <stdexcept>
 
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -8,6 +9,7 @@
 #include "farm_ng/blobstore.h"
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/event_log_reader.h"
+#include "farm_ng/init.h"
 #include "farm_ng/ipc.h"
 
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
@@ -60,17 +62,6 @@ class CalibrateApriltagRigProgram {
     on_timer(boost::system::error_code());
   }
 
-  ~CalibrateApriltagRigProgram() {
-    if (bus_.get_io_service().stopped()) {
-      LOG(INFO) << "bus was stopped for some reason...";
-      bus_.get_io_service().reset();
-    }
-    farm_ng::RequestStopLogging(bus_);
-    LOG(INFO) << "Requested Stop logging";
-    int n_jobs = bus_.get_io_service().poll();
-    LOG(INFO) << "Ran " << n_jobs << " jobs.";
-  }
-
   void OnLogEvent(const EventPb& event, ApriltagRigCalibrator* calibrator) {
     if (!is_calibration_event(event.name())) {
       return;
@@ -79,6 +70,7 @@ class CalibrateApriltagRigProgram {
     if (!event.data().UnpackTo(&detections)) {
       return;
     }
+    calibrator->AddFrame(detections);
   }
 
   // reads the event log from the CalibrationDatasetResult, and
@@ -87,7 +79,7 @@ class CalibrateApriltagRigProgram {
     auto dataset_result =
         ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
             configuration_.calibration_dataset());
-
+    LOG(INFO) << "dataset_result: " << dataset_result.ShortDebugString();
     EventLogReader log_reader(dataset_result.dataset());
     ApriltagRigCalibrator calibrator(&bus_, configuration_);
     while (true) {
@@ -104,11 +96,10 @@ class CalibrateApriltagRigProgram {
   }
 
   int run() {
-    if (status_.has_input_required_configuration()) {
-      set_configuration(
-          WaitForConfiguration<CalibrateApriltagRigConfiguration>(bus_));
+    while (status_.has_input_required_configuration()) {
+      bus_.get_io_service().run_one();
     }
-    WaitForServices(bus_, {"ipc-logger"});
+    WaitForServices(bus_, {"ipc_logger"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
 
     ApriltagRigModel model = LoadCalibrationDataset();
@@ -199,47 +190,35 @@ class CalibrateApriltagRigProgram {
 
 }  // namespace farm_ng
 
-int main(int argc, char* argv[]) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
-  FLAGS_logtostderr = 1;
+void Cleanup(farm_ng::EventBus& bus) {
+  farm_ng::RequestStopLogging(bus);
+  LOG(INFO) << "Requested Stop logging";
+}
 
-  google::InitGoogleLogging(argv[0]);
-  google::InstallFailureSignalHandler();
-
-  boost::asio::io_service io_service;
-
-  boost::asio::signal_set signals(io_service, SIGTERM, SIGINT);
-  signals.async_wait([&io_service](const boost::system::error_code& error,
-                                   int signal_number) {
-    std::cout << "Received (error, signal) " << error << " , " << signal_number
-              << std::endl;
-    io_service.stop();
-    throw std::runtime_error("signal caught: " + std::to_string(signal_number));
-  });
-
-  try {
-    farm_ng::EventBus& bus =
-        farm_ng::GetEventBus(io_service, "calibrate_apriltag_rig");
-    std::optional<CalibrateApriltagRigConfiguration> configuration;
-    if (!FLAGS_interactive) {
-      CalibrateApriltagRigConfiguration flags_config;
-      std::stringstream tag_ids_stream(FLAGS_tag_ids);
-      while (tag_ids_stream.good()) {
-        std::string tag_id;
-        std::getline(tag_ids_stream, tag_id, ',');
-        flags_config.add_tag_ids(stoi(tag_id));
-      }
-      flags_config.mutable_calibration_dataset()->set_path(
-          FLAGS_calibration_dataset);
-      flags_config.set_root_tag_id(FLAGS_root_tag_id);
-      flags_config.set_name(FLAGS_name);
-      configuration = flags_config;
+int Main(farm_ng::EventBus& bus) {
+  std::optional<CalibrateApriltagRigConfiguration> configuration;
+  if (!FLAGS_interactive) {
+    CalibrateApriltagRigConfiguration flags_config;
+    std::stringstream tag_ids_stream(FLAGS_tag_ids);
+    while (tag_ids_stream.good()) {
+      std::string tag_id;
+      std::getline(tag_ids_stream, tag_id, ',');
+      flags_config.add_tag_ids(stoi(tag_id));
     }
-    farm_ng::CalibrateApriltagRigProgram program(bus, configuration);
-    return program.run();
-  } catch (std::runtime_error& e) {
-    LOG(WARNING) << "caught error." << e.what()
-                 << " stopped: " << io_service.stopped();
-    return 1;
+    flags_config.mutable_calibration_dataset()->set_path(
+        FLAGS_calibration_dataset);
+    flags_config.mutable_calibration_dataset()->set_content_type(
+        "application/json; "
+        "type=type.googleapis.com/"
+        "farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult");
+
+    flags_config.set_root_tag_id(FLAGS_root_tag_id);
+    flags_config.set_name(FLAGS_name);
+    configuration = flags_config;
   }
+  farm_ng::CalibrateApriltagRigProgram program(bus, configuration);
+  return program.run();
+}
+int main(int argc, char* argv[]) {
+  return farm_ng::Main(argc, argv, &Main, &Cleanup);
 }

@@ -7,6 +7,7 @@
 
 #include "farm_ng/blobstore.h"
 #include "farm_ng/event_log_reader.h"
+#include "farm_ng/init.h"
 #include "farm_ng/ipc.h"
 
 #include "farm_ng/calibration/base_to_camera_calibrator.h"
@@ -79,22 +80,12 @@ class CalibrateBaseToCameraProgram {
     on_timer(boost::system::error_code());
   }
 
-  ~CalibrateBaseToCameraProgram() {
-    if (bus_.get_io_service().stopped()) {
-      LOG(INFO) << "bus was stopped for some reason...";
-      bus_.get_io_service().reset();
-    }
-    farm_ng::RequestStopLogging(bus_);
-    LOG(INFO) << "Requested Stop logging";
-    int n_jobs = bus_.get_io_service().poll();
-    LOG(INFO) << "Ran " << n_jobs << " jobs.";
-  }
   int run() {
     if (status_.has_input_required_configuration()) {
       set_configuration(
           WaitForConfiguration<CalibrateBaseToCameraConfiguration>(bus_));
     }
-    WaitForServices(bus_, {"ipc-logger"});
+    WaitForServices(bus_, {"ipc_logger"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
 
     auto dataset_result =
@@ -191,59 +182,39 @@ class CalibrateBaseToCameraProgram {
 };
 
 }  // namespace farm_ng
+void Cleanup(farm_ng::EventBus& bus) {
+  farm_ng::RequestStopLogging(bus);
+  LOG(INFO) << "Requested Stop logging";
+}
 
+int Main(farm_ng::EventBus& bus) {
+  CalibrateBaseToCameraConfiguration config;
+  config.mutable_calibration_dataset()->set_path(FLAGS_calibration_dataset);
+  config.mutable_calibration_dataset()->set_path(FLAGS_apriltag_rig_result);
+  config.mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline);
+  config.mutable_wheel_baseline()->set_constant(FLAGS_wheel_baseline_constant);
+  config.mutable_wheel_radius()->set_value(FLAGS_wheel_radius);
+  config.mutable_wheel_radius()->set_constant(FLAGS_wheel_radius_constant);
+  config.mutable_base_pose_camera_initialization()->mutable_x()->set_value(
+      FLAGS_base_pose_camera_tx);
+  config.mutable_base_pose_camera_initialization()->mutable_x()->set_constant(
+      FLAGS_base_pose_camera_tx_constant);
+  config.mutable_base_pose_camera_initialization()->mutable_y()->set_value(
+      FLAGS_base_pose_camera_ty);
+  config.mutable_base_pose_camera_initialization()->mutable_y()->set_constant(
+      FLAGS_base_pose_camera_ty_constant);
+  config.mutable_base_pose_camera_initialization()->mutable_z()->set_value(
+      FLAGS_base_pose_camera_tz);
+  config.mutable_base_pose_camera_initialization()->mutable_z()->set_constant(
+      FLAGS_base_pose_camera_tz_constant);
+  ViewDirection camera_direction;
+  CHECK(ViewDirection_Parse(FLAGS_camera_direction, &camera_direction));
+  config.mutable_base_pose_camera_initialization()->set_view_direction(
+      camera_direction);
+  config.set_name(FLAGS_name);
+  farm_ng::CalibrateBaseToCameraProgram program(bus, config, FLAGS_interactive);
+  return program.run();
+}
 int main(int argc, char* argv[]) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
-  FLAGS_logtostderr = 1;
-
-  google::InitGoogleLogging(argv[0]);
-  google::InstallFailureSignalHandler();
-
-  boost::asio::io_service io_service;
-
-  boost::asio::signal_set signals(io_service, SIGTERM, SIGINT);
-  signals.async_wait([&io_service](const boost::system::error_code& error,
-                                   int signal_number) {
-    std::cout << "Received (error, signal) " << error << " , " << signal_number
-              << std::endl;
-    io_service.stop();
-    throw std::runtime_error("signal caught: " + std::to_string(signal_number));
-  });
-
-  try {
-    farm_ng::EventBus& bus = farm_ng::GetEventBus(
-        io_service, farm_ng::CalibrateBaseToCameraProgram::id);
-    CalibrateBaseToCameraConfiguration config;
-    config.mutable_calibration_dataset()->set_path(FLAGS_calibration_dataset);
-    config.mutable_calibration_dataset()->set_path(FLAGS_apriltag_rig_result);
-    config.mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline);
-    config.mutable_wheel_baseline()->set_constant(
-        FLAGS_wheel_baseline_constant);
-    config.mutable_wheel_radius()->set_value(FLAGS_wheel_radius);
-    config.mutable_wheel_radius()->set_constant(FLAGS_wheel_radius_constant);
-    config.mutable_base_pose_camera_initialization()->mutable_x()->set_value(
-        FLAGS_base_pose_camera_tx);
-    config.mutable_base_pose_camera_initialization()->mutable_x()->set_constant(
-        FLAGS_base_pose_camera_tx_constant);
-    config.mutable_base_pose_camera_initialization()->mutable_y()->set_value(
-        FLAGS_base_pose_camera_ty);
-    config.mutable_base_pose_camera_initialization()->mutable_y()->set_constant(
-        FLAGS_base_pose_camera_ty_constant);
-    config.mutable_base_pose_camera_initialization()->mutable_z()->set_value(
-        FLAGS_base_pose_camera_tz);
-    config.mutable_base_pose_camera_initialization()->mutable_z()->set_constant(
-        FLAGS_base_pose_camera_tz_constant);
-    ViewDirection camera_direction;
-    CHECK(ViewDirection_Parse(FLAGS_camera_direction, &camera_direction));
-    config.mutable_base_pose_camera_initialization()->set_view_direction(
-        camera_direction);
-    config.set_name(FLAGS_name);
-    farm_ng::CalibrateBaseToCameraProgram program(bus, config,
-                                                  FLAGS_interactive);
-    return program.run();
-  } catch (std::runtime_error& e) {
-    LOG(WARNING) << "caught error." << e.what()
-                 << " stopped: " << io_service.stopped();
-    return 1;
-  }
+  return farm_ng::Main(argc, argv, &Main, &Cleanup);
 }
