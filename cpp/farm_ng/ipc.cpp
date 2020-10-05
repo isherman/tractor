@@ -308,7 +308,10 @@ void EventBus::Send(const farm_ng_proto::tractor::v1::Event& event) {
 void EventBus::SetName(const std::string& name) { impl_->set_name(name); }
 std::string EventBus::GetName() { return impl_->get_name(); }
 
-void SetArchivePath(const std::string& name) { get_archive().SetPath(name); }
+void SetArchivePath(const std::string& name) {
+  LOG(INFO) << "Setting archive path to: " << name;
+  get_archive().SetPath(name);
+}
 
 boost::filesystem::path GetArchivePath() { return get_archive().path(); }
 boost::filesystem::path GetArchiveRoot() { return get_archive().root(); }

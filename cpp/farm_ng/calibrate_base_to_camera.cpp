@@ -85,8 +85,6 @@ class CalibrateBaseToCameraProgram {
     if (status_.has_input_required_configuration()) {
       bus_.get_io_service().run_one();
     }
-    WaitForServices(bus_, {"ipc_logger"});
-    LoggingStatus log = StartLogging(bus_, configuration_.name());
 
     auto dataset_result =
         ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
@@ -95,30 +93,40 @@ class CalibrateBaseToCameraProgram {
     auto rig_result = ReadProtobufFromResource<CalibrateApriltagRigResult>(
         configuration_.apriltag_rig_result());
 
+    auto output_dir =
+        boost::filesystem::path(dataset_result.dataset().path()).parent_path();
+
+    // Output under the same directory as the dataset.
+    SetArchivePath((output_dir / "base_to_camera").string());
+
     BaseToCameraModel model = InitialBaseToCameraModelFromEventLog(
         dataset_result.dataset(), rig_result.monocular_apriltag_rig_solved());
 
     CalibrateBaseToCameraResult result;
     result.mutable_configuration()->CopyFrom(configuration_);
     result.mutable_base_to_camera_model_initial()->CopyFrom(
-        ArchiveProtobufAsBinaryResource("base_to_camera/initial", model));
+        ArchiveProtobufAsBinaryResource("initial", model));
     result.set_solver_status(model.solver_status());
     result.set_rmse(model.rmse());
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
-    if (log.has_recording()) {
-      result.mutable_event_log()->set_path(log.recording().archive_path());
-    }
-    status_.mutable_result()->CopyFrom(ArchiveProtobufAsBinaryResource(
-        "base_to_camera/initial_result", result));
+    // if (log.has_recording()) {
+    //      result.mutable_event_log()->set_path(log.recording().archive_path());
+    //}
+    status_.mutable_result()->CopyFrom(
+        ArchiveProtobufAsBinaryResource("initial_result", result));
     send_status();
 
     auto solved_model = SolveBasePoseCamera(model, false);
     result.mutable_base_to_camera_model_solved()->CopyFrom(
-        ArchiveProtobufAsBinaryResource("base_to_camera/solved", solved_model));
+        ArchiveProtobufAsBinaryResource("solved", solved_model));
     result.set_solver_status(model.solver_status());
     result.set_rmse(model.rmse());
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
+
+    // TODO some how save the result in the archive directory as well, so its
+    // self contained.
+    ArchiveProtobufAsJsonResource(configuration_.name(), result);
 
     status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
         BucketId::kBaseToCameraModels, configuration_.name(), result));
@@ -128,8 +136,7 @@ class CalibrateBaseToCameraProgram {
   }
 
   void send_status() {
-    bus_.Send(MakeEvent(
-        std::string(CalibrateBaseToCameraProgram::id) + "/status", status_));
+    bus_.Send(MakeEvent(bus_.GetName() + "/status", status_));
   }
 
   void on_timer(const boost::system::error_code& error) {
@@ -161,18 +168,13 @@ class CalibrateBaseToCameraProgram {
   }
 
   void on_event(const EventPb& event) {
-    if (!event.name().rfind(std::string(CalibrateBaseToCameraProgram::id) + "/",
-                            0) == 0) {
+    if (!event.name().rfind(bus_.GetName() + "/", 0) == 0) {
       return;
     }
     if (on_configuration(event)) {
       return;
     }
   }
-
-  // TODO: Is this the right pattern? Does it meet style guide requirements?
-  // https://google.github.io/styleguide/cppguide.html#Static_and_Global_Variables
-  static constexpr const char* id = "calibrate_base_to_camera";
 
  private:
   EventBus& bus_;
@@ -183,10 +185,7 @@ class CalibrateBaseToCameraProgram {
 };
 
 }  // namespace farm_ng
-void Cleanup(farm_ng::EventBus& bus) {
-  farm_ng::RequestStopLogging(bus);
-  LOG(INFO) << "Requested Stop logging";
-}
+void Cleanup(farm_ng::EventBus& bus) { LOG(INFO) << "Cleanup."; }
 
 int Main(farm_ng::EventBus& bus) {
   CalibrateBaseToCameraConfiguration config;

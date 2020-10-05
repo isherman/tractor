@@ -48,5 +48,4 @@ message CalibrateBaseToCameraResult {
   google.protobuf.Timestamp stamp_end = 6;
   // Debug event log.
   Resource event_log = 7;
-
 }

@@ -24,8 +24,6 @@ using farm_ng_proto::tractor::v1::SolverStatus;
 
 using Sophus::SE3d;
 
-class EventBus;
-
 struct ApriltagRigModel {
   int root_id;
   std::string rig_name;
@@ -52,8 +50,7 @@ Sophus::optional<NamedSE3Pose> EstimateCameraPoseRig(
 
 class ApriltagRigCalibrator {
  public:
-  ApriltagRigCalibrator(EventBus* bus,
-                        const CalibrateApriltagRigConfiguration& config);
+  ApriltagRigCalibrator(const CalibrateApriltagRigConfiguration& config);
 
   void PoseInit(const std::vector<std::unordered_map<int, SE3d>>& frames,
                 std::unordered_map<int, SE3d>& tag_mean_pose_root,
@@ -64,7 +61,6 @@ class ApriltagRigCalibrator {
 
   int NumFrames() const;
 
-  EventBus* bus_;
   std::string rig_name_ = "rig";  // TODO(ethanrublee) set from command/config.
   int root_id_;
   std::unordered_set<int> ids_;

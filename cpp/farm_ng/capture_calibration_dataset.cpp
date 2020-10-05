@@ -62,6 +62,10 @@ class CaptureCalibrationDatasetProgram {
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
     result.mutable_dataset()->set_path(log.recording().archive_path());
 
+    // TODO some how save the result in the archive directory as well, so its
+    // self contained.
+    ArchiveProtobufAsJsonResource(configuration_.name(), result);
+
     auto result_resource = WriteProtobufAsJsonResource(
         BucketId::kCalibrationDatasets, configuration_.name(), result);
     VLOG(1) << result_resource.ShortDebugString();
@@ -73,7 +77,7 @@ class CaptureCalibrationDatasetProgram {
   // using 'calibrator' for compatibility w/ existing code
   void send_status() {
     LOG(INFO) << status_.ShortDebugString();
-    bus_.Send(MakeEvent("calibrator/status", status_));
+    bus_.Send(MakeEvent(bus_.GetName() + "/status", status_));
   }
 
   void on_timer(const boost::system::error_code& error) {

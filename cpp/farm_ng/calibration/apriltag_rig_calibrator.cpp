@@ -200,8 +200,8 @@ void ModelError(ApriltagRigModel& model) {
 }
 
 ApriltagRigCalibrator::ApriltagRigCalibrator(
-    EventBus* bus, const CalibrateApriltagRigConfiguration& config)
-    : bus_(bus), root_id_(0) {
+    const CalibrateApriltagRigConfiguration& config)
+    : root_id_(0) {
   LOG(INFO) << "Config: HERRREEE" << config.ShortDebugString();
   if (config.tag_ids_size() > 0) {
     root_id_ = config.tag_ids().Get(0);

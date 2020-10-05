@@ -75,13 +75,10 @@ class CalibrateApriltagRigProgram {
 
   // reads the event log from the CalibrationDatasetResult, and
   // populates a MonocularApriltagRigModel to be solved.
-  ApriltagRigModel LoadCalibrationDataset() {
-    auto dataset_result =
-        ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
-            configuration_.calibration_dataset());
-    LOG(INFO) << "dataset_result: " << dataset_result.ShortDebugString();
+  ApriltagRigModel LoadCalibrationDataset(
+      const CaptureCalibrationDatasetResult& dataset_result) {
     EventLogReader log_reader(dataset_result.dataset());
-    ApriltagRigCalibrator calibrator(&bus_, configuration_);
+    ApriltagRigCalibrator calibrator(configuration_);
     while (true) {
       EventPb event;
       try {
@@ -99,10 +96,20 @@ class CalibrateApriltagRigProgram {
     while (status_.has_input_required_configuration()) {
       bus_.get_io_service().run_one();
     }
-    WaitForServices(bus_, {"ipc_logger"});
-    LoggingStatus log = StartLogging(bus_, configuration_.name());
+    // WaitForServices(bus_, {"ipc_logger"});
+    LOG(INFO) << "config:\n" << configuration_.DebugString();
 
-    ApriltagRigModel model = LoadCalibrationDataset();
+    auto dataset_result =
+        ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
+            configuration_.calibration_dataset());
+    LOG(INFO) << "dataset_result:\n" << dataset_result.DebugString();
+
+    auto output_dir =
+        boost::filesystem::path(dataset_result.dataset().path()).parent_path();
+
+    // Output under the same directory as the dataset.
+    SetArchivePath((output_dir / "apriltag_rig_model").string());
+    ApriltagRigModel model = LoadCalibrationDataset(dataset_result);
 
     MonocularApriltagRigModel initial_model_pb;
     model.ToMonocularApriltagRigModel(&initial_model_pb);
@@ -110,40 +117,44 @@ class CalibrateApriltagRigProgram {
     CalibrateApriltagRigResult result;
     result.mutable_configuration()->CopyFrom(configuration_);
     result.mutable_monocular_apriltag_rig_initial()->CopyFrom(
-        ArchiveProtobufAsBinaryResource("apriltag_rig_model/initial",
-                                        initial_model_pb));
+        ArchiveProtobufAsBinaryResource("initial", initial_model_pb));
     result.set_rmse(model.rmse);
     result.set_solver_status(model.status);
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
-    if (log.has_recording()) {
-      result.mutable_event_log()->set_path(log.recording().archive_path());
-    }
-    status_.mutable_result()->CopyFrom(ArchiveProtobufAsJsonResource(
-        "apriltag_rig_model/initial_result", result));
+    // if (log.has_recording()) {
+    //      result.mutable_event_log()->set_path(log.recording().archive_path());
+    //}
+    status_.mutable_result()->CopyFrom(
+        ArchiveProtobufAsJsonResource("initial_result", result));
     send_status();
 
     farm_ng::Solve(&model);
     MonocularApriltagRigModel final_model_pb;
     model.ToMonocularApriltagRigModel(&final_model_pb);
     result.mutable_monocular_apriltag_rig_solved()->CopyFrom(
-        ArchiveProtobufAsBinaryResource("apriltag_rig_model/solved",
-                                        initial_model_pb));
+        ArchiveProtobufAsBinaryResource("solved", initial_model_pb));
     result.set_rmse(model.rmse);
     result.set_solver_status(model.status);
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
+
+    // TODO some how save the result in the archive directory as well, so its
+    // self contained.
+    ArchiveProtobufAsJsonResource(configuration_.name(), result);
 
     auto result_resource = WriteProtobufAsJsonResource(
         BucketId::kApriltagRigModels, configuration_.name(), result);
     status_.mutable_result()->CopyFrom(result_resource);
 
-    LOG(INFO) << "Complete:\n" << status_.DebugString();
+    LOG(INFO) << "status:\n"
+              << status_.DebugString() << "\nresult:\n"
+              << result.DebugString();
 
     send_status();
     return 0;
   }
 
   void send_status() {
-    bus_.Send(MakeEvent("calibrate_apriltag_rig/status", status_));
+    bus_.Send(MakeEvent(bus_.GetName() + "/status", status_));
   }
 
   void on_timer(const boost::system::error_code& error) {
@@ -193,10 +204,7 @@ class CalibrateApriltagRigProgram {
 
 }  // namespace farm_ng
 
-void Cleanup(farm_ng::EventBus& bus) {
-  farm_ng::RequestStopLogging(bus);
-  LOG(INFO) << "Requested Stop logging";
-}
+void Cleanup(farm_ng::EventBus& bus) { LOG(INFO) << "Cleanup."; }
 
 int Main(farm_ng::EventBus& bus) {
   std::optional<CalibrateApriltagRigConfiguration> configuration;
