@@ -25,6 +25,7 @@ using farm_ng_proto::tractor::v1::CalibrateApriltagRigResult;
 using farm_ng_proto::tractor::v1::CalibrateBaseToCameraConfiguration;
 using farm_ng_proto::tractor::v1::CalibrateBaseToCameraResult;
 using farm_ng_proto::tractor::v1::CalibrateBaseToCameraStatus;
+
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
 using farm_ng_proto::tractor::v1::ViewDirection;
@@ -82,8 +83,7 @@ class CalibrateBaseToCameraProgram {
 
   int run() {
     if (status_.has_input_required_configuration()) {
-      set_configuration(
-          WaitForConfiguration<CalibrateBaseToCameraConfiguration>(bus_));
+      bus_.get_io_service().run_one();
     }
     WaitForServices(bus_, {"ipc_logger"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
@@ -120,8 +120,9 @@ class CalibrateBaseToCameraProgram {
     result.set_rmse(model.rmse());
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
 
-    status_.mutable_result()->CopyFrom(WriteProtobufAsBinaryResource(
+    status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
         BucketId::kBaseToCameraModels, configuration_.name(), result));
+    LOG(INFO) << "Complete:\n" << status_.DebugString();
     send_status();
     return 0;
   }
@@ -190,7 +191,12 @@ void Cleanup(farm_ng::EventBus& bus) {
 int Main(farm_ng::EventBus& bus) {
   CalibrateBaseToCameraConfiguration config;
   config.mutable_calibration_dataset()->set_path(FLAGS_calibration_dataset);
-  config.mutable_calibration_dataset()->set_path(FLAGS_apriltag_rig_result);
+  config.mutable_calibration_dataset()->set_content_type(
+      farm_ng::ContentTypeProtobufJson<CaptureCalibrationDatasetResult>());
+
+  config.mutable_apriltag_rig_result()->set_path(FLAGS_apriltag_rig_result);
+  config.mutable_apriltag_rig_result()->set_content_type(
+      farm_ng::ContentTypeProtobufJson<CalibrateApriltagRigResult>());
   config.mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline);
   config.mutable_wheel_baseline()->set_constant(FLAGS_wheel_baseline_constant);
   config.mutable_wheel_radius()->set_value(FLAGS_wheel_radius);

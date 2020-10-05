@@ -132,9 +132,12 @@ class CalibrateApriltagRigProgram {
     result.set_solver_status(model.status);
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
 
-    auto result_resource = WriteProtobufAsBinaryResource(
+    auto result_resource = WriteProtobufAsJsonResource(
         BucketId::kApriltagRigModels, configuration_.name(), result);
     status_.mutable_result()->CopyFrom(result_resource);
+
+    LOG(INFO) << "Complete:\n" << status_.DebugString();
+
     send_status();
     return 0;
   }
