@@ -33,6 +33,7 @@ using farm_ng_proto::tractor::v1::ViewDirection_Name;
 using farm_ng_proto::tractor::v1::ViewDirection_Parse;
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
+
 DEFINE_string(calibration_dataset, "",
               "The path to a serialized CaptureCalibrationDatasetResult");
 DEFINE_string(apriltag_rig_result, "",

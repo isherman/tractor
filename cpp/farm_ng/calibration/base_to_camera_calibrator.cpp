@@ -42,10 +42,11 @@ struct BasePoseCameraCostFunctor {
   }
 
   template <class T>
-  bool operator()(T const* const raw_base_pose_camera,
+  bool operator()(T const* const raw_camera_pose_base,
                   T const* const raw_base_params, T* raw_residuals) const {
-    Eigen::Map<Sophus::SE3<T> const> const base_pose_camera(
-        raw_base_pose_camera);
+    Eigen::Map<Sophus::SE3<T> const> const camera_pose_base(
+        raw_camera_pose_base);
+    auto base_pose_camera = camera_pose_base.inverse();
     Eigen::Map<Eigen::Matrix<T, 2, 1> const> const base_params(raw_base_params);
     const Sophus::SE3<T> camera_end_pose_camera_start(
         camera_end_pose_camera_start_.cast<T>());
@@ -56,7 +57,7 @@ struct BasePoseCameraCostFunctor {
 
     auto tractor_start_pose_tractor_start =
         tractor_start_pose_tractor_end * base_pose_camera *
-        camera_end_pose_camera_start * base_pose_camera.inverse();
+        camera_end_pose_camera_start * camera_pose_base;
 
     residuals = tractor_start_pose_tractor_start.log();
     return true;
@@ -67,9 +68,9 @@ struct BasePoseCameraCostFunctor {
 
 class BaseToCameraIterationCallback : public ceres::IterationCallback {
  public:
-  explicit BaseToCameraIterationCallback(const SE3d* base_pose_camera,
+  explicit BaseToCameraIterationCallback(const SE3d* camera_pose_base,
                                          const Eigen::Vector2d* base_parameters)
-      : base_pose_camera_(base_pose_camera),
+      : camera_pose_base_(camera_pose_base),
         base_parameters_(base_parameters) {}
 
   ~BaseToCameraIterationCallback() {}
@@ -77,7 +78,7 @@ class BaseToCameraIterationCallback : public ceres::IterationCallback {
   ceres::CallbackReturnType operator()(
       const ceres::IterationSummary& summary = ceres::IterationSummary()) {
     SE3Pose pose_pb;
-    SophusToProto(*base_pose_camera_, &pose_pb);
+    SophusToProto(camera_pose_base_->inverse(), &pose_pb);
     LOG(INFO) << "base_pose_camera: " << pose_pb.ShortDebugString()
               << " wheel_radius (inches): " << (*base_parameters_)[0] / 0.0254
               << " wheel_baseline (inches): "
@@ -86,7 +87,7 @@ class BaseToCameraIterationCallback : public ceres::IterationCallback {
   }
 
  private:
-  const SE3d* base_pose_camera_;
+  const SE3d* camera_pose_base_;
   const Eigen::Vector2d* base_parameters_;
 };
 
@@ -94,16 +95,17 @@ BaseToCameraModel SolveBasePoseCamera(BaseToCameraModel model,
                                       bool hold_base_parameters_const) {
   SE3d base_pose_camera;
   ProtoToSophus(model.base_pose_camera().a_pose_b(), &base_pose_camera);
+  SE3d camera_pose_base = base_pose_camera.inverse();
   Eigen::Vector2d base_parameters(model.wheel_radius(), model.wheel_baseline());
 
   ceres::Problem problem;
 
-  problem.AddParameterBlock(base_pose_camera.data(), SE3d::num_parameters,
-                            new LocalParameterizationSE3);
+  // here we hold Z constant, through the local parameterization.
+  problem.AddParameterBlock(camera_pose_base.data(), SE3d::num_parameters,
+                            new LocalParameterizationSE3({0, 0, 1, 0, 0, 0}));
 
   problem.AddParameterBlock(base_parameters.data(), 2,
                             new LocalParameterizationAbs(2));
-
   if (hold_base_parameters_const) {
     problem.SetParameterBlockConstant(base_parameters.data());
   }
@@ -112,11 +114,11 @@ BaseToCameraModel SolveBasePoseCamera(BaseToCameraModel model,
         new ceres::AutoDiffCostFunction<BasePoseCameraCostFunctor, 6,
                                         Sophus::SE3d::num_parameters, 2>(
             new BasePoseCameraCostFunctor(sample));
-    problem.AddResidualBlock(cost_function1, nullptr, base_pose_camera.data(),
+    problem.AddResidualBlock(cost_function1, nullptr, camera_pose_base.data(),
                              base_parameters.data());
   }
 
-  BaseToCameraIterationCallback callback(&base_pose_camera, &base_parameters);
+  BaseToCameraIterationCallback callback(&camera_pose_base, &base_parameters);
   // Set solver options (precision / method)
   ceres::Solver::Options options;
   options.gradient_tolerance = 1e-8;
@@ -131,6 +133,7 @@ BaseToCameraModel SolveBasePoseCamera(BaseToCameraModel model,
   options.minimizer_progress_to_stdout = true;
   options.update_state_every_iteration = true;
   ceres::Solve(options, &problem, &summary);
+  base_pose_camera = camera_pose_base.inverse();
   LOG(INFO) << summary.FullReport() << std::endl;
   double rmse = std::sqrt(summary.final_cost / summary.num_residuals);
 
@@ -218,10 +221,11 @@ BaseToCameraModel InitialBaseToCameraModelFromEventLog(
   if (with_initialization) {
     model.set_wheel_radius((17.0 / 2.0) * 0.0254);
     model.set_wheel_baseline(42 * 0.0254);
-    SophusToProto(Sophus::SE3d::rotZ(-M_PI / 2.0) *
+    SophusToProto(Sophus::SE3d::transZ(1.0) * Sophus::SE3d::rotZ(-M_PI / 2.0) *
                       Sophus::SE3d::rotX(M_PI / 2.0) * Sophus::SE3d::rotY(M_PI),
                   "tractor/base", rig_model.camera_frame_name(),
                   model.mutable_base_pose_camera());
+
   } else {
     // this works, but takes a long time, and is scary!
     model.set_wheel_radius(1);
