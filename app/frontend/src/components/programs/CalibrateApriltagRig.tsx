@@ -95,8 +95,15 @@ const Component: React.FC = () => {
                   <Form.Control
                     type="text"
                     name="tagIds"
-                    value={configuration?.tagIds || ""}
-                    onChange={handleConfigurationChange}
+                    // TODO: Make this a controlled form element, with better UI
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      const tagIds = (e.target.value || "")
+                        .split(",")
+                        .map((_) => parseInt(_.trim()));
+                      setConfiguration(
+                        (c) => ({ ...c, tagIds } as Configuration)
+                      );
+                    }}
                   />
                 </Form.Group>
 
