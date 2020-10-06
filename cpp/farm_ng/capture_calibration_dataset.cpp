@@ -27,15 +27,13 @@ namespace farm_ng {
 class CaptureCalibrationDatasetProgram {
  public:
   CaptureCalibrationDatasetProgram(
-      EventBus& bus,
-      std::optional<CaptureCalibrationDatasetConfiguration> configuration)
+      EventBus& bus, CaptureCalibrationDatasetConfiguration configuration,
+      bool interactive)
       : bus_(bus), timer_(bus_.get_io_service()) {
-    if (configuration.has_value()) {
-      set_configuration(configuration.value());
+    if (interactive) {
+      status_.mutable_input_required_configuration()->CopyFrom(configuration);
     } else {
-      status_.mutable_input_required_configuration()->set_name(FLAGS_name);
-      status_.mutable_input_required_configuration()->set_num_frames(
-          FLAGS_num_frames);
+      set_configuration(configuration);
     }
     bus_.GetEventSignal()->connect(
         std::bind(&CaptureCalibrationDatasetProgram::on_event, this,
@@ -47,10 +45,11 @@ class CaptureCalibrationDatasetProgram {
     while (status_.has_input_required_configuration()) {
       bus_.get_io_service().run_one();
     }
-    LOG(INFO) << "Right here! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
     WaitForServices(bus_, {"ipc_logger", "tracking_camera"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
     RequestStartCapturing(bus_);
+
     while (status_.num_frames() < configuration_.num_frames()) {
       bus_.get_io_service().run_one();
     }
@@ -66,17 +65,14 @@ class CaptureCalibrationDatasetProgram {
     // self contained.
     ArchiveProtobufAsJsonResource(configuration_.name(), result);
 
-    auto result_resource = WriteProtobufAsJsonResource(
-        BucketId::kCalibrationDatasets, configuration_.name(), result);
-    VLOG(1) << result_resource.ShortDebugString();
-    status_.mutable_result()->CopyFrom(result_resource);
+    status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
+        BucketId::kCalibrationDatasets, configuration_.name(), result));
+    LOG(INFO) << "Complete:\n" << status_.DebugString();
     send_status();
     return 0;
   }
 
-  // using 'calibrator' for compatibility w/ existing code
   void send_status() {
-    LOG(INFO) << status_.ShortDebugString();
     bus_.Send(MakeEvent(bus_.GetName() + "/status", status_));
   }
 
@@ -120,7 +116,7 @@ class CaptureCalibrationDatasetProgram {
     if (!event.data().UnpackTo(&configuration)) {
       return false;
     }
-    LOG(INFO) << event.name() << " " << configuration.ShortDebugString();
+    LOG(INFO) << configuration.ShortDebugString();
     set_configuration(configuration);
     return true;
   }
@@ -129,7 +125,6 @@ class CaptureCalibrationDatasetProgram {
     configuration_ = configuration;
     status_.clear_input_required_configuration();
     send_status();
-    LOG(INFO) << "Set configuration woot!";
   }
 
   void on_event(const EventPb& event) {
@@ -160,14 +155,12 @@ void Cleanup(farm_ng::EventBus& bus) {
   LOG(INFO) << "Requested Stop logging";
 }
 int Main(farm_ng::EventBus& bus) {
-  std::optional<CaptureCalibrationDatasetConfiguration> configuration;
-  if (!FLAGS_interactive) {
-    CaptureCalibrationDatasetConfiguration flags_config;
-    flags_config.set_num_frames(FLAGS_num_frames);
-    flags_config.set_name(FLAGS_name);
-    configuration = flags_config;
-  }
-  farm_ng::CaptureCalibrationDatasetProgram program(bus, configuration);
+  CaptureCalibrationDatasetConfiguration config;
+  config.set_num_frames(FLAGS_num_frames);
+  config.set_name(FLAGS_name);
+
+  farm_ng::CaptureCalibrationDatasetProgram program(bus, config,
+                                                    FLAGS_interactive);
   return program.run();
 }
 

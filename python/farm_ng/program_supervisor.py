@@ -22,26 +22,34 @@ farm_ng_root = os.environ['FARM_NG_ROOT']
 ProgramInfo = namedtuple('ProgramInfo', 'path args name description')
 
 library = {
-    'calibrate-apriltag-rig-playback': ProgramInfo(
+    'calibrate_apriltag_rig_playback': ProgramInfo(
         path=f'{farm_ng_root}/build/cpp/farm_ng/log_playback',
         args=['-send', '-log', f'{farm_ng_root}/../tractor-data/cal01/events-02498-00000.log'],
         name='Apriltag Rig Calibration Playback',
         description='Log playback',
     ),
-    'capture-calibration-dataset': ProgramInfo(
+    'capture_calibration_dataset': ProgramInfo(
         path=f'{farm_ng_root}/build/cpp/farm_ng/capture_calibration_dataset',
         args=['-interactive'],
         name='Capture Calibration Dataset',
         description='Capture apriltag detections, for use in other calibration programs',
     ),
-    'calibrate-apriltag-rig': ProgramInfo(
+    'calibrate_apriltag_rig': ProgramInfo(
         path=f'{farm_ng_root}/build/cpp/farm_ng/calibrate_apriltag_rig',
         args=['-interactive'],
         name='Apriltag Rig Calibration',
-        description='Solves an apriltag rig from data collected with capture-calibration-dataset',
+        description='Solves an apriltag rig from data collected with capture_calibration_dataset',
+    ),
+    'calibrate_base_to_camera': ProgramInfo(
+        path=f'{farm_ng_root}/build/cpp/farm_ng/calibrate_base_to_camera',
+        args=['-interactive'],
+        name='Base-to-Camera Calibration',
+        description=(
+            'Solves a base_pose_camera and other base calibration parameters from '
+            'an apriltag rig and data collected with capture_calibration_dataset'
+        ),
     ),
     'sleep-5': ProgramInfo(path='sleep', args=['5'], name='Sleep 5', description='Take a nap'),
-    'sleep-100': ProgramInfo(path='sleep', args=['100'], name='Sleep 100', description='Take a looong nap'),
 }
 libraryPb = [Program(id=_id, name=p.name, description=p.description) for _id, p in library.items()]
 
@@ -58,7 +66,6 @@ class ProgramSupervisor:
     async def send_status(self):
         while not self.shutdown:
             event = make_event('program_supervisor/status', self.status)
-            # print(MessageToString(event, as_one_line=True))
             event_bus.send(event)
             await asyncio.sleep(1)
 

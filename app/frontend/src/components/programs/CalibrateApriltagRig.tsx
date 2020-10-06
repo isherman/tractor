@@ -14,13 +14,12 @@ import {
 } from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
 import { Resource } from "../../../genproto/farm_ng_proto/tractor/v1/resource";
 
-const eventBusNamePrefix = "calibrate_apriltag_rig";
+const programId = "calibrate_apriltag_rig";
 
 const Component: React.FC = () => {
   const { programsStore: store } = useStores();
   useEffect(() => {
-    store.eventLogPredicate = (e) =>
-      e.name.startsWith(`${eventBusNamePrefix}/`);
+    store.eventLogPredicate = (e) => e.name.startsWith(`${programId}/`);
     return () => store.resetEventLog();
   }, []);
 
@@ -28,12 +27,9 @@ const Component: React.FC = () => {
     null
   );
 
-  console.log(configuration);
-
   const handleConfigurationChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    console.log("handleConfigurationChange: ", e.target.name, e.target.value);
     setConfiguration({
       ...(configuration || {}),
       [e.target.name]: e.target.value
@@ -44,7 +40,6 @@ const Component: React.FC = () => {
   const handleResourcePathChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    console.log("handleResourcePathChange: ", e.target.name, e.target.value);
     setConfiguration({
       ...(configuration || {}),
       calibrationDataset: Resource.fromJSON({
@@ -61,7 +56,7 @@ const Component: React.FC = () => {
     e.preventDefault();
     store.busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigConfiguration",
-      `${eventBusNamePrefix}/configure`,
+      `${programId}/configure`,
       Configuration.encode(Configuration.fromJSON(configuration)).finish()
     );
   };
@@ -70,7 +65,7 @@ const Component: React.FC = () => {
     const requestedConfiguration =
       store.runningProgram &&
       store.latestEvent &&
-      store.latestEvent.name.startsWith(`${eventBusNamePrefix}/status`) &&
+      store.latestEvent.name.startsWith(`${programId}/status`) &&
       store.latestEvent.typeUrl.endsWith("CalibrateApriltagRigStatus")
         ? (store.latestEvent.event as Status).inputRequiredConfiguration
         : null;
@@ -145,10 +140,7 @@ const Component: React.FC = () => {
 };
 
 export class CalibrateApriltagRig implements ProgramUI {
-  static id: ProgramId = "calibrate-apriltag-rig";
-  programIds = [
-    "calibrate-apriltag-rig",
-    "calibrate-apriltag-rig-playback"
-  ] as const;
+  static id: ProgramId = programId;
+  programIds = [programId, `${programId}-playback`] as const;
   component = Component;
 }

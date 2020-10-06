@@ -13,10 +13,13 @@ import {
 import { ProgramLogVisualizer } from "./ProgramLogVisualizer";
 import { ProgramForm } from "./ProgramForm";
 
+const programId = "capture_calibration_dataset";
+
 const Component: React.FC = () => {
   const { programsStore: store } = useStores();
   useEffect(() => {
-    store.eventLogPredicate = (e) => e.name.startsWith("calibrator/");
+    store.eventLogPredicate = (e) =>
+      e.name.startsWith(`${programId}/`) || e.name.startsWith("calibrator/");
     return () => store.resetEventLog();
   }, []);
 
@@ -27,7 +30,6 @@ const Component: React.FC = () => {
   const handleConfigurationChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ): void => {
-    console.log("handleConfigurationChange: ", e.target.name, e.target.value);
     setConfiguration({
       ...(configuration || {}),
       [e.target.name]: e.target.value
@@ -40,7 +42,7 @@ const Component: React.FC = () => {
     e.preventDefault();
     store.busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetConfiguration",
-      "calibrator/configure",
+      `${programId}/configure`,
       Configuration.encode(Configuration.fromJSON(configuration)).finish()
     );
   };
@@ -49,7 +51,7 @@ const Component: React.FC = () => {
     const requestedConfiguration =
       store.runningProgram &&
       store.latestEvent &&
-      store.latestEvent.name.startsWith("calibrator/status") &&
+      store.latestEvent.name.startsWith(`${programId}/status`) &&
       store.latestEvent.typeUrl.endsWith("CaptureCalibrationDatasetStatus")
         ? (store.latestEvent.event as Status).inputRequiredConfiguration
         : null;
@@ -107,7 +109,7 @@ const Component: React.FC = () => {
 };
 
 export class CaptureCalibrationDataset implements ProgramUI {
-  static id: ProgramId = "capture-calibration-dataset";
-  programIds = ["capture-calibration-dataset"] as const;
+  static id: ProgramId = programId;
+  programIds = [programId] as const;
   component = Component;
 }

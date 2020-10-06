@@ -85,7 +85,7 @@ class CalibrateBaseToCameraProgram {
   }
 
   int run() {
-    if (status_.has_input_required_configuration()) {
+    while (status_.has_input_required_configuration()) {
       bus_.get_io_service().run_one();
     }
 
@@ -183,7 +183,7 @@ class CalibrateBaseToCameraProgram {
     if (!event.data().UnpackTo(&configuration)) {
       return false;
     }
-    VLOG(2) << configuration.ShortDebugString();
+    LOG(INFO) << configuration.ShortDebugString();
     set_configuration(configuration);
     return true;
   }
@@ -212,6 +212,7 @@ class CalibrateBaseToCameraProgram {
 };
 
 }  // namespace farm_ng
+
 void Cleanup(farm_ng::EventBus& bus) { LOG(INFO) << "Cleanup."; }
 
 int Main(farm_ng::EventBus& bus) {
@@ -244,6 +245,7 @@ int Main(farm_ng::EventBus& bus) {
   config.mutable_base_pose_camera_initialization()->set_view_direction(
       camera_direction);
   config.set_name(FLAGS_name);
+
   farm_ng::CalibrateBaseToCameraProgram program(bus, config, FLAGS_interactive);
   return program.run();
 }

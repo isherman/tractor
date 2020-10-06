@@ -46,16 +46,14 @@ bool is_calibration_event(const std::string& s) {
 
 class CalibrateApriltagRigProgram {
  public:
-  CalibrateApriltagRigProgram(
-      EventBus& bus,
-      std::optional<CalibrateApriltagRigConfiguration> configuration)
+  CalibrateApriltagRigProgram(EventBus& bus,
+                              CalibrateApriltagRigConfiguration configuration,
+                              bool interactive)
       : bus_(bus), timer_(bus_.get_io_service()) {
-    if (configuration.has_value()) {
-      set_configuration(configuration.value());
+    if (interactive) {
+      status_.mutable_input_required_configuration()->CopyFrom(configuration);
     } else {
-      status_.mutable_input_required_configuration()->set_name(FLAGS_name);
-      status_.mutable_input_required_configuration()->set_root_tag_id(
-          FLAGS_root_tag_id);
+      set_configuration(configuration);
     }
     bus_.GetEventSignal()->connect(std::bind(
         &CalibrateApriltagRigProgram::on_event, this, std::placeholders::_1));
@@ -96,7 +94,6 @@ class CalibrateApriltagRigProgram {
     while (status_.has_input_required_configuration()) {
       bus_.get_io_service().run_one();
     }
-    // WaitForServices(bus_, {"ipc_logger"});
     LOG(INFO) << "config:\n" << configuration_.DebugString();
 
     auto dataset_result =
@@ -141,9 +138,8 @@ class CalibrateApriltagRigProgram {
     // self contained.
     ArchiveProtobufAsJsonResource(configuration_.name(), result);
 
-    auto result_resource = WriteProtobufAsJsonResource(
-        BucketId::kApriltagRigModels, configuration_.name(), result);
-    status_.mutable_result()->CopyFrom(result_resource);
+    status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
+        BucketId::kApriltagRigModels, configuration_.name(), result));
 
     LOG(INFO) << "status:\n"
               << status_.DebugString() << "\nresult:\n"
@@ -174,7 +170,7 @@ class CalibrateApriltagRigProgram {
     if (!event.data().UnpackTo(&configuration)) {
       return false;
     }
-    VLOG(2) << configuration.ShortDebugString();
+    LOG(INFO) << configuration.ShortDebugString();
     set_configuration(configuration);
     return true;
   }
@@ -186,7 +182,7 @@ class CalibrateApriltagRigProgram {
   }
 
   void on_event(const EventPb& event) {
-    if (!event.name().rfind("calibrate_apriltag_rig/", 0) == 0) {
+    if (!event.name().rfind(bus_.GetName() + "/", 0) == 0) {
       return;
     }
     if (on_configuration(event)) {
@@ -207,27 +203,19 @@ class CalibrateApriltagRigProgram {
 void Cleanup(farm_ng::EventBus& bus) { LOG(INFO) << "Cleanup."; }
 
 int Main(farm_ng::EventBus& bus) {
-  std::optional<CalibrateApriltagRigConfiguration> configuration;
-  if (!FLAGS_interactive) {
-    CalibrateApriltagRigConfiguration flags_config;
-    std::stringstream tag_ids_stream(FLAGS_tag_ids);
-    while (tag_ids_stream.good()) {
-      std::string tag_id;
-      std::getline(tag_ids_stream, tag_id, ',');
-      flags_config.add_tag_ids(stoi(tag_id));
-    }
-    flags_config.mutable_calibration_dataset()->set_path(
-        FLAGS_calibration_dataset);
-    flags_config.mutable_calibration_dataset()->set_content_type(
-        "application/json; "
-        "type=type.googleapis.com/"
-        "farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult");
-
-    flags_config.set_root_tag_id(FLAGS_root_tag_id);
-    flags_config.set_name(FLAGS_name);
-    configuration = flags_config;
+  CalibrateApriltagRigConfiguration config;
+  std::stringstream ss(FLAGS_tag_ids);
+  std::string token;
+  while (std::getline(ss, token, ',')) {
+    config.add_tag_ids(stoi(token));
   }
-  farm_ng::CalibrateApriltagRigProgram program(bus, configuration);
+  config.mutable_calibration_dataset()->set_path(FLAGS_calibration_dataset);
+  config.mutable_calibration_dataset()->set_content_type(
+      farm_ng::ContentTypeProtobufJson<CaptureCalibrationDatasetResult>());
+  config.set_root_tag_id(FLAGS_root_tag_id);
+  config.set_name(FLAGS_name);
+
+  farm_ng::CalibrateApriltagRigProgram program(bus, config, FLAGS_interactive);
   return program.run();
 }
 int main(int argc, char* argv[]) {
