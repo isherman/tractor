@@ -55,7 +55,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "git.ignoreLimitWarning": true,
-  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
   "cmake.configureOnOpen": true,
   "C_Cpp.formatting": "clangFormat",
   "files.associations": {

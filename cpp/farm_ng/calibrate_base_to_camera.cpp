@@ -28,6 +28,8 @@ using farm_ng_proto::tractor::v1::CalibrateBaseToCameraStatus;
 
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
+using farm_ng_proto::tractor::v1::SolverStatus;
+using farm_ng_proto::tractor::v1::SolverStatus_Name;
 using farm_ng_proto::tractor::v1::ViewDirection;
 using farm_ng_proto::tractor::v1::ViewDirection_Name;
 using farm_ng_proto::tractor::v1::ViewDirection_Parse;
@@ -38,26 +40,26 @@ DEFINE_string(calibration_dataset, "",
               "The path to a serialized CaptureCalibrationDatasetResult");
 DEFINE_string(apriltag_rig_result, "",
               "The path to a serialized ApriltagRigCalibrationResult");
-DEFINE_double(wheel_baseline, 0.0, "The wheel baseline parameter");
-DEFINE_bool(wheel_baseline_constant, true,
+DEFINE_double(wheel_baseline, 42, "The wheel baseline parameter");
+DEFINE_bool(wheel_baseline_constant, false,
             "Hold the wheel baseline parameter constant");
-DEFINE_double(wheel_radius, 0.0, "The wheel radius parameter");
-DEFINE_bool(wheel_radius_constant, true,
+DEFINE_double(wheel_radius, 8.5, "The wheel radius parameter");
+DEFINE_bool(wheel_radius_constant, false,
             "Hold the wheel radius parameter constant");
 DEFINE_double(
-    base_pose_camera_tx, 0.0,
+    base_pose_camera_tx, -12.0,
     "The x component of translation to use for base_to_camera initialization");
 DEFINE_bool(base_pose_camera_tx_constant, false,
             "Hold the base_pose_camera_tx parameter constant");
 DEFINE_double(
-    base_pose_camera_ty, 0.0,
+    base_pose_camera_ty, 42 / 2.0,
     "The y component of translation to use for base_to_camera initialization");
 DEFINE_bool(base_pose_camera_ty_constant, false,
             "Hold the base_pose_camera_ty parameter constant");
 DEFINE_double(
-    base_pose_camera_tz, 0.0,
+    base_pose_camera_tz, 48.0,
     "The z component of translation to use for base_to_camera initialization");
-DEFINE_bool(base_pose_camera_tz_constant, false,
+DEFINE_bool(base_pose_camera_tz_constant, true,
             "Hold the base_pose_camera_tz parameter constant");
 DEFINE_string(
     camera_direction, ViewDirection_Name(ViewDirection::VIEW_DIRECTION_FRONT),
@@ -100,8 +102,17 @@ class CalibrateBaseToCameraProgram {
     // Output under the same directory as the dataset.
     SetArchivePath((output_dir / "base_to_camera").string());
 
+    BaseToCameraInitialization initialization;
+    initialization.mutable_wheel_radius()->CopyFrom(
+        configuration_.wheel_radius());
+    initialization.mutable_wheel_baseline()->CopyFrom(
+        configuration_.wheel_baseline());
+    initialization.mutable_base_pose_camera()->CopyFrom(
+        configuration_.base_pose_camera_initialization());
+
     BaseToCameraModel model = InitialBaseToCameraModelFromEventLog(
-        dataset_result.dataset(), rig_result.monocular_apriltag_rig_solved());
+        initialization, dataset_result.dataset(),
+        rig_result.monocular_apriltag_rig_solved());
 
     CalibrateBaseToCameraResult result;
     result.mutable_configuration()->CopyFrom(configuration_);
@@ -118,7 +129,22 @@ class CalibrateBaseToCameraProgram {
         ArchiveProtobufAsJsonResource("initial_result", result));
     send_status();
 
-    auto solved_model = SolveBasePoseCamera(model, false);
+    BasePoseCameraSolverOptions options;
+
+    // First hold our base parameters constant, so that the camera pose is
+    // solved for, this seems to be stable even with very poor initialization.
+    options.hold_base_parameters_constant = true;
+    auto solved_model = SolveBasePoseCamera(model, options);
+
+    if (solved_model.solver_status() != SolverStatus::SOLVER_STATUS_CONVERGED) {
+      LOG(FATAL) << "Failed to solve the initial base_pose_camera model: "
+                 << SolverStatus_Name(solved_model.solver_status());
+    }
+    // Now allow the solver to adjust everything, since we have an optimized
+    // camera pose.  Keep in mind the constantness from the configuration will
+    // take precident.
+    options.hold_base_parameters_constant = false;
+    solved_model = SolveBasePoseCamera(solved_model, options);
     result.mutable_base_to_camera_model_solved()->CopyFrom(
         ArchiveProtobufAsBinaryResource("solved", solved_model));
     result.set_solver_status(model.solver_status());
@@ -197,20 +223,20 @@ int Main(farm_ng::EventBus& bus) {
   config.mutable_apriltag_rig_result()->set_path(FLAGS_apriltag_rig_result);
   config.mutable_apriltag_rig_result()->set_content_type(
       farm_ng::ContentTypeProtobufJson<CalibrateApriltagRigResult>());
-  config.mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline);
+  config.mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline * 0.0254);
   config.mutable_wheel_baseline()->set_constant(FLAGS_wheel_baseline_constant);
-  config.mutable_wheel_radius()->set_value(FLAGS_wheel_radius);
+  config.mutable_wheel_radius()->set_value(FLAGS_wheel_radius * 0.0254);
   config.mutable_wheel_radius()->set_constant(FLAGS_wheel_radius_constant);
   config.mutable_base_pose_camera_initialization()->mutable_x()->set_value(
-      FLAGS_base_pose_camera_tx);
+      FLAGS_base_pose_camera_tx * 0.0254);
   config.mutable_base_pose_camera_initialization()->mutable_x()->set_constant(
       FLAGS_base_pose_camera_tx_constant);
   config.mutable_base_pose_camera_initialization()->mutable_y()->set_value(
-      FLAGS_base_pose_camera_ty);
+      FLAGS_base_pose_camera_ty * 0.0254);
   config.mutable_base_pose_camera_initialization()->mutable_y()->set_constant(
       FLAGS_base_pose_camera_ty_constant);
   config.mutable_base_pose_camera_initialization()->mutable_z()->set_value(
-      FLAGS_base_pose_camera_tz);
+      FLAGS_base_pose_camera_tz * 0.0254);
   config.mutable_base_pose_camera_initialization()->mutable_z()->set_constant(
       FLAGS_base_pose_camera_tz_constant);
   ViewDirection camera_direction;
