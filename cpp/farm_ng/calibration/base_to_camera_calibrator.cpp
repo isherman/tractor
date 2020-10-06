@@ -227,7 +227,7 @@ BaseToCameraModel InitialBaseToCameraModelFromEventLog(
     model.set_wheel_radius(1);
     model.set_wheel_baseline(1);
   }
-
+  model.set_solver_status(SolverStatus::SOLVER_STATUS_INITIAL);
   BaseToCameraModel::Sample sample;
 
   bool has_start = false;

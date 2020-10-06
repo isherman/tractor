@@ -114,7 +114,7 @@ class CalibrateBaseToCameraProgram {
     //      result.mutable_event_log()->set_path(log.recording().archive_path());
     //}
     status_.mutable_result()->CopyFrom(
-        ArchiveProtobufAsBinaryResource("initial_result", result));
+        ArchiveProtobufAsJsonResource("initial_result", result));
     send_status();
 
     auto solved_model = SolveBasePoseCamera(model, false);
