@@ -51,7 +51,7 @@ struct SE3Plus {
     Eigen::Matrix<Scalar, 6, 1> delta;
     for (int i = 0; i < 6; ++i) {
       if (constancy_mask_[i]) {
-        delta[i] = delta_raw[i] * 0.0;
+        delta[i] = Scalar(0.0);
       } else {
         delta[i] = delta_raw[i];
       }
