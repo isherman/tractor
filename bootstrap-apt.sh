@@ -46,6 +46,7 @@ sudo apt-get install -y \
      librealsense2-dev \
      librealsense2-utils \
      libsuitesparse-dev \
+     libusb-1.0-0-dev \
      lsb-release \
      network-manager \
      protobuf-compiler \
@@ -58,9 +59,10 @@ if ! pip3 show virtualenv > /dev/null 2>&1; then
 fi
 
 # Go
+arch=`dpkg --print-architecture`
 if ! /usr/local/go/bin/go version | grep 1.15.1; then
-  wget https://golang.org/dl/go1.15.1.linux-arm64.tar.gz -P /tmp/
-  sudo tar -C /usr/local -xzf /tmp/go1.15.1.linux-arm64.tar.gz
+  wget https://golang.org/dl/go1.15.1.linux-${arch}.tar.gz -P /tmp/
+  sudo tar -C /usr/local -xzf /tmp/go1.15.1.linux-${arch}.tar.gz
   /usr/local/go/bin/go version
 fi
 
