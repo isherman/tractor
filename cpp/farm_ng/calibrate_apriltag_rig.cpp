@@ -204,11 +204,10 @@ void Cleanup(farm_ng::EventBus& bus) { LOG(INFO) << "Cleanup."; }
 
 int Main(farm_ng::EventBus& bus) {
   CalibrateApriltagRigConfiguration config;
-  std::stringstream tag_ids_stream(FLAGS_tag_ids);
-  while (tag_ids_stream.good()) {
-    std::string tag_id;
-    std::getline(tag_ids_stream, tag_id, ',');
-    config.add_tag_ids(stoi(tag_id));
+  std::stringstream ss(FLAGS_tag_ids);
+  std::string token;
+  while (std::getline(ss, token, ',')) {
+    config.add_tag_ids(stoi(token));
   }
   config.mutable_calibration_dataset()->set_path(FLAGS_calibration_dataset);
   config.mutable_calibration_dataset()->set_content_type(

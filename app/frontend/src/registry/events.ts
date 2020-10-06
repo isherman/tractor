@@ -38,6 +38,10 @@ import {
   CalibrateApriltagRigConfiguration,
   CalibrateApriltagRigStatus
 } from "../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
+import {
+  CalibrateBaseToCameraConfiguration,
+  CalibrateBaseToCameraStatus
+} from "../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
 
 export type EventType =
   | SteeringCommand
@@ -62,7 +66,9 @@ export type EventType =
   | CaptureCalibrationDatasetStatus
   | CaptureCalibrationDatasetConfiguration
   | CalibrateApriltagRigConfiguration
-  | CalibrateApriltagRigStatus;
+  | CalibrateApriltagRigStatus
+  | CalibrateBaseToCameraConfiguration
+  | CalibrateBaseToCameraStatus;
 
 // Infer the keys, but restrict values to Message<EventType>
 // https://stackoverflow.com/a/54598743
@@ -93,7 +99,9 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetStatus": CaptureCalibrationDatasetStatus,
   "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetConfiguration": CaptureCalibrationDatasetConfiguration,
   "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigConfiguration": CalibrateApriltagRigConfiguration,
-  "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigStatus": CalibrateApriltagRigStatus
+  "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigStatus": CalibrateApriltagRigStatus,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraConfiguration": CalibrateBaseToCameraConfiguration,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraStatus": CalibrateBaseToCameraStatus
 });
 
 export const eventTypeIds = Object.keys(
