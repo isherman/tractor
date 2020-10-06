@@ -248,6 +248,8 @@ message BaseToCameraModel {
   double wheel_radius = 4;
   NamedSE3Pose base_pose_camera = 5;
   repeated Sample samples = 6;
+
+  BaseToCameraInitialization initialization = 7;
 }
 
 message CalibrationParameter {
@@ -268,4 +270,10 @@ message ViewInitialization {
   CalibrationParameter y = 2;
   CalibrationParameter z = 3;
   ViewDirection view_direction = 4;
+}
+
+message BaseToCameraInitialization {
+  CalibrationParameter wheel_radius = 1;
+  CalibrationParameter wheel_baseline = 2;
+  ViewInitialization base_pose_camera = 3;
 }

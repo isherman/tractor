@@ -5,10 +5,8 @@
 namespace farm_ng {
 template <typename T>
 static Sophus::SE3<T> TractorPoseDelta(
-    const Eigen::Matrix<T, 2, 1>& base_parameters,
+    const T& wheel_radius, const T& wheel_baseline,
     const BaseToCameraModel::WheelMeasurement wheel_measurement) {
-  const T& wheel_radius = base_parameters[0];
-  const T& wheel_baseline = base_parameters[1];
   T vel_left(wheel_measurement.wheel_velocity_rads_left());
   T vel_right(wheel_measurement.wheel_velocity_rads_right());
   T dt(wheel_measurement.dt());
@@ -20,14 +18,14 @@ static Sophus::SE3<T> TractorPoseDelta(
 }
 template <typename T>
 Sophus::SE3<T> TractorStartPoseTractorEnd(
-    const Eigen::Matrix<T, 2, 1>& base_params,
+    const T& wheel_radius, const T& wheel_baseline,
     const BaseToCameraModel::Sample& sample) {
   Sophus::SE3<T> tractor_start_pose_tractor_end =
       Sophus::SE3d::rotZ(0).cast<T>();
   for (const auto& wheel_state : sample.wheel_measurements()) {
     tractor_start_pose_tractor_end =
         tractor_start_pose_tractor_end *
-        TractorPoseDelta<T>(base_params, wheel_state);
+        TractorPoseDelta<T>(wheel_radius, wheel_baseline, wheel_state);
   }
   return tractor_start_pose_tractor_end;
 }

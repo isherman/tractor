@@ -4,6 +4,7 @@
 #include <array>
 
 #include <ceres/local_parameterization.h>
+#include <ceres/problem.h>
 
 namespace farm_ng {
 
@@ -24,25 +25,21 @@ class LocalParameterizationAbs : public ceres::LocalParameterization {
 };
 
 // https://github.com/strasdat/Sophus/blob/master/test/ceres/local_parameterization_se3.hpp
-class LocalParameterizationSE3 : public ceres::LocalParameterization {
+class LocalParameterizationSO3 : public ceres::LocalParameterization {
  public:
-  // Set constancy_mask to 1 to hold const at the corresponding tangent vector
-  // index {tx, ty, tz, rx, ry, rz}
-  explicit LocalParameterizationSE3(const std::array<int, 6>& constancy_mask = {
-                                        0});
-  ~LocalParameterizationSE3();
+  explicit LocalParameterizationSO3();
+  ~LocalParameterizationSO3();
 
-  // SE3 plus operation for Ceres, note this premultiplies by exp(x) so that
-  // holding a value constant is with respect to the parent frame.
+  // SO3 plus operation for Ceres
   //
   //  a_T_b' = a_T_b * exp(b_x_b')
   //
   bool Plus(double const* T_raw, double const* delta_raw,
             double* T_plus_delta_raw) const override;
 
-  // Jacobian of SE3 plus operation for Ceres
+  // Jacobian of SO3 plus operation for Ceres
   //
-  // Dx T * exp(x)  with  x=0
+  // Dx a_T_b * exp(b_x_b')  with  b_x_b'=0
   //
   bool ComputeJacobian(double const* T_raw,
                        double* jacobian_raw) const override;
@@ -51,9 +48,39 @@ class LocalParameterizationSE3 : public ceres::LocalParameterization {
   int LocalSize() const override;
 
  private:
-  std::array<int, 6> constancy_mask_;
-  int local_size_;
 };
+
+// github.com/strasdat/Sophus/blob/master/test/ceres/local_parameterization_se3.hpp
+class LocalParameterizationSE3 : public ceres::LocalParameterization {
+ public:
+  explicit LocalParameterizationSE3();
+  ~LocalParameterizationSE3();
+
+  // SE3 plus operation for Ceres
+  //
+  //  a_T_b' = a_T_b * exp(b_x_b')
+  //
+  bool Plus(double const* T_raw, double const* delta_raw,
+            double* T_plus_delta_raw) const override;
+
+  // Jacobian of SO3 plus operation for Ceres
+  //
+  // Dx a_T_b * exp(b_x_b')  with  b_x_b'=0
+  //
+  bool ComputeJacobian(double const* T_raw,
+                       double* jacobian_raw) const override;
+
+  int GlobalSize() const override;
+  int LocalSize() const override;
+
+ private:
+};
+
+// Add an SE3 parameter block {qx, qy, qz, qw, tx, ty, tz} and enable holding a
+// subset of the translation constant.
+void AddSE3ParameterBlockSubsetTranslation(
+    ceres::Problem* problem, double* parameter_block,
+    const std::vector<int>& translation_subset);
 
 }  // namespace farm_ng
 
