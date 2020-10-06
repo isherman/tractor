@@ -40,8 +40,16 @@ library = {
         name='Apriltag Rig Calibration',
         description='Solves an apriltag rig from data collected with capture-calibration-dataset',
     ),
+    'calibrate-base-to-camera': ProgramInfo(
+        path=f'{farm_ng_root}/build/cpp/farm_ng/calibrate_base_to_camera',
+        args=['-interactive'],
+        name='Base-to-Camera Calibration',
+        description=(
+            'Solves a base-to-camera pose and other base calibration parameters from '
+            'an apriltag rig and data collected with capture-calibration-dataset'
+        ),
+    ),
     'sleep-5': ProgramInfo(path='sleep', args=['5'], name='Sleep 5', description='Take a nap'),
-    'sleep-100': ProgramInfo(path='sleep', args=['100'], name='Sleep 100', description='Take a looong nap'),
 }
 libraryPb = [Program(id=_id, name=p.name, description=p.description) for _id, p in library.items()]
 
@@ -58,7 +66,6 @@ class ProgramSupervisor:
     async def send_status(self):
         while not self.shutdown:
             event = make_event('program_supervisor/status', self.status)
-            # print(MessageToString(event, as_one_line=True))
             event_bus.send(event)
             await asyncio.sleep(1)
 

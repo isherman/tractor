@@ -111,20 +111,6 @@ inline EventBus& GetEventBus(boost::asio::io_service& io_service) {
   return service;
 }
 
-template <typename Configuration>
-Configuration WaitForConfiguration(EventBus& bus) {
-  Configuration configuration;
-  std::string event_name = bus.GetName() + "/configure";
-  LOG(INFO) << "Waiting for configuration at " << event_name;
-  while (true) {
-    bus.get_io_service().run_one();
-    if (bus.GetState().count(event_name) &&
-        bus.GetState().at(event_name).data().UnpackTo(&configuration)) {
-      return configuration;
-    }
-  }
-}
-
 void WaitForServices(EventBus& bus,
                      const std::vector<std::string>& service_names_in);
 LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path);
