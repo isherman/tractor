@@ -117,6 +117,7 @@ void ModelError(ApriltagRigModel& model) {
   double all_sum_error = 0;
   double all_error_count = 0;
   model.per_tag_stats.clear();
+  model.reprojection_images.clear();
 
   for (size_t frame_n = 0; frame_n < model.camera_poses_root.size();
        ++frame_n) {
