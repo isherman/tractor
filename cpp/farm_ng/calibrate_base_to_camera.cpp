@@ -102,13 +102,7 @@ class CalibrateBaseToCameraProgram {
     // Output under the same directory as the dataset.
     SetArchivePath((output_dir / "base_to_camera").string());
 
-    BaseToCameraInitialization initialization;
-    initialization.mutable_wheel_radius()->CopyFrom(
-        configuration_.wheel_radius());
-    initialization.mutable_wheel_baseline()->CopyFrom(
-        configuration_.wheel_baseline());
-    initialization.mutable_base_pose_camera()->CopyFrom(
-        configuration_.base_pose_camera_initialization());
+    BaseToCameraInitialization initialization = configuration_.initialization();
 
     BaseToCameraModel model = InitialBaseToCameraModelFromEventLog(
         initialization, dataset_result.dataset(),
@@ -224,25 +218,31 @@ int Main(farm_ng::EventBus& bus) {
   config.mutable_apriltag_rig_result()->set_path(FLAGS_apriltag_rig_result);
   config.mutable_apriltag_rig_result()->set_content_type(
       farm_ng::ContentTypeProtobufJson<CalibrateApriltagRigResult>());
-  config.mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline * 0.0254);
-  config.mutable_wheel_baseline()->set_constant(FLAGS_wheel_baseline_constant);
-  config.mutable_wheel_radius()->set_value(FLAGS_wheel_radius * 0.0254);
-  config.mutable_wheel_radius()->set_constant(FLAGS_wheel_radius_constant);
-  config.mutable_base_pose_camera_initialization()->mutable_x()->set_value(
+  auto initialization = config.mutable_initialization();
+  initialization->mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline *
+                                                      0.0254);
+  initialization->mutable_wheel_baseline()->set_constant(
+      FLAGS_wheel_baseline_constant);
+  initialization->mutable_wheel_radius()->set_value(FLAGS_wheel_radius *
+                                                    0.0254);
+  initialization->mutable_wheel_radius()->set_constant(
+      FLAGS_wheel_radius_constant);
+
+  initialization->mutable_base_pose_camera()->mutable_x()->set_value(
       FLAGS_base_pose_camera_tx * 0.0254);
-  config.mutable_base_pose_camera_initialization()->mutable_x()->set_constant(
+  initialization->mutable_base_pose_camera()->mutable_x()->set_constant(
       FLAGS_base_pose_camera_tx_constant);
-  config.mutable_base_pose_camera_initialization()->mutable_y()->set_value(
+  initialization->mutable_base_pose_camera()->mutable_y()->set_value(
       FLAGS_base_pose_camera_ty * 0.0254);
-  config.mutable_base_pose_camera_initialization()->mutable_y()->set_constant(
+  initialization->mutable_base_pose_camera()->mutable_y()->set_constant(
       FLAGS_base_pose_camera_ty_constant);
-  config.mutable_base_pose_camera_initialization()->mutable_z()->set_value(
+  initialization->mutable_base_pose_camera()->mutable_z()->set_value(
       FLAGS_base_pose_camera_tz * 0.0254);
-  config.mutable_base_pose_camera_initialization()->mutable_z()->set_constant(
+  initialization->mutable_base_pose_camera()->mutable_z()->set_constant(
       FLAGS_base_pose_camera_tz_constant);
   ViewDirection camera_direction;
   CHECK(ViewDirection_Parse(FLAGS_camera_direction, &camera_direction));
-  config.mutable_base_pose_camera_initialization()->set_view_direction(
+  initialization->mutable_base_pose_camera()->set_view_direction(
       camera_direction);
   config.set_name(FLAGS_name);
 

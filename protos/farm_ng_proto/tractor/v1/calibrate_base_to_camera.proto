@@ -14,14 +14,10 @@ message CalibrateBaseToCameraConfiguration {
   // Serialized ApriltagRigCalibrationResult
   Resource apriltag_rig_result = 2;
 
-  CalibrationParameter wheel_baseline = 3;
-
-  CalibrationParameter wheel_radius = 4;
-
-  ViewInitialization base_pose_camera_initialization = 5;
+  BaseToCameraInitialization initialization = 3;
 
   // name of the result.
-  string name = 6;
+  string name = 4;
 }
 
 message CalibrateBaseToCameraStatus {
