@@ -129,7 +129,7 @@ class CalibrateApriltagRigProgram {
     MonocularApriltagRigModel final_model_pb;
     model.ToMonocularApriltagRigModel(&final_model_pb);
     result.mutable_monocular_apriltag_rig_solved()->CopyFrom(
-        ArchiveProtobufAsBinaryResource("solved", initial_model_pb));
+        ArchiveProtobufAsBinaryResource("solved", final_model_pb));
     result.set_rmse(model.rmse);
     result.set_solver_status(model.status);
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
