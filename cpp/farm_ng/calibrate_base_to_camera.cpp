@@ -141,8 +141,8 @@ class CalibrateBaseToCameraProgram {
     solved_model = SolveBasePoseCamera(solved_model, options);
     result.mutable_base_to_camera_model_solved()->CopyFrom(
         ArchiveProtobufAsBinaryResource("solved", solved_model));
-    result.set_solver_status(model.solver_status());
-    result.set_rmse(model.rmse());
+    result.set_solver_status(solved_model.solver_status());
+    result.set_rmse(solved_model.rmse());
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
 
     // TODO some how save the result in the archive directory as well, so its
