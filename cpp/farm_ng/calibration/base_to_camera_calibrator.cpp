@@ -26,6 +26,7 @@ using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
 using farm_ng_proto::tractor::v1::NamedSE3Pose;
 using farm_ng_proto::tractor::v1::SolverStatus;
 using farm_ng_proto::tractor::v1::TractorState;
+
 using farm_ng_proto::tractor::v1::ViewDirection;
 using farm_ng_proto::tractor::v1::ViewInitialization;
 
@@ -284,6 +285,56 @@ void CopyTractorStateToWheelState(
   wheel_measurement->mutable_stamp()->CopyFrom(tractor_state.stamp());
 }
 
+template <typename ValueT>
+class Timeseries {
+ public:
+  typedef typename std::vector<ValueT>::const_iterator const_iterator;
+  static bool Compare(const ValueT& lhs, const ValueT& rhs) {
+    return lhs.stamp() < rhs.stamp();
+  }
+
+  const_iterator lower_bound(const google::protobuf::Timestamp& stamp) const {
+    ValueT x;
+    x.mutable_stamp()->CopyFrom(stamp);
+    return std::lower_bound(series_.begin(), series_.end(), x,
+                            [](const ValueT& lhs, const ValueT& rhs) {
+                              return lhs.stamp() < rhs.stamp();
+                            });
+  }
+
+  const_iterator upper_bound(const google::protobuf::Timestamp& stamp) const {
+    return std::upper_bound(
+        series_.begin(), series_.end(), stamp,
+        [](const google::protobuf::Timestamp& stamp, const ValueT& rhs) {
+          return stamp < rhs.stamp();
+        });
+  }
+
+  std::pair<const_iterator, const_iterator> find_range(
+      google::protobuf::Timestamp begin_stamp,
+      google::protobuf::Timestamp end_stamp) const {
+    auto begin_it = lower_bound(begin_stamp);
+    VLOG(2) << "begin delta milliseconds: "
+            << google::protobuf::util::TimeUtil::DurationToMilliseconds(
+                   begin_it->stamp() - begin_stamp);
+    auto end_it = upper_bound(end_stamp);
+    if (end_it != series_.end()) {
+      VLOG(2) << "end delta milliseconds: "
+              << google::protobuf::util::TimeUtil::DurationToMilliseconds(
+                     end_it->stamp() - end_stamp);
+    }
+
+    return std::make_pair(begin_it, end_it);
+  }
+
+  void insert(const ValueT& value) {
+    series_.insert(upper_bound(value.stamp()), value);
+  }
+
+ private:
+  std::vector<ValueT> series_;
+};  // namespace farm_ng
+
 BaseToCameraModel InitialBaseToCameraModelFromEventLog(
     const BaseToCameraInitialization& initialization,
     const Resource& event_log_resource, const Resource& apriltag_rig_resource) {
@@ -308,29 +359,17 @@ BaseToCameraModel InitialBaseToCameraModelFromEventLog(
   // visualization of pose error.
   bool full_apriltag_trajectory = true;
 
+  Timeseries<BaseToCameraModel::WheelMeasurement> wheel_measurement_series;
   while (true) {
     EventPb event;
     try {
       event = log_reader.ReadNext();
       TractorState tractor_state;
       if (event.data().UnpackTo(&tractor_state)) {
-        if (has_start) {
-          farm_ng::CopyTractorStateToWheelState(
-              tractor_state, sample.add_wheel_measurements());
-
-          // TODO(ethanrublee) Tractor state is offset by some time in the log,
-          // due to the latency of detecting april tags.
-          // Align the tractor state to the detection.
-          if (false) {
-            LOG(INFO)
-                << "Difference in time: "
-                << google::protobuf::util::TimeUtil::DurationToMicroseconds(
-                       tractor_state.stamp() -
-                       sample.camera_pose_rig_start().a_pose_b().stamp()) *
-                       1e-6;
-          }
-        }
-        // LOG(INFO) << tractor_state.ShortDebugString();
+        BaseToCameraModel::WheelMeasurement wheel_measurement;
+        farm_ng::CopyTractorStateToWheelState(tractor_state,
+                                              &wheel_measurement);
+        wheel_measurement_series.insert(wheel_measurement);
       } else {
         bool calibration_sample =
             farm_ng::StartsWith(event.name(), "calibrator");
@@ -371,9 +410,39 @@ BaseToCameraModel InitialBaseToCameraModelFromEventLog(
               o_camera_pose_rig->a_pose_b());
         } else if (has_start && calibration_sample) {
           sample.mutable_camera_pose_rig_end()->CopyFrom(*o_camera_pose_rig);
+
+          auto begin_end = wheel_measurement_series.find_range(
+              sample.camera_pose_rig_start().a_pose_b().stamp(),
+              sample.camera_pose_rig_end().a_pose_b().stamp());
+          CHECK(begin_end.first != begin_end.second)
+              << "Couldn't find any wheel measurements in the given range: "
+              << sample.camera_pose_rig_start()
+                     .a_pose_b()
+                     .stamp()
+                     .ShortDebugString()
+              << " - "
+              << sample.camera_pose_rig_end()
+                     .a_pose_b()
+                     .stamp()
+                     .ShortDebugString();
+          auto begin_dt_millisecond =
+              google::protobuf::util::TimeUtil::DurationToMilliseconds(
+                  (begin_end.first->stamp() -
+                   sample.camera_pose_rig_start().a_pose_b().stamp()));
+          // this consistently finds a range that is within ~10 milliseconds of
+          // the beginning or end.
+          while (begin_end.first != begin_end.second) {
+            sample.add_wheel_measurements()->CopyFrom((*begin_end.first++));
+          }
+          auto end_dt_millisecond =
+              google::protobuf::util::TimeUtil::DurationToMilliseconds(
+                  (sample.wheel_measurements().rbegin()->stamp() -
+                   sample.camera_pose_rig_end().a_pose_b().stamp()));
           model.add_samples()->CopyFrom(sample);
           LOG(INFO) << "n wheel measurments: "
-                    << sample.wheel_measurements().size();
+                    << sample.wheel_measurements().size()
+                    << " begin dt ms: " << begin_dt_millisecond
+                    << " end dt ms: " << end_dt_millisecond;
           sample.Clear();
           sample.mutable_camera_pose_rig_start()->CopyFrom(*o_camera_pose_rig);
           sample.mutable_camera_trajectory_rig()->set_frame_a(
