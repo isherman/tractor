@@ -5,10 +5,11 @@ import { TimestampedEvent, TimestampedEventVector } from "../types/common";
 import { EventType, EventTypeId, eventTypeIds } from "./events";
 import { ResourceArchive } from "../models/ResourceArchive";
 import { ImageVisualizer } from "../components/scope/visualizers/ImageVisualizer";
-import { CalibratorStatusVisualizer } from "../components/scope/visualizers/CalibratorStatusVisualizer";
 import { ApriltagDetectionsVisualizer } from "../components/scope/visualizers/ApriltagDetectionsVisualizer";
 import { NamedSE3PoseVisualizer } from "../components/scope/visualizers/NamedSE3PoseVisualizer";
 import { TrackingCameraPoseFrameVisualizer } from "../components/scope/visualizers/TrackingCameraPoseFrameVisualizer";
+import { CalibrateApriltagRigStatusVisualizer } from "../components/scope/visualizers/CalibrateApriltagRigStatus";
+import { CalibrateBaseToCameraStatusVisualizer } from "../components/scope/visualizers/CalibrateBaseToCameraStatus";
 
 export interface VisualizerOptionConfig {
   label: string;
@@ -35,7 +36,8 @@ export interface Visualizer<T extends EventType = EventType> {
 }
 
 export const visualizerRegistry: { [k: string]: Visualizer } = {
-  [CalibratorStatusVisualizer.id]: new CalibratorStatusVisualizer() as Visualizer,
+  [CalibrateBaseToCameraStatusVisualizer.id]: new CalibrateBaseToCameraStatusVisualizer() as Visualizer,
+  [CalibrateApriltagRigStatusVisualizer.id]: new CalibrateApriltagRigStatusVisualizer() as Visualizer,
   [TrackingCameraPoseFrameVisualizer.id]: new TrackingCameraPoseFrameVisualizer() as Visualizer,
   [NamedSE3PoseVisualizer.id]: new NamedSE3PoseVisualizer() as Visualizer,
   [ImageVisualizer.id]: new ImageVisualizer() as Visualizer,
