@@ -144,45 +144,59 @@ const Component: React.FC = () => {
               />
             </Form.Group>
 
-            {configuration?.wheelBaseline && (
+            {configuration?.initialization?.wheelBaseline && (
               <CalibrationParameterFormSection
                 name="wheelBaseline"
                 label="Wheel Baseline"
-                parameter={configuration.wheelBaseline}
+                parameter={configuration.initialization.wheelBaseline}
                 onChange={(p) => {
                   setConfiguration(
-                    (c) => ({ ...c, wheelBaseline: p } as Configuration)
+                    (c) =>
+                      ({
+                        ...c,
+                        initialization: {
+                          ...c?.initialization,
+                          wheelBaseline: p
+                        }
+                      } as Configuration)
                   );
                 }}
               />
             )}
 
-            {configuration?.wheelRadius && (
+            {configuration?.initialization?.wheelRadius && (
               <CalibrationParameterFormSection
                 name="wheelRadius"
                 label="Wheel Radius"
-                parameter={configuration.wheelRadius}
+                parameter={configuration.initialization.wheelRadius}
                 onChange={(p) => {
                   setConfiguration(
-                    (c) => ({ ...c, wheelRadius: p } as Configuration)
+                    (c) =>
+                      ({
+                        ...c,
+                        initialization: { ...c?.initialization, wheelRadius: p }
+                      } as Configuration)
                   );
                 }}
               />
             )}
 
-            {configuration?.basePoseCameraInitialization?.x && (
+            {configuration?.initialization?.basePoseCamera?.x && (
               <CalibrationParameterFormSection
                 name="basePoseCameraInitializationX"
                 label="Initial base_pose_camera X"
-                parameter={configuration.basePoseCameraInitialization.x}
+                parameter={configuration.initialization.basePoseCamera.x}
                 onChange={(p) => {
                   setConfiguration(
                     (c) =>
                       ({
                         ...c,
-                        basePoseCameraInitialization: {
-                          ...c?.basePoseCameraInitialization,
-                          x: p
+                        initialization: {
+                          ...c?.initialization,
+                          basePoseCamera: {
+                            ...c?.initialization?.basePoseCamera,
+                            x: p
+                          }
                         }
                       } as Configuration)
                   );
@@ -190,19 +204,22 @@ const Component: React.FC = () => {
               />
             )}
 
-            {configuration?.basePoseCameraInitialization?.y && (
+            {configuration?.initialization?.basePoseCamera?.y && (
               <CalibrationParameterFormSection
                 name="basePoseCameraInitializationY"
                 label="Initial base_pose_camera Y"
-                parameter={configuration.basePoseCameraInitialization.y}
+                parameter={configuration.initialization.basePoseCamera.y}
                 onChange={(p) => {
                   setConfiguration(
                     (c) =>
                       ({
                         ...c,
-                        basePoseCameraInitialization: {
-                          ...c?.basePoseCameraInitialization,
-                          y: p
+                        initialization: {
+                          ...c?.initialization,
+                          basePoseCamera: {
+                            ...c?.initialization?.basePoseCamera,
+                            y: p
+                          }
                         }
                       } as Configuration)
                   );
@@ -210,19 +227,22 @@ const Component: React.FC = () => {
               />
             )}
 
-            {configuration?.basePoseCameraInitialization?.z && (
+            {configuration?.initialization?.basePoseCamera?.z && (
               <CalibrationParameterFormSection
                 name="basePoseCameraInitializationZ"
                 label="Initial base_pose_camera Z"
-                parameter={configuration.basePoseCameraInitialization.z}
+                parameter={configuration.initialization.basePoseCamera.z}
                 onChange={(p) => {
                   setConfiguration(
                     (c) =>
                       ({
                         ...c,
-                        basePoseCameraInitialization: {
-                          ...c?.basePoseCameraInitialization,
-                          z: p
+                        initialization: {
+                          ...c?.initialization,
+                          basePoseCamera: {
+                            ...c?.initialization?.basePoseCamera,
+                            z: p
+                          }
                         }
                       } as Configuration)
                   );
@@ -235,7 +255,7 @@ const Component: React.FC = () => {
               <Form.Control
                 as="select"
                 value={
-                  configuration?.basePoseCameraInitialization?.viewDirection
+                  configuration?.initialization?.basePoseCamera?.viewDirection
                 }
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                   const viewDirection = parseInt(e.target.value);
@@ -243,9 +263,12 @@ const Component: React.FC = () => {
                     (c) =>
                       ({
                         ...c,
-                        basePoseCameraInitialization: {
-                          ...c?.basePoseCameraInitialization,
-                          viewDirection
+                        initialization: {
+                          ...c?.initialization,
+                          basePoseCamera: {
+                            ...c?.initialization?.basePoseCamera,
+                            viewDirection
+                          }
                         }
                       } as Configuration)
                   );
