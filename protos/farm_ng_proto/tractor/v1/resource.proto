@@ -20,3 +20,15 @@ message Resource {
   // (Optional) The uncompressed size of the resource in bytes.
   google.protobuf.Int64Value length = 4;
 }
+
+message File {
+  string name = 1;
+}
+
+message Directory {
+  string name = 1;
+  oneof listing {
+    Directory directory = 2;
+    File file = 3;
+  }
+}

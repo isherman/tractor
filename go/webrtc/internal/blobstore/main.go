@@ -46,6 +46,7 @@ func logf(r *http.Request, format string, args ...interface{}) {
 	}
 }
 
+// TODO: Replace this with a protobuf response
 func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 	dirs, err := f.Readdir(-1)
 	if err != nil {
