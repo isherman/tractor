@@ -15,13 +15,22 @@ import { useEffect, useState } from "react";
 import { File } from "../../genproto/farm_ng_proto/tractor/v1/resource";
 // import styles from "./Blobstore.module.scss";
 
+// TODO: import
+const baseUrl = `http://${window.location.hostname}:8081/blobstore`;
+
 const fileToFileData = (f: File): FileData => ({
   id: f.name,
   name: f.name,
   isDir: Boolean(f.directory),
   modDate: f.modificationTime,
-  size: (f.size as unknown) as number
+  size: parseInt((f.size as unknown) as string) // TODO: fix
 });
+
+const folderChainToPath = (folderChain: FileData[]): string =>
+  folderChain
+    .slice(1)
+    .map((_) => _.name)
+    .join("/") + (folderChain.length > 1 ? "/" : "");
 
 export const Blobstore: React.FC = () => {
   const [folderChain, setFolderChain] = useState<FileData[]>([]);
@@ -29,24 +38,17 @@ export const Blobstore: React.FC = () => {
 
   useEffect(() => {
     const fetchResult = async (): Promise<void> => {
-      const path =
-        folderChain
-          .slice(1)
-          .map((_) => _.name)
-          .join("/") + (folderChain.length > 1 ? "/" : "");
-      const response = await fetch(
-        `http://${window.location.hostname}:8081/blobstore/${path}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json"
-          }
+      const path = folderChainToPath(folderChain);
+      const response = await fetch(`${baseUrl}/${path}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
         }
-      );
-      const responseJson = (await response.json()) as File;
-      setDirInfo(responseJson);
+      });
+      const file = File.fromJSON(await response.json());
+      setDirInfo(file);
       if (folderChain.length === 0) {
-        setFolderChain((prev) => [...prev, fileToFileData(responseJson)]);
+        setFolderChain((prev) => [...prev, fileToFileData(file)]);
       }
     };
     fetchResult();
@@ -57,7 +59,13 @@ export const Blobstore: React.FC = () => {
   const handleFileAction = (action: FileAction, data: FileActionData): void => {
     if (action.id === ChonkyActions.OpenFiles.id) {
       const target = data?.target;
-      if (target && target.isDir) {
+      if (target) {
+        if (!target.isDir) {
+          window.open(
+            `${baseUrl}/${folderChainToPath(folderChain)}${target.name}`
+          );
+          return;
+        }
         const index = folderChain.findIndex((_) => _.id === target.id);
         if (index >= 0) {
           setFolderChain((prev) => prev.slice(0, index));
