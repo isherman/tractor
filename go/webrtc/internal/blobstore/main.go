@@ -60,7 +60,7 @@ func logf(r *http.Request, format string, args ...interface{}) {
 func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 	dirs, err := f.Readdir(-1)
 	if err != nil {
-		logf(r, "http: error reading directory: %v", err)
+		logf(r, "blobstore: error reading directory: %v", err)
 		http.Error(w, "Error reading directory", http.StatusInternalServerError)
 		return
 	}
@@ -68,14 +68,14 @@ func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 
 	fileInfo, err := f.Stat()
 	if err != nil {
-		logf(r, "http: error reading fileinfo: %v", err)
+		logf(r, "blobstore: error reading fileinfo: %v", err)
 		http.Error(w, "Error reading fileinfo", http.StatusInternalServerError)
 		return
 	}
 	response := &pb.File{}
 	err = marshalFileInfoToProto(fileInfo, response)
 	if err != nil {
-		logf(r, "http: error marshaling file to proto: %v", err)
+		logf(r, "blobstore: error marshaling file to proto: %v", err)
 		http.Error(w, "Error marshaling file to proto", http.StatusInternalServerError)
 		return
 	}
@@ -85,7 +85,7 @@ func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 		proto := &pb.File{}
 		err = marshalFileInfoToProto(d, proto)
 		if err != nil {
-			logf(r, "http: error marshaling file to proto: %v", err)
+			logf(r, "blobstore: error marshaling file to proto: %v", err)
 			http.Error(w, "Error marshaling file to proto", http.StatusInternalServerError)
 			return
 		}
@@ -96,7 +96,7 @@ func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 		w.Header().Set("Content-Type", "application/protobuf")
 		out, err := proto.Marshal(response)
 		if err != nil {
-			logf(r, "http: error marshaling response to proto: %v", err)
+			logf(r, "blobstore: error marshaling response to proto: %v", err)
 			http.Error(w, "Error marshaling response to proto", http.StatusInternalServerError)
 			return
 		}
