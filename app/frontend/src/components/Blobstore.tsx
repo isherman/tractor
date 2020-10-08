@@ -18,6 +18,7 @@ import styles from "./Blobstore.module.scss";
 import { TractorConfig } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { eventRegistry, EventType, EventTypeId } from "../registry/events";
 import { visualizersForEventType } from "../registry/visualization";
+import { Button } from "react-bootstrap";
 
 // TODO: import
 const baseUrl = `http://${window.location.hostname}:8081/blobstore`;
@@ -56,6 +57,7 @@ export const Blobstore: React.FC = () => {
   const [selectedPath, setSelectedPath] = useState<string>();
   const [selectedEventType, setSelectedEventType] = useState<EventTypeId>();
   const [selectedResource, setSelectedResource] = useState<EventType>();
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchSelected = async (): Promise<void> => {
@@ -152,16 +154,35 @@ export const Blobstore: React.FC = () => {
           <FileList />
         </FileBrowser>
       </div>
-      {selectedResource && (
-        <div className={styles.detail}>
-          {visualizer &&
-            React.createElement(visualizer.component, {
-              values: [[0, selectedResource]],
-              options: [{ label: "", options: [], value: "overlay" }],
-              resources: httpResourceArchive
+      <div className={styles.detail}>
+        {selectedResource && !isEditing && (
+          <Button onClick={() => setIsEditing(true)}>{"Edit"}</Button>
+        )}
+        {selectedResource && isEditing && (
+          <Button onClick={() => setIsEditing(false)}>{"Cancel"}</Button>
+        )}
+        {selectedResource && isEditing && (
+          <Button onClick={() => setIsEditing(false)}>{"Submit"}</Button>
+        )}
+        {!isEditing && selectedResource && (
+          <>
+            {visualizer &&
+              React.createElement(visualizer.component, {
+                values: [[0, selectedResource]],
+                options: [{ label: "", options: [], value: "overlay" }],
+                resources: httpResourceArchive
+              })}
+          </>
+        )}
+        {isEditing && selectedResource && visualizer?.form && (
+          <>
+            {React.createElement(visualizer.form, {
+              initialValue: selectedResource,
+              onUpdate: (updated) => console.log("Updated: ", updated)
             })}
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

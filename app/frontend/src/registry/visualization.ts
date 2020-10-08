@@ -39,10 +39,16 @@ export interface VisualizerProps<T extends EventType = EventType> {
   resources: ResourceArchive | null;
 }
 
+export interface FormProps<T extends EventType = EventType> {
+  initialValue: T;
+  onUpdate: (updated: T) => void;
+}
+
 export interface Visualizer<T extends EventType = EventType> {
   component: React.FC<VisualizerProps<T>>;
   options: VisualizerOptionConfig[];
   types: EventTypeId[] | "*";
+  form?: React.FC<FormProps<T>>;
 }
 
 export const visualizerRegistry: { [k: string]: Visualizer } = {
