@@ -10,7 +10,7 @@ const [busEventEmitter, mediaStreamEmitter, busClient] = getWebRTCEmitters(
   `http://${window.location.hostname}:8081/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`
 );
 
-const httpResourceArchive = new HttpResourceArchive(
+export const httpResourceArchive = new HttpResourceArchive(
   `http://${window.location.hostname}:8081/blobstore`
 );
 

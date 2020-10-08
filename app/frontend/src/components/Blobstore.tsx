@@ -13,7 +13,10 @@ import * as React from "react";
 import "chonky/style/main.css";
 import { useEffect, useState } from "react";
 import { File } from "../../genproto/farm_ng_proto/tractor/v1/resource";
-// import styles from "./Blobstore.module.scss";
+import { httpResourceArchive } from "../contexts";
+import styles from "./Blobstore.module.scss";
+import { CalibrateApriltagRigResultElement } from "./scope/visualizers/CalibrateApriltagRigResult";
+import { CalibrateApriltagRigResult } from "../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
 
 // TODO: import
 const baseUrl = `http://${window.location.hostname}:8081/blobstore`;
@@ -35,6 +38,24 @@ const folderChainToPath = (folderChain: FileData[]): string =>
 export const Blobstore: React.FC = () => {
   const [folderChain, setFolderChain] = useState<FileData[]>([]);
   const [dirInfo, setDirInfo] = useState<File | null>(null);
+  const [rigPath, setRigPath] = useState<string>();
+  const [rig, setRig] = useState<CalibrateApriltagRigResult | null>(null);
+
+  useEffect(() => {
+    if (!rigPath) {
+      setRig(null);
+      return;
+    }
+    const fetchRig = async (): Promise<void> => {
+      try {
+        const json = await httpResourceArchive.getJson(rigPath);
+        setRig(CalibrateApriltagRigResult.fromJSON(json));
+      } catch (e) {
+        console.error(`Error loading resource ${rigPath}: ${e}`);
+      }
+    };
+    fetchRig();
+  }, [rigPath]);
 
   useEffect(() => {
     const fetchResult = async (): Promise<void> => {
@@ -57,35 +78,69 @@ export const Blobstore: React.FC = () => {
   const files = dirInfo?.directory?.files.map<FileData>(fileToFileData);
 
   const handleFileAction = (action: FileAction, data: FileActionData): void => {
+    if (action.id === ChonkyActions.ChangeSelection.id) {
+      const { files } = data;
+      if (files?.length !== 1) {
+        setRigPath(undefined);
+        return;
+      }
+      const target = files[0];
+      if (
+        !target.isDir &&
+        target.name.endsWith(".json") &&
+        folderChain.map((_) => _.name).includes("apriltag_rig_models")
+      ) {
+        setRigPath(`${folderChainToPath(folderChain)}${target.name}`);
+        return;
+      }
+      setRigPath(undefined);
+    }
     if (action.id === ChonkyActions.OpenFiles.id) {
       const target = data?.target;
-      if (target) {
-        if (!target.isDir) {
-          window.open(
-            `${baseUrl}/${folderChainToPath(folderChain)}${target.name}`
-          );
-          return;
-        }
-        const index = folderChain.findIndex((_) => _.id === target.id);
-        if (index >= 0) {
-          setFolderChain((prev) => prev.slice(0, index));
-        } else {
-          setFolderChain((prev) => [...prev, target]);
-        }
+      if (!target) {
+        return;
+      }
+      if (!target.isDir) {
+        window.open(
+          `${baseUrl}/${folderChainToPath(folderChain)}${target.name}`
+        );
+        return;
+      }
+      const index = folderChain.findIndex((_) => _.id === target.id);
+      if (index >= 0) {
+        setFolderChain((prev) => prev.slice(0, index));
+      } else {
+        setFolderChain((prev) => [...prev, target]);
       }
     }
   };
 
   return (
-    <FileBrowser
-      files={files || []}
-      folderChain={folderChain}
-      onFileAction={handleFileAction}
-      defaultFileViewActionId={ChonkyActions.EnableListView.id}
-    >
-      <FileToolbar />
-      <FileSearch />
-      <FileList />
-    </FileBrowser>
+    <div className={styles.container}>
+      <div className={styles.browser}>
+        <FileBrowser
+          files={files || []}
+          folderChain={folderChain}
+          onFileAction={handleFileAction}
+          clearSelectionOnOutsideClick={false}
+          defaultFileViewActionId={ChonkyActions.EnableListView.id}
+        >
+          <FileToolbar />
+          <FileSearch />
+          <FileList />
+        </FileBrowser>
+      </div>
+      {rig && (
+        <div className={styles.detail}>
+          {
+            <CalibrateApriltagRigResultElement
+              value={[0, rig]}
+              options={[]}
+              resources={httpResourceArchive}
+            />
+          }
+        </div>
+      )}
+    </div>
   );
 };
