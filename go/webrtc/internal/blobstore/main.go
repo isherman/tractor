@@ -11,7 +11,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
-	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -19,6 +18,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	pb "github.com/farm-ng/tractor/genproto"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/ptypes"
 )
 
 // The algorithm uses at most sniffLen bytes to make its decision.
@@ -34,6 +37,13 @@ var htmlReplacer = strings.NewReplacer(
 	"'", "&#39;",
 )
 
+var jsonMarshaler = jsonpb.Marshaler{
+	EnumsAsInts:  false,
+	EmitDefaults: true,
+	Indent:       "  ",
+	OrigName:     true,
+}
+
 // logf prints to the ErrorLog of the *Server associated with request r
 // via ServerContextKey. If there's no associated server, or if ErrorLog
 // is nil, logging is done via the log package's standard logger.
@@ -46,7 +56,6 @@ func logf(r *http.Request, format string, args ...interface{}) {
 	}
 }
 
-// TODO: Replace this with a protobuf response
 func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 	dirs, err := f.Readdir(-1)
 	if err != nil {
@@ -56,20 +65,51 @@ func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 	}
 	sort.Slice(dirs, func(i, j int) bool { return dirs[i].Name() < dirs[j].Name() })
 
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, "<pre>\n")
-	for _, d := range dirs {
-		name := d.Name()
-		if d.IsDir() {
-			name += "/"
-		}
-		// name may contain '?' or '#', which must be escaped to remain
-		// part of the URL path, and not indicate the start of a query
-		// string or fragment.
-		url := url.URL{Path: name}
-		fmt.Fprintf(w, "<a href=\"%s\">%s</a>\n", url.String(), htmlReplacer.Replace(name))
+	w.Header().Set("Content-Type", "application/json")
+
+	fileInfo, err := f.Stat()
+	if err != nil {
+		logf(r, "http: error reading fileinfo: %v", err)
+		http.Error(w, "Error reading fileinfo", http.StatusInternalServerError)
+		return
 	}
-	fmt.Fprintf(w, "</pre>\n")
+	response := &pb.File{}
+	err = marshalFileInfoToProto(fileInfo, response)
+	if err != nil {
+		logf(r, "http: error marshaling file to proto: %v", err)
+		http.Error(w, "Error marshaling file to proto", http.StatusInternalServerError)
+		return
+	}
+
+	files := &response.Type.(*pb.File_Directory_).Directory.Files
+	for _, d := range dirs {
+		proto := &pb.File{}
+		err = marshalFileInfoToProto(d, proto)
+		if err != nil {
+			logf(r, "http: error marshaling file to proto: %v", err)
+			http.Error(w, "Error marshaling file to proto", http.StatusInternalServerError)
+			return
+		}
+		*files = append(*files, proto)
+	}
+	jsonMarshaler.Marshal(w, response)
+}
+
+func marshalFileInfoToProto(fileInfo os.FileInfo, f *pb.File) error {
+	modificationTime, err := ptypes.TimestampProto(fileInfo.ModTime())
+	if err != nil {
+		return err
+	}
+
+	f.Name = fileInfo.Name()
+	f.Size = fileInfo.Size()
+	f.ModificationTime = modificationTime
+	if fileInfo.IsDir() {
+		f.Type = &pb.File_Directory_{Directory: &pb.File_Directory{}}
+	} else {
+		f.Type = &pb.File_Ordinary_{}
+	}
+	return nil
 }
 
 // errNoOverlap is returned by serveContent's parseRange if first-byte-pos of
