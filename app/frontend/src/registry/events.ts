@@ -28,7 +28,10 @@ import {
   TrackingCameraMotionFrame,
   TrackingCameraCommand
 } from "../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
-import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
+import {
+  TractorConfig,
+  TractorState
+} from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { Message } from "../types/common";
 import {
   ProgramSupervisorStatus,
@@ -62,6 +65,7 @@ export type EventType =
   | Announce
   | Vec2
   | Image
+  | TractorConfig
   | CalibrationParameter
   | ViewInitialization
   | LoggingCommand
@@ -104,6 +108,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.Announce": Announce,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": Vec2,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Image": Image,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig": TractorConfig,
   "type.googleapis.com/farm_ng_proto.tractor.v1.ViewInitialization": ViewInitialization,
   "type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraInitialization": BaseToCameraInitialization,
   "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrationParameter": CalibrationParameter,

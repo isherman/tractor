@@ -15,8 +15,9 @@ import { useEffect, useState } from "react";
 import { File } from "../../genproto/farm_ng_proto/tractor/v1/resource";
 import { httpResourceArchive } from "../contexts";
 import styles from "./Blobstore.module.scss";
-import { CalibrateApriltagRigResultElement } from "./scope/visualizers/CalibrateApriltagRigResult";
-import { CalibrateApriltagRigResult } from "../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
+import { TractorConfig } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
+import { eventRegistry, EventType, EventTypeId } from "../registry/events";
+import { visualizersForEventType } from "../registry/visualization";
 
 // TODO: import
 const baseUrl = `http://${window.location.hostname}:8081/blobstore`;
@@ -35,30 +36,68 @@ const folderChainToPath = (folderChain: FileData[]): string =>
     .map((_) => _.name)
     .join("/") + (folderChain.length > 1 ? "/" : "");
 
+const exampleTractorConfig = TractorConfig.fromPartial({
+  wheelRadius: 1,
+  hubMotorGearRatio: 10.5,
+  hubMotorPollPairs: 6,
+  basePosesSensor: [
+    {
+      frameA: "base",
+      frameB: "camera_left",
+      aPoseB: { position: { x: 0.2, y: 1, z: 2.2 } }
+    }
+  ]
+});
+console.log(TractorConfig.toJSON(exampleTractorConfig));
+
 export const Blobstore: React.FC = () => {
   const [folderChain, setFolderChain] = useState<FileData[]>([]);
   const [dirInfo, setDirInfo] = useState<File | null>(null);
-  const [rigPath, setRigPath] = useState<string>();
-  const [rig, setRig] = useState<CalibrateApriltagRigResult | null>(null);
+  const [selectedPath, setSelectedPath] = useState<string>();
+  const [selectedEventType, setSelectedEventType] = useState<EventTypeId>();
+  const [selectedResource, setSelectedResource] = useState<EventType>();
 
   useEffect(() => {
-    if (!rigPath) {
-      setRig(null);
-      return;
-    }
-    const fetchRig = async (): Promise<void> => {
+    const fetchSelected = async (): Promise<void> => {
+      if (!selectedPath) {
+        return;
+      }
+      let eventType: EventTypeId | null = null;
+      if (folderChain.map((_) => _.name).includes("apriltag_rig_models")) {
+        eventType =
+          "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigResult";
+      }
+      if (folderChain.map((_) => _.name).includes("configurations")) {
+        eventType =
+          "type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig";
+      }
+      if (folderChain.map((_) => _.name).includes("base_to_camera_models")) {
+        eventType =
+          "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraResult";
+      }
+      if (folderChain.map((_) => _.name).includes("calibration-datasets")) {
+        eventType =
+          "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult";
+      }
+
+      if (!eventType) {
+        setSelectedResource(undefined);
+        window.open(`${baseUrl}/${selectedPath}`);
+        return;
+      }
       try {
-        const json = await httpResourceArchive.getJson(rigPath);
-        setRig(CalibrateApriltagRigResult.fromJSON(json));
+        const json = await httpResourceArchive.getJson(selectedPath);
+        setSelectedEventType(eventType);
+        setSelectedResource(eventRegistry[eventType].fromJSON(json));
       } catch (e) {
-        console.error(`Error loading resource ${rigPath}: ${e}`);
+        console.error(`Error loading resource ${selectedPath}: ${e}`);
       }
     };
-    fetchRig();
-  }, [rigPath]);
+    fetchSelected();
+  }, [selectedPath]);
 
   useEffect(() => {
-    const fetchResult = async (): Promise<void> => {
+    const fetchFolder = async (): Promise<void> => {
       const path = folderChainToPath(folderChain);
       const response = await fetch(`${baseUrl}/${path}`, {
         method: "GET",
@@ -72,38 +111,21 @@ export const Blobstore: React.FC = () => {
         setFolderChain((prev) => [...prev, fileToFileData(file)]);
       }
     };
-    fetchResult();
+    fetchFolder();
   }, [folderChain]);
 
   const files = dirInfo?.directory?.files.map<FileData>(fileToFileData);
+  const visualizer =
+    selectedEventType && visualizersForEventType(selectedEventType)[0];
 
   const handleFileAction = (action: FileAction, data: FileActionData): void => {
-    if (action.id === ChonkyActions.ChangeSelection.id) {
-      const { files } = data;
-      if (files?.length !== 1) {
-        setRigPath(undefined);
-        return;
-      }
-      const target = files[0];
-      if (
-        !target.isDir &&
-        target.name.endsWith(".json") &&
-        folderChain.map((_) => _.name).includes("apriltag_rig_models")
-      ) {
-        setRigPath(`${folderChainToPath(folderChain)}${target.name}`);
-        return;
-      }
-      setRigPath(undefined);
-    }
     if (action.id === ChonkyActions.OpenFiles.id) {
       const target = data?.target;
       if (!target) {
         return;
       }
       if (!target.isDir) {
-        window.open(
-          `${baseUrl}/${folderChainToPath(folderChain)}${target.name}`
-        );
+        setSelectedPath(`${folderChainToPath(folderChain)}${target.name}`);
         return;
       }
       const index = folderChain.findIndex((_) => _.id === target.id);
@@ -130,15 +152,14 @@ export const Blobstore: React.FC = () => {
           <FileList />
         </FileBrowser>
       </div>
-      {rig && (
+      {selectedResource && (
         <div className={styles.detail}>
-          {
-            <CalibrateApriltagRigResultElement
-              value={[0, rig]}
-              options={[]}
-              resources={httpResourceArchive}
-            />
-          }
+          {visualizer &&
+            React.createElement(visualizer.component, {
+              values: [[0, selectedResource]],
+              options: [{ label: "", options: [], value: "overlay" }],
+              resources: httpResourceArchive
+            })}
         </div>
       )}
     </div>
