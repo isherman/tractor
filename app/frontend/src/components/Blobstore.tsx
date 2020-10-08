@@ -42,10 +42,10 @@ export const Blobstore: React.FC = () => {
       const response = await fetch(`${baseUrl}/${path}`, {
         method: "GET",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/protobuf"
         }
       });
-      const file = File.fromJSON(await response.json());
+      const file = File.decode(new Uint8Array(await response.arrayBuffer()));
       setDirInfo(file);
       if (folderChain.length === 0) {
         setFolderChain((prev) => [...prev, fileToFileData(file)]);

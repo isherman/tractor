@@ -22,6 +22,7 @@ import (
 	pb "github.com/farm-ng/tractor/genproto"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/proto"
 )
 
 // The algorithm uses at most sniffLen bytes to make its decision.
@@ -65,8 +66,6 @@ func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 	}
 	sort.Slice(dirs, func(i, j int) bool { return dirs[i].Name() < dirs[j].Name() })
 
-	w.Header().Set("Content-Type", "application/json")
-
 	fileInfo, err := f.Stat()
 	if err != nil {
 		logf(r, "http: error reading fileinfo: %v", err)
@@ -92,6 +91,19 @@ func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 		}
 		*files = append(*files, proto)
 	}
+
+	if r.Header.Get("Content-Type") == "application/protobuf" {
+		w.Header().Set("Content-Type", "application/protobuf")
+		out, err := proto.Marshal(response)
+		if err != nil {
+			logf(r, "http: error marshaling response to proto: %v", err)
+			http.Error(w, "Error marshaling response to proto", http.StatusInternalServerError)
+			return
+		}
+		w.Write(out)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
 	jsonMarshaler.Marshal(w, response)
 }
 
