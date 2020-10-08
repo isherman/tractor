@@ -20,8 +20,7 @@ enum class BucketId {
   kLogs,
   kCalibrationDatasets,
   kApriltagRigModels,
-  kBaseToCameraModels,
-  kVideoDatasets
+  kBaseToCameraModels
 };
 
 boost::filesystem::path GetBlobstoreRoot();
