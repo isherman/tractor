@@ -20,7 +20,7 @@ import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
 import { Overlay } from "./Overlay";
 import { Canvas } from "../../Canvas";
 
-const NamedSE3PoseElement: React.FC<SingleElementVisualizerProps<
+export const NamedSE3PoseElement: React.FC<SingleElementVisualizerProps<
   NamedSE3Pose
 >> = ({ value: [timestamp, value] }) => {
   return (

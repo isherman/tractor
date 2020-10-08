@@ -19,6 +19,7 @@ import { CaptureCalibrationDatasetConfigurationVisualizer } from "../components/
 import { CaptureCalibrationDatasetStatusVisualizer } from "../components/scope/visualizers/CaptureCalibrationDatasetStatus";
 import { CaptureCalibrationDatasetResultVisualizer } from "../components/scope/visualizers/CaptureCalibrationDatasetResult";
 import { MonocularApriltagRigModelVisualizer } from "../components/scope/visualizers/MonocularApriltagRigModel";
+import { TractorConfigVisualizer } from "../components/scope/visualizers/TractorConfig";
 
 export interface VisualizerOptionConfig {
   label: string;
@@ -58,6 +59,7 @@ export const visualizerRegistry: { [k: string]: Visualizer } = {
   [CaptureCalibrationDatasetStatusVisualizer.id]: new CaptureCalibrationDatasetStatusVisualizer() as Visualizer,
   [ImageVisualizer.id]: new ImageVisualizer() as Visualizer,
   [TrackingCameraPoseFrameVisualizer.id]: new TrackingCameraPoseFrameVisualizer() as Visualizer,
+  [TractorConfigVisualizer.id]: new TractorConfigVisualizer() as Visualizer,
   [MonocularApriltagRigModelVisualizer.id]: new MonocularApriltagRigModelVisualizer() as Visualizer,
   [NamedSE3PoseVisualizer.id]: new NamedSE3PoseVisualizer() as Visualizer,
   [SteeringCommandVisualizer.id]: new SteeringCommandVisualizer() as Visualizer,
