@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import {
+  FormProps,
   SingleElementVisualizerProps,
   Visualizer,
   VisualizerId,
@@ -17,7 +18,73 @@ import { CaptureCalibrationDatasetResult } from "../../../../genproto/farm_ng_pr
 import { CalibrateApriltagRigResult } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
 import { CaptureCalibrationDatasetResultElement } from "./CaptureCalibrationDatasetResult";
 import { CalibrateApriltagRigResultElement } from "./CalibrateApriltagRigResult";
-import { BaseToCameraInitializationTable } from "./BaseToCameraInitializationTable";
+import {
+  BaseToCameraInitializationForm,
+  BaseToCameraInitializationTable
+} from "./BaseToCameraInitializationTable";
+import { useFormState } from "../../../hooks/useFormState";
+import FormGroup from "./FormGroup";
+import { Resource } from "../../../../genproto/farm_ng_proto/tractor/v1/resource";
+import { BaseToCameraInitialization } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
+
+export const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
+  CalibrateBaseToCameraConfiguration
+>> = (props) => {
+  const [value, update] = useFormState(props);
+  return (
+    <>
+      <FormGroup
+        // TODO: Replace with resource browser
+        label="Calibration Dataset"
+        value={value.calibrationDataset?.path}
+        type="text"
+        onChange={(e) =>
+          update((v) => ({
+            ...v,
+            calibrationDataset: Resource.fromPartial({
+              path: e.target.value,
+              contentType:
+                "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult"
+            })
+          }))
+        }
+      />
+
+      <FormGroup
+        // TODO: Replace with resource browser
+        label="Apriltag Rig Result"
+        value={value.apriltagRigResult?.path}
+        type="text"
+        onChange={(e) =>
+          update((v) => ({
+            ...v,
+            apriltagRigResult: Resource.fromPartial({
+              path: e.target.value,
+              contentType:
+                "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigResult"
+            })
+          }))
+        }
+      />
+
+      <BaseToCameraInitializationForm
+        initialValue={
+          value.initialization || BaseToCameraInitialization.fromPartial({})
+        }
+        onUpdate={(updated) =>
+          update((v) => ({ ...v, initialization: updated }))
+        }
+      />
+
+      <FormGroup
+        label="Name"
+        value={value.name}
+        type="text"
+        onChange={(e) => update((v) => ({ ...v, name: e.target.value }))}
+      />
+    </>
+  );
+};
 
 export const CalibrateBaseToCameraConfigurationElement: React.FC<SingleElementVisualizerProps<
   CalibrateBaseToCameraConfiguration

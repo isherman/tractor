@@ -4,10 +4,15 @@ import { toCamelCase, toSentenceCase } from "../../../utils/string";
 
 interface IProps extends FormControlProps {
   label: string;
+  description?: string;
+  checked?: boolean;
+  onChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+  >;
 }
 
 const FormGroup: React.FC<IProps> = (props) => {
-  const { label, value } = props;
+  const { label, value, description, children } = props;
   const camelCaseLabel = toCamelCase(label);
   const defaultValue = typeof value === "number" ? 0 : "";
   return (
@@ -17,7 +22,12 @@ const FormGroup: React.FC<IProps> = (props) => {
         name={camelCaseLabel}
         value={value || defaultValue}
         {...props}
-      />
+      >
+        {children}
+      </Form.Control>
+      {description && (
+        <Form.Text className="text-muted">{description}</Form.Text>
+      )}
     </Form.Group>
   );
 };

@@ -9,10 +9,11 @@ import commonStyles from "./common.module.scss";
 import { Button, Collapse, Form } from "react-bootstrap";
 import { ProgramForm } from "./ProgramForm";
 import {
+  CalibrateApriltagRigConfiguration,
   CalibrateApriltagRigConfiguration as Configuration,
   CalibrateApriltagRigStatus as Status
 } from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
-import { Resource } from "../../../genproto/farm_ng_proto/tractor/v1/resource";
+import { CalibrateApriltagRigConfigurationForm } from "../scope/visualizers/CalibrateApriltagRigConfiguration";
 
 const programId = "calibrate_apriltag_rig";
 
@@ -26,29 +27,6 @@ const Component: React.FC = () => {
   const [configuration, setConfiguration] = useState<Configuration | null>(
     null
   );
-
-  const handleConfigurationChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setConfiguration({
-      ...(configuration || {}),
-      [e.target.name]: e.target.value
-    } as Configuration);
-  };
-
-  // TODO: Replace this with a resource browser
-  const handleResourcePathChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setConfiguration({
-      ...(configuration || {}),
-      calibrationDataset: Resource.fromJSON({
-        path: e.target.value,
-        contentType:
-          "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult"
-      })
-    } as Configuration);
-  };
 
   const handleConfigurationSubmit = (
     e: React.FormEvent<HTMLFormElement>
@@ -80,52 +58,13 @@ const Component: React.FC = () => {
           <div>
             <ProgramForm>
               <Form onSubmit={handleConfigurationSubmit}>
-                <Form.Group controlId="resourcePath">
-                  <Form.Label>ResourcePath</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="resource"
-                    value={configuration?.calibrationDataset?.path || ""}
-                    onChange={handleResourcePathChange}
-                  />
-                </Form.Group>
-
-                <Form.Group controlId="tagIds">
-                  <Form.Label>Tag IDs</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="tagIds"
-                    // TODO: Make this a controlled form element, with better UI
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const tagIds = (e.target.value || "")
-                        .split(",")
-                        .map((_) => parseInt(_.trim()));
-                      setConfiguration(
-                        (c) => ({ ...c, tagIds } as Configuration)
-                      );
-                    }}
-                  />
-                </Form.Group>
-
-                <Form.Group controlId="rootTagId">
-                  <Form.Label>Root Tag ID</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="rootTagId"
-                    value={configuration?.rootTagId || ""}
-                    onChange={handleConfigurationChange}
-                  />
-                </Form.Group>
-
-                <Form.Group controlId="name">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="name"
-                    value={configuration?.name || ""}
-                    onChange={handleConfigurationChange}
-                  />
-                </Form.Group>
+                <CalibrateApriltagRigConfigurationForm
+                  initialValue={
+                    configuration ||
+                    CalibrateApriltagRigConfiguration.fromPartial({})
+                  }
+                  onUpdate={(updated) => setConfiguration(updated)}
+                />
                 <Button variant="primary" type="submit">
                   Submit
                 </Button>

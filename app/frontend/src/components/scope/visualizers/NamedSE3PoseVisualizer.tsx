@@ -3,6 +3,7 @@ import * as React from "react";
 import { Card } from "react-bootstrap";
 import styles from "./NamedSE3PoseVisualizer.module.scss";
 import {
+  FormProps,
   SingleElementVisualizerProps,
   Visualizer,
   VisualizerId,
@@ -12,13 +13,44 @@ import {
 import { formatValue } from "../../../utils/formatValue";
 import { EventTypeId } from "../../../registry/events";
 import { JsonPopover } from "../../JsonPopover";
-import { NamedSE3Pose } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
+import {
+  NamedSE3Pose,
+  SE3Pose
+} from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { Controls } from "../../Controls";
 import { Ground } from "../../Ground";
 import { Lights } from "../../Lights";
 import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
 import { Overlay } from "./Overlay";
 import { Canvas } from "../../Canvas";
+import { useFormState } from "../../../hooks/useFormState";
+import FormGroup from "./FormGroup";
+import { SE3PoseForm } from "./SE3Pose";
+
+export const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
+  const [value, update] = useFormState(props);
+  return (
+    <>
+      <FormGroup
+        label="Frame A"
+        value={value.frameA}
+        type="text"
+        onChange={(e) => update((v) => ({ ...v, frameA: e.target.value }))}
+      />
+      <FormGroup
+        label="Frame B"
+        value={value.frameB}
+        type="text"
+        onChange={(e) => update((v) => ({ ...v, frameB: e.target.value }))}
+      />
+
+      <SE3PoseForm
+        initialValue={value.aPoseB || SE3Pose.fromJSON({})}
+        onUpdate={(updated) => update((v) => ({ ...v, aPoseB: updated }))}
+      />
+    </>
+  );
+};
 
 export const NamedSE3PoseElement: React.FC<SingleElementVisualizerProps<
   NamedSE3Pose

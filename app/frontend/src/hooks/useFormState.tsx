@@ -5,36 +5,22 @@ interface IProps<T> {
   onUpdate: (updated: T) => void;
 }
 
-type IReturnValue<T> = [
-  T,
-  (e: React.ChangeEvent<HTMLInputElement>) => void,
-  (e: React.ChangeEvent<HTMLInputElement>) => void
-];
+type IReturnValue<T> = [T, (updater: (c: T) => T) => void];
 
 export function useFormState<T>({
   initialValue,
   onUpdate
 }: IProps<T>): IReturnValue<T> {
-  const [config, setConfig] = useState(initialValue);
+  const [value, setValue] = useState(initialValue);
   useEffect(() => {
-    if (config) {
-      onUpdate(config);
+    if (value) {
+      onUpdate(value);
     }
-  }, [config]);
+  }, [value]);
 
-  const onStringChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setConfig({
-      ...(config || {}),
-      [e.target.name]: e.target.value
-    } as T);
+  const updateValue = (updater: (c: T) => T): void => {
+    setValue(updater(value));
   };
 
-  const onNumberChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setConfig({
-      ...(config || {}),
-      [e.target.name]: parseFloat(e.target.value)
-    } as T);
-  };
-
-  return [config, onStringChange, onNumberChange];
+  return [value, updateValue];
 }

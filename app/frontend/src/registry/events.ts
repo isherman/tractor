@@ -4,6 +4,7 @@ import {
 } from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
 import {
   NamedSE3Pose,
+  SE3Pose,
   Vec2
 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import {
@@ -58,6 +59,7 @@ export type EventType =
   | SteeringCommand
   | TrackingCameraPoseFrame
   | TrackingCameraMotionFrame
+  | SE3Pose
   | NamedSE3Pose
   | MotorControllerState
   | ApriltagDetections
@@ -100,6 +102,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand": SteeringCommand,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraPoseFrame": TrackingCameraPoseFrame,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraMotionFrame": TrackingCameraMotionFrame,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.SE3Pose": SE3Pose,
   "type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose": NamedSE3Pose,
   "type.googleapis.com/farm_ng_proto.tractor.v1.MotorControllerState": MotorControllerState,
   "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections": ApriltagDetections,

@@ -13,28 +13,92 @@ import { Layout } from "./Layout";
 import { Card } from "./Card";
 import { TractorConfig } from "../../../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { KeyValueTable } from "./KeyValueTable";
-import { NamedSE3PoseElement } from "./NamedSE3PoseVisualizer";
+import {
+  NamedSE3PoseElement,
+  NamedSE3PoseForm
+} from "./NamedSE3PoseVisualizer";
 import { useFormState } from "../../../hooks/useFormState";
 import FormGroup from "./FormGroup";
 
 const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
-  const [config, , onNumberChange] = useFormState(props);
+  const [value, update] = useFormState(props);
 
   return (
     <>
-      <FormGroup.NumberSet
-        object={config}
-        keys={[
-          "wheelBaseline",
-          "wheelRadius",
-          "wheelRadiusLeft",
-          "wheelRadiusRight",
-          "hubMotorGearRatio",
-          "hubMotorPollPairs"
-        ]}
-        onChange={onNumberChange}
+      <FormGroup
+        label="Wheel Baseline"
+        value={value.wheelBaseline}
+        type="number"
+        onChange={(e) =>
+          update((v) => ({ ...v, wheelBaseline: parseFloat(e.target.value) }))
+        }
       />
-      <p>TODO: basePosesSensor</p>
+
+      <FormGroup
+        label="Wheel Radius"
+        value={value.wheelRadius}
+        type="number"
+        onChange={(e) =>
+          update((v) => ({ ...v, wheelRadius: parseFloat(e.target.value) }))
+        }
+      />
+
+      <FormGroup
+        label="Wheel Radius Left"
+        value={value.wheelRadiusLeft}
+        type="number"
+        onChange={(e) =>
+          update((v) => ({ ...v, wheelRadiusLeft: parseFloat(e.target.value) }))
+        }
+      />
+
+      <FormGroup
+        label="Wheel Radius Right"
+        value={value.wheelRadiusRight}
+        type="number"
+        onChange={(e) =>
+          update((v) => ({
+            ...v,
+            wheelRadiusRight: parseFloat(e.target.value)
+          }))
+        }
+      />
+
+      <FormGroup
+        label="Hub Motor Gear Ratio"
+        value={value.hubMotorGearRatio}
+        type="number"
+        onChange={(e) =>
+          update((v) => ({
+            ...v,
+            hubMotorGearRatio: parseFloat(e.target.value)
+          }))
+        }
+      />
+
+      <FormGroup
+        label="Hub Motor Poll Pairs"
+        value={value.hubMotorPollPairs}
+        type="number"
+        onChange={(e) =>
+          update((v) => ({ ...v, hubMotorPollPairs: parseInt(e.target.value) }))
+        }
+      />
+
+      {value.basePosesSensor.map((basePoseSensor, i) => (
+        <NamedSE3PoseForm
+          key={basePoseSensor.frameA + basePoseSensor.frameB}
+          initialValue={basePoseSensor}
+          onUpdate={(updated) =>
+            update((v) => ({
+              ...v,
+              basePosesSensor: Object.assign([...v.basePosesSensor], {
+                [i]: updated
+              })
+            }))
+          }
+        />
+      ))}
     </>
   );
 };

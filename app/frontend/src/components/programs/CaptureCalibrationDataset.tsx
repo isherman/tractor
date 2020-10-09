@@ -7,11 +7,13 @@ import commonStyles from "./common.module.scss";
 import { useEffect, useState } from "react";
 import { Button, Collapse, Form } from "react-bootstrap";
 import {
+  CaptureCalibrationDatasetConfiguration,
   CaptureCalibrationDatasetConfiguration as Configuration,
   CaptureCalibrationDatasetStatus as Status
 } from "../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { ProgramLogVisualizer } from "./ProgramLogVisualizer";
 import { ProgramForm } from "./ProgramForm";
+import { CaptureCalibrationDatasetConfigurationForm } from "../scope/visualizers/CaptureCalibrationDatasetConfiguration";
 
 const programId = "capture_calibration_dataset";
 
@@ -26,15 +28,6 @@ const Component: React.FC = () => {
   const [configuration, setConfiguration] = useState<Configuration | null>(
     null
   );
-
-  const handleConfigurationChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setConfiguration({
-      ...(configuration || {}),
-      [e.target.name]: e.target.value
-    } as Configuration);
-  };
 
   const handleConfigurationSubmit = (
     e: React.FormEvent<HTMLFormElement>
@@ -66,28 +59,13 @@ const Component: React.FC = () => {
           <div>
             <ProgramForm>
               <Form onSubmit={handleConfigurationSubmit}>
-                <Form.Group controlId="numFrames">
-                  <Form.Label>Number of Frames</Form.Label>
-                  <Form.Control
-                    type="number"
-                    name="numFrames"
-                    value={configuration?.numFrames || 0}
-                    onChange={handleConfigurationChange}
-                  />
-                </Form.Group>
-
-                <Form.Group controlId="name">
-                  <Form.Label>Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="name"
-                    value={configuration?.name || ""}
-                    onChange={handleConfigurationChange}
-                  />
-                  <Form.Text className="text-muted">
-                    A name for the dataset, used to name the output archive.
-                  </Form.Text>
-                </Form.Group>
+                <CaptureCalibrationDatasetConfigurationForm
+                  initialValue={
+                    configuration ||
+                    CaptureCalibrationDatasetConfiguration.fromPartial({})
+                  }
+                  onUpdate={(updated) => setConfiguration(updated)}
+                />
                 <Button variant="primary" type="submit">
                   Submit
                 </Button>
