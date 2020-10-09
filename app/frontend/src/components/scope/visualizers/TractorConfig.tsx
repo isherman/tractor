@@ -14,51 +14,27 @@ import { Card } from "./Card";
 import { TractorConfig } from "../../../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { KeyValueTable } from "./KeyValueTable";
 import { NamedSE3PoseElement } from "./NamedSE3PoseVisualizer";
-import { Form } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useFormState } from "../../../hooks/useFormState";
+import FormGroup from "./FormGroup";
 
-export const TractorConfigForm: React.FC<FormProps<TractorConfig>> = ({
-  initialValue,
-  onUpdate
-}) => {
-  const [config, setConfig] = useState(initialValue);
-
-  useEffect(() => {
-    if (config) {
-      onUpdate(config);
-    }
-  }, [config]);
-
-  const handleConfigurationChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setConfig({
-      ...(config || {}),
-      [e.target.name]: e.target.value
-    } as TractorConfig);
-  };
+const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
+  const [config, , onNumberChange] = useFormState(props);
 
   return (
     <>
-      <Form.Group controlId="wheelBaseline">
-        <Form.Label>Wheel Baseline</Form.Label>
-        <Form.Control
-          type="number"
-          name="wheelBaseline"
-          value={config?.wheelBaseline || 0}
-          onChange={handleConfigurationChange}
-        />
-      </Form.Group>
-
-      <Form.Group controlId="wheelRadius">
-        <Form.Label>Wheel Radius</Form.Label>
-        <Form.Control
-          type="text"
-          name="wheelRadius"
-          value={config?.wheelRadius || ""}
-          onChange={handleConfigurationChange}
-        />
-      </Form.Group>
+      <FormGroup.NumberSet
+        object={config}
+        keys={[
+          "wheelBaseline",
+          "wheelRadius",
+          "wheelRadiusLeft",
+          "wheelRadiusRight",
+          "hubMotorGearRatio",
+          "hubMotorPollPairs"
+        ]}
+        onChange={onNumberChange}
+      />
+      <p>TODO: basePosesSensor</p>
     </>
   );
 };
