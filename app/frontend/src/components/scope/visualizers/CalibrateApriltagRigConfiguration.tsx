@@ -47,7 +47,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
       <FormGroup
         // TODO: Replace with repeated integer input (CURRENTLY BROKEN)
         label="Tag IDs"
-        value={value.tagIds.join(", ")}
+        value={(value.tagIds || []).join(", ")}
         type="text"
         onChange={(e) =>
           setValue((v) => ({
@@ -97,7 +97,7 @@ const CalibrateApriltagRigConfigurationElement: React.FC<SingleElementVisualizer
         <KeyValueTable
           records={[
             ["Name", name],
-            ["Tag IDs", tagIds.join(", ")],
+            ["Tag IDs", (tagIds || []).join(", ")],
             ["Root Tag ID", rootTagId]
           ]}
         />

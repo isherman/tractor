@@ -34,7 +34,7 @@ export const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisua
         <KeyValueTable
           records={[
             ["Num Frames", numFrames],
-            ["Tag IDs", tagIds.join(", ")]
+            ["Tag IDs", (tagIds || []).join(", ")]
           ]}
         />
       </Card>

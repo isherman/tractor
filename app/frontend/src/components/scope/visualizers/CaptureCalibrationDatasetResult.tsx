@@ -25,7 +25,7 @@ const CaptureCalibrationDatasetResultElement: React.FC<SingleElementVisualizerPr
         <KeyValueTable
           records={[
             ["Num Frames", numFrames],
-            ["Tag IDs", tagIds.join(", ")],
+            ["Tag IDs", (tagIds || []).join(", ")],
             ["Stamp End", stampEnd],
             ["Dataset URL", dataset?.path]
           ]}

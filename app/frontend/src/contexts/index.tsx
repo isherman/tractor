@@ -6,13 +6,13 @@ import { VisualizationStore } from "../stores/VisualizationStore";
 import { ProgramsStore } from "../stores/ProgramsStore";
 import { HttpResourceArchive } from "../models/ResourceArchive";
 
+const baseUrl = `http://${window.location.hostname}:8081`;
+
 const [busEventEmitter, mediaStreamEmitter, busClient] = getWebRTCEmitters(
-  `http://${window.location.hostname}:8081/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`
+  `${baseUrl}/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`
 );
 
-export const httpResourceArchive = new HttpResourceArchive(
-  `http://${window.location.hostname}:8081/blobstore`
-);
+const httpResourceArchive = new HttpResourceArchive(`${baseUrl}/blobstore`);
 
 export const storesContext = React.createContext({
   programsStore: new ProgramsStore(
@@ -25,5 +25,7 @@ export const storesContext = React.createContext({
   visualizationStore: new VisualizationStore(
     busEventEmitter,
     httpResourceArchive
-  )
+  ),
+  baseUrl,
+  httpResourceArchive
 });

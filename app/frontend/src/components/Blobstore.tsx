@@ -13,15 +13,12 @@ import * as React from "react";
 import "chonky/style/main.css";
 import { useEffect, useState } from "react";
 import { File } from "../../genproto/farm_ng_proto/tractor/v1/resource";
-import { httpResourceArchive } from "../contexts";
 import styles from "./Blobstore.module.scss";
-import { TractorConfig } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
+// import { TractorConfig } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { eventRegistry, EventType, EventTypeId } from "../registry/events";
 import { visualizersForEventType } from "../registry/visualization";
 import { Button } from "react-bootstrap";
-
-// TODO: import
-const baseUrl = `http://${window.location.hostname}:8081/blobstore`;
+import { useStores } from "../hooks/useStores";
 
 const fileToFileData = (f: File): FileData => ({
   id: f.name,
@@ -31,60 +28,65 @@ const fileToFileData = (f: File): FileData => ({
   size: parseInt((f.size as unknown) as string) // TODO: fix
 });
 
-const folderChainToPath = (folderChain: FileData[]): string =>
-  folderChain
-    .slice(1)
-    .map((_) => _.name)
-    .join("/") + (folderChain.length > 1 ? "/" : "");
+const dirsToPath = (dirs: FileData[]): string =>
+  dirs.map((_) => _.name).join("/");
 
-const exampleTractorConfig = TractorConfig.fromPartial({
-  wheelRadius: 1,
-  hubMotorGearRatio: 10.5,
-  hubMotorPollPairs: 6,
-  basePosesSensor: [
-    {
-      frameA: "base",
-      frameB: "camera_left",
-      aPoseB: { position: { x: 0.2, y: 1, z: 2.2 } }
-    }
-  ]
-});
-console.log(TractorConfig.toJSON(exampleTractorConfig));
+const bestGuessEventType = (
+  folderChain: FileData[]
+): EventTypeId | undefined => {
+  if (folderChain.map((_) => _.name).includes("apriltag_rig_models")) {
+    return "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigResult";
+  }
+  if (folderChain.map((_) => _.name).includes("configurations")) {
+    return "type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig";
+  }
+  if (folderChain.map((_) => _.name).includes("base_to_camera_models")) {
+    return "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraResult";
+  }
+  if (folderChain.map((_) => _.name).includes("calibration-datasets")) {
+    return "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult";
+  }
+  return undefined;
+};
+
+// const exampleTractorConfig = TractorConfig.fromPartial({
+//   wheelRadius: 1,
+//   hubMotorGearRatio: 10.5,
+//   hubMotorPollPairs: 6,
+//   basePosesSensor: [
+//     {
+//       frameA: "base",
+//       frameB: "camera_left",
+//       aPoseB: { position: { x: 0.2, y: 1, z: 2.2 } }
+//     }
+//   ]
+// });
+// console.log(TractorConfig.toJSON(exampleTractorConfig));
 
 export const Blobstore: React.FC = () => {
-  const [folderChain, setFolderChain] = useState<FileData[]>([]);
-  const [dirInfo, setDirInfo] = useState<File>();
+  const [rootDir, setRootDir] = useState<FileData>();
+  const [parentDirs, setParentDirs] = useState<FileData[]>([]);
+  const [currentDir, setCurrentDir] = useState<File>();
   const [selectedPath, setSelectedPath] = useState<string>();
   const [selectedEventType, setSelectedEventType] = useState<EventTypeId>();
   const [selectedResource, setSelectedResource] = useState<EventType>();
   const [isEditing, setIsEditing] = useState(false);
 
+  const { baseUrl, httpResourceArchive } = useStores();
+  const blobstoreUrl = `${baseUrl}/blobstore`;
+
+  // Handle selected files
   useEffect(() => {
     const fetchSelected = async (): Promise<void> => {
       if (!selectedPath) {
         return;
       }
-      let eventType: EventTypeId | null = null;
-      if (folderChain.map((_) => _.name).includes("apriltag_rig_models")) {
-        eventType =
-          "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigResult";
-      }
-      if (folderChain.map((_) => _.name).includes("configurations")) {
-        eventType =
-          "type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig";
-      }
-      if (folderChain.map((_) => _.name).includes("base_to_camera_models")) {
-        eventType =
-          "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraResult";
-      }
-      if (folderChain.map((_) => _.name).includes("calibration-datasets")) {
-        eventType =
-          "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult";
-      }
+
+      const eventType = bestGuessEventType(parentDirs);
 
       if (!eventType) {
         setSelectedResource(undefined);
-        window.open(`${baseUrl}/${selectedPath}`);
+        window.open(`${blobstoreUrl}/${selectedPath}`);
         return;
       }
       try {
@@ -98,53 +100,62 @@ export const Blobstore: React.FC = () => {
     fetchSelected();
   }, [selectedPath]);
 
+  // Fetch current directory
   useEffect(() => {
-    const fetchFolder = async (): Promise<void> => {
-      const path = folderChainToPath(folderChain);
-      const response = await fetch(`${baseUrl}/${path}`, {
+    const fetchDir = async (): Promise<void> => {
+      const path = dirsToPath(parentDirs);
+      const response = await fetch(`${blobstoreUrl}/${path}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/protobuf"
         }
       });
       const file = File.decode(new Uint8Array(await response.arrayBuffer()));
-      setDirInfo(file);
-      if (folderChain.length === 0) {
-        setFolderChain((prev) => [...prev, fileToFileData(file)]);
+      setCurrentDir(file);
+      if (!rootDir) {
+        setRootDir(fileToFileData(file));
       }
     };
-    fetchFolder();
-  }, [folderChain]);
-
-  const files = dirInfo?.directory?.files.map<FileData>(fileToFileData);
-  const visualizer =
-    selectedEventType && visualizersForEventType(selectedEventType)[0];
+    fetchDir();
+  }, [rootDir, parentDirs]);
 
   const handleFileAction = (action: FileAction, data: FileActionData): void => {
+    // Triggered by double-click
     if (action.id === ChonkyActions.OpenFiles.id) {
       const target = data?.target;
       if (!target) {
         return;
       }
       if (!target.isDir) {
-        setSelectedPath(`${folderChainToPath(folderChain)}${target.name}`);
+        setSelectedPath(`${dirsToPath(parentDirs)}/${target.name}`);
         return;
       }
-      const index = folderChain.findIndex((_) => _.id === target.id);
-      if (index >= 0) {
-        setFolderChain((prev) => prev.slice(0, index));
+      const index = parentDirs.findIndex((_) => _.id === target.id);
+      if (target.id === rootDir?.id) {
+        setParentDirs([]);
+      } else if (index >= 0) {
+        setParentDirs((prev) => prev.slice(0, index + 1));
       } else {
-        setFolderChain((prev) => [...prev, target]);
+        setParentDirs((prev) => [...prev, target]);
       }
     }
   };
+
+  const files = currentDir?.directory?.files.map<FileData>(fileToFileData);
+  const visualizer =
+    selectedEventType && visualizersForEventType(selectedEventType)[0];
+  console.log(
+    "ParentDirs: ",
+    parentDirs.map((_) => _.name)
+  );
+  console.log("All: ", [rootDir, ...parentDirs]);
 
   return (
     <div className={styles.container}>
       <div className={styles.browser}>
         <FileBrowser
           files={files || []}
-          folderChain={folderChain}
+          folderChain={[rootDir, ...parentDirs].filter((_) => _)}
           onFileAction={handleFileAction}
           clearSelectionOnOutsideClick={false}
           defaultFileViewActionId={ChonkyActions.EnableListView.id}
@@ -155,7 +166,7 @@ export const Blobstore: React.FC = () => {
         </FileBrowser>
       </div>
       <div className={styles.detail}>
-        {selectedResource && !isEditing && (
+        {selectedResource && !isEditing && visualizer?.Form && (
           <Button onClick={() => setIsEditing(true)}>{"Edit"}</Button>
         )}
         {selectedResource && isEditing && (
@@ -166,10 +177,9 @@ export const Blobstore: React.FC = () => {
         )}
         {!isEditing && selectedResource && (
           <>
-            {visualizer &&
-              React.createElement(visualizer.Component, {
-                values: [[0, selectedResource]],
-                options: [{ label: "", options: [], value: "overlay" }],
+            {visualizer?.Element &&
+              React.createElement(visualizer.Element, {
+                value: [0, selectedResource],
                 resources: httpResourceArchive
               })}
           </>
