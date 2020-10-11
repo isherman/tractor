@@ -1,13 +1,10 @@
 /* eslint-disable no-console */
 import * as React from "react";
-import { Card } from "react-bootstrap";
-import styles from "./NamedSE3Pose.module.scss";
+import { Card } from "./Card";
 import {
   FormProps,
   SingleElementVisualizerProps
 } from "../../../registry/visualization";
-import { formatValue } from "../../../utils/formatValue";
-import { JsonPopover } from "../../JsonPopover";
 import {
   NamedSE3Pose,
   SE3Pose
@@ -51,23 +48,17 @@ const NamedSE3PoseElement: React.FC<SingleElementVisualizerProps<
   NamedSE3Pose
 >> = ({ value: [timestamp, value] }) => {
   return (
-    <Card bg={"light"} className={[styles.card, "shadow-sm"].join(" ")}>
-      <Card.Body>
-        <Canvas>
-          <Lights />
-          <Ground transparent={true} />
-          <fogExp2 args={[0xcccccc, 0.02]} />
-          <Controls />
-          <axesHelper
-            position={toVector3(value.aPoseB?.position)}
-            quaternion={toQuaternion(value.aPoseB?.rotation)}
-          />
-        </Canvas>
-      </Card.Body>
-      <Card.Footer className={styles.footer}>
-        <span className="text-muted">{formatValue(new Date(timestamp))}</span>
-        <JsonPopover json={value} />
-      </Card.Footer>
+    <Card json={value} timestamp={timestamp}>
+      <Canvas>
+        <Lights />
+        <Ground transparent={true} />
+        <fogExp2 args={[0xcccccc, 0.02]} />
+        <Controls />
+        <axesHelper
+          position={toVector3(value.aPoseB?.position)}
+          quaternion={toQuaternion(value.aPoseB?.rotation)}
+        />
+      </Canvas>
     </Card>
   );
 };

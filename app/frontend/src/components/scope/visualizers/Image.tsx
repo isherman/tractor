@@ -1,12 +1,10 @@
 /* eslint-disable no-console */
 import * as React from "react";
-import { Card } from "react-bootstrap";
+import { Card } from "./Card";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { Image } from "../../../../genproto/farm_ng_proto/tractor/v1/image";
-import { formatValue } from "../../../utils/formatValue";
 import { useEffect, useState } from "react";
 import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
-import { JsonPopover } from "../../JsonPopover";
 import styles from "./Image.module.scss";
 
 const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = ({
@@ -30,14 +28,8 @@ const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = ({
   }, [value, resources]);
 
   return (
-    <Card bg={"light"} className={[styles.card, "shadow-sm"].join(" ")}>
-      <Card.Body>
-        <img src={imgSrc || undefined} className={styles.image} />
-      </Card.Body>
-      <Card.Footer className={styles.footer}>
-        <span className="text-muted">{formatValue(new Date(timestamp))}</span>
-        <JsonPopover json={value} />
-      </Card.Footer>
+    <Card json={value} timestamp={timestamp}>
+      <img src={imgSrc || undefined} className={styles.image} />
     </Card>
   );
 };

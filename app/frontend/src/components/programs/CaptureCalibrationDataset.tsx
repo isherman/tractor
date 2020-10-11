@@ -78,7 +78,7 @@ const Component: React.FC = () => {
           eventLog={store.eventLog}
           selectedEntry={store.selectedEntry}
           onSelectEntry={(e) => (store.selectedEntry = e)}
-          visualizer={store.visualizer?.Component || null}
+          visualizer={store.visualizer?.Element}
           resources={store.resourceArchive}
         />
       </div>

@@ -1,14 +1,12 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
-import { Card } from "react-bootstrap";
+import { Card } from "./Card";
 import styles from "./ApriltagDetections.module.scss";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { formatValue } from "../../../utils/formatValue";
 import { ApriltagDetections } from "../../../../genproto/farm_ng_proto/tractor/v1/apriltag";
 import { autorun } from "mobx";
 import { drawAprilTagDetections } from "../../../utils/drawApriltagDetections";
-import { JsonPopover } from "../../JsonPopover";
 import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 
 const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
@@ -71,23 +69,17 @@ const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
   );
 
   return (
-    <Card bg={"light"} className={[styles.card, "shadow-sm"].join(" ")}>
-      <Card.Body>
-        <div className={styles.annotatedImageContainer}>
-          <div className={styles.annotatedImage}>
-            <img
-              ref={imageRef}
-              src={imgSrc || undefined}
-              className={styles.image}
-            />
-            <canvas ref={canvasRef} className={styles.canvas}></canvas>
-          </div>
+    <Card json={value} timestamp={timestamp}>
+      <div className={styles.annotatedImageContainer}>
+        <div className={styles.annotatedImage}>
+          <img
+            ref={imageRef}
+            src={imgSrc || undefined}
+            className={styles.image}
+          />
+          <canvas ref={canvasRef} className={styles.canvas}></canvas>
         </div>
-      </Card.Body>
-      <Card.Footer className={styles.footer}>
-        <span className="text-muted">{formatValue(new Date(timestamp))}</span>
-        <JsonPopover json={value} />
-      </Card.Footer>
+      </div>
     </Card>
   );
 };
