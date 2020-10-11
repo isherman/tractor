@@ -53,7 +53,7 @@ console.log(TractorConfig.toJSON(exampleTractorConfig));
 
 export const Blobstore: React.FC = () => {
   const [folderChain, setFolderChain] = useState<FileData[]>([]);
-  const [dirInfo, setDirInfo] = useState<File | null>(null);
+  const [dirInfo, setDirInfo] = useState<File>();
   const [selectedPath, setSelectedPath] = useState<string>();
   const [selectedEventType, setSelectedEventType] = useState<EventTypeId>();
   const [selectedResource, setSelectedResource] = useState<EventType>();

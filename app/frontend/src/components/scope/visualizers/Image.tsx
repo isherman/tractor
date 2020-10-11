@@ -11,7 +11,7 @@ const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = ({
   value: [timestamp, value],
   resources
 }) => {
-  const [imgSrc, setImgSrc] = useState<string | null>(null);
+  const [imgSrc, setImgSrc] = useState<string>();
 
   useEffect(() => {
     const fetchImage = async (): Promise<void> => {

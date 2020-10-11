@@ -23,16 +23,18 @@ const CalibrateBaseToCameraStatusElement: React.FC<SingleElementVisualizerProps<
     resources || undefined
   );
 
+  if (!result) {
+    return null;
+  }
+
   return (
-    result && (
-      <Card timestamp={timestamp} json={value}>
-        <CalibrateBaseToCameraResultVisualizer.Element
-          value={[0, result]}
-          options={[]}
-          resources={resources}
-        />
-      </Card>
-    )
+    <Card timestamp={timestamp} json={value}>
+      <CalibrateBaseToCameraResultVisualizer.Element
+        value={[0, result]}
+        options={[]}
+        resources={resources}
+      />
+    </Card>
   );
 };
 

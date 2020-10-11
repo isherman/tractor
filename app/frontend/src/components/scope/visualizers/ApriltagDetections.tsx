@@ -12,9 +12,9 @@ import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
   ApriltagDetections
 >> = ({ value: [timestamp, value], resources }) => {
-  const [imgSrc, setImgSrc] = useState<string | null>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [imgSrc, setImgSrc] = useState<string>();
+  const imageRef = useRef<HTMLImageElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const fetchImage = async (): Promise<void> => {

@@ -25,9 +25,7 @@ const Component: React.FC = () => {
     return () => store.resetEventLog();
   }, []);
 
-  const [configuration, setConfiguration] = useState<Configuration | null>(
-    null
-  );
+  const [configuration, setConfiguration] = useState<Configuration>();
 
   const handleConfigurationSubmit = (
     e: React.FormEvent<HTMLFormElement>
