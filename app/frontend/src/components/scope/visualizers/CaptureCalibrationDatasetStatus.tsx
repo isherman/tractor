@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import {
@@ -21,7 +24,7 @@ export const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisua
 
   const result = useFetchResource<CaptureCalibrationDatasetResult>(
     value.result,
-    resources || undefined
+    resources
   );
   const { numFrames, tagIds } = value;
 
@@ -39,9 +42,8 @@ export const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisua
         <Card title="Result">
           {
             <CaptureCalibrationDatasetResultVisualizer.Element
+              {...props}
               value={[0, result]}
-              options={[]}
-              resources={resources}
             />
           }
         </Card>
@@ -55,7 +57,7 @@ export const CaptureCalibrationDatasetStatusVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetStatus"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(CaptureCalibrationDatasetStatusElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(CaptureCalibrationDatasetStatusElement),
   Element: CaptureCalibrationDatasetStatusElement
 };

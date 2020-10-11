@@ -7,7 +7,10 @@ import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { ApriltagDetections } from "../../../../genproto/farm_ng_proto/tractor/v1/apriltag";
 import { autorun } from "mobx";
 import { drawAprilTagDetections } from "../../../utils/drawApriltagDetections";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 
 const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
   ApriltagDetections
@@ -87,7 +90,7 @@ const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
 export const ApriltagDetectionsVisualizer = {
   id: "ApriltagDetections",
   types: ["type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections"],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(ApriltagDetectionsElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(ApriltagDetectionsElement),
   Element: ApriltagDetectionsElement
 };

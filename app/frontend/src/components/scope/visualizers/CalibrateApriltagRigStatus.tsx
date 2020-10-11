@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import {
   CalibrateApriltagRigResult,
   CalibrateApriltagRigStatus
@@ -20,7 +23,7 @@ const CalibrateApriltagRigStatusElement: React.FC<SingleElementVisualizerProps<
 
   const result = useFetchResource<CalibrateApriltagRigResult>(
     value.result,
-    resources || undefined
+    resources
   );
 
   if (!result) {
@@ -30,9 +33,8 @@ const CalibrateApriltagRigStatusElement: React.FC<SingleElementVisualizerProps<
   return (
     <Card timestamp={timestamp} json={value}>
       <CalibrateApriltagRigResultVisualizer.Element
+        {...props}
         value={[0, result]}
-        options={[]}
-        resources={resources}
       />
     </Card>
   );
@@ -43,7 +45,7 @@ export const CalibrateApriltagRigStatusVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigStatus"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(CalibrateApriltagRigStatusElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(CalibrateApriltagRigStatusElement),
   Element: CalibrateApriltagRigStatusElement
 };

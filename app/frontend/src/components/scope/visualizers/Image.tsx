@@ -4,7 +4,10 @@ import { Card } from "./Card";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { Image } from "../../../../genproto/farm_ng_proto/tractor/v1/image";
 import { useEffect, useState } from "react";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import styles from "./Image.module.scss";
 
 const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = ({
@@ -37,7 +40,7 @@ const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = ({
 export const ImageVisualizer = {
   id: "Image",
   types: ["type.googleapis.com/farm_ng_proto.tractor.v1.Image"],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(ImageElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(ImageElement),
   Element: ImageElement
 };

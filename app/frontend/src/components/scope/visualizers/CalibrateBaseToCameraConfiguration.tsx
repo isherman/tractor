@@ -4,7 +4,10 @@ import {
   FormProps,
   SingleElementVisualizerProps
 } from "../../../registry/visualization";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import { CalibrateBaseToCameraConfiguration } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
@@ -88,11 +91,11 @@ const CalibrateBaseToCameraConfigurationElement: React.FC<SingleElementVisualize
 
   const calibrationDataset = useFetchResource<CaptureCalibrationDatasetResult>(
     value.calibrationDataset,
-    resources || undefined
+    resources
   );
   const apriltagRigResult = useFetchResource<CalibrateApriltagRigResult>(
     value.apriltagRigResult,
-    resources || undefined
+    resources
   );
   const { initialization, name } = value;
 
@@ -111,18 +114,16 @@ const CalibrateBaseToCameraConfigurationElement: React.FC<SingleElementVisualize
       {calibrationDataset && (
         <Card title="Calibration Dataset">
           <CaptureCalibrationDatasetResultVisualizer.Element
+            {...props}
             value={[0, calibrationDataset]}
-            options={[]}
-            resources={resources}
           />
         </Card>
       )}
       {apriltagRigResult && (
         <Card title="Apriltag Rig Result">
           <CalibrateApriltagRigResultVisualizer.Element
+            {...props}
             value={[0, apriltagRigResult]}
-            options={[]}
-            resources={resources}
           />
         </Card>
       )}
@@ -135,10 +136,8 @@ export const CalibrateBaseToCameraConfigurationVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraConfiguration"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(
-    CalibrateBaseToCameraConfigurationElement
-  ),
+  options: StandardComponentOptions,
+  Component: StandardComponent(CalibrateBaseToCameraConfigurationElement),
   Element: CalibrateBaseToCameraConfigurationElement,
   Form: CalibrateBaseToCameraConfigurationForm
 };

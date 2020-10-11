@@ -4,7 +4,10 @@ import {
   FormProps,
   SingleElementVisualizerProps
 } from "../../../registry/visualization";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import { CaptureCalibrationDatasetConfiguration } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
@@ -66,10 +69,8 @@ export const CaptureCalibrationDatasetConfigurationVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetConfiguration"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(
-    CaptureCalibrationDatasetConfigurationElement
-  ),
+  options: StandardComponentOptions,
+  Component: StandardComponent(CaptureCalibrationDatasetConfigurationElement),
   Element: CaptureCalibrationDatasetConfigurationElement,
   Form: CaptureCalibrationDatasetConfigurationForm
 };

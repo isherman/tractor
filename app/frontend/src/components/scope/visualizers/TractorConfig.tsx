@@ -4,7 +4,10 @@ import {
   FormProps,
   SingleElementVisualizerProps
 } from "../../../registry/visualization";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { Card } from "./Card";
 import { TractorConfig } from "../../../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { KeyValueTable } from "./KeyValueTable";
@@ -99,8 +102,7 @@ const TractorConfigElement: React.FC<SingleElementVisualizerProps<
   TractorConfig
 >> = (props) => {
   const {
-    value: [timestamp, value],
-    resources
+    value: [timestamp, value]
   } = props;
 
   return (
@@ -121,9 +123,8 @@ const TractorConfigElement: React.FC<SingleElementVisualizerProps<
         return (
           <Card key={title} title={title}>
             <NamedSE3PoseVisualizer.Element
+              {...props}
               value={[0, basePoseSensor]}
-              options={[]}
-              resources={resources}
             />
           </Card>
         );
@@ -135,8 +136,8 @@ const TractorConfigElement: React.FC<SingleElementVisualizerProps<
 export const TractorConfigVisualizer = {
   id: "TractorConfig",
   types: ["type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig"],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(TractorConfigElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(TractorConfigElement),
   Element: TractorConfigElement,
   Form: TractorConfigForm
 };

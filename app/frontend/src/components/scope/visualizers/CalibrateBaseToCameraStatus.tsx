@@ -7,7 +7,10 @@ import {
   CalibrateBaseToCameraResult,
   CalibrateBaseToCameraStatus
 } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { CalibrateBaseToCameraResultVisualizer } from "./CalibrateBaseToCameraResult";
 
 const CalibrateBaseToCameraStatusElement: React.FC<SingleElementVisualizerProps<
@@ -20,7 +23,7 @@ const CalibrateBaseToCameraStatusElement: React.FC<SingleElementVisualizerProps<
 
   const result = useFetchResource<CalibrateBaseToCameraResult>(
     value.result,
-    resources || undefined
+    resources
   );
 
   if (!result) {
@@ -30,9 +33,8 @@ const CalibrateBaseToCameraStatusElement: React.FC<SingleElementVisualizerProps<
   return (
     <Card timestamp={timestamp} json={value}>
       <CalibrateBaseToCameraResultVisualizer.Element
+        {...props}
         value={[0, result]}
-        options={[]}
-        resources={resources}
       />
     </Card>
   );
@@ -43,7 +45,7 @@ export const CalibrateBaseToCameraStatusVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraStatus"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(CalibrateBaseToCameraStatusElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(CalibrateBaseToCameraStatusElement),
   Element: CalibrateBaseToCameraStatusElement
 };

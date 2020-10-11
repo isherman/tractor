@@ -5,7 +5,10 @@ import {
   BaseToCameraModel,
   solverStatusToJSON
 } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { Card } from "./Card";
 import { KeyValueTable } from "./KeyValueTable";
 import { BaseToCameraInitializationVisualizer } from "./BaseToCameraInitialization";
@@ -56,7 +59,7 @@ const BaseToCameraModelElement: React.FC<SingleElementVisualizerProps<
 export const BaseToCameraModelVisualizer = {
   id: "BaseToCameraModel",
   types: ["type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraModel"],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(BaseToCameraModelElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(BaseToCameraModelElement),
   Element: BaseToCameraModelElement
 };

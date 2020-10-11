@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { CalibrateApriltagRigResult } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
 import {
   MonocularApriltagRigModel,
@@ -45,27 +48,24 @@ const CalibrateApriltagRigResultElement: React.FC<SingleElementVisualizerProps<
       {configuration && (
         <Card title="Configuration">
           <CalibrateApriltagRigConfigurationVisualizer.Element
+            {...props}
             value={[0, configuration]}
-            options={[]}
-            resources={resources}
           />
         </Card>
       )}
       {initial && (
         <Card title="Initial">
           <MonocularApriltagRigModelVisualizer.Element
+            {...props}
             value={[0, initial]}
-            options={[]}
-            resources={resources}
           />
         </Card>
       )}
       {solved && (
         <Card title="Solved">
           <MonocularApriltagRigModelVisualizer.Element
+            {...props}
             value={[0, solved]}
-            options={[]}
-            resources={resources}
           />
         </Card>
       )}
@@ -78,7 +78,7 @@ export const CalibrateApriltagRigResultVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigResult"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(CalibrateApriltagRigResultElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(CalibrateApriltagRigResultElement),
   Element: CalibrateApriltagRigResultElement
 };

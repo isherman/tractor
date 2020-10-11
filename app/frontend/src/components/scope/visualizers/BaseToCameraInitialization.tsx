@@ -12,7 +12,10 @@ import {
 import { CalibrationParameterVisualizer } from "./CalibrationParameter";
 import { CalibrationParameterTable } from "./CalibrationParameterTable";
 import { Card } from "./Card";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { ViewInitializationVisualizer } from "./ViewInitialization";
 
 const BaseToCameraInitializationForm: React.FC<FormProps<
@@ -75,8 +78,8 @@ export const BaseToCameraInitializationVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraInitialization"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(BaseToCameraInitializationElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(BaseToCameraInitializationElement),
   Element: BaseToCameraInitializationElement,
   Form: BaseToCameraInitializationForm
 };

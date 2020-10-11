@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import { CaptureCalibrationDatasetResult } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
@@ -11,8 +14,7 @@ const CaptureCalibrationDatasetResultElement: React.FC<SingleElementVisualizerPr
   CaptureCalibrationDatasetResult
 >> = (props) => {
   const {
-    value: [timestamp, value],
-    resources
+    value: [timestamp, value]
   } = props;
 
   const { configuration, numFrames, tagIds, stampEnd, dataset } = value;
@@ -33,9 +35,8 @@ const CaptureCalibrationDatasetResultElement: React.FC<SingleElementVisualizerPr
         <Card title="Configuration">
           {
             <CaptureCalibrationDatasetConfigurationVisualizer.Element
+              {...props}
               value={[0, configuration]}
-              options={[]}
-              resources={resources}
             />
           }
         </Card>
@@ -49,7 +50,7 @@ export const CaptureCalibrationDatasetResultVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(CaptureCalibrationDatasetResultElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(CaptureCalibrationDatasetResultElement),
   Element: CaptureCalibrationDatasetResultElement
 };

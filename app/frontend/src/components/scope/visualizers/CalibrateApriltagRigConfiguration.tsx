@@ -4,7 +4,10 @@ import {
   FormProps,
   SingleElementVisualizerProps
 } from "../../../registry/visualization";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import { CalibrateApriltagRigConfiguration } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { KeyValueTable } from "./KeyValueTable";
@@ -85,7 +88,7 @@ const CalibrateApriltagRigConfigurationElement: React.FC<SingleElementVisualizer
 
   const calibrationDataset = useFetchResource<CaptureCalibrationDatasetResult>(
     value.calibrationDataset,
-    resources || undefined
+    resources
   );
 
   return (
@@ -102,9 +105,8 @@ const CalibrateApriltagRigConfigurationElement: React.FC<SingleElementVisualizer
       {calibrationDataset && (
         <Card title="Calibration Dataset">
           <CaptureCalibrationDatasetResultVisualizer.Element
+            {...props}
             value={[0, calibrationDataset]}
-            options={[]}
-            resources={resources}
           />
         </Card>
       )}
@@ -117,10 +119,8 @@ export const CalibrateApriltagRigConfigurationVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigConfiguration"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(
-    CalibrateApriltagRigConfigurationElement
-  ),
+  options: StandardComponentOptions,
+  Component: StandardComponent(CalibrateApriltagRigConfigurationElement),
   Element: CalibrateApriltagRigConfigurationElement,
   Form: CalibrateApriltagRigConfigurationForm
 };

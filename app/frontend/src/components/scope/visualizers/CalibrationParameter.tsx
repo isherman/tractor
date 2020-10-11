@@ -3,7 +3,7 @@ import { CalibrationParameter } from "../../../../genproto/farm_ng_proto/tractor
 import { useFormState } from "../../../hooks/useFormState";
 import { FormProps } from "../../../registry/visualization";
 import FormGroup from "./FormGroup";
-import { LayoutOptions } from "./Layout";
+import { StandardComponentOptions } from "./StandardComponent";
 
 const CalibrationParameterForm: React.FC<FormProps<CalibrationParameter>> = (
   props
@@ -34,6 +34,6 @@ const CalibrationParameterForm: React.FC<FormProps<CalibrationParameter>> = (
 export const CalibrationParameterVisualizer = {
   id: "CalibrationParameter",
   types: ["type.googleapis.com/farm_ng_proto.tractor.v1.CalibrationParameter"],
-  options: LayoutOptions,
+  options: StandardComponentOptions,
   Form: CalibrationParameterForm
 };

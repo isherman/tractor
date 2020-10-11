@@ -2,7 +2,10 @@ import * as React from "react";
 import { ListGroup } from "react-bootstrap";
 import { Card } from "./Card";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 
 const JSONElement: React.FC<SingleElementVisualizerProps> = ({
   value: [timestamp, value]
@@ -21,7 +24,7 @@ const JSONElement: React.FC<SingleElementVisualizerProps> = ({
 export const JSONVisualizer = {
   id: "JSON",
   types: "*" as const,
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(JSONElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(JSONElement),
   Element: JSONElement
 };

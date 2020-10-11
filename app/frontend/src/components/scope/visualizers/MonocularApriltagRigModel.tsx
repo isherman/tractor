@@ -9,7 +9,10 @@ import {
 } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
 import { formatValue } from "../../../utils/formatValue";
 import { useState } from "react";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 import RangeSlider from "react-bootstrap-range-slider";
 import styles from "./MonocularApriltagRigModel.module.scss";
 import { Canvas } from "../../Canvas";
@@ -224,7 +227,7 @@ export const MonocularApriltagRigModelVisualizer = {
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.MonocularApriltagRigModel"
   ],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(MonocularApriltagRigModelElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(MonocularApriltagRigModelElement),
   Element: MonocularApriltagRigModelElement
 };

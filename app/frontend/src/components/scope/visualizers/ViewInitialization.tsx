@@ -15,7 +15,10 @@ import { CalibrationParameterVisualizer } from "./CalibrationParameter";
 import { CalibrationParameterTable } from "./CalibrationParameterTable";
 import FormGroup from "./FormGroup";
 import { KeyValueTable } from "./KeyValueTable";
-import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import {
+  StandardComponentOptions,
+  StandardComponent
+} from "./StandardComponent";
 
 const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
   props
@@ -83,8 +86,8 @@ const ViewInitializationElement: React.FC<SingleElementVisualizerProps<
 export const ViewInitializationVisualizer = {
   id: "ViewInitialization",
   types: ["type.googleapis.com/farm_ng_proto.tractor.v1.ViewInitialization"],
-  options: LayoutOptions,
-  Component: LayoutVisualizerComponent(ViewInitializationElement),
+  options: StandardComponentOptions,
+  Component: StandardComponent(ViewInitializationElement),
   Element: ViewInitializationElement,
   Form: ViewInitializationForm
 };
