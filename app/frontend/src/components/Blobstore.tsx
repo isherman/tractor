@@ -14,18 +14,18 @@ import "chonky/style/main.css";
 import { useEffect, useState } from "react";
 import { File } from "../../genproto/farm_ng_proto/tractor/v1/resource";
 import styles from "./Blobstore.module.scss";
-// import { TractorConfig } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { eventRegistry, EventType, EventTypeId } from "../registry/events";
 import { visualizersForEventType } from "../registry/visualization";
 import { Button } from "react-bootstrap";
 import { useStores } from "../hooks/useStores";
+import { useHistory, useParams } from "react-router-dom";
 
 const fileToFileData = (f: File): FileData => ({
   id: f.name,
   name: f.name,
   isDir: Boolean(f.directory),
   modDate: f.modificationTime,
-  size: parseInt((f.size as unknown) as string) // TODO: fix
+  size: parseInt((f.size as unknown) as string) // TODO: due to issues with ts-proto Long
 });
 
 const dirsToPath = (dirs: FileData[]): string =>
@@ -49,20 +49,6 @@ const bestGuessEventType = (
   return undefined;
 };
 
-// const exampleTractorConfig = TractorConfig.fromPartial({
-//   wheelRadius: 1,
-//   hubMotorGearRatio: 10.5,
-//   hubMotorPollPairs: 6,
-//   basePosesSensor: [
-//     {
-//       frameA: "base",
-//       frameB: "camera_left",
-//       aPoseB: { position: { x: 0.2, y: 1, z: 2.2 } }
-//     }
-//   ]
-// });
-// console.log(TractorConfig.toJSON(exampleTractorConfig));
-
 export const Blobstore: React.FC = () => {
   const [rootDir, setRootDir] = useState<FileData>();
   const [parentDirs, setParentDirs] = useState<FileData[]>([]);
@@ -74,8 +60,21 @@ export const Blobstore: React.FC = () => {
 
   const { baseUrl, httpResourceArchive } = useStores();
   const blobstoreUrl = `${baseUrl}/blobstore`;
+  const history = useHistory();
 
-  // Handle selected files
+  // Handle page load with nested URL
+  // TODO: Support back button
+  const { blobPath } = useParams<{ blobPath: string }>();
+  if (!rootDir && parentDirs.length === 0 && blobPath) {
+    const dirs = blobPath.split("/").map((path) => ({
+      id: path,
+      name: path,
+      isDir: true
+    }));
+    setParentDirs(dirs);
+  }
+
+  // Handle file selection
   useEffect(() => {
     const fetchSelected = async (): Promise<void> => {
       if (!selectedPath) {
@@ -100,6 +99,21 @@ export const Blobstore: React.FC = () => {
     fetchSelected();
   }, [selectedPath]);
 
+  // Fetch root directory
+  useEffect(() => {
+    const fetchRootDir = async (): Promise<void> => {
+      const response = await fetch(`${blobstoreUrl}/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/protobuf"
+        }
+      });
+      const file = File.decode(new Uint8Array(await response.arrayBuffer()));
+      setRootDir(fileToFileData(file));
+    };
+    fetchRootDir();
+  }, []);
+
   // Fetch current directory
   useEffect(() => {
     const fetchDir = async (): Promise<void> => {
@@ -112,12 +126,10 @@ export const Blobstore: React.FC = () => {
       });
       const file = File.decode(new Uint8Array(await response.arrayBuffer()));
       setCurrentDir(file);
-      if (!rootDir) {
-        setRootDir(fileToFileData(file));
-      }
     };
     fetchDir();
-  }, [rootDir, parentDirs]);
+    history.push(`/blobs/${dirsToPath(parentDirs)}`);
+  }, [parentDirs]);
 
   const handleFileAction = (action: FileAction, data: FileActionData): void => {
     // Triggered by double-click
@@ -144,11 +156,6 @@ export const Blobstore: React.FC = () => {
   const files = currentDir?.directory?.files.map<FileData>(fileToFileData);
   const visualizer =
     selectedEventType && visualizersForEventType(selectedEventType)[0];
-  console.log(
-    "ParentDirs: ",
-    parentDirs.map((_) => _.name)
-  );
-  console.log("All: ", [rootDir, ...parentDirs]);
 
   return (
     <div className={styles.container}>

@@ -58,7 +58,7 @@ export const App: React.FC = () => {
         <Route exact path="/map" component={Map} />
         <Route exact path="/programs" component={Programs} />
         <Route exact path="/scope" component={Scope} />
-        <Route exact path="/blobs" component={Blobstore} />
+        <Route path={["/blobs/:blobPath+", "/blobs"]} component={Blobstore} />
         <Route render={() => <p>Not found</p>} />
       </Switch>
     </div>
