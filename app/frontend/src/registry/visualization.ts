@@ -41,7 +41,7 @@ export interface VisualizerProps<T extends EventType = EventType> {
 
 export interface FormProps<T extends EventType = EventType> {
   initialValue: T;
-  onUpdate: (updated: T) => void;
+  onChange: (updated: T) => void;
 }
 
 export interface Visualizer<T extends EventType = EventType> {

@@ -16,7 +16,7 @@ import FormGroup from "./FormGroup";
 import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
 
 const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
-  const [value, update] = useFormState(props);
+  const [value, setValue] = useFormState(props);
 
   return (
     <>
@@ -25,7 +25,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.wheelBaseline}
         type="number"
         onChange={(e) =>
-          update((v) => ({ ...v, wheelBaseline: parseFloat(e.target.value) }))
+          setValue((v) => ({ ...v, wheelBaseline: parseFloat(e.target.value) }))
         }
       />
 
@@ -34,7 +34,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.wheelRadius}
         type="number"
         onChange={(e) =>
-          update((v) => ({ ...v, wheelRadius: parseFloat(e.target.value) }))
+          setValue((v) => ({ ...v, wheelRadius: parseFloat(e.target.value) }))
         }
       />
 
@@ -43,7 +43,10 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.wheelRadiusLeft}
         type="number"
         onChange={(e) =>
-          update((v) => ({ ...v, wheelRadiusLeft: parseFloat(e.target.value) }))
+          setValue((v) => ({
+            ...v,
+            wheelRadiusLeft: parseFloat(e.target.value)
+          }))
         }
       />
 
@@ -52,7 +55,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.wheelRadiusRight}
         type="number"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             wheelRadiusRight: parseFloat(e.target.value)
           }))
@@ -64,7 +67,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.hubMotorGearRatio}
         type="number"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             hubMotorGearRatio: parseFloat(e.target.value)
           }))
@@ -76,7 +79,10 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.hubMotorPollPairs}
         type="number"
         onChange={(e) =>
-          update((v) => ({ ...v, hubMotorPollPairs: parseInt(e.target.value) }))
+          setValue((v) => ({
+            ...v,
+            hubMotorPollPairs: parseInt(e.target.value)
+          }))
         }
       />
 
@@ -84,8 +90,8 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         <NamedSE3PoseVisualizer.Form
           key={basePoseSensor.frameA + basePoseSensor.frameB}
           initialValue={basePoseSensor}
-          onUpdate={(updated) =>
-            update((v) => ({
+          onChange={(updated) =>
+            setValue((v) => ({
               ...v,
               basePosesSensor: Object.assign([...v.basePosesSensor], {
                 [i]: updated

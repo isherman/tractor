@@ -61,7 +61,7 @@ const Component: React.FC = () => {
                     configuration ||
                     CalibrateApriltagRigConfiguration.fromPartial({})
                   }
-                  onUpdate={(updated) => setConfiguration(updated)}
+                  onChange={(updated) => setConfiguration(updated)}
                 />
                 <Button variant="primary" type="submit">
                   Submit

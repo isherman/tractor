@@ -2,25 +2,20 @@ import { useState, useEffect } from "react";
 
 interface IProps<T> {
   initialValue: T;
-  onUpdate: (updated: T) => void;
+  onChange: (updated: T) => void;
 }
 
-type IReturnValue<T> = [T, (updater: (c: T) => T) => void];
-
 export function useFormState<T>({
-  initialValue,
-  onUpdate
-}: IProps<T>): IReturnValue<T> {
+  initialValue, // initial value for `value`
+  onChange // automatically invoked whenever `value` changes
+}: IProps<T>): [T, (updater: (c: T) => T) => void] {
   const [value, setValue] = useState(initialValue);
+
   useEffect(() => {
     if (value) {
-      onUpdate(value);
+      onChange(value);
     }
   }, [value]);
 
-  const updateValue = (updater: (c: T) => T): void => {
-    setValue(updater(value));
-  };
-
-  return [value, updateValue];
+  return [value, setValue];
 }

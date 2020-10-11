@@ -62,7 +62,7 @@ const Component: React.FC = () => {
                     configuration ||
                     CaptureCalibrationDatasetConfiguration.fromPartial({})
                   }
-                  onUpdate={(updated) => setConfiguration(updated)}
+                  onChange={(updated) => setConfiguration(updated)}
                 />
                 <Button variant="primary" type="submit">
                   Submit

@@ -23,23 +23,23 @@ import {
 const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
   props
 ) => {
-  const [value, update] = useFormState(props);
+  const [value, setValue] = useFormState(props);
   return (
     <>
       <h6>X</h6>
       <CalibrationParameterVisualizer.Form
         initialValue={value.x || CalibrationParameter.fromPartial({})}
-        onUpdate={(updated) => update((v) => ({ ...v, x: updated }))}
+        onChange={(updated) => setValue((v) => ({ ...v, x: updated }))}
       />
       <h6>Y</h6>
       <CalibrationParameterVisualizer.Form
         initialValue={value.y || CalibrationParameter.fromPartial({})}
-        onUpdate={(updated) => update((v) => ({ ...v, y: updated }))}
+        onChange={(updated) => setValue((v) => ({ ...v, y: updated }))}
       />
       <h6>Z</h6>
       <CalibrationParameterVisualizer.Form
         initialValue={value.z || CalibrationParameter.fromPartial({})}
-        onUpdate={(updated) => update((v) => ({ ...v, z: updated }))}
+        onChange={(updated) => setValue((v) => ({ ...v, z: updated }))}
       />
 
       <FormGroup
@@ -47,7 +47,7 @@ const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
         value={value.viewDirection}
         as="select"
         onChange={(e) =>
-          update((v) => ({ ...v, viewDirection: parseInt(e.target.value) }))
+          setValue((v) => ({ ...v, viewDirection: parseInt(e.target.value) }))
         }
       >
         {enumNumericKeys(ViewDirection)

@@ -23,7 +23,7 @@ CaptureCalibrationDatasetResultVisualizer.Element;
 const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
   CalibrateApriltagRigConfiguration
 >> = (props) => {
-  const [value, update] = useFormState(props);
+  const [value, setValue] = useFormState(props);
 
   return (
     <>
@@ -33,7 +33,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         value={value.calibrationDataset?.path}
         type="text"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             calibrationDataset: Resource.fromPartial({
               path: e.target.value,
@@ -50,7 +50,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         value={value.tagIds.join(", ")}
         type="text"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             tagIds: e.target.value.split(", ").map((_) => parseInt(_.trim()))
           }))
@@ -61,7 +61,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         label="Name"
         value={value.name}
         type="text"
-        onChange={(e) => update((v) => ({ ...v, name: e.target.value }))}
+        onChange={(e) => setValue((v) => ({ ...v, name: e.target.value }))}
       />
 
       <FormGroup
@@ -69,7 +69,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         value={value.rootTagId}
         type="number"
         onChange={(e) =>
-          update((v) => ({ ...v, rootTagId: parseInt(e.target.value) }))
+          setValue((v) => ({ ...v, rootTagId: parseInt(e.target.value) }))
         }
       />
     </>

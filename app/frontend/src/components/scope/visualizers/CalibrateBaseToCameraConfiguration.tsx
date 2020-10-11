@@ -25,7 +25,7 @@ import { BaseToCameraInitializationVisualizer } from "./BaseToCameraInitializati
 const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
   CalibrateBaseToCameraConfiguration
 >> = (props) => {
-  const [value, update] = useFormState(props);
+  const [value, setValue] = useFormState(props);
   return (
     <>
       <FormGroup
@@ -34,7 +34,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         value={value.calibrationDataset?.path}
         type="text"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             calibrationDataset: Resource.fromPartial({
               path: e.target.value,
@@ -51,7 +51,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         value={value.apriltagRigResult?.path}
         type="text"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             apriltagRigResult: Resource.fromPartial({
               path: e.target.value,
@@ -66,8 +66,8 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         initialValue={
           value.initialization || BaseToCameraInitialization.fromPartial({})
         }
-        onUpdate={(updated) =>
-          update((v) => ({ ...v, initialization: updated }))
+        onChange={(updated) =>
+          setValue((v) => ({ ...v, initialization: updated }))
         }
       />
 
@@ -75,7 +75,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         label="Name"
         value={value.name}
         type="text"
-        onChange={(e) => update((v) => ({ ...v, name: e.target.value }))}
+        onChange={(e) => setValue((v) => ({ ...v, name: e.target.value }))}
       />
     </>
   );

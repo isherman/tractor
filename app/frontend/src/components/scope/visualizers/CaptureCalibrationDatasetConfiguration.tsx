@@ -17,7 +17,7 @@ import FormGroup from "./FormGroup";
 const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
   CaptureCalibrationDatasetConfiguration
 >> = (props) => {
-  const [value, update] = useFormState(props);
+  const [value, setValue] = useFormState(props);
 
   return (
     <>
@@ -26,7 +26,7 @@ const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
         value={value.numFrames}
         type="number"
         onChange={(e) =>
-          update((v) => ({ ...v, numFrames: parseInt(e.target.value) }))
+          setValue((v) => ({ ...v, numFrames: parseInt(e.target.value) }))
         }
       />
 
@@ -35,7 +35,7 @@ const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
         value={value.name}
         description="A name for the dataset, used to name the output archive."
         type="text"
-        onChange={(e) => update((v) => ({ ...v, name: e.target.value }))}
+        onChange={(e) => setValue((v) => ({ ...v, name: e.target.value }))}
       />
     </>
   );

@@ -51,7 +51,7 @@ const Component: React.FC = () => {
                 configuration ||
                 CalibrateBaseToCameraConfiguration.fromPartial({})
               }
-              onUpdate={(updated) => setConfiguration(updated)}
+              onChange={(updated) => setConfiguration(updated)}
             />
 
             <Button variant="primary" type="submit">

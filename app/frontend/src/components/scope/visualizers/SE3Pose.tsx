@@ -14,7 +14,7 @@ import { useFormState } from "../../../hooks/useFormState";
 import FormGroup from "./FormGroup";
 
 const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
-  const [value, update] = useFormState(props);
+  const [value, setValue] = useFormState(props);
   return (
     <>
       <FormGroup
@@ -22,7 +22,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.position?.x}
         type="number"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             position: { ...v.position, x: parseFloat(e.target.value) } as Vec3
           }))
@@ -33,7 +33,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.position?.x}
         type="number"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             position: { ...v.position, y: parseFloat(e.target.value) } as Vec3
           }))
@@ -44,7 +44,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.position?.z}
         type="number"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             position: { ...v.position, z: parseFloat(e.target.value) } as Vec3
           }))
@@ -56,7 +56,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.rotation?.x}
         type="number"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
@@ -71,7 +71,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.rotation?.y}
         type="number"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
@@ -86,7 +86,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.rotation?.z}
         type="number"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
@@ -101,7 +101,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.rotation?.w}
         type="number"
         onChange={(e) =>
-          update((v) => ({
+          setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,

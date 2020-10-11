@@ -8,7 +8,7 @@ import { StandardComponentOptions } from "./StandardComponent";
 const CalibrationParameterForm: React.FC<FormProps<CalibrationParameter>> = (
   props
 ) => {
-  const [value, update] = useFormState(props);
+  const [value, setValue] = useFormState(props);
   return (
     <>
       <FormGroup
@@ -16,7 +16,7 @@ const CalibrationParameterForm: React.FC<FormProps<CalibrationParameter>> = (
         value={value.value}
         type="number"
         onChange={(e) =>
-          update((v) => ({ ...v, value: parseFloat(e.target.value) }))
+          setValue((v) => ({ ...v, value: parseFloat(e.target.value) }))
         }
       />
       <FormGroup
@@ -24,7 +24,7 @@ const CalibrationParameterForm: React.FC<FormProps<CalibrationParameter>> = (
         checked={value.constant}
         type="checkbox"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          update((v) => ({ ...v, constant: Boolean(e.target.checked) }))
+          setValue((v) => ({ ...v, constant: Boolean(e.target.checked) }))
         }
       />
     </>

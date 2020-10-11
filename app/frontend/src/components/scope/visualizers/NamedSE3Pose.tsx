@@ -20,25 +20,25 @@ import FormGroup from "./FormGroup";
 import { SE3PoseVisualizer } from "./SE3Pose";
 
 const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
-  const [value, update] = useFormState(props);
+  const [value, setValue] = useFormState(props);
   return (
     <>
       <FormGroup
         label="Frame A"
         value={value.frameA}
         type="text"
-        onChange={(e) => update((v) => ({ ...v, frameA: e.target.value }))}
+        onChange={(e) => setValue((v) => ({ ...v, frameA: e.target.value }))}
       />
       <FormGroup
         label="Frame B"
         value={value.frameB}
         type="text"
-        onChange={(e) => update((v) => ({ ...v, frameB: e.target.value }))}
+        onChange={(e) => setValue((v) => ({ ...v, frameB: e.target.value }))}
       />
 
       <SE3PoseVisualizer.Form
         initialValue={value.aPoseB || SE3Pose.fromJSON({})}
-        onUpdate={(updated) => update((v) => ({ ...v, aPoseB: updated }))}
+        onChange={(updated) => setValue((v) => ({ ...v, aPoseB: updated }))}
       />
     </>
   );

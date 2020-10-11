@@ -21,7 +21,7 @@ import { ViewInitializationVisualizer } from "./ViewInitialization";
 const BaseToCameraInitializationForm: React.FC<FormProps<
   BaseToCameraInitialization
 >> = (props) => {
-  const [value, update] = useFormState(props);
+  const [value, setValue] = useFormState(props);
   return (
     <>
       <h6>Wheel Baseline</h6>
@@ -29,21 +29,23 @@ const BaseToCameraInitializationForm: React.FC<FormProps<
         initialValue={
           value.wheelBaseline || CalibrationParameter.fromPartial({})
         }
-        onUpdate={(updated) =>
-          update((v) => ({ ...v, wheelBaseline: updated }))
+        onChange={(updated) =>
+          setValue((v) => ({ ...v, wheelBaseline: updated }))
         }
       />
       <h6>Wheel Radius</h6>
       <CalibrationParameterVisualizer.Form
         initialValue={value.wheelRadius || CalibrationParameter.fromPartial({})}
-        onUpdate={(updated) => update((v) => ({ ...v, wheelRadius: updated }))}
+        onChange={(updated) =>
+          setValue((v) => ({ ...v, wheelRadius: updated }))
+        }
       />
       <ViewInitializationVisualizer.Form
         initialValue={
           value.basePoseCamera || ViewInitialization.fromPartial({})
         }
-        onUpdate={(updated) =>
-          update((v) => ({ ...v, basePoseCamera: updated }))
+        onChange={(updated) =>
+          setValue((v) => ({ ...v, basePoseCamera: updated }))
         }
       />
     </>
