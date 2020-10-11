@@ -11,14 +11,14 @@ import { Icon } from "../../Icon";
 import { Button } from "react-bootstrap";
 
 export interface IProps<T extends EventType> {
-  element: React.FC<SingleElementVisualizerProps<T>>;
+  Element: React.FC<SingleElementVisualizerProps<T>>;
 }
 export type OverlayProps<T extends EventType> = IProps<T> & VisualizerProps<T>;
 
 export const Overlay = <T extends EventType>(
   props: OverlayProps<T>
 ): React.ReactElement<OverlayProps<T>> | null => {
-  const { element: Component, values } = props;
+  const { Element, values } = props;
 
   const [index, setIndex] = useState(0);
   const [pinned, setPinned] = useState(true);
@@ -61,7 +61,15 @@ export const Overlay = <T extends EventType>(
           <Icon id="chevronBarRight" />
         </Button>
       </div>
-      <Component value={value} {...props} />
+      <Element value={value} {...props} />
     </div>
   );
 };
+
+export const OverlayVisualizerComponent = <T extends EventType>(
+  Element: React.FC<SingleElementVisualizerProps<T>>
+): React.FC<VisualizerProps<T>> => (props) => {
+  return <Overlay Element={Element} {...props} />;
+};
+
+export const OverlayOptions = [];

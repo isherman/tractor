@@ -1,17 +1,12 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { Card } from "react-bootstrap";
-import styles from "./NamedSE3PoseVisualizer.module.scss";
+import styles from "./NamedSE3Pose.module.scss";
 import {
   FormProps,
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
+  SingleElementVisualizerProps
 } from "../../../registry/visualization";
 import { formatValue } from "../../../utils/formatValue";
-import { EventTypeId } from "../../../registry/events";
 import { JsonPopover } from "../../JsonPopover";
 import {
   NamedSE3Pose,
@@ -21,13 +16,13 @@ import { Controls } from "../../Controls";
 import { Ground } from "../../Ground";
 import { Lights } from "../../Lights";
 import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
-import { Overlay } from "./Overlay";
+import { OverlayOptions, OverlayVisualizerComponent } from "./Overlay";
 import { Canvas } from "../../Canvas";
 import { useFormState } from "../../../hooks/useFormState";
 import FormGroup from "./FormGroup";
-import { SE3PoseForm } from "./SE3Pose";
+import { SE3PoseVisualizer } from "./SE3Pose";
 
-export const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
+const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
   const [value, update] = useFormState(props);
   return (
     <>
@@ -44,7 +39,7 @@ export const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
         onChange={(e) => update((v) => ({ ...v, frameB: e.target.value }))}
       />
 
-      <SE3PoseForm
+      <SE3PoseVisualizer.Form
         initialValue={value.aPoseB || SE3Pose.fromJSON({})}
         onUpdate={(updated) => update((v) => ({ ...v, aPoseB: updated }))}
       />
@@ -52,7 +47,7 @@ export const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
   );
 };
 
-export const NamedSE3PoseElement: React.FC<SingleElementVisualizerProps<
+const NamedSE3PoseElement: React.FC<SingleElementVisualizerProps<
   NamedSE3Pose
 >> = ({ value: [timestamp, value] }) => {
   return (
@@ -77,15 +72,11 @@ export const NamedSE3PoseElement: React.FC<SingleElementVisualizerProps<
   );
 };
 
-export class NamedSE3PoseVisualizer implements Visualizer<NamedSE3Pose> {
-  static id: VisualizerId = "namedSE3Pose";
-  types: EventTypeId[] = [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose"
-  ];
-
-  options: VisualizerOptionConfig[] = [];
-
-  component: React.FC<VisualizerProps<NamedSE3Pose>> = (props) => {
-    return <Overlay element={NamedSE3PoseElement} {...props} />;
-  };
-}
+export const NamedSE3PoseVisualizer = {
+  id: "NamedSE3Pose",
+  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose"],
+  options: OverlayOptions,
+  Component: OverlayVisualizerComponent(NamedSE3PoseElement),
+  Element: NamedSE3PoseElement,
+  Form: NamedSE3PoseForm
+};

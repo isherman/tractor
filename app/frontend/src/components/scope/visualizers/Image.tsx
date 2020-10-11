@@ -1,22 +1,15 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { Card } from "react-bootstrap";
-import {
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
-} from "../../../registry/visualization";
+import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { Image } from "../../../../genproto/farm_ng_proto/tractor/v1/image";
 import { formatValue } from "../../../utils/formatValue";
-import { EventTypeId } from "../../../registry/events";
 import { useEffect, useState } from "react";
-import { Layout } from "./Layout";
+import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 import { JsonPopover } from "../../JsonPopover";
-import styles from "./ImageVisualizer.module.scss";
+import styles from "./Image.module.scss";
 
-export const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = ({
+const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = ({
   value: [timestamp, value],
   resources
 }) => {
@@ -49,16 +42,10 @@ export const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = ({
   );
 };
 
-export class ImageVisualizer implements Visualizer<Image> {
-  static id: VisualizerId = "image";
-  types: EventTypeId[] = ["type.googleapis.com/farm_ng_proto.tractor.v1.Image"];
-
-  options: VisualizerOptionConfig[] = [
-    { label: "view", options: ["overlay", "grid"] }
-  ];
-
-  component: React.FC<VisualizerProps<Image>> = (props) => {
-    const view = props.options[0].value as "overlay" | "grid";
-    return <Layout view={view} element={ImageElement} {...props} />;
-  };
-}
+export const ImageVisualizer = {
+  id: "Image",
+  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.Image"],
+  options: LayoutOptions,
+  Component: LayoutVisualizerComponent(ImageElement),
+  Element: ImageElement
+};

@@ -2,23 +2,15 @@
 import * as React from "react";
 import {
   FormProps,
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
+  SingleElementVisualizerProps
 } from "../../../registry/visualization";
-import { EventTypeId } from "../../../registry/events";
-import { Layout } from "./Layout";
+import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 import { Card } from "./Card";
 import { TractorConfig } from "../../../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { KeyValueTable } from "./KeyValueTable";
-import {
-  NamedSE3PoseElement,
-  NamedSE3PoseForm
-} from "./NamedSE3PoseVisualizer";
 import { useFormState } from "../../../hooks/useFormState";
 import FormGroup from "./FormGroup";
+import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
 
 const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
   const [value, update] = useFormState(props);
@@ -86,7 +78,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
       />
 
       {value.basePosesSensor.map((basePoseSensor, i) => (
-        <NamedSE3PoseForm
+        <NamedSE3PoseVisualizer.Form
           key={basePoseSensor.frameA + basePoseSensor.frameB}
           initialValue={basePoseSensor}
           onUpdate={(updated) =>
@@ -103,7 +95,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
   );
 };
 
-export const TractorConfigElement: React.FC<SingleElementVisualizerProps<
+const TractorConfigElement: React.FC<SingleElementVisualizerProps<
   TractorConfig
 >> = (props) => {
   const {
@@ -128,7 +120,7 @@ export const TractorConfigElement: React.FC<SingleElementVisualizerProps<
         const title = `${basePoseSensor.frameA}_pose_${basePoseSensor.frameB}`;
         return (
           <Card key={title} title={title}>
-            <NamedSE3PoseElement
+            <NamedSE3PoseVisualizer.Element
               value={[0, basePoseSensor]}
               options={[]}
               resources={resources}
@@ -140,20 +132,11 @@ export const TractorConfigElement: React.FC<SingleElementVisualizerProps<
   );
 };
 
-export class TractorConfigVisualizer implements Visualizer<TractorConfig> {
-  static id: VisualizerId = "tractorConfig";
-  types: EventTypeId[] = [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig"
-  ];
-
-  options: VisualizerOptionConfig[] = [
-    { label: "view", options: ["overlay", "grid"] }
-  ];
-
-  component: React.FC<VisualizerProps<TractorConfig>> = (props) => {
-    const view = props.options[0].value as "overlay" | "grid";
-    return <Layout view={view} element={TractorConfigElement} {...props} />;
-  };
-
-  form = TractorConfigForm;
-}
+export const TractorConfigVisualizer = {
+  id: "TractorConfig",
+  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig"],
+  options: LayoutOptions,
+  Component: LayoutVisualizerComponent(TractorConfigElement),
+  Element: TractorConfigElement,
+  Form: TractorConfigForm
+};

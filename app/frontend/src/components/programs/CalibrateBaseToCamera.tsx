@@ -15,7 +15,7 @@ import {
 } from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
 
 import { toJS } from "mobx";
-import { CalibrateBaseToCameraConfigurationForm } from "../scope/visualizers/CalibrateBaseToCameraConfiguration";
+import { CalibrateBaseToCameraConfigurationVisualizer } from "../scope/visualizers/CalibrateBaseToCameraConfiguration";
 
 const programId = "calibrate_base_to_camera";
 
@@ -48,7 +48,7 @@ const Component: React.FC = () => {
       <div>
         <ProgramForm>
           <Form onSubmit={handleConfigurationSubmit}>
-            <CalibrateBaseToCameraConfigurationForm
+            <CalibrateBaseToCameraConfigurationVisualizer.Form
               initialValue={
                 configuration ||
                 CalibrateBaseToCameraConfiguration.fromPartial({})
@@ -85,7 +85,7 @@ const Component: React.FC = () => {
           eventLog={store.eventLog}
           selectedEntry={store.selectedEntry}
           onSelectEntry={(e) => (store.selectedEntry = e)}
-          visualizer={store.visualizer?.component || null}
+          visualizer={store.visualizer?.Component || null}
           resources={store.resourceArchive}
         />
       </div>

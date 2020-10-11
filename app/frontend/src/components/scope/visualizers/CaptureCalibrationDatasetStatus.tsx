@@ -1,14 +1,7 @@
 /* eslint-disable no-console */
 import * as React from "react";
-import {
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
-} from "../../../registry/visualization";
-import { EventTypeId } from "../../../registry/events";
-import { Layout } from "./Layout";
+import { SingleElementVisualizerProps } from "../../../registry/visualization";
+import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import {
@@ -16,7 +9,7 @@ import {
   CaptureCalibrationDatasetStatus
 } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { useFetchResource } from "../../../hooks/useFetchResource";
-import { CaptureCalibrationDatasetResultElement } from "./CaptureCalibrationDatasetResult";
+import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
 
 export const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisualizerProps<
   CaptureCalibrationDatasetStatus
@@ -45,7 +38,7 @@ export const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisua
       {result && (
         <Card title="Result">
           {
-            <CaptureCalibrationDatasetResultElement
+            <CaptureCalibrationDatasetResultVisualizer.Element
               value={[0, result]}
               options={[]}
               resources={resources}
@@ -57,27 +50,12 @@ export const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisua
   );
 };
 
-export class CaptureCalibrationDatasetStatusVisualizer
-  implements Visualizer<CaptureCalibrationDatasetStatus> {
-  static id: VisualizerId = "captureCalibrationDatasetStatus";
-  types: EventTypeId[] = [
+export const CaptureCalibrationDatasetStatusVisualizer = {
+  id: "CaptureCalibrationDatasetStatus",
+  types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetStatus"
-  ];
-
-  options: VisualizerOptionConfig[] = [
-    { label: "view", options: ["overlay", "grid"] }
-  ];
-
-  component: React.FC<VisualizerProps<CaptureCalibrationDatasetStatus>> = (
-    props
-  ) => {
-    const view = props.options[0].value as "overlay" | "grid";
-    return (
-      <Layout
-        view={view}
-        element={CaptureCalibrationDatasetStatusElement}
-        {...props}
-      />
-    );
-  };
-}
+  ],
+  options: LayoutOptions,
+  Component: LayoutVisualizerComponent(CaptureCalibrationDatasetStatusElement),
+  Element: CaptureCalibrationDatasetStatusElement
+};

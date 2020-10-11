@@ -1,16 +1,9 @@
 import * as React from "react";
 import { Card, ListGroup } from "react-bootstrap";
 import styles from "./JSONVisualizer.module.scss";
-import {
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
-} from "../../../registry/visualization";
-import { EventType } from "../../../registry/events";
+import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { formatValue } from "../../../utils/formatValue";
-import { Layout } from "./Layout";
+import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 
 const JSONElement: React.FC<SingleElementVisualizerProps> = ({
   value: [timestamp, value]
@@ -31,16 +24,10 @@ const JSONElement: React.FC<SingleElementVisualizerProps> = ({
   );
 };
 
-export class JSONVisualizer implements Visualizer {
-  static id: VisualizerId = "json";
-  types = "*" as const;
-
-  options: VisualizerOptionConfig[] = [
-    { label: "view", options: ["overlay", "grid"] }
-  ];
-
-  component: React.FC<VisualizerProps<EventType>> = (props) => {
-    const viewOption = props.options[0].value as "overlay" | "grid";
-    return <Layout view={viewOption} element={JSONElement} {...props} />;
-  };
-}
+export const JSONVisualizer = {
+  id: "json",
+  types: "*" as const,
+  options: LayoutOptions,
+  Component: LayoutVisualizerComponent(JSONElement),
+  Element: JSONElement
+};

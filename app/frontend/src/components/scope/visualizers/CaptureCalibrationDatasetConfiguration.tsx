@@ -2,21 +2,16 @@
 import * as React from "react";
 import {
   FormProps,
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
+  SingleElementVisualizerProps
 } from "../../../registry/visualization";
-import { EventTypeId } from "../../../registry/events";
-import { Layout } from "./Layout";
+import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import { CaptureCalibrationDatasetConfiguration } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { useFormState } from "../../../hooks/useFormState";
 import FormGroup from "./FormGroup";
 
-export const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
+const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
   CaptureCalibrationDatasetConfiguration
 >> = (props) => {
   const [value, update] = useFormState(props);
@@ -43,7 +38,7 @@ export const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
   );
 };
 
-export const CaptureCalibrationDatasetConfigurationElement: React.FC<SingleElementVisualizerProps<
+const CaptureCalibrationDatasetConfigurationElement: React.FC<SingleElementVisualizerProps<
   CaptureCalibrationDatasetConfiguration
 >> = (props) => {
   const {
@@ -66,27 +61,15 @@ export const CaptureCalibrationDatasetConfigurationElement: React.FC<SingleEleme
   );
 };
 
-export class CaptureCalibrationDatasetConfigurationVisualizer
-  implements Visualizer<CaptureCalibrationDatasetConfiguration> {
-  static id: VisualizerId = "captureCalibrationDatasetConfiguration";
-  types: EventTypeId[] = [
+export const CaptureCalibrationDatasetConfigurationVisualizer = {
+  id: "CaptureCalibrationDatasetConfiguration",
+  types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetConfiguration"
-  ];
-
-  options: VisualizerOptionConfig[] = [
-    { label: "view", options: ["overlay", "grid"] }
-  ];
-
-  component: React.FC<
-    VisualizerProps<CaptureCalibrationDatasetConfiguration>
-  > = (props) => {
-    const view = props.options[0].value as "overlay" | "grid";
-    return (
-      <Layout
-        view={view}
-        element={CaptureCalibrationDatasetConfigurationElement}
-        {...props}
-      />
-    );
-  };
-}
+  ],
+  options: LayoutOptions,
+  Component: LayoutVisualizerComponent(
+    CaptureCalibrationDatasetConfigurationElement
+  ),
+  Element: CaptureCalibrationDatasetConfigurationElement,
+  Form: CaptureCalibrationDatasetConfigurationForm
+};

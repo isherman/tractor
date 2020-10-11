@@ -167,16 +167,16 @@ export const Blobstore: React.FC = () => {
         {!isEditing && selectedResource && (
           <>
             {visualizer &&
-              React.createElement(visualizer.component, {
+              React.createElement(visualizer.Component, {
                 values: [[0, selectedResource]],
                 options: [{ label: "", options: [], value: "overlay" }],
                 resources: httpResourceArchive
               })}
           </>
         )}
-        {isEditing && selectedResource && visualizer?.form && (
+        {isEditing && selectedResource && visualizer?.Form && (
           <>
-            {React.createElement(visualizer.form, {
+            {React.createElement(visualizer.Form, {
               initialValue: selectedResource,
               onUpdate: (updated) => console.log("Updated: ", updated)
             })}

@@ -1,23 +1,16 @@
 /* eslint-disable no-console */
 import * as React from "react";
-import {
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
-} from "../../../registry/visualization";
+import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import {
   BaseToCameraModel,
   solverStatusToJSON
 } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
-import { Layout } from "./Layout";
+import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 import { Card } from "./Card";
 import { KeyValueTable } from "./KeyValueTable";
-import { EventTypeId } from "../../../registry/events";
 import { BaseToCameraInitializationTable } from "./BaseToCameraInitializationTable";
 
-export const BaseToCameraModelElement: React.FC<SingleElementVisualizerProps<
+const BaseToCameraModelElement: React.FC<SingleElementVisualizerProps<
   BaseToCameraModel
 >> = (props) => {
   const {
@@ -58,19 +51,10 @@ export const BaseToCameraModelElement: React.FC<SingleElementVisualizerProps<
   );
 };
 
-export class BaseToCameraModelVisualizer
-  implements Visualizer<BaseToCameraModel> {
-  static id: VisualizerId = "baseToCameraModel";
-  types: EventTypeId[] = [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraModel"
-  ];
-
-  options: VisualizerOptionConfig[] = [
-    { label: "view", options: ["overlay", "grid"] }
-  ];
-
-  component: React.FC<VisualizerProps<BaseToCameraModel>> = (props) => {
-    const view = props.options[0].value as "overlay" | "grid";
-    return <Layout view={view} element={BaseToCameraModelElement} {...props} />;
-  };
-}
+export const BaseToCameraModelVisualizer = {
+  id: "baseToCameraModel",
+  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraModel"],
+  options: LayoutOptions,
+  Component: LayoutVisualizerComponent(BaseToCameraModelElement),
+  Element: BaseToCameraModelElement
+};

@@ -13,7 +13,7 @@ import {
 } from "../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { ProgramLogVisualizer } from "./ProgramLogVisualizer";
 import { ProgramForm } from "./ProgramForm";
-import { CaptureCalibrationDatasetConfigurationForm } from "../scope/visualizers/CaptureCalibrationDatasetConfiguration";
+import { CaptureCalibrationDatasetConfigurationVisualizer } from "../scope/visualizers/CaptureCalibrationDatasetConfiguration";
 
 const programId = "capture_calibration_dataset";
 
@@ -59,7 +59,7 @@ const Component: React.FC = () => {
           <div>
             <ProgramForm>
               <Form onSubmit={handleConfigurationSubmit}>
-                <CaptureCalibrationDatasetConfigurationForm
+                <CaptureCalibrationDatasetConfigurationVisualizer.Form
                   initialValue={
                     configuration ||
                     CaptureCalibrationDatasetConfiguration.fromPartial({})
@@ -78,7 +78,7 @@ const Component: React.FC = () => {
           eventLog={store.eventLog}
           selectedEntry={store.selectedEntry}
           onSelectEntry={(e) => (store.selectedEntry = e)}
-          visualizer={store.visualizer?.component || null}
+          visualizer={store.visualizer?.Component || null}
           resources={store.resourceArchive}
         />
       </div>

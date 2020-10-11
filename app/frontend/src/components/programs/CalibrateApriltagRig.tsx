@@ -13,7 +13,7 @@ import {
   CalibrateApriltagRigConfiguration as Configuration,
   CalibrateApriltagRigStatus as Status
 } from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
-import { CalibrateApriltagRigConfigurationForm } from "../scope/visualizers/CalibrateApriltagRigConfiguration";
+import { CalibrateApriltagRigConfigurationVisualizer } from "../scope/visualizers/CalibrateApriltagRigConfiguration";
 
 const programId = "calibrate_apriltag_rig";
 
@@ -58,7 +58,7 @@ const Component: React.FC = () => {
           <div>
             <ProgramForm>
               <Form onSubmit={handleConfigurationSubmit}>
-                <CalibrateApriltagRigConfigurationForm
+                <CalibrateApriltagRigConfigurationVisualizer.Form
                   initialValue={
                     configuration ||
                     CalibrateApriltagRigConfiguration.fromPartial({})
@@ -77,7 +77,7 @@ const Component: React.FC = () => {
           eventLog={store.eventLog}
           selectedEntry={store.selectedEntry}
           onSelectEntry={(e) => (store.selectedEntry = e)}
-          visualizer={store.visualizer?.component || null}
+          visualizer={store.visualizer?.Component || null}
           resources={store.resourceArchive}
         />
       </div>

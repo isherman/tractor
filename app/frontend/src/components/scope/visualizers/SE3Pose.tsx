@@ -2,23 +2,18 @@
 import * as React from "react";
 import {
   FormProps,
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
+  SingleElementVisualizerProps
 } from "../../../registry/visualization";
-import { EventTypeId } from "../../../registry/events";
 import {
   Quaternion,
   SE3Pose,
   Vec3
 } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
-import { Overlay } from "./Overlay";
+import { OverlayOptions, OverlayVisualizerComponent } from "./Overlay";
 import { useFormState } from "../../../hooks/useFormState";
 import FormGroup from "./FormGroup";
 
-export const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
+const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
   const [value, update] = useFormState(props);
   return (
     <>
@@ -119,21 +114,15 @@ export const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
   );
 };
 
-export const SE3PoseElement: React.FC<SingleElementVisualizerProps<
-  SE3Pose
->> = () => {
+const SE3PoseElement: React.FC<SingleElementVisualizerProps<SE3Pose>> = () => {
   return <p>TODO</p>;
 };
 
-export class SE3PoseVisualizer implements Visualizer<SE3Pose> {
-  static id: VisualizerId = "SE3Pose";
-  types: EventTypeId[] = [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.SE3Pose"
-  ];
-
-  options: VisualizerOptionConfig[] = [];
-
-  component: React.FC<VisualizerProps<SE3Pose>> = (props) => {
-    return <Overlay element={SE3PoseElement} {...props} />;
-  };
-}
+export const SE3PoseVisualizer = {
+  id: "SE3Pose",
+  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.SE3Pose"],
+  options: OverlayOptions,
+  Component: OverlayVisualizerComponent(SE3PoseElement),
+  Element: SE3PoseElement,
+  Form: SE3PoseForm
+};

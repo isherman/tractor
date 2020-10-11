@@ -2,23 +2,16 @@
 import * as React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Card } from "react-bootstrap";
-import styles from "./ApriltagDetectionsVisualizer.module.scss";
-import {
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
-} from "../../../registry/visualization";
+import styles from "./ApriltagDetections.module.scss";
+import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { formatValue } from "../../../utils/formatValue";
 import { ApriltagDetections } from "../../../../genproto/farm_ng_proto/tractor/v1/apriltag";
-import { EventTypeId } from "../../../registry/events";
 import { autorun } from "mobx";
 import { drawAprilTagDetections } from "../../../utils/drawApriltagDetections";
 import { JsonPopover } from "../../JsonPopover";
-import { Layout } from "./Layout";
+import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 
-export const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
+const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
   ApriltagDetections
 >> = ({ value: [timestamp, value], resources }) => {
   const [imgSrc, setImgSrc] = useState<string | null>(null);
@@ -99,21 +92,10 @@ export const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
   );
 };
 
-export class ApriltagDetectionsVisualizer
-  implements Visualizer<ApriltagDetections> {
-  static id: VisualizerId = "apriltagDetections";
-  types: EventTypeId[] = [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections"
-  ];
-
-  options: VisualizerOptionConfig[] = [
-    { label: "view", options: ["overlay", "grid"] }
-  ];
-
-  component: React.FC<VisualizerProps<ApriltagDetections>> = (props) => {
-    const view = props.options[0].value as "overlay" | "grid";
-    return (
-      <Layout view={view} element={ApriltagDetectionsElement} {...props} />
-    );
-  };
-}
+export const ApriltagDetectionsVisualizer = {
+  id: "apriltagDetections",
+  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections"],
+  options: LayoutOptions,
+  Component: LayoutVisualizerComponent(ApriltagDetectionsElement),
+  Element: ApriltagDetectionsElement
+};
