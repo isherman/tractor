@@ -56,6 +56,8 @@ export const Blobstore: React.FC = () => {
   const [selectedPath, setSelectedPath] = useState<string>();
   const [selectedEventType, setSelectedEventType] = useState<EventTypeId>();
   const [selectedResource, setSelectedResource] = useState<EventType>();
+  const [modifiedResource, setModifiedResource] = useState<EventType>();
+  const [modificationInFlight, setModificationInFlight] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   const { baseUrl, httpResourceArchive } = useStores();
@@ -80,6 +82,9 @@ export const Blobstore: React.FC = () => {
       if (!selectedPath) {
         return;
       }
+      if (modificationInFlight) {
+        return;
+      }
 
       const eventType = bestGuessEventType(parentDirs);
 
@@ -97,7 +102,7 @@ export const Blobstore: React.FC = () => {
       }
     };
     fetchSelected();
-  }, [selectedPath]);
+  }, [selectedPath, modificationInFlight]);
 
   // Fetch root directory
   useEffect(() => {
@@ -153,6 +158,41 @@ export const Blobstore: React.FC = () => {
     }
   };
 
+  const handleCancel = (): void => {
+    setIsEditing(false);
+  };
+
+  const handleSubmit = async (): Promise<void> => {
+    if (!selectedPath) {
+      return;
+    }
+
+    const eventType = bestGuessEventType(parentDirs);
+
+    if (!eventType) {
+      console.error(`Aborting submit. Unknown eventType for ${selectedPath}`);
+      return;
+    }
+
+    if (!modifiedResource) {
+      console.error(`Aborting submit. No changes made.`);
+      return;
+    }
+
+    const Message = eventRegistry[eventType];
+    const message = Message.toJSON(Message.fromPartial(modifiedResource));
+    setModificationInFlight(true);
+    await fetch(`${blobstoreUrl}/${selectedPath}`, {
+      method: "POST",
+      body: JSON.stringify(message, null, 2),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    setModificationInFlight(false);
+    setIsEditing(false);
+  };
+
   const files = currentDir?.directory?.files.map<FileData>(fileToFileData);
   const visualizer =
     selectedEventType && visualizersForEventType(selectedEventType)[0];
@@ -177,10 +217,10 @@ export const Blobstore: React.FC = () => {
           <Button onClick={() => setIsEditing(true)}>{"Edit"}</Button>
         )}
         {selectedResource && isEditing && (
-          <Button onClick={() => setIsEditing(false)}>{"Cancel"}</Button>
+          <Button onClick={handleCancel}>{"Cancel"}</Button>
         )}
         {selectedResource && isEditing && (
-          <Button onClick={() => setIsEditing(false)}>{"Submit"}</Button>
+          <Button onClick={handleSubmit}>{"Submit"}</Button>
         )}
         {!isEditing && selectedResource && (
           <>
@@ -195,7 +235,10 @@ export const Blobstore: React.FC = () => {
           <>
             {React.createElement(visualizer.Form, {
               initialValue: selectedResource,
-              onChange: (updated) => console.log("Updated: ", updated)
+              onChange: (updated) => {
+                console.log("Modified resource: ", updated);
+                setModifiedResource(updated);
+              }
             })}
           </>
         )}

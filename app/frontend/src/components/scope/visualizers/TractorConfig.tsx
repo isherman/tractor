@@ -24,66 +24,78 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         label="Wheel Baseline"
         value={value.wheelBaseline}
         type="number"
-        onChange={(e) =>
-          setValue((v) => ({ ...v, wheelBaseline: parseFloat(e.target.value) }))
-        }
+        onChange={(e) => {
+          const { value } = e.target;
+          setValue((v) => ({
+            ...v,
+            wheelBaseline: parseFloat(value)
+          }));
+        }}
       />
 
       <FormGroup
         label="Wheel Radius"
         value={value.wheelRadius}
         type="number"
-        onChange={(e) =>
-          setValue((v) => ({ ...v, wheelRadius: parseFloat(e.target.value) }))
-        }
+        onChange={(e) => {
+          const { value } = e.target;
+          setValue((v) => ({
+            ...v,
+            wheelRadius: parseFloat(value)
+          }));
+        }}
       />
 
       <FormGroup
         label="Wheel Radius Left"
         value={value.wheelRadiusLeft}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
-            wheelRadiusLeft: parseFloat(e.target.value)
-          }))
-        }
+            wheelRadiusLeft: parseFloat(value)
+          }));
+        }}
       />
 
       <FormGroup
         label="Wheel Radius Right"
         value={value.wheelRadiusRight}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
-            wheelRadiusRight: parseFloat(e.target.value)
-          }))
-        }
+            wheelRadiusRight: parseFloat(value)
+          }));
+        }}
       />
 
       <FormGroup
         label="Hub Motor Gear Ratio"
         value={value.hubMotorGearRatio}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
-            hubMotorGearRatio: parseFloat(e.target.value)
-          }))
-        }
+            hubMotorGearRatio: parseFloat(value)
+          }));
+        }}
       />
 
       <FormGroup
         label="Hub Motor Poll Pairs"
         value={value.hubMotorPollPairs}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
-            hubMotorPollPairs: parseInt(e.target.value)
-          }))
-        }
+            hubMotorPollPairs: parseInt(value)
+          }));
+        }}
       />
 
       {value.basePosesSensor.map((basePoseSensor, i) => (
@@ -115,8 +127,8 @@ const TractorConfigElement: React.FC<SingleElementVisualizerProps<
     <Card timestamp={timestamp} json={value}>
       <KeyValueTable
         records={[
-          ["Wheel Radius", value.wheelRadius],
           ["Wheel Baseline", value.wheelBaseline],
+          ["Wheel Radius", value.wheelRadius],
           ["Wheel Radius Left", value.wheelRadiusLeft],
           ["Wheel Radius Right", value.wheelRadiusRight],
           ["Hub Motor Gear Ratio", value.hubMotorGearRatio],

@@ -74,12 +74,12 @@ func main() {
 		log.Fatalln("BLOBSTORE_ROOT must be set.")
 	}
 	blobstoreCorsWrapper := cors.New(cors.Options{
-		AllowedOrigins: []string{"*"},
-		AllowedMethods: []string{"GET"},
+		AllowedOrigins: []string{"*"}, // TODO: Security issue
+		AllowedMethods: []string{"GET", "POST"},
 		AllowedHeaders: []string{"Content-Type"},
 	})
 	log.Println("Serving blobstore from ", blobstoreRoot)
-	blobstore := blobstoreCorsWrapper.Handler(blobstore.FileServer(http.Dir(blobstoreRoot)))
+	blobstore := blobstoreCorsWrapper.Handler(blobstore.FileServer(&blobstore.RWDir{Dir: http.Dir(blobstoreRoot)}))
 
 	// Serve the API and frontend
 	serverAddr := defaultServerAddr

@@ -25,38 +25,83 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-// The algorithm uses at most sniffLen bytes to make its decision.
-const sniffLen = 512
-
-var htmlReplacer = strings.NewReplacer(
-	"&", "&amp;",
-	"<", "&lt;",
-	">", "&gt;",
-	// "&#34;" is shorter than "&quot;".
-	`"`, "&#34;",
-	// "&#39;" is shorter than "&apos;" and apos was not in HTML until HTML5.
-	"'", "&#39;",
-)
-
-var jsonMarshaler = jsonpb.Marshaler{
-	EnumsAsInts:  false,
-	EmitDefaults: true,
-	Indent:       "  ",
-	OrigName:     true,
+// RWDir is an extension of http.Dir, with support for writing files
+type RWDir struct {
+	Dir http.Dir
 }
 
-// logf prints to the ErrorLog of the *Server associated with request r
-// via ServerContextKey. If there's no associated server, or if ErrorLog
-// is nil, logging is done via the log package's standard logger.
-func logf(r *http.Request, format string, args ...interface{}) {
-	s, _ := r.Context().Value(http.ServerContextKey).(*http.Server)
-	if s != nil && s.ErrorLog != nil {
-		s.ErrorLog.Printf(format, args...)
-	} else {
-		log.Printf(format, args...)
+// RWFile is an extension of http.File, with support for writing
+type RWFile interface {
+	http.File
+	io.Writer
+}
+
+type rwFileSystem interface {
+	http.FileSystem
+	OpenFile(name string, flag int, perm os.FileMode) (RWFile, error)
+}
+
+type fileHandler struct {
+	root rwFileSystem
+}
+
+// Open implements FileSystem using os.Open, opening files for reading rooted
+// and relative to the directory d.
+func (d RWDir) Open(name string) (http.File, error) {
+	return (d.Dir.Open(name))
+}
+
+// OpenFile implements FileSystem using os.OpenFile, opening files for reading rooted
+// and relative to the directory d.
+func (d RWDir) OpenFile(name string, flag int, perm os.FileMode) (RWFile, error) {
+	if filepath.Separator != '/' && strings.ContainsRune(name, filepath.Separator) {
+		return nil, errors.New("http: invalid character in file path")
 	}
+	dir := string(d.Dir)
+	if dir == "" {
+		dir = "."
+	}
+	fullName := filepath.Join(dir, filepath.FromSlash(path.Clean("/"+name)))
+	f, err := os.OpenFile(fullName, flag, perm)
+	if err != nil {
+		return nil, mapDirOpenError(err, fullName)
+	}
+	return f, nil
 }
 
+func uploadFile(w http.ResponseWriter, r *http.Request, fs rwFileSystem, name string) {
+	f, err := fs.OpenFile(name, os.O_RDWR|os.O_TRUNC, 0644) // perms not actually used in R/W mode
+	if err != nil {
+		msg, code := toHTTPError(err)
+		http.Error(w, msg, code)
+		return
+	}
+	defer f.Close()
+
+	d, err := f.Stat()
+	if err != nil {
+		msg, code := toHTTPError(err)
+		http.Error(w, msg, code)
+		return
+	}
+
+	if d.IsDir() {
+		logf(r, "blobstore: cannot upload to directory: %v", name)
+		http.Error(w, "Error uploading", http.StatusInternalServerError)
+		return
+	}
+
+	_, err = io.Copy(f, r.Body)
+	if err != nil {
+		logf(r, "blobstore: cannot upload to file: %v", err)
+		http.Error(w, "Error uploading to file", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+// populates and returns a protobuf that describes the directory contents
 func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 	dirs, err := f.Readdir(-1)
 	if err != nil {
@@ -105,6 +150,95 @@ func dirList(w http.ResponseWriter, r *http.Request, f http.File) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	jsonMarshaler.Marshal(w, response)
+}
+
+// FileServer returns a handler that serves HTTP requests
+// with the contents of the file system rooted at root.
+//
+// To use the operating system's file system implementation,
+// use http.Dir:
+//
+//     http.Handle("/", http.FileServer(http.Dir("/tmp")))
+//
+// As a special case, the returned file server redirects any request
+// ending in "/index.html" to the same path, without the final
+// "index.html".
+func FileServer(root rwFileSystem) http.Handler {
+	return &fileHandler{root}
+}
+
+func (f *fileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	upath := r.URL.Path
+	if !strings.HasPrefix(upath, "/") {
+		upath = "/" + upath
+		r.URL.Path = upath
+	}
+
+	if r.Method == "POST" {
+		uploadFile(w, r, f.root, path.Clean(upath))
+	} else {
+		serveFile(w, r, f.root, path.Clean(upath), true)
+	}
+}
+
+// Farm-ng specific
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Original implementation
+
+// mapDirOpenError maps the provided non-nil error from opening name
+// to a possibly better non-nil error. In particular, it turns OS-specific errors
+// about opening files in non-directories into os.ErrNotExist. See Issue 18984.
+func mapDirOpenError(originalErr error, name string) error {
+	if os.IsNotExist(originalErr) || os.IsPermission(originalErr) {
+		return originalErr
+	}
+
+	parts := strings.Split(name, string(filepath.Separator))
+	for i := range parts {
+		if parts[i] == "" {
+			continue
+		}
+		fi, err := os.Stat(strings.Join(parts[:i+1], string(filepath.Separator)))
+		if err != nil {
+			return originalErr
+		}
+		if !fi.IsDir() {
+			return os.ErrNotExist
+		}
+	}
+	return originalErr
+}
+
+// The algorithm uses at most sniffLen bytes to make its decision.
+const sniffLen = 512
+
+var htmlReplacer = strings.NewReplacer(
+	"&", "&amp;",
+	"<", "&lt;",
+	">", "&gt;",
+	// "&#34;" is shorter than "&quot;".
+	`"`, "&#34;",
+	// "&#39;" is shorter than "&apos;" and apos was not in HTML until HTML5.
+	"'", "&#39;",
+)
+
+var jsonMarshaler = jsonpb.Marshaler{
+	EnumsAsInts:  false,
+	EmitDefaults: true,
+	Indent:       "  ",
+	OrigName:     true,
+}
+
+// logf prints to the ErrorLog of the *Server associated with request r
+// via ServerContextKey. If there's no associated server, or if ErrorLog
+// is nil, logging is done via the log package's standard logger.
+func logf(r *http.Request, format string, args ...interface{}) {
+	s, _ := r.Context().Value(http.ServerContextKey).(*http.Server)
+	if s != nil && s.ErrorLog != nil {
+		s.ErrorLog.Printf(format, args...)
+	} else {
+		log.Printf(format, args...)
+	}
 }
 
 func marshalFileInfoToProto(fileInfo os.FileInfo, f *pb.File) error {
@@ -600,34 +734,6 @@ func localRedirect(w http.ResponseWriter, r *http.Request, newPath string) {
 	}
 	w.Header().Set("Location", newPath)
 	w.WriteHeader(http.StatusMovedPermanently)
-}
-
-type fileHandler struct {
-	root http.FileSystem
-}
-
-// FileServer returns a handler that serves HTTP requests
-// with the contents of the file system rooted at root.
-//
-// To use the operating system's file system implementation,
-// use http.Dir:
-//
-//     http.Handle("/", http.FileServer(http.Dir("/tmp")))
-//
-// As a special case, the returned file server redirects any request
-// ending in "/index.html" to the same path, without the final
-// "index.html".
-func FileServer(root http.FileSystem) http.Handler {
-	return &fileHandler{root}
-}
-
-func (f *fileHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	upath := r.URL.Path
-	if !strings.HasPrefix(upath, "/") {
-		upath = "/" + upath
-		r.URL.Path = upath
-	}
-	serveFile(w, r, f.root, path.Clean(upath), true)
 }
 
 // httpRange specifies the byte range to be sent to the client.
