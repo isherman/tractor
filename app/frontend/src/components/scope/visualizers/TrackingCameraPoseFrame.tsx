@@ -40,7 +40,7 @@ const TrackingCameraPoseFrameVisualizerComponent: React.FC<VisualizerProps<
 };
 
 export const TrackingCameraPoseFrameVisualizer = {
-  id: "trackingCameraPoseFrame",
+  id: "TrackingCameraPoseFrame",
   types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraPoseFrame"
   ],

@@ -54,7 +54,7 @@ const BaseToCameraModelElement: React.FC<SingleElementVisualizerProps<
 };
 
 export const BaseToCameraModelVisualizer = {
-  id: "baseToCameraModel",
+  id: "BaseToCameraModel",
   types: ["type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraModel"],
   options: LayoutOptions,
   Component: LayoutVisualizerComponent(BaseToCameraModelElement),
