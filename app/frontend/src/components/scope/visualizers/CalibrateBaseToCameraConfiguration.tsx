@@ -11,16 +11,13 @@ import { CalibrateBaseToCameraConfiguration } from "../../../../genproto/farm_ng
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { CaptureCalibrationDatasetResult } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { CalibrateApriltagRigResult } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
-import {
-  BaseToCameraInitializationForm,
-  BaseToCameraInitializationTable
-} from "./BaseToCameraInitializationTable";
 import { useFormState } from "../../../hooks/useFormState";
 import FormGroup from "./FormGroup";
 import { Resource } from "../../../../genproto/farm_ng_proto/tractor/v1/resource";
 import { BaseToCameraInitialization } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
 import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
 import { CalibrateApriltagRigResultVisualizer } from "./CalibrateApriltagRigResult";
+import { BaseToCameraInitializationVisualizer } from "./BaseToCameraInitialization";
 
 const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
   CalibrateBaseToCameraConfiguration
@@ -62,7 +59,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         }
       />
 
-      <BaseToCameraInitializationForm
+      <BaseToCameraInitializationVisualizer.Form
         initialValue={
           value.initialization || BaseToCameraInitialization.fromPartial({})
         }
@@ -106,7 +103,9 @@ const CalibrateBaseToCameraConfigurationElement: React.FC<SingleElementVisualize
       </Card>
       {initialization && (
         <Card title="base_pose_camera Initialization">
-          <BaseToCameraInitializationTable value={initialization} />
+          <BaseToCameraInitializationVisualizer.Element
+            value={[0, initialization]}
+          />
         </Card>
       )}
       {calibrationDataset && (

@@ -8,7 +8,7 @@ import {
 import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 import { Card } from "./Card";
 import { KeyValueTable } from "./KeyValueTable";
-import { BaseToCameraInitializationTable } from "./BaseToCameraInitializationTable";
+import { BaseToCameraInitializationVisualizer } from "./BaseToCameraInitialization";
 
 const BaseToCameraModelElement: React.FC<SingleElementVisualizerProps<
   BaseToCameraModel
@@ -44,7 +44,9 @@ const BaseToCameraModelElement: React.FC<SingleElementVisualizerProps<
       </Card>
       {initialization && (
         <Card title="Initialization">
-          <BaseToCameraInitializationTable value={initialization} />
+          <BaseToCameraInitializationVisualizer.Element
+            value={[0, initialization]}
+          />
         </Card>
       )}
     </Card>

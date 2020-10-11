@@ -5,25 +5,24 @@ import {
   ViewInitialization
 } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
 import { useFormState } from "../../../hooks/useFormState";
-import { FormProps } from "../../../registry/visualization";
 import {
-  CalibrationParameterForm,
-  CalibrationParameterTable
-} from "./CalibrationParameterTable";
+  FormProps,
+  SingleElementVisualizerProps
+} from "../../../registry/visualization";
+import { CalibrationParameterVisualizer } from "./CalibrationParameter";
+import { CalibrationParameterTable } from "./CalibrationParameterTable";
 import { Card } from "./Card";
-import {
-  ViewInitializationForm,
-  ViewInitializationTable
-} from "./ViewInitializationTable";
+import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
+import { ViewInitializationVisualizer } from "./ViewInitialization";
 
-export const BaseToCameraInitializationForm: React.FC<FormProps<
+const BaseToCameraInitializationForm: React.FC<FormProps<
   BaseToCameraInitialization
 >> = (props) => {
   const [value, update] = useFormState(props);
   return (
     <>
       <h6>Wheel Baseline</h6>
-      <CalibrationParameterForm
+      <CalibrationParameterVisualizer.Form
         initialValue={
           value.wheelBaseline || CalibrationParameter.fromPartial({})
         }
@@ -32,11 +31,11 @@ export const BaseToCameraInitializationForm: React.FC<FormProps<
         }
       />
       <h6>Wheel Radius</h6>
-      <CalibrationParameterForm
+      <CalibrationParameterVisualizer.Form
         initialValue={value.wheelRadius || CalibrationParameter.fromPartial({})}
         onUpdate={(updated) => update((v) => ({ ...v, wheelRadius: updated }))}
       />
-      <ViewInitializationForm
+      <ViewInitializationVisualizer.Form
         initialValue={
           value.basePoseCamera || ViewInitialization.fromPartial({})
         }
@@ -48,19 +47,15 @@ export const BaseToCameraInitializationForm: React.FC<FormProps<
   );
 };
 
-interface IProps {
-  value: BaseToCameraInitialization;
-}
-
-export const BaseToCameraInitializationTable: React.FC<IProps> = ({
-  value
-}) => {
+const BaseToCameraInitializationElement: React.FC<SingleElementVisualizerProps<
+  BaseToCameraInitialization
+>> = ({ value: [, value] }) => {
   const { wheelBaseline, wheelRadius, basePoseCamera } = value;
   return (
     <>
       {basePoseCamera && (
         <Card title="base_pose_camera Initialization">
-          <ViewInitializationTable view={basePoseCamera} />
+          <ViewInitializationVisualizer.Element value={[0, basePoseCamera]} />
         </Card>
       )}
       {wheelBaseline && wheelRadius && (
@@ -73,4 +68,15 @@ export const BaseToCameraInitializationTable: React.FC<IProps> = ({
       )}
     </>
   );
+};
+
+export const BaseToCameraInitializationVisualizer = {
+  id: "BaseToCameraInitialization",
+  types: [
+    "type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraInitialization"
+  ],
+  options: LayoutOptions,
+  Component: LayoutVisualizerComponent(BaseToCameraInitializationElement),
+  Element: BaseToCameraInitializationElement,
+  Form: BaseToCameraInitializationForm
 };

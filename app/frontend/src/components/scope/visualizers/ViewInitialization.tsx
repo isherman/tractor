@@ -6,33 +6,35 @@ import {
   ViewInitialization
 } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
 import { useFormState } from "../../../hooks/useFormState";
-import { FormProps } from "../../../registry/visualization";
-import { enumNumericKeys } from "../../../utils/enum";
 import {
-  CalibrationParameterForm,
-  CalibrationParameterTable
-} from "./CalibrationParameterTable";
+  FormProps,
+  SingleElementVisualizerProps
+} from "../../../registry/visualization";
+import { enumNumericKeys } from "../../../utils/enum";
+import { CalibrationParameterVisualizer } from "./CalibrationParameter";
+import { CalibrationParameterTable } from "./CalibrationParameterTable";
 import FormGroup from "./FormGroup";
 import { KeyValueTable } from "./KeyValueTable";
+import { LayoutOptions, LayoutVisualizerComponent } from "./Layout";
 
-export const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
+const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
   props
 ) => {
   const [value, update] = useFormState(props);
   return (
     <>
       <h6>X</h6>
-      <CalibrationParameterForm
+      <CalibrationParameterVisualizer.Form
         initialValue={value.x || CalibrationParameter.fromPartial({})}
         onUpdate={(updated) => update((v) => ({ ...v, x: updated }))}
       />
       <h6>Y</h6>
-      <CalibrationParameterForm
+      <CalibrationParameterVisualizer.Form
         initialValue={value.y || CalibrationParameter.fromPartial({})}
         onUpdate={(updated) => update((v) => ({ ...v, y: updated }))}
       />
       <h6>Z</h6>
-      <CalibrationParameterForm
+      <CalibrationParameterVisualizer.Form
         initialValue={value.z || CalibrationParameter.fromPartial({})}
         onUpdate={(updated) => update((v) => ({ ...v, z: updated }))}
       />
@@ -59,12 +61,10 @@ export const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
   );
 };
 
-interface IProps {
-  view: ViewInitialization;
-}
-
-export const ViewInitializationTable: React.FC<IProps> = ({ view }) => {
-  const { x, y, z } = view;
+const ViewInitializationElement: React.FC<SingleElementVisualizerProps<
+  ViewInitialization
+>> = ({ value: [, value] }) => {
+  const { x, y, z } = value;
   return (
     <>
       {x && y && z && (
@@ -74,8 +74,17 @@ export const ViewInitializationTable: React.FC<IProps> = ({ view }) => {
         />
       )}
       <KeyValueTable
-        records={[["Direction", viewDirectionToJSON(view.viewDirection)]]}
+        records={[["Direction", viewDirectionToJSON(value.viewDirection)]]}
       />
     </>
   );
+};
+
+export const ViewInitializationVisualizer = {
+  id: "ViewInitialization",
+  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.ViewInitialization"],
+  options: LayoutOptions,
+  Component: LayoutVisualizerComponent(ViewInitializationElement),
+  Element: ViewInitializationElement,
+  Form: ViewInitializationForm
 };
