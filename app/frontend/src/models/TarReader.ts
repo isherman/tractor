@@ -87,10 +87,6 @@ function readFileBlob(
   return blob;
 }
 
-export function normalizeTarPath(path: string): string {
-  return path.substring(path.indexOf("/") + 1);
-}
-
 export class TarReader {
   private data: Promise<{ fileInfo: FileInfo[]; buffer: ArrayBuffer }>;
 
@@ -115,7 +111,7 @@ export class TarReader {
     blobProperties?: BlobPropertyBag
   ): Promise<Blob> {
     const { buffer, fileInfo } = await this.data;
-    const info = fileInfo.find((_) => fileName === normalizeTarPath(_.name));
+    const info = fileInfo.find((_) => fileName === _.name);
     if (!info) {
       return Promise.reject(`${fileName} not found in tar directory`);
     }
