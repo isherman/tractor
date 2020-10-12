@@ -1,14 +1,13 @@
 import * as React from "react";
 import { useResizeObserver } from "../../hooks/useResizeObserver";
 import { ResourceArchive } from "../../models/ResourceArchive";
-import { EventType } from "../../registry/events";
+import { DeserializedEvent, EventType } from "../../registry/events";
 import { SingleElementVisualizerProps } from "../../registry/visualization";
-import { EventLogEntry } from "../../stores/ProgramsStore";
 import { ProgramLog } from "./ProgramLog";
 import styles from "./ProgramLogVisualizer.module.scss";
 
 interface IProps {
-  eventLog: EventLogEntry[];
+  eventLog: DeserializedEvent[];
   selectedEntry: number | null;
   onSelectEntry: (index: number | null) => void;
   visualizer?: React.FC<SingleElementVisualizerProps<EventType>>;
@@ -30,7 +29,7 @@ export const ProgramLogVisualizer: React.FC<IProps> = (props) => {
       {visualizer && selectedEvent && selectedEvent.stamp && (
         <div className={styles.programVisualizer}>
           {React.createElement(visualizer, {
-            value: [selectedEvent.stamp.getTime(), selectedEvent.event],
+            value: [selectedEvent.stamp.getTime(), selectedEvent.data],
             options: [{ label: "", options: [], value: "overlay" }],
             resources
           })}

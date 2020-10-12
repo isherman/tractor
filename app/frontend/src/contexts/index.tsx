@@ -15,11 +15,7 @@ const [busEventEmitter, mediaStreamEmitter, busClient] = getWebRTCEmitters(
 const httpResourceArchive = new HttpResourceArchive(`${baseUrl}/blobstore`);
 
 export const storesContext = React.createContext({
-  programsStore: new ProgramsStore(
-    busClient,
-    busEventEmitter,
-    httpResourceArchive
-  ),
+  programsStore: new ProgramsStore(busEventEmitter),
   busEventStore: new BusEventStore(busEventEmitter),
   mediaStreamStore: new MediaStreamStore(mediaStreamEmitter),
   visualizationStore: new VisualizationStore(

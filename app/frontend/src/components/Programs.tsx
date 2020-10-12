@@ -12,7 +12,7 @@ import styles from "./Programs.module.scss";
 import { ProgramLogVisualizer } from "./programs/ProgramLogVisualizer";
 
 export const Programs: React.FC = () => {
-  const { programsStore: store } = useStores();
+  const { busClient, httpResourceArchive, programsStore: store } = useStores();
 
   useEffect(() => {
     store.startStreaming();
@@ -20,7 +20,7 @@ export const Programs: React.FC = () => {
   }, []);
 
   const handleStart = (id: string): void => {
-    store.busClient.send(
+    busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.StartProgramRequest",
       "program_supervisor/request",
       StartProgramRequest.encode(StartProgramRequest.fromJSON({ id })).finish()
@@ -28,7 +28,7 @@ export const Programs: React.FC = () => {
   };
 
   const handleStop = (id: string): void => {
-    store.busClient.send(
+    busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.StopProgramRequest",
       "program_supervisor/request",
       StopProgramRequest.encode(StopProgramRequest.fromJSON({ id })).finish()
@@ -126,7 +126,7 @@ export const Programs: React.FC = () => {
             selectedEntry={store.selectedEntry}
             onSelectEntry={(e) => (store.selectedEntry = e)}
             visualizer={store.visualizer?.Element}
-            resources={store.resourceArchive}
+            resources={httpResourceArchive}
           />
         </div>
       </div>

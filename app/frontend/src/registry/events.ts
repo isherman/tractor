@@ -152,3 +152,10 @@ export const eventTypeIds = Object.keys(
   eventRegistry
 ) as (keyof typeof eventRegistry)[];
 export type EventTypeId = typeof eventTypeIds[number];
+
+export interface DeserializedEvent {
+  stamp: Date | undefined;
+  name: string;
+  typeUrl: EventTypeId;
+  data: EventType;
+}

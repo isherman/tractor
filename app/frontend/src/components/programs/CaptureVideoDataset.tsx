@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useStores } from "../../hooks/useStores";
-import { EventLogEntry } from "../../stores/ProgramsStore";
 import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
@@ -11,13 +10,14 @@ import {
 } from "../../../genproto/farm_ng_proto/tractor/v1/capture_video_dataset";
 import { CaptureVideoDatasetConfigurationVisualizer } from "../scope/visualizers/CaptureVideoDatasetConfiguration";
 import { ProgramProps } from "../../registry/programs";
+import { DeserializedEvent } from "../../registry/events";
 
 const programId = "capture_video_dataset";
 
 const Component: React.FC<ProgramProps<Configuration>> = ({
   inputRequired
 }) => {
-  const { programsStore: store } = useStores();
+  const { busClient } = useStores();
   const [configuration, setConfiguration] = useState<Configuration | null>(
     null
   );
@@ -26,7 +26,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
     e: React.FormEvent<HTMLFormElement>
   ): void => {
     e.preventDefault();
-    store.busClient.send(
+    busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureVideoDatasetConfiguration",
       `${programId}/configure`,
       Configuration.encode(Configuration.fromJSON(configuration)).finish()
@@ -55,10 +55,10 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
 export const CaptureVideoDatasetProgram = {
   programIds: [programId] as const,
   eventLogPredicate: (e: BusAnyEvent) => e.name.startsWith(`${programId}/`),
-  inputRequired: (e: EventLogEntry) =>
+  inputRequired: (e: DeserializedEvent) =>
     (e.name.startsWith(`${programId}/status`) &&
       e.typeUrl.endsWith("CaptureVideoDatasetStatus") &&
-      (e.event as Status).inputRequiredConfiguration) ||
+      (e.data as Status).inputRequiredConfiguration) ||
     null,
   Component
 };

@@ -11,7 +11,7 @@ import {
 } from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
 import { CalibrateApriltagRigConfigurationVisualizer } from "../scope/visualizers/CalibrateApriltagRigConfiguration";
 import { ProgramProps } from "../../registry/programs";
-import { EventLogEntry } from "../../stores/ProgramsStore";
+import { DeserializedEvent } from "../../registry/events";
 
 const programId = "calibrate_apriltag_rig";
 
@@ -55,10 +55,10 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
 export const CalibrateApriltagRigProgram = {
   programIds: [programId, `${programId}-playback`] as const,
   eventLogPredicate: (e: BusAnyEvent) => e.name.startsWith(`${programId}/`),
-  inputRequired: (e: EventLogEntry) =>
+  inputRequired: (e: DeserializedEvent) =>
     (e.name.startsWith(`${programId}/status`) &&
       e.typeUrl.endsWith("CalibrateApriltagRigStatus") &&
-      (e.event as Status).inputRequiredConfiguration) ||
+      (e.data as Status).inputRequiredConfiguration) ||
     null,
   Component
 };

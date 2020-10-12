@@ -3,7 +3,6 @@ import * as React from "react";
 import { useState } from "react";
 import { useStores } from "../../hooks/useStores";
 import { Button, Form } from "react-bootstrap";
-import { EventLogEntry } from "../../stores/ProgramsStore";
 import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import {
   CalibrateBaseToCameraConfiguration,
@@ -12,6 +11,7 @@ import {
 } from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
 import { CalibrateBaseToCameraConfigurationVisualizer } from "../scope/visualizers/CalibrateBaseToCameraConfiguration";
 import { ProgramProps } from "../../registry/programs";
+import { DeserializedEvent } from "../../registry/events";
 
 const programId = "calibrate_base_to_camera";
 
@@ -56,10 +56,10 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
 export const CalibrateBaseToCameraProgram = {
   programIds: [programId] as const,
   eventLogPredicate: (e: BusAnyEvent) => e.name.startsWith(`${programId}/`),
-  inputRequired: (e: EventLogEntry) =>
+  inputRequired: (e: DeserializedEvent) =>
     (e.name.startsWith(`${programId}/status`) &&
       e.typeUrl.endsWith("CalibrateBaseToCameraStatus") &&
-      (e.event as Status).inputRequiredConfiguration) ||
+      (e.data as Status).inputRequiredConfiguration) ||
     null,
   Component
 };

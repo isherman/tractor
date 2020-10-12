@@ -6,22 +6,13 @@ import {
   BusEventEmitter,
   BusEventEmitterHandle
 } from "../models/BusEventEmitter";
-import { EventType, EventTypeId } from "../registry/events";
+import { DeserializedEvent, EventType, EventTypeId } from "../registry/events";
 import {
   ProgramExecution,
   ProgramSupervisorStatus
 } from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
-import { BusClient } from "../models/BusClient";
 import { Program, programForProgramId } from "../registry/programs";
 import { Visualizer, visualizersForEventType } from "../registry/visualization";
-import { ResourceArchive } from "../models/ResourceArchive";
-
-export interface EventLogEntry {
-  stamp: Date | undefined;
-  name: string;
-  typeUrl: EventTypeId;
-  event: EventType;
-}
 
 export class ProgramsStore {
   private busHandle: BusEventEmitterHandle | null = null;
@@ -30,16 +21,12 @@ export class ProgramsStore {
   @observable supervisorStatus: ProgramSupervisorStatus | null = null;
 
   // A buffer of events, as populated by the active program's eventLog predicate
-  @observable eventLog: EventLogEntry[] = [];
+  @observable eventLog: DeserializedEvent[] = [];
 
   // A user-selected element in the eventLog buffer
   @observable selectedEntry: number | null = null;
 
-  constructor(
-    public busClient: BusClient,
-    private busEventEmitter: BusEventEmitter,
-    public resourceArchive: ResourceArchive
-  ) {}
+  constructor(private busEventEmitter: BusEventEmitter) {}
 
   @computed get runningProgram(): ProgramExecution | null {
     return this.supervisorStatus?.running?.program || null;
@@ -49,11 +36,11 @@ export class ProgramsStore {
     return this.supervisorStatus?.stopped?.lastProgram || null;
   }
 
-  @computed get selectedEvent(): EventLogEntry | null {
+  @computed get selectedEvent(): DeserializedEvent | null {
     return this.selectedEntry ? this.eventLog[this.selectedEntry] : null;
   }
 
-  @computed get latestEvent(): EventLogEntry | null {
+  @computed get latestEvent(): DeserializedEvent | null {
     return this.eventLog.length > 0
       ? this.eventLog[this.eventLog.length - 1]
       : null;
@@ -101,19 +88,18 @@ export class ProgramsStore {
       // TODO: ugly
       const eventLogPredicate = (() => this.eventLogPredicate)();
       if (eventLogPredicate(anyEvent)) {
-        const event = decodeAnyEvent(anyEvent);
-        if (!event) {
+        const data = decodeAnyEvent(anyEvent);
+        if (!data) {
           console.error(`ProgramsStore could not decode Any event`, anyEvent);
           return;
         }
-        const logEntry = {
-          stamp: anyEvent.stamp,
-          name: anyEvent.name,
-          typeUrl: anyEvent.data.typeUrl as EventTypeId,
-          event
-        };
         if (eventLogPredicate(anyEvent)) {
-          this.eventLog.push(logEntry);
+          this.eventLog.push({
+            stamp: anyEvent.stamp,
+            name: anyEvent.name,
+            typeUrl: anyEvent.data.typeUrl as EventTypeId,
+            data
+          });
         }
       }
     });

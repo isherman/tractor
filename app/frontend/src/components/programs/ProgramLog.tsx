@@ -1,11 +1,11 @@
 import * as React from "react";
 import { ListChildComponentProps, FixedSizeList as List } from "react-window";
-import { EventLogEntry } from "../../stores/ProgramsStore";
+import { DeserializedEvent } from "../../registry/events";
 import { formatValue } from "../../utils/formatValue";
 import styles from "./ProgramLog.module.scss";
 
 interface IProps {
-  eventLog: EventLogEntry[];
+  eventLog: DeserializedEvent[];
   selectedEntry: number | null;
   onSelectEntry: (index: number | null) => void;
 }
