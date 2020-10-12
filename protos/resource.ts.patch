@@ -1,5 +1,5 @@
---- resource.ts.2.orig	2020-10-12 12:30:16.052442002 -0700
-+++ resource.ts	2020-10-12 12:31:20.459182709 -0700
+--- app/frontend/genproto/farm_ng_proto/tractor/v1/resource.ts	2020-09-24 10:33:12.000000000 -0700
++++ protos/resource.patch.ts	2020-09-24 10:33:03.000000000 -0700
 @@ -22,7 +22,7 @@
    /**
     *  (Optional) The uncompressed size of the resource in bytes.
