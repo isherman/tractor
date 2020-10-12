@@ -3,7 +3,7 @@ import * as React from "react";
 import { useStores } from "../../hooks/useStores";
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import {
   CaptureCalibrationDatasetConfiguration,
   CaptureCalibrationDatasetConfiguration as Configuration,
@@ -54,7 +54,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
 
 export const CaptureCalibrationDatasetProgram = {
   programIds: [programId] as const,
-  eventLogPredicate: (e: BusAnyEvent) =>
+  eventLogPredicate: (e: BusEvent) =>
     e.name.startsWith(`${programId}/`) || e.name.startsWith("calibrator/"),
   inputRequired: (e: DeserializedEvent) =>
     (e.name.startsWith(`${programId}/status`) &&

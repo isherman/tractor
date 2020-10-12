@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useStores } from "../../hooks/useStores";
-import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import {
@@ -54,7 +54,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
 
 export const CaptureVideoDatasetProgram = {
   programIds: [programId] as const,
-  eventLogPredicate: (e: BusAnyEvent) => e.name.startsWith(`${programId}/`),
+  eventLogPredicate: (e: BusEvent) => e.name.startsWith(`${programId}/`),
   inputRequired: (e: DeserializedEvent) =>
     (e.name.startsWith(`${programId}/status`) &&
       e.typeUrl.endsWith("CaptureVideoDatasetStatus") &&

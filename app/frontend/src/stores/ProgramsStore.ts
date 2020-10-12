@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { computed, observable } from "mobx";
 import { decodeAnyEvent } from "../models/decodeAnyEvent";
-import { Event as BusAnyEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 import {
   BusEventEmitter,
   BusEventEmitterHandle
@@ -51,7 +51,7 @@ export class ProgramsStore {
     return programId ? programForProgramId(programId) : null;
   }
 
-  @computed get eventLogPredicate(): (e: BusAnyEvent) => boolean {
+  @computed get eventLogPredicate(): (e: BusEvent) => boolean {
     return (
       (this.runningProgram && this.program && this.program.eventLogPredicate) ||
       (() => false)
@@ -74,30 +74,30 @@ export class ProgramsStore {
   }
 
   public startStreaming(): void {
-    this.busHandle = this.busEventEmitter.on("*", (anyEvent: BusAnyEvent) => {
-      if (!anyEvent || !anyEvent.data) {
-        console.error(`ProgramStore received incomplete event ${anyEvent}`);
+    this.busHandle = this.busEventEmitter.on("*", (busEvent: BusEvent) => {
+      if (!busEvent || !busEvent.data) {
+        console.error(`ProgramStore received incomplete event ${busEvent}`);
         return;
       }
       if (
-        anyEvent.data.typeUrl ===
+        busEvent.data.typeUrl ===
         "type.googleapis.com/farm_ng_proto.tractor.v1.ProgramSupervisorStatus"
       ) {
-        this.supervisorStatus = decodeAnyEvent(anyEvent);
+        this.supervisorStatus = decodeAnyEvent(busEvent);
       }
       // TODO: ugly
       const eventLogPredicate = (() => this.eventLogPredicate)();
-      if (eventLogPredicate(anyEvent)) {
-        const data = decodeAnyEvent(anyEvent);
+      if (eventLogPredicate(busEvent)) {
+        const data = decodeAnyEvent(busEvent);
         if (!data) {
-          console.error(`ProgramsStore could not decode Any event`, anyEvent);
+          console.error(`ProgramsStore could not decode Any event`, busEvent);
           return;
         }
-        if (eventLogPredicate(anyEvent)) {
+        if (eventLogPredicate(busEvent)) {
           this.eventLog.push({
-            stamp: anyEvent.stamp,
-            name: anyEvent.name,
-            typeUrl: anyEvent.data.typeUrl as EventTypeId,
+            stamp: busEvent.stamp,
+            name: busEvent.name,
+            typeUrl: busEvent.data.typeUrl as EventTypeId,
             data
           });
         }

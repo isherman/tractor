@@ -3,12 +3,12 @@ import { CalibrateApriltagRigProgram } from "../components/programs/CalibrateApr
 import { CalibrateBaseToCameraProgram } from "../components/programs/CalibrateBaseToCamera";
 import { CaptureVideoDatasetProgram } from "../components/programs/CaptureVideoDataset";
 import { DeserializedEvent, EventType } from "./events";
-import { Event as BusAnyEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 
 export interface Program<T extends EventType = EventType> {
   programIds: readonly string[];
   inputRequired: (e: DeserializedEvent) => T | null;
-  eventLogPredicate: (e: BusAnyEvent) => boolean;
+  eventLogPredicate: (e: BusEvent) => boolean;
   Component: React.FC<ProgramProps<T>>;
 }
 
