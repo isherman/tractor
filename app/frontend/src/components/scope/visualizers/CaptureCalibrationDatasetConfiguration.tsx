@@ -26,8 +26,8 @@ const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
         value={value.numFrames}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, numFrames: parseInt(value) }));
+          const numFrames = parseInt(e.target.value);
+          setValue((v) => ({ ...v, numFrames }));
         }}
       />
 
@@ -37,8 +37,8 @@ const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
         description="A name for the dataset, used to name the output archive."
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, name: value }));
+          const name = e.target.value;
+          setValue((v) => ({ ...v, name }));
         }}
       />
     </>

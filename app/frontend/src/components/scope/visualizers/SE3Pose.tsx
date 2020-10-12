@@ -22,10 +22,10 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.position?.x}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const x = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
-            position: { ...v.position, x: parseFloat(value) } as Vec3
+            position: { ...v.position, x } as Vec3
           }));
         }}
       />
@@ -34,10 +34,10 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.position?.x}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const y = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
-            position: { ...v.position, y: parseFloat(value) } as Vec3
+            position: { ...v.position, y } as Vec3
           }));
         }}
       />
@@ -46,10 +46,10 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.position?.z}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const z = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
-            position: { ...v.position, z: parseFloat(value) } as Vec3
+            position: { ...v.position, z } as Vec3
           }));
         }}
       />
@@ -59,12 +59,12 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.rotation?.x}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const x = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
-              x: parseFloat(value)
+              x
             } as Quaternion
           }));
         }}
@@ -75,12 +75,12 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.rotation?.y}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const y = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
-              y: parseFloat(value)
+              y
             } as Quaternion
           }));
         }}
@@ -91,12 +91,12 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.rotation?.z}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const z = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
-              z: parseFloat(value)
+              z
             } as Quaternion
           }));
         }}
@@ -107,12 +107,12 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         value={value.rotation?.w}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const w = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
-              w: parseFloat(value)
+              w
             } as Quaternion
           }));
         }}

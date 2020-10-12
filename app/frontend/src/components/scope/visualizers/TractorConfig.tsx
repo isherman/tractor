@@ -25,10 +25,10 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.wheelBaseline}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const wheelBaseline = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
-            wheelBaseline: parseFloat(value)
+            wheelBaseline
           }));
         }}
       />
@@ -38,10 +38,10 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.wheelRadius}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const wheelRadius = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
-            wheelRadius: parseFloat(value)
+            wheelRadius
           }));
         }}
       />
@@ -51,10 +51,10 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.wheelRadiusLeft}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const wheelRadiusLeft = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
-            wheelRadiusLeft: parseFloat(value)
+            wheelRadiusLeft
           }));
         }}
       />
@@ -64,10 +64,10 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.wheelRadiusRight}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const wheelRadiusRight = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
-            wheelRadiusRight: parseFloat(value)
+            wheelRadiusRight
           }));
         }}
       />
@@ -77,10 +77,10 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.hubMotorGearRatio}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const hubMotorGearRatio = parseFloat(e.target.value);
           setValue((v) => ({
             ...v,
-            hubMotorGearRatio: parseFloat(value)
+            hubMotorGearRatio
           }));
         }}
       />
@@ -90,10 +90,10 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         value={value.hubMotorPollPairs}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
+          const hubMotorPollPairs = parseInt(e.target.value);
           setValue((v) => ({
             ...v,
-            hubMotorPollPairs: parseInt(value)
+            hubMotorPollPairs
           }));
         }}
       />

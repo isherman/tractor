@@ -27,8 +27,8 @@ const CaptureVideoDatasetConfigurationForm: React.FC<FormProps<
         description="A name for the dataset, used to name the output archive."
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, name: value }));
+          const name = e.target.value;
+          setValue((v) => ({ ...v, name }));
         }}
       />
     </>

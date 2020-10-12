@@ -34,11 +34,11 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         value={value.calibrationDataset?.path}
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
+          const path = e.target.value;
           setValue((v) => ({
             ...v,
             calibrationDataset: Resource.fromPartial({
-              path: value,
+              path,
               contentType:
                 "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult"
             })
@@ -52,11 +52,11 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         value={value.apriltagRigResult?.path}
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
+          const path = e.target.value;
           setValue((v) => ({
             ...v,
             apriltagRigResult: Resource.fromPartial({
-              path: value,
+              path,
               contentType:
                 "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigResult"
             })
@@ -78,8 +78,8 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         value={value.name}
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, name: value }));
+          const name = e.target.value;
+          setValue((v) => ({ ...v, name }));
         }}
       />
     </>

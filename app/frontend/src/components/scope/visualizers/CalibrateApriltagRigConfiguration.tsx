@@ -33,11 +33,11 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         value={value.calibrationDataset?.path}
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
+          const path = e.target.value;
           setValue((v) => ({
             ...v,
             calibrationDataset: Resource.fromPartial({
-              path: value,
+              path,
               contentType:
                 "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult"
             })
@@ -51,10 +51,12 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         value={(value.tagIds || []).join(", ")}
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
+          const tagIds = e.target.value
+            .split(", ")
+            .map((_) => parseInt(_.trim()));
           setValue((v) => ({
             ...v,
-            tagIds: value.split(", ").map((_) => parseInt(_.trim()))
+            tagIds
           }));
         }}
       />
@@ -64,8 +66,8 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         value={value.name}
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, name: value }));
+          const name = e.target.value;
+          setValue((v) => ({ ...v, name }));
         }}
       />
 
@@ -74,8 +76,8 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         value={value.rootTagId}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, rootTagId: parseInt(value) }));
+          const rootTagId = parseInt(e.target.value);
+          setValue((v) => ({ ...v, rootTagId }));
         }}
       />
     </>

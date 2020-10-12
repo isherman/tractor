@@ -47,8 +47,8 @@ const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
         value={value.viewDirection}
         as="select"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, viewDirection: parseInt(value) }));
+          const viewDirection = parseInt(e.target.value);
+          setValue((v) => ({ ...v, viewDirection }));
         }}
       >
         {enumNumericKeys(ViewDirection)

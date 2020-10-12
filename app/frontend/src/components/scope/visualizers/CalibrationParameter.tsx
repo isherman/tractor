@@ -16,8 +16,8 @@ const CalibrationParameterForm: React.FC<FormProps<CalibrationParameter>> = (
         value={value.value}
         type="number"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, value: parseFloat(value) }));
+          const value = parseFloat(e.target.value);
+          setValue((v) => ({ ...v, value }));
         }}
       />
       <FormGroup

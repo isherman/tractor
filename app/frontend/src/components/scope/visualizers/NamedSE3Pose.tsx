@@ -28,8 +28,8 @@ const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
         value={value.frameA}
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, frameA: value }));
+          const frameA = e.target.value;
+          setValue((v) => ({ ...v, frameA }));
         }}
       />
       <FormGroup
@@ -37,8 +37,8 @@ const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
         value={value.frameB}
         type="text"
         onChange={(e) => {
-          const { value } = e.target;
-          setValue((v) => ({ ...v, frameB: value }));
+          const frameB = e.target.value;
+          setValue((v) => ({ ...v, frameB }));
         }}
       />
 
