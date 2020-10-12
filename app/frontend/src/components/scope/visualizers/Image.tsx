@@ -1,38 +1,41 @@
-/* eslint-disable no-console */
 import * as React from "react";
 import { Card } from "./Card";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { Image } from "../../../../genproto/farm_ng_proto/tractor/v1/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
   StandardComponentOptions,
   StandardComponent
 } from "./StandardComponent";
 import styles from "./Image.module.scss";
+import { useFetchDataUrl } from "../../../hooks/useFetchDataUrl";
 
 const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = ({
   value: [timestamp, value],
   resources
 }) => {
-  const [imgSrc, setImgSrc] = useState<string>();
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const isVideoFrame = value.resource?.contentType.startsWith("video");
+  const mediaSrc = useFetchDataUrl(value.resource, resources || undefined);
 
   useEffect(() => {
-    const fetchImage = async (): Promise<void> => {
-      const resource = value.resource;
-      if (resources && resource) {
-        try {
-          setImgSrc(await resources.getDataUrl(resource.path));
-        } catch (e) {
-          console.error(`Error loading resource ${resource.path}: ${e}`);
-        }
-      }
-    };
-    fetchImage();
-  }, [value, resources]);
+    if (value && videoRef.current) {
+      const currentTime = (value.frameNumber || 0) / (value.fps || 1);
+      videoRef.current.currentTime = currentTime;
+    }
+  }, [value, videoRef]);
 
   return (
-    <Card json={value} timestamp={timestamp}>
-      <img src={imgSrc || undefined} className={styles.image} />
+    <Card timestamp={timestamp} json={value}>
+      {isVideoFrame ? (
+        <video
+          src={mediaSrc || undefined}
+          ref={videoRef}
+          className={styles.media}
+        />
+      ) : (
+        <img src={mediaSrc || undefined} className={styles.media} />
+      )}
     </Card>
   );
 };

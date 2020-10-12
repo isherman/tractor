@@ -20,6 +20,9 @@ import { CaptureCalibrationDatasetStatusVisualizer } from "../components/scope/v
 import { CaptureCalibrationDatasetResultVisualizer } from "../components/scope/visualizers/CaptureCalibrationDatasetResult";
 import { MonocularApriltagRigModelVisualizer } from "../components/scope/visualizers/MonocularApriltagRigModel";
 import { TractorConfigVisualizer } from "../components/scope/visualizers/TractorConfig";
+import { CaptureVideoDatasetConfigurationVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetConfiguration";
+import { CaptureVideoDatasetStatusVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetStatus";
+import { CaptureVideoDatasetResultVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetResult";
 
 export interface VisualizerOptionConfig {
   label: string;
@@ -65,6 +68,9 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   CaptureCalibrationDatasetConfigurationVisualizer,
   CaptureCalibrationDatasetResultVisualizer,
   CaptureCalibrationDatasetStatusVisualizer,
+  CaptureVideoDatasetConfigurationVisualizer,
+  CaptureVideoDatasetResultVisualizer,
+  CaptureVideoDatasetStatusVisualizer,
   ImageVisualizer,
   MonocularApriltagRigModelVisualizer,
   NamedSE3PoseVisualizer,
