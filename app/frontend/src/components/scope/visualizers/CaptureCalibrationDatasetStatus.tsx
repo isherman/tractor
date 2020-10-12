@@ -14,7 +14,7 @@ import {
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
 
-export const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisualizerProps<
+const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisualizerProps<
   CaptureCalibrationDatasetStatus
 >> = (props) => {
   const {

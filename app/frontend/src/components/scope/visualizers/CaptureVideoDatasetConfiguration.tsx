@@ -1,19 +1,38 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import {
-  SingleElementVisualizerProps,
-  Visualizer,
-  VisualizerId,
-  VisualizerOptionConfig,
-  VisualizerProps
+  FormProps,
+  SingleElementVisualizerProps
 } from "../../../registry/visualization";
-import { EventTypeId } from "../../../registry/events";
-import { Layout } from "./Layout";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import { CaptureVideoDatasetConfiguration } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_video_dataset";
+import {
+  StandardComponent,
+  StandardComponentOptions
+} from "./StandardComponent";
+import { useFormState } from "../../../hooks/useFormState";
+import FormGroup from "./FormGroup";
 
-export const CaptureVideoDatasetConfigurationElement: React.FC<SingleElementVisualizerProps<
+const CaptureVideoDatasetConfigurationForm: React.FC<FormProps<
+  CaptureVideoDatasetConfiguration
+>> = (props) => {
+  const [value, setValue] = useFormState(props);
+
+  return (
+    <>
+      <FormGroup
+        label="Name"
+        value={value.name}
+        description="A name for the dataset, used to name the output archive."
+        type="text"
+        onChange={(e) => setValue((v) => ({ ...v, name: e.target.value }))}
+      />
+    </>
+  );
+};
+
+const CaptureVideoDatasetConfigurationElement: React.FC<SingleElementVisualizerProps<
   CaptureVideoDatasetConfiguration
 >> = (props) => {
   const {
@@ -31,27 +50,13 @@ export const CaptureVideoDatasetConfigurationElement: React.FC<SingleElementVisu
   );
 };
 
-export class CaptureVideoDatasetConfigurationVisualizer
-  implements Visualizer<CaptureVideoDatasetConfiguration> {
-  static id: VisualizerId = "captureVideoDatasetConfiguration";
-  types: EventTypeId[] = [
+export const CaptureVideoDatasetConfigurationVisualizer = {
+  id: "CaptureVideoDatasetConfiguration",
+  types: [
     "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureVideoDatasetConfiguration"
-  ];
-
-  options: VisualizerOptionConfig[] = [
-    { label: "view", options: ["overlay", "grid"] }
-  ];
-
-  component: React.FC<VisualizerProps<CaptureVideoDatasetConfiguration>> = (
-    props
-  ) => {
-    const view = props.options[0].value as "overlay" | "grid";
-    return (
-      <Layout
-        view={view}
-        element={CaptureVideoDatasetConfigurationElement}
-        {...props}
-      />
-    );
-  };
-}
+  ],
+  options: StandardComponentOptions,
+  Component: StandardComponent(CaptureVideoDatasetConfigurationElement),
+  Element: CaptureVideoDatasetConfigurationElement,
+  Form: CaptureVideoDatasetConfigurationForm
+};
