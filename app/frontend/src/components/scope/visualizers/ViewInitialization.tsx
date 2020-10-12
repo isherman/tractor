@@ -46,9 +46,10 @@ const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
         label="View Direction"
         value={value.viewDirection}
         as="select"
-        onChange={(e) =>
-          setValue((v) => ({ ...v, viewDirection: parseInt(e.target.value) }))
-        }
+        onChange={(e) => {
+          const { value } = e.target;
+          setValue((v) => ({ ...v, viewDirection: parseInt(value) }));
+        }}
       >
         {enumNumericKeys(ViewDirection)
           .filter((k) => k > 0)

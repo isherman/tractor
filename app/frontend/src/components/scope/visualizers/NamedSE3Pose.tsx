@@ -27,13 +27,19 @@ const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
         label="Frame A"
         value={value.frameA}
         type="text"
-        onChange={(e) => setValue((v) => ({ ...v, frameA: e.target.value }))}
+        onChange={(e) => {
+          const { value } = e.target;
+          setValue((v) => ({ ...v, frameA: value }));
+        }}
       />
       <FormGroup
         label="Frame B"
         value={value.frameB}
         type="text"
-        onChange={(e) => setValue((v) => ({ ...v, frameB: e.target.value }))}
+        onChange={(e) => {
+          const { value } = e.target;
+          setValue((v) => ({ ...v, frameB: value }));
+        }}
       />
 
       <SE3PoseVisualizer.Form

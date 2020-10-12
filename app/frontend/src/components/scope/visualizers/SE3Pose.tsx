@@ -21,94 +21,101 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         label="tx"
         value={value.position?.x}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
-            position: { ...v.position, x: parseFloat(e.target.value) } as Vec3
-          }))
-        }
+            position: { ...v.position, x: parseFloat(value) } as Vec3
+          }));
+        }}
       />
       <FormGroup
         label="ty"
         value={value.position?.x}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
-            position: { ...v.position, y: parseFloat(e.target.value) } as Vec3
-          }))
-        }
+            position: { ...v.position, y: parseFloat(value) } as Vec3
+          }));
+        }}
       />
       <FormGroup
         label="tz"
         value={value.position?.z}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
-            position: { ...v.position, z: parseFloat(e.target.value) } as Vec3
-          }))
-        }
+            position: { ...v.position, z: parseFloat(value) } as Vec3
+          }));
+        }}
       />
 
       <FormGroup
         label="rx"
         value={value.rotation?.x}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
-              x: parseFloat(e.target.value)
+              x: parseFloat(value)
             } as Quaternion
-          }))
-        }
+          }));
+        }}
       />
 
       <FormGroup
         label="ry"
         value={value.rotation?.y}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
-              y: parseFloat(e.target.value)
+              y: parseFloat(value)
             } as Quaternion
-          }))
-        }
+          }));
+        }}
       />
 
       <FormGroup
         label="rz"
         value={value.rotation?.z}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
-              z: parseFloat(e.target.value)
+              z: parseFloat(value)
             } as Quaternion
-          }))
-        }
+          }));
+        }}
       />
 
       <FormGroup
         label="rw"
         value={value.rotation?.w}
         type="number"
-        onChange={(e) =>
+        onChange={(e) => {
+          const { value } = e.target;
           setValue((v) => ({
             ...v,
             rotation: {
               ...v.rotation,
-              w: parseFloat(e.target.value)
+              w: parseFloat(value)
             } as Quaternion
-          }))
-        }
+          }));
+        }}
       />
     </>
   );
