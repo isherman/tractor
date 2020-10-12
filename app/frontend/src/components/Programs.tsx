@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Table } from "react-bootstrap";
+import { Alert, Button, Collapse, Table } from "react-bootstrap";
 import { useStores } from "../hooks/useStores";
 import {
   StartProgramRequest,
@@ -9,6 +9,7 @@ import { useObserver } from "mobx-react-lite";
 import { useEffect } from "react";
 import { formatValue } from "../utils/formatValue";
 import styles from "./Programs.module.scss";
+import { ProgramLogVisualizer } from "./programs/ProgramLogVisualizer";
 
 export const Programs: React.FC = () => {
   const { programsStore: store } = useStores();
@@ -35,8 +36,6 @@ export const Programs: React.FC = () => {
   };
 
   return useObserver(() => {
-    const programUI = store.programUI?.component;
-
     const rows = store.supervisorStatus?.library.map(
       ({ id, name, description }) => (
         <tr key={id}>
@@ -108,7 +107,28 @@ export const Programs: React.FC = () => {
           </thead>
           <tbody>{rows}</tbody>
         </Table>
-        {programUI && React.createElement(programUI, {})}
+        <div className={styles.programDetail}>
+          <Collapse in={Boolean(store.inputRequired)}>
+            <div>
+              <div className={styles.programForm}>
+                <Alert variant="warning">User Input Requested</Alert>
+                {store.program &&
+                  store.inputRequired &&
+                  React.createElement(store.program.Component, {
+                    inputRequired: store.inputRequired
+                  })}
+              </div>
+            </div>
+          </Collapse>
+
+          <ProgramLogVisualizer
+            eventLog={store.eventLog}
+            selectedEntry={store.selectedEntry}
+            onSelectEntry={(e) => (store.selectedEntry = e)}
+            visualizer={store.visualizer?.Element}
+            resources={store.resourceArchive}
+          />
+        </div>
       </div>
     );
   });

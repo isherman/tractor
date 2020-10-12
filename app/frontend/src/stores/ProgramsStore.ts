@@ -12,7 +12,7 @@ import {
   ProgramSupervisorStatus
 } from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
 import { BusClient } from "../models/BusClient";
-import { ProgramUI, programUIForProgramId } from "../registry/programs";
+import { Program, programForProgramId } from "../registry/programs";
 import { Visualizer, visualizersForEventType } from "../registry/visualization";
 import { ResourceArchive } from "../models/ResourceArchive";
 
@@ -29,8 +29,7 @@ export class ProgramsStore {
   // The latest supervisor status
   @observable supervisorStatus: ProgramSupervisorStatus | null = null;
 
-  // Should return true for events that should be added to the eventLog buffer
-  public eventLogPredicate: (e: BusAnyEvent) => boolean = () => false;
+  // A buffer of events, as populated by the active program's eventLog predicate
   @observable eventLog: EventLogEntry[] = [];
 
   // A user-selected element in the eventLog buffer
@@ -60,9 +59,25 @@ export class ProgramsStore {
       : null;
   }
 
-  @computed get programUI(): ProgramUI | null {
+  @computed get program(): Program | null {
     const programId = this.runningProgram?.id || this.lastProgram?.id;
-    return programId ? programUIForProgramId(programId) : null;
+    return programId ? programForProgramId(programId) : null;
+  }
+
+  @computed get eventLogPredicate(): (e: BusAnyEvent) => boolean {
+    return (
+      (this.runningProgram && this.program && this.program.eventLogPredicate) ||
+      (() => false)
+    );
+  }
+
+  @computed get inputRequired(): EventType | null {
+    return (
+      this.runningProgram &&
+      this.latestEvent &&
+      this.program &&
+      this.program.inputRequired(this.latestEvent)
+    );
   }
 
   @computed get visualizer(): Visualizer | null {
@@ -112,7 +127,6 @@ export class ProgramsStore {
   }
 
   public resetEventLog(): void {
-    this.eventLogPredicate = () => false;
     this.eventLog = [];
     this.selectedEntry = null;
   }

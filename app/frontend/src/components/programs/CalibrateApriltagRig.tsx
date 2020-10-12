@@ -1,90 +1,64 @@
 /* eslint-disable no-console */
-import { useObserver } from "mobx-react-lite";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useStores } from "../../hooks/useStores";
-import { ProgramUI, ProgramId } from "../../registry/programs";
-import { ProgramLogVisualizer } from "./ProgramLogVisualizer";
-import commonStyles from "./common.module.scss";
-import { Button, Collapse, Form } from "react-bootstrap";
-import { ProgramForm } from "./ProgramForm";
+import { Button, Form } from "react-bootstrap";
+import { Event as BusAnyEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import {
   CalibrateApriltagRigConfiguration,
   CalibrateApriltagRigConfiguration as Configuration,
   CalibrateApriltagRigStatus as Status
 } from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
 import { CalibrateApriltagRigConfigurationVisualizer } from "../scope/visualizers/CalibrateApriltagRigConfiguration";
+import { ProgramProps } from "../../registry/programs";
+import { EventLogEntry } from "../../stores/ProgramsStore";
 
 const programId = "calibrate_apriltag_rig";
 
-const Component: React.FC = () => {
-  const { programsStore: store } = useStores();
-  useEffect(() => {
-    store.eventLogPredicate = (e) => e.name.startsWith(`${programId}/`);
-    return () => store.resetEventLog();
-  }, []);
-
+const Component: React.FC<ProgramProps<Configuration>> = ({
+  inputRequired
+}) => {
+  const { busClient } = useStores();
   const [configuration, setConfiguration] = useState<Configuration>();
 
   const handleConfigurationSubmit = (
     e: React.FormEvent<HTMLFormElement>
   ): void => {
     e.preventDefault();
-    store.busClient.send(
+    // TODO: Provide a better API to busClient.send
+    busClient.send(
       "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigConfiguration",
       `${programId}/configure`,
       Configuration.encode(Configuration.fromJSON(configuration)).finish()
     );
   };
 
-  return useObserver(() => {
-    const requestedConfiguration =
-      store.runningProgram &&
-      store.latestEvent &&
-      store.latestEvent.name.startsWith(`${programId}/status`) &&
-      store.latestEvent.typeUrl.endsWith("CalibrateApriltagRigStatus")
-        ? (store.latestEvent.event as Status).inputRequiredConfiguration
-        : null;
+  if (inputRequired && !configuration) {
+    setConfiguration(inputRequired);
+  }
 
-    if (requestedConfiguration && !configuration) {
-      setConfiguration(requestedConfiguration);
-    }
-
-    return (
-      <div className={commonStyles.programDetail}>
-        <Collapse in={Boolean(requestedConfiguration)}>
-          <div>
-            <ProgramForm>
-              <Form onSubmit={handleConfigurationSubmit}>
-                <CalibrateApriltagRigConfigurationVisualizer.Form
-                  initialValue={
-                    configuration ||
-                    CalibrateApriltagRigConfiguration.fromPartial({})
-                  }
-                  onChange={(updated) => setConfiguration(updated)}
-                />
-                <Button variant="primary" type="submit">
-                  Submit
-                </Button>
-              </Form>
-            </ProgramForm>
-          </div>
-        </Collapse>
-
-        <ProgramLogVisualizer
-          eventLog={store.eventLog}
-          selectedEntry={store.selectedEntry}
-          onSelectEntry={(e) => (store.selectedEntry = e)}
-          visualizer={store.visualizer?.Element}
-          resources={store.resourceArchive}
-        />
-      </div>
-    );
-  });
+  return (
+    <Form onSubmit={handleConfigurationSubmit}>
+      <CalibrateApriltagRigConfigurationVisualizer.Form
+        initialValue={
+          configuration || CalibrateApriltagRigConfiguration.fromPartial({})
+        }
+        onChange={(updated) => setConfiguration(updated)}
+      />
+      <Button variant="primary" type="submit">
+        Submit
+      </Button>
+    </Form>
+  );
 };
 
-export class CalibrateApriltagRig implements ProgramUI {
-  static id: ProgramId = programId;
-  programIds = [programId, `${programId}-playback`] as const;
-  component = Component;
-}
+export const CalibrateApriltagRigProgram = {
+  programIds: [programId, `${programId}-playback`] as const,
+  eventLogPredicate: (e: BusAnyEvent) => e.name.startsWith(`${programId}/`),
+  inputRequired: (e: EventLogEntry) =>
+    (e.name.startsWith(`${programId}/status`) &&
+      e.typeUrl.endsWith("CalibrateApriltagRigStatus") &&
+      (e.event as Status).inputRequiredConfiguration) ||
+    null,
+  Component
+};

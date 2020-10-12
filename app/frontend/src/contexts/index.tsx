@@ -27,5 +27,6 @@ export const storesContext = React.createContext({
     httpResourceArchive
   ),
   baseUrl,
-  httpResourceArchive
+  httpResourceArchive,
+  busClient
 });
