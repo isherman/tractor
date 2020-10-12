@@ -147,6 +147,10 @@ export const Blobstore: React.FC = () => {
         setSelectedPath(`${dirsToPath(parentDirs)}/${target.name}`);
         return;
       }
+      // To detect navigation upwards in the directory hierarchy, look for
+      // a parentDir with the target ID.
+      // TODO: Support nested directories that have the same name. One approach would be to
+      // use the full directory path as the id rather than just the directory name.
       const index = parentDirs.findIndex((_) => _.id === target.id);
       if (target.id === rootDir?.id) {
         setParentDirs([]);
