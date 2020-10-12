@@ -11,13 +11,13 @@ import {
 } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
 import { OverlayOptions, OverlayVisualizerComponent } from "./Overlay";
 import { useFormState } from "../../../hooks/useFormState";
-import FormGroup from "./FormGroup";
+import Form from "./Form";
 
 const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
   const [value, setValue] = useFormState(props);
   return (
     <>
-      <FormGroup
+      <Form.Group
         label="tx"
         value={value.position?.x}
         type="number"
@@ -29,7 +29,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
           }));
         }}
       />
-      <FormGroup
+      <Form.Group
         label="ty"
         value={value.position?.x}
         type="number"
@@ -41,7 +41,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
           }));
         }}
       />
-      <FormGroup
+      <Form.Group
         label="tz"
         value={value.position?.z}
         type="number"
@@ -54,7 +54,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="rx"
         value={value.rotation?.x}
         type="number"
@@ -70,7 +70,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="ry"
         value={value.rotation?.y}
         type="number"
@@ -86,7 +86,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="rz"
         value={value.rotation?.z}
         type="number"
@@ -102,7 +102,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="rw"
         value={value.rotation?.w}
         type="number"

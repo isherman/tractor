@@ -2,7 +2,6 @@
 import * as React from "react";
 import { useState } from "react";
 import { useStores } from "../../hooks/useStores";
-import { Button, Form } from "react-bootstrap";
 import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import {
   CalibrateBaseToCameraConfiguration,
@@ -12,6 +11,7 @@ import {
 import { CalibrateBaseToCameraConfigurationVisualizer } from "../scope/visualizers/CalibrateBaseToCameraConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";
+import Form from "../scope/visualizers/Form";
 
 const programId = "calibrate_base_to_camera";
 
@@ -46,9 +46,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
         }
         onChange={(updated) => setConfiguration(updated)}
       />
-      <Button variant="primary" type="submit">
-        Submit
-      </Button>
+      <Form.ButtonGroup type="submit" buttonText="Submit" />
     </Form>
   );
 };

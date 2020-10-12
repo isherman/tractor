@@ -15,7 +15,7 @@ import { useFetchResource } from "../../../hooks/useFetchResource";
 import { CaptureCalibrationDatasetResult } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { CalibrateApriltagRigResult } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
 import { useFormState } from "../../../hooks/useFormState";
-import FormGroup from "./FormGroup";
+import Form from "./Form";
 import { Resource } from "../../../../genproto/farm_ng_proto/tractor/v1/resource";
 import { BaseToCameraInitialization } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
 import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
@@ -28,7 +28,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
   const [value, setValue] = useFormState(props);
   return (
     <>
-      <FormGroup
+      <Form.Group
         // TODO: Replace with resource browser
         label="Calibration Dataset"
         value={value.calibrationDataset?.path}
@@ -46,7 +46,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         }}
       />
 
-      <FormGroup
+      <Form.Group
         // TODO: Replace with resource browser
         label="Apriltag Rig Result"
         value={value.apriltagRigResult?.path}
@@ -73,7 +73,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
         }
       />
 
-      <FormGroup
+      <Form.Group
         label="Name"
         value={value.name}
         type="text"

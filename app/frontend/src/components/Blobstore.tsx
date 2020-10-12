@@ -19,6 +19,7 @@ import { visualizersForEventType } from "../registry/visualization";
 import { Button } from "react-bootstrap";
 import { useStores } from "../hooks/useStores";
 import { useHistory, useParams } from "react-router-dom";
+import Form from "./scope/visualizers/Form";
 
 const fileToFileData = (f: File): FileData => ({
   id: f.name,
@@ -166,7 +167,10 @@ export const Blobstore: React.FC = () => {
     setIsEditing(false);
   };
 
-  const handleSubmit = async (): Promise<void> => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault();
     if (!selectedPath) {
       return;
     }
@@ -223,9 +227,6 @@ export const Blobstore: React.FC = () => {
         {selectedResource && isEditing && (
           <Button onClick={handleCancel}>{"Cancel"}</Button>
         )}
-        {selectedResource && isEditing && (
-          <Button onClick={handleSubmit}>{"Submit"}</Button>
-        )}
         {!isEditing && selectedResource && (
           <>
             {visualizer?.Element &&
@@ -236,7 +237,7 @@ export const Blobstore: React.FC = () => {
           </>
         )}
         {isEditing && selectedResource && visualizer?.Form && (
-          <>
+          <Form onSubmit={handleSubmit} className={styles.form}>
             {React.createElement(visualizer.Form, {
               initialValue: selectedResource,
               onChange: (updated) => {
@@ -244,7 +245,8 @@ export const Blobstore: React.FC = () => {
                 setModifiedResource(updated);
               }
             })}
-          </>
+            <Form.ButtonGroup type="submit" buttonText="Submit" />
+          </Form>
         )}
       </div>
     </div>

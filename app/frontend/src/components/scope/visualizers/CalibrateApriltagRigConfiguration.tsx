@@ -14,10 +14,9 @@ import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import { CaptureCalibrationDatasetResult } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { useFormState } from "../../../hooks/useFormState";
-import FormGroup from "./FormGroup";
+import Form from "./Form";
 import { Resource } from "../../../../genproto/farm_ng_proto/tractor/v1/resource";
 import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
-import { Button } from "react-bootstrap";
 
 CaptureCalibrationDatasetResultVisualizer.Element;
 
@@ -30,7 +29,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
 
   return (
     <>
-      <FormGroup
+      <Form.Group
         // TODO: Replace with resource browser
         label="Resource Path"
         value={value.calibrationDataset?.path}
@@ -50,7 +49,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
       <h6>Tag IDs</h6>
       {value.tagIds.map((tagId, index) => (
         <React.Fragment key={index}>
-          <FormGroup
+          <Form.Group
             label={`Tag ID ${index}`}
             value={tagId}
             type="number"
@@ -62,7 +61,8 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
               }));
             }}
           />
-          <Button
+          <Form.ButtonGroup
+            buttonText="X"
             onClick={() =>
               setValue((v) => ({
                 ...v,
@@ -72,23 +72,21 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
                 ]
               }))
             }
-          >
-            X
-          </Button>
+          />
         </React.Fragment>
       ))}
-      <Button
+
+      <Form.ButtonGroup
+        buttonText="+"
         onClick={() =>
           setValue((v) => ({
             ...v,
             tagIds: [...v.tagIds, 0]
           }))
         }
-      >
-        +
-      </Button>
+      />
 
-      <FormGroup
+      <Form.Group
         label="Name"
         value={value.name}
         type="text"
@@ -98,7 +96,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="Root Tag ID"
         value={value.rootTagId}
         type="number"

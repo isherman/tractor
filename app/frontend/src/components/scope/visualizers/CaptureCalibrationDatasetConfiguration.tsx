@@ -12,7 +12,7 @@ import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import { CaptureCalibrationDatasetConfiguration } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { useFormState } from "../../../hooks/useFormState";
-import FormGroup from "./FormGroup";
+import Form from "./Form";
 
 const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
   CaptureCalibrationDatasetConfiguration
@@ -21,7 +21,7 @@ const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
 
   return (
     <>
-      <FormGroup
+      <Form.Group
         label="Number of Frames"
         value={value.numFrames}
         type="number"
@@ -31,7 +31,7 @@ const CaptureCalibrationDatasetConfigurationForm: React.FC<FormProps<
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="Name"
         value={value.name}
         description="A name for the dataset, used to name the output archive."

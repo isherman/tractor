@@ -2,17 +2,22 @@ import * as React from "react";
 import { CalibrationParameter } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
 import { useFormState } from "../../../hooks/useFormState";
 import { FormProps } from "../../../registry/visualization";
-import FormGroup from "./FormGroup";
+import Form from "./Form";
 import { StandardComponentOptions } from "./StandardComponent";
 
-const CalibrationParameterForm: React.FC<FormProps<CalibrationParameter>> = (
-  props
-) => {
+interface IFormProps extends FormProps<CalibrationParameter> {
+  valueLabel?: string;
+}
+
+const CalibrationParameterForm: React.FC<IFormProps> = ({
+  valueLabel,
+  ...props
+}) => {
   const [value, setValue] = useFormState(props);
   return (
     <>
-      <FormGroup
-        label="Value"
+      <Form.Group
+        label={valueLabel || "Value"}
         value={value.value}
         type="number"
         onChange={(e) => {
@@ -20,7 +25,7 @@ const CalibrationParameterForm: React.FC<FormProps<CalibrationParameter>> = (
           setValue((v) => ({ ...v, value }));
         }}
       />
-      <FormGroup
+      <Form.Group
         label="Constant"
         checked={value.constant}
         type="checkbox"

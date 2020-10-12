@@ -3,7 +3,6 @@ import * as React from "react";
 
 import { useStores } from "../../hooks/useStores";
 import { useState } from "react";
-import { Button, Form } from "react-bootstrap";
 import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
 import {
   CaptureCalibrationDatasetConfiguration,
@@ -13,6 +12,7 @@ import {
 import { CaptureCalibrationDatasetConfigurationVisualizer } from "../scope/visualizers/CaptureCalibrationDatasetConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";
+import Form from "../scope/visualizers/Form";
 
 const programId = "capture_calibration_dataset";
 
@@ -46,9 +46,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
         }
         onChange={(updated) => setConfiguration(updated)}
       />
-      <Button variant="primary" type="submit">
-        Submit
-      </Button>
+      <Form.ButtonGroup type="submit" buttonText="Submit" />
     </Form>
   );
 };

@@ -12,7 +12,7 @@ import { Card } from "./Card";
 import { TractorConfig } from "../../../../genproto/farm_ng_proto/tractor/v1/tractor";
 import { KeyValueTable } from "./KeyValueTable";
 import { useFormState } from "../../../hooks/useFormState";
-import FormGroup from "./FormGroup";
+import Form from "./Form";
 import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
 
 const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
@@ -20,7 +20,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
 
   return (
     <>
-      <FormGroup
+      <Form.Group
         label="Wheel Baseline"
         value={value.wheelBaseline}
         type="number"
@@ -33,7 +33,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="Wheel Radius"
         value={value.wheelRadius}
         type="number"
@@ -46,7 +46,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="Wheel Radius Left"
         value={value.wheelRadiusLeft}
         type="number"
@@ -59,7 +59,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="Wheel Radius Right"
         value={value.wheelRadiusRight}
         type="number"
@@ -72,7 +72,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="Hub Motor Gear Ratio"
         value={value.hubMotorGearRatio}
         type="number"
@@ -85,7 +85,7 @@ const TractorConfigForm: React.FC<FormProps<TractorConfig>> = (props) => {
         }}
       />
 
-      <FormGroup
+      <Form.Group
         label="Hub Motor Poll Pairs"
         value={value.hubMotorPollPairs}
         type="number"

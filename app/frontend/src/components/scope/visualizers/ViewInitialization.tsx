@@ -13,7 +13,7 @@ import {
 import { enumNumericKeys } from "../../../utils/enum";
 import { CalibrationParameterVisualizer } from "./CalibrationParameter";
 import { CalibrationParameterTable } from "./CalibrationParameterTable";
-import FormGroup from "./FormGroup";
+import Form from "./Form";
 import { KeyValueTable } from "./KeyValueTable";
 import {
   StandardComponentOptions,
@@ -26,23 +26,23 @@ const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
   const [value, setValue] = useFormState(props);
   return (
     <>
-      <h6>X</h6>
       <CalibrationParameterVisualizer.Form
+        valueLabel="X"
         initialValue={value.x || CalibrationParameter.fromPartial({})}
         onChange={(updated) => setValue((v) => ({ ...v, x: updated }))}
       />
-      <h6>Y</h6>
       <CalibrationParameterVisualizer.Form
+        valueLabel="Y"
         initialValue={value.y || CalibrationParameter.fromPartial({})}
         onChange={(updated) => setValue((v) => ({ ...v, y: updated }))}
       />
-      <h6>Z</h6>
       <CalibrationParameterVisualizer.Form
+        valueLabel="Z"
         initialValue={value.z || CalibrationParameter.fromPartial({})}
         onChange={(updated) => setValue((v) => ({ ...v, z: updated }))}
       />
 
-      <FormGroup
+      <Form.Group
         label="View Direction"
         value={value.viewDirection}
         as="select"
@@ -60,7 +60,7 @@ const ViewInitializationForm: React.FC<FormProps<ViewInitialization>> = (
               </option>
             );
           })}
-      </FormGroup>
+      </Form.Group>
     </>
   );
 };

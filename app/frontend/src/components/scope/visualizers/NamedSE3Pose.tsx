@@ -16,14 +16,14 @@ import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
 import { OverlayOptions, OverlayVisualizerComponent } from "./Overlay";
 import { Canvas } from "../../Canvas";
 import { useFormState } from "../../../hooks/useFormState";
-import FormGroup from "./FormGroup";
+import Form from "./Form";
 import { SE3PoseVisualizer } from "./SE3Pose";
 
 const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
   const [value, setValue] = useFormState(props);
   return (
     <>
-      <FormGroup
+      <Form.Group
         label="Frame A"
         value={value.frameA}
         type="text"
@@ -32,7 +32,7 @@ const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
           setValue((v) => ({ ...v, frameA }));
         }}
       />
-      <FormGroup
+      <Form.Group
         label="Frame B"
         value={value.frameB}
         type="text"

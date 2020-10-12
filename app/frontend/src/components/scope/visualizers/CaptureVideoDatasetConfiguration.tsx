@@ -12,7 +12,7 @@ import {
   StandardComponentOptions
 } from "./StandardComponent";
 import { useFormState } from "../../../hooks/useFormState";
-import FormGroup from "./FormGroup";
+import Form from "./Form";
 
 const CaptureVideoDatasetConfigurationForm: React.FC<FormProps<
   CaptureVideoDatasetConfiguration
@@ -21,7 +21,7 @@ const CaptureVideoDatasetConfigurationForm: React.FC<FormProps<
 
   return (
     <>
-      <FormGroup
+      <Form.Group
         label="Name"
         value={value.name}
         description="A name for the dataset, used to name the output archive."
