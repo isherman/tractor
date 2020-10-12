@@ -17,6 +17,7 @@ import { useFormState } from "../../../hooks/useFormState";
 import FormGroup from "./FormGroup";
 import { Resource } from "../../../../genproto/farm_ng_proto/tractor/v1/resource";
 import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
+import { Button } from "react-bootstrap";
 
 CaptureCalibrationDatasetResultVisualizer.Element;
 
@@ -24,6 +25,8 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
   CalibrateApriltagRigConfiguration
 >> = (props) => {
   const [value, setValue] = useFormState(props);
+
+  console.log(value);
 
   return (
     <>
@@ -44,22 +47,46 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
           }));
         }}
       />
-
-      <FormGroup
-        // TODO: Replace with repeated integer input (CURRENTLY BROKEN)
-        label="Tag IDs"
-        value={(value.tagIds || []).join(", ")}
-        type="text"
-        onChange={(e) => {
-          const tagIds = e.target.value
-            .split(", ")
-            .map((_) => parseInt(_.trim()));
+      <h6>Tag IDs</h6>
+      {value.tagIds.map((tagId, index) => (
+        <React.Fragment key={index}>
+          <FormGroup
+            label={`Tag ID ${index}`}
+            value={tagId}
+            type="number"
+            onChange={(e) => {
+              const tagId = parseInt(e.target.value);
+              setValue((v) => ({
+                ...v,
+                tagIds: Object.assign([...v.tagIds], { [index]: tagId })
+              }));
+            }}
+          />
+          <Button
+            onClick={() =>
+              setValue((v) => ({
+                ...v,
+                tagIds: [
+                  ...v.tagIds.slice(0, index),
+                  ...v.tagIds.slice(index + 1)
+                ]
+              }))
+            }
+          >
+            X
+          </Button>
+        </React.Fragment>
+      ))}
+      <Button
+        onClick={() =>
           setValue((v) => ({
             ...v,
-            tagIds
-          }));
-        }}
-      />
+            tagIds: [...v.tagIds, 0]
+          }))
+        }
+      >
+        +
+      </Button>
 
       <FormGroup
         label="Name"
