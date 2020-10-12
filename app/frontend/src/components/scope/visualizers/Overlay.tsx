@@ -26,7 +26,7 @@ export const Overlay = <T extends EventType>(
   const value = pinned ? values[values.length - 1] : values[index];
   if (!value) {
     // An external change (e.g. to the throttle) made the current index invalid.
-    if (values[0]) {
+    if (values.length > 0 && values[0]) {
       setIndex(0);
     }
     return null;

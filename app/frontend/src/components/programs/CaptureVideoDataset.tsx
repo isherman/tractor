@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as React from "react";
 import { useStores } from "../../hooks/useStores";
 import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
@@ -10,7 +11,7 @@ import {
 } from "../../../genproto/farm_ng_proto/tractor/v1/capture_video_dataset";
 import { CaptureVideoDatasetConfigurationVisualizer } from "../scope/visualizers/CaptureVideoDatasetConfiguration";
 import { ProgramProps } from "../../registry/programs";
-import { DeserializedEvent } from "../../registry/events";
+import { decodeAnyEvent } from "../../models/decodeAnyEvent";
 
 const programId = "capture_video_dataset";
 
@@ -55,10 +56,16 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
 export const CaptureVideoDatasetProgram = {
   programIds: [programId] as const,
   eventLogPredicate: (e: BusEvent) => e.name.startsWith(`${programId}/`),
-  inputRequired: (e: DeserializedEvent) =>
-    (e.name.startsWith(`${programId}/status`) &&
-      e.typeUrl.endsWith("CaptureVideoDatasetStatus") &&
-      (e.data as Status).inputRequiredConfiguration) ||
-    null,
+  inputRequired: (e: BusEvent) => {
+    if (!e.name.startsWith(`${programId}/status`)) {
+      return null;
+    }
+    const data = decodeAnyEvent(e);
+    if (!data) {
+      console.error(`Could not decode bus event`, e);
+      return null;
+    }
+    return (data as Status).inputRequiredConfiguration || null;
+  },
   Component
 };

@@ -11,7 +11,7 @@ import {
 } from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
 import { CalibrateBaseToCameraConfigurationVisualizer } from "../scope/visualizers/CalibrateBaseToCameraConfiguration";
 import { ProgramProps } from "../../registry/programs";
-import { DeserializedEvent } from "../../registry/events";
+import { decodeAnyEvent } from "../../models/decodeAnyEvent";
 
 const programId = "calibrate_base_to_camera";
 
@@ -56,10 +56,16 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
 export const CalibrateBaseToCameraProgram = {
   programIds: [programId] as const,
   eventLogPredicate: (e: BusEvent) => e.name.startsWith(`${programId}/`),
-  inputRequired: (e: DeserializedEvent) =>
-    (e.name.startsWith(`${programId}/status`) &&
-      e.typeUrl.endsWith("CalibrateBaseToCameraStatus") &&
-      (e.data as Status).inputRequiredConfiguration) ||
-    null,
+  inputRequired: (e: BusEvent) => {
+    if (!e.name.startsWith(`${programId}/status`)) {
+      return null;
+    }
+    const data = decodeAnyEvent(e);
+    if (!data) {
+      console.error(`Could not decode bus event`, e);
+      return null;
+    }
+    return (data as Status).inputRequiredConfiguration || null;
+  },
   Component
 };

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import * as React from "react";
 
 import { useStores } from "../../hooks/useStores";
@@ -11,7 +12,7 @@ import {
 } from "../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
 import { CaptureCalibrationDatasetConfigurationVisualizer } from "../scope/visualizers/CaptureCalibrationDatasetConfiguration";
 import { ProgramProps } from "../../registry/programs";
-import { DeserializedEvent } from "../../registry/events";
+import { decodeAnyEvent } from "../../models/decodeAnyEvent";
 
 const programId = "capture_calibration_dataset";
 
@@ -56,10 +57,16 @@ export const CaptureCalibrationDatasetProgram = {
   programIds: [programId] as const,
   eventLogPredicate: (e: BusEvent) =>
     e.name.startsWith(`${programId}/`) || e.name.startsWith("calibrator/"),
-  inputRequired: (e: DeserializedEvent) =>
-    (e.name.startsWith(`${programId}/status`) &&
-      e.typeUrl.endsWith("CaptureCalibrationDatasetStatus") &&
-      (e.data as Status).inputRequiredConfiguration) ||
-    null,
+  inputRequired: (e: BusEvent) => {
+    if (!e.name.startsWith(`${programId}/status`)) {
+      return null;
+    }
+    const data = decodeAnyEvent(e);
+    if (!data) {
+      console.error(`Could not decode bus event`, e);
+      return null;
+    }
+    return (data as Status).inputRequiredConfiguration || null;
+  },
   Component
 };

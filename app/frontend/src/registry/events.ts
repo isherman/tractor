@@ -59,8 +59,10 @@ import {
   CalibrateBaseToCameraResult,
   CalibrateBaseToCameraStatus
 } from "../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
+import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 
 export type EventType =
+  | BusEvent
   | SteeringCommand
   | TrackingCameraPoseFrame
   | TrackingCameraMotionFrame
@@ -107,6 +109,7 @@ const inferKeys = <T>(
 ): { [K in keyof T]: Message<EventType> } => o;
 
 export const eventRegistry = inferKeys({
+  "type.googleapis.com/farm_ng_proto.tractor.v1.Event": BusEvent,
   "type.googleapis.com/farm_ng_proto.tractor.v1.SteeringCommand": SteeringCommand,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraPoseFrame": TrackingCameraPoseFrame,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraMotionFrame": TrackingCameraMotionFrame,
@@ -152,10 +155,3 @@ export const eventTypeIds = Object.keys(
   eventRegistry
 ) as (keyof typeof eventRegistry)[];
 export type EventTypeId = typeof eventTypeIds[number];
-
-export interface DeserializedEvent {
-  stamp: Date | undefined;
-  name: string;
-  typeUrl: EventTypeId;
-  data: EventType;
-}

@@ -6,13 +6,13 @@ import {
   BusEventEmitter,
   BusEventEmitterHandle
 } from "../models/BusEventEmitter";
-import { DeserializedEvent, EventType, EventTypeId } from "../registry/events";
+import { EventType } from "../registry/events";
 import {
   ProgramExecution,
   ProgramSupervisorStatus
 } from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
 import { Program, programForProgramId } from "../registry/programs";
-import { Visualizer, visualizersForEventType } from "../registry/visualization";
+import { TimestampedEventVector } from "../types/common";
 
 export class ProgramsStore {
   private busHandle: BusEventEmitterHandle | null = null;
@@ -21,7 +21,9 @@ export class ProgramsStore {
   @observable supervisorStatus: ProgramSupervisorStatus | null = null;
 
   // A buffer of events, as populated by the active program's eventLog predicate
-  @observable eventLog: DeserializedEvent[] = [];
+  eventLog: TimestampedEventVector<BusEvent> = observable.array([], {
+    deep: false
+  });
 
   // A user-selected element in the eventLog buffer
   @observable selectedEntry: number | null = null;
@@ -36,13 +38,9 @@ export class ProgramsStore {
     return this.supervisorStatus?.stopped?.lastProgram || null;
   }
 
-  @computed get selectedEvent(): DeserializedEvent | null {
-    return this.selectedEntry ? this.eventLog[this.selectedEntry] : null;
-  }
-
-  @computed get latestEvent(): DeserializedEvent | null {
+  @computed get latestEvent(): BusEvent | null {
     return this.eventLog.length > 0
-      ? this.eventLog[this.eventLog.length - 1]
+      ? this.eventLog[this.eventLog.length - 1][1]
       : null;
   }
 
@@ -67,12 +65,6 @@ export class ProgramsStore {
     );
   }
 
-  @computed get visualizer(): Visualizer | null {
-    return this.selectedEvent
-      ? visualizersForEventType(this.selectedEvent.typeUrl)[0]
-      : null;
-  }
-
   public startStreaming(): void {
     this.busHandle = this.busEventEmitter.on("*", (busEvent: BusEvent) => {
       if (!busEvent || !busEvent.data) {
@@ -87,20 +79,8 @@ export class ProgramsStore {
       }
       // TODO: ugly
       const eventLogPredicate = (() => this.eventLogPredicate)();
-      if (eventLogPredicate(busEvent)) {
-        const data = decodeAnyEvent(busEvent);
-        if (!data) {
-          console.error(`ProgramsStore could not decode Any event`, busEvent);
-          return;
-        }
-        if (eventLogPredicate(busEvent)) {
-          this.eventLog.push({
-            stamp: busEvent.stamp,
-            name: busEvent.name,
-            typeUrl: busEvent.data.typeUrl as EventTypeId,
-            data
-          });
-        }
+      if (eventLogPredicate(busEvent) && busEvent.stamp) {
+        this.eventLog.push([busEvent.stamp.getTime(), busEvent]);
       }
     });
   }

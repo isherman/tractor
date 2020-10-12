@@ -9,7 +9,7 @@ import { useObserver } from "mobx-react-lite";
 import { useEffect } from "react";
 import { formatValue } from "../utils/formatValue";
 import styles from "./Programs.module.scss";
-import { ProgramLogVisualizer } from "./programs/ProgramLogVisualizer";
+import { EventVisualizer } from "./scope/visualizers/Event";
 
 export const Programs: React.FC = () => {
   const { busClient, httpResourceArchive, programsStore: store } = useStores();
@@ -120,12 +120,9 @@ export const Programs: React.FC = () => {
               </div>
             </div>
           </Collapse>
-
-          <ProgramLogVisualizer
-            eventLog={store.eventLog}
-            selectedEntry={store.selectedEntry}
-            onSelectEntry={(e) => (store.selectedEntry = e)}
-            visualizer={store.visualizer?.Element}
+          <EventVisualizer.Component
+            values={store.eventLog}
+            options={[{ label: "", options: [], value: "overlay" }]}
             resources={httpResourceArchive}
           />
         </div>

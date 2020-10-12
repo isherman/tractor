@@ -63,7 +63,6 @@
     "react-json-view": "^1.19.1",
     "react-router-dom": "^5.2.0",
     "react-three-fiber": "^4.2.20",
-    "react-window": "^1.8.5",
     "resize-observer-polyfill": "^1.5.1",
     "three": "^0.119.1",
     "ts-proto": "^1.35.1",
