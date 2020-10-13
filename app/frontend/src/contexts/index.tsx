@@ -5,8 +5,9 @@ import { getWebRTCEmitters } from "../models/getWebRTCEmitters";
 import { VisualizationStore } from "../stores/VisualizationStore";
 import { ProgramsStore } from "../stores/ProgramsStore";
 import { HttpResourceArchive } from "../models/ResourceArchive";
+import { env } from "../config";
 
-const baseUrl = `http://${window.location.hostname}:8081`;
+const baseUrl = env.BASE_URL || window.location.origin;
 
 const [busEventEmitter, mediaStreamEmitter, busClient] = getWebRTCEmitters(
   `${baseUrl}/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`
