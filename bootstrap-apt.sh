@@ -35,6 +35,8 @@ sudo apt-get install -y \
      build-essential \
      ca-certificates \
      clang \
+     clang-10 \
+     clang-tidy-10 \
      cmake \
      curl \
      dirmngr \
@@ -46,6 +48,7 @@ sudo apt-get install -y \
      libboost-filesystem-dev \
      libboost-regex-dev \
      libboost-system-dev \
+     libclang-10-dev \
      libeigen3-dev \
      libgoogle-glog-dev \
      libgstreamer-plugins-base1.0-dev \
@@ -65,6 +68,11 @@ sudo apt-get install -y \
 if ! pip3 show virtualenv > /dev/null 2>&1; then
   pip3 install virtualenv
 fi
+
+# clang
+sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10 100
+sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-10 100
+sudo update-alternatives --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-10 100
 
 # Go
 arch=`dpkg --print-architecture`
