@@ -8,6 +8,7 @@
 #      `auto Foo() -> std::string { return ...; }`, we think the code is less
 #      readable in this form.
 #
+# TODO(isherman|ethanrublee)
 # - All others are provisionally disabled, and should be re-enabled or documented as disabled
 Checks: >
   -*,
