@@ -19,7 +19,7 @@ Checks: >
   modernize-*,
   performance-*,
   portability-*,
-  readability-*
+  readability-*,
   -bugprone-branch-clone,
   -bugprone-integer-division,
   -bugprone-narrowing-conversions,

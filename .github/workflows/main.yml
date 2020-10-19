@@ -32,6 +32,12 @@ jobs:
       with:
         node-version: '12'
     - run: yarn --cwd app/frontend install
+    - name: Install clang-tidy
+      run: |
+        sudo apt-get install clang-10 clang-tidy-10
+        sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10 100
+        sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-10 100
+        sudo update-alternatives --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-10 100
     - uses: actions/cache@v1
       with:
         path: ~/.cache/pre-commit
