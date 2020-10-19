@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: "12"
       - name: Install system dependencies
-        run: make bootstrap
+        run: ./bootstrap-apt.sh
       - uses: actions/cache@v1
         with:
           path: ~/.cache/pre-commit

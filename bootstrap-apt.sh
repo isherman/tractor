@@ -1,13 +1,4 @@
 #!/bin/bash -ex
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
-  SOURCE="$(readlink "$SOURCE")"
-  # if $SOURCE was a relative symlink, we need to resolve it
-  # relative to the path where the symlink file was located
-  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
-done
-export FARM_NG_ROOT=$( cd "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
 # Realsense apt sources
 if ! dpkg -s librealsense2-dev > /dev/null 2>&1; then
@@ -26,6 +17,11 @@ fi
 if ! dpkg -s grafana > /dev/null 2>&1; then
   wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
   echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+fi
+
+# Node apt sources
+if ! dpkg -s nodejs > /dev/null 2>&1; then
+  curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 fi
 
 # System dependencies
@@ -60,59 +56,11 @@ sudo apt-get install -y \
      libusb-1.0-0-dev \
      lsb-release \
      network-manager \
+     nodejs \
      protobuf-compiler \
      python3-pip \
      yarn
 
-# Virtualenv
-if ! pip3 show virtualenv > /dev/null 2>&1; then
-  pip3 install virtualenv
-fi
-
-# clang
 sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-10 100
 sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-10 100
 sudo update-alternatives --install /usr/bin/run-clang-tidy run-clang-tidy /usr/bin/run-clang-tidy-10 100
-
-# Go
-arch=`dpkg --print-architecture`
-if ! /usr/local/go/bin/go version | grep 1.15.1; then
-  wget https://golang.org/dl/go1.15.1.linux-${arch}.tar.gz -P /tmp/
-  sudo tar -C /usr/local -xzf /tmp/go1.15.1.linux-${arch}.tar.gz
-  /usr/local/go/bin/go version
-fi
-
-# Node
-if ! nodejs --version | grep 12.18.3; then
-  curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
-  sudo apt -y install nodejs
-  nodejs --version
-fi
-
-# Prometheus Node Exporter
-if ! node_exporter --version | grep 1.0.1; then
-  wget https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-${arch}.tar.gz -P /tmp/
-  tar -C /tmp -xzf /tmp/node_exporter-1.0.1.linux-${arch}.tar.gz
-  sudo cp /tmp/node_exporter-1.0.1.linux-${arch}/node_exporter /usr/local/bin
-fi
-
-# Prometheus
-if ! prometheus --version | grep 2.21.0; then
-  wget https://github.com/prometheus/prometheus/releases/download/v2.21.0/prometheus-2.21.0.linux-${arch}.tar.gz -P /tmp/
-  tar -C /tmp -xzf /tmp/prometheus-2.21.0.linux-${arch}.tar.gz
-  sudo cp /tmp/prometheus-2.21.0.linux-${arch}/prometheus /usr/local/bin
-fi
-
-
-# tractor-logs
-if [ ! -d "$HOME/tractor-logs" ]; then
-  if git clone git@github.com:farm-ng/tractor-logs.git $HOME/tractor-logs; then
-    cd ~/tractor-logs
-    git lfs install --local
-    git config user.email `hostname`
-    git config user.name `hostname`
-  else
-    echo "Please generate an SSH keypair and add it to the tractor-logs repository."
-    exit 1
-  fi
-fi
