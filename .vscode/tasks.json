@@ -1,0 +1,16 @@
+{
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "IWYU Current File",
+      "command": "iwyu_tool.py -p build ${relativeFile} | fix_includes.py --nosafe_headers",
+      "presentation": {
+        "reveal": "always"
+      },
+      "options": {
+        "cwd": "${workspaceRoot}"
+      }
+    }
+  ],
+  "version": "2.0.0"
+}

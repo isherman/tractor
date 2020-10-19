@@ -22,3 +22,7 @@
 [submodule "third_party/opencv"]
 	path = third_party/opencv
 	url = https://github.com/opencv/opencv.git
+[submodule "third_party/iwyu"]
+	path = third_party/iwyu
+	url = https://github.com/include-what-you-use/include-what-you-use.git
+	branch = clang_10
