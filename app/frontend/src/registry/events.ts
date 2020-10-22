@@ -7,11 +7,13 @@ import {
 import {
   NamedSE3Pose,
   SE3Pose,
+  TrajectorySE3,
   Vec2
 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
 import {
   BaseToCameraInitialization,
   BaseToCameraModel,
+  BaseToCameraModel_Sample as BaseToCameraModelSample,
   CalibrationParameter,
   CalibratorCommand,
   CalibratorStatus,
@@ -75,6 +77,7 @@ export type EventType =
   | TractorState
   | Announce
   | Vec2
+  | TrajectorySE3
   | Image
   | TractorConfig
   | ApriltagConfig
@@ -92,6 +95,7 @@ export type EventType =
   | StopProgramRequest
   | MonocularApriltagRigModel
   | BaseToCameraModel
+  | BaseToCameraModelSample
   | BaseToCameraInitialization
   | CaptureCalibrationDatasetConfiguration
   | CaptureCalibrationDatasetStatus
@@ -125,6 +129,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.TractorState": TractorState,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Announce": Announce,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": Vec2,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.TrajectorySE3": TrajectorySE3,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Image": Image,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig": TractorConfig,
   "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagConfig": ApriltagConfig,
@@ -139,6 +144,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.LoggingStatus": LoggingStatus,
   "type.googleapis.com/farm_ng_proto.tractor.v1.MonocularApriltagRigModel": MonocularApriltagRigModel,
   "type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraModel": BaseToCameraModel,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraModel_Sample": BaseToCameraModelSample,
   "type.googleapis.com/farm_ng_proto.tractor.v1.ProgramSupervisorStatus": ProgramSupervisorStatus,
   "type.googleapis.com/farm_ng_proto.tractor.v1.StartProgramRequest": StartProgramRequest,
   "type.googleapis.com/farm_ng_proto.tractor.v1.StopProgramRequest": StopProgramRequest,

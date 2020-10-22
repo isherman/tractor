@@ -1,29 +1,16 @@
 import * as React from "react";
 import ReactJson from "react-json-view";
-import { Button, OverlayTrigger, Popover } from "react-bootstrap";
-import styles from "./JsonPopover.module.scss";
+import { Popover, PopoverProps } from "./Popover";
 
-interface IProps {
-  title?: string;
+interface IProps extends PopoverProps {
   // eslint-disable-next-line @typescript-eslint/ban-types
   json: Object;
 }
 
-export const JsonPopover: React.FC<IProps> = ({ title, json }) => {
-  const jsonElement = <ReactJson src={json} displayDataTypes={false} />;
-
-  const popover = (
-    <Popover>
-      {title && <Popover.Title as="h3">{title}</Popover.Title>}
-      <Popover.Content>
-        <div className={styles.popoverContent}>{jsonElement}</div>
-      </Popover.Content>
-    </Popover>
-  );
-
+export const JsonPopover: React.FC<IProps> = ({ json, ...props }) => {
   return (
-    <OverlayTrigger trigger="click" placement="auto" overlay={popover}>
-      <Button variant={"light"}>{"{}"}</Button>
-    </OverlayTrigger>
+    <Popover {...props}>
+      <ReactJson src={json} displayDataTypes={false} />
+    </Popover>
   );
 };

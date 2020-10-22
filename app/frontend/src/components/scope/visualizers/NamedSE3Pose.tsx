@@ -18,6 +18,39 @@ import { Canvas } from "../../Canvas";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 import { SE3PoseVisualizer } from "./SE3Pose";
+import { Html } from "drei";
+
+const NamedSE3Pose3DElement: React.FC<SingleElementVisualizerProps<
+  NamedSE3Pose
+>> = ({ children, ...props }) => {
+  const {
+    value: [, value]
+  } = props;
+
+  return (
+    <group>
+      <line>
+        <geometry
+          attach="geometry"
+          vertices={[toVector3(undefined), toVector3(value.aPoseB?.position)]}
+          onUpdate={(self) => (self.verticesNeedUpdate = true)}
+        />
+        <lineBasicMaterial attach="material" color="lightgray" />
+      </line>
+      <group
+        position={toVector3(value.aPoseB?.position)}
+        quaternion={toQuaternion(value.aPoseB?.rotation)}
+      >
+        <axesHelper>
+          <Html>
+            <div>{value.frameB}</div>
+          </Html>
+        </axesHelper>
+        {children}
+      </group>
+    </group>
+  );
+};
 
 const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
   const [value, setValue] = useFormState(props);
@@ -75,5 +108,6 @@ export const NamedSE3PoseVisualizer = {
   options: OverlayOptions,
   Component: OverlayVisualizerComponent(NamedSE3PoseElement),
   Element: NamedSE3PoseElement,
-  Form: NamedSE3PoseForm
+  Form: NamedSE3PoseForm,
+  Marker3D: NamedSE3Pose3DElement
 };

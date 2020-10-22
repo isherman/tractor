@@ -14,6 +14,7 @@ import {
 } from "../registry/visualization";
 import { Buffer, TimestampedEvent } from "../types/common";
 import { duration } from "../utils/duration";
+import { testBuffer } from "../utils/testBuffer";
 
 function mapToDateRange(value: number, startDate: Date, endDate: Date): Date {
   return new Date(
@@ -76,7 +77,7 @@ export class VisualizationStore {
   @observable bufferRangeStart = 0;
   @observable bufferRangeEnd = 1;
   @observable bufferThrottle = 0;
-  @observable buffer: Buffer = {};
+  @observable buffer: Buffer = testBuffer;
   @observable bufferLogLoadProgress = 0;
   @observable bufferExpirationWindow = 1 * duration.minute;
   @observable resourceArchive: ResourceArchive;

@@ -12,6 +12,23 @@ import {
 import { OverlayOptions, OverlayVisualizerComponent } from "./Overlay";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
+import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
+
+const SE3Pose3DElement: React.FC<SingleElementVisualizerProps<SE3Pose>> = (
+  props
+) => {
+  const {
+    value: [, value]
+  } = props;
+  return (
+    <group
+      position={toVector3(value.position)}
+      quaternion={toQuaternion(value.rotation)}
+    >
+      <axesHelper />
+    </group>
+  );
+};
 
 const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
   const [value, setValue] = useFormState(props);
@@ -131,5 +148,6 @@ export const SE3PoseVisualizer = {
   options: OverlayOptions,
   Component: OverlayVisualizerComponent(SE3PoseElement),
   Element: SE3PoseElement,
-  Form: SE3PoseForm
+  Form: SE3PoseForm,
+  Marker3D: SE3Pose3DElement
 };
