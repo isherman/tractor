@@ -67,7 +67,8 @@ import {
   Marker,
   MarkerList,
   PointMarker,
-  PoseMarker
+  PoseMarker,
+  TrajectoryMarker
 } from "../../genproto/farm_ng_proto/tractor/v1/markers";
 import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 
@@ -88,6 +89,7 @@ export type EventType =
   | Marker
   | PointMarker
   | PoseMarker
+  | TrajectoryMarker
   | Image
   | TractorConfig
   | ApriltagConfig
@@ -144,6 +146,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.Marker": Marker,
   "type.googleapis.com/farm_ng_proto.tractor.v1.PointMarker": PointMarker,
   "type.googleapis.com/farm_ng_proto.tractor.v1.PoseMarker": PoseMarker,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.TrajectoryMarker": TrajectoryMarker,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Image": Image,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig": TractorConfig,
   "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagConfig": ApriltagConfig,

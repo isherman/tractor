@@ -13,12 +13,15 @@ import {
 import { Card } from "./Card";
 import { KeyValueTable } from "./KeyValueTable";
 import { BaseToCameraInitializationVisualizer } from "./BaseToCameraInitialization";
-import { TrajectorySE3Visualizer } from "./TrajectorySE3";
+// import { TrajectorySE3Visualizer } from "./TrajectorySE3";
 import { Canvas } from "../../Canvas";
 import { Lights } from "../../Lights";
 import { Controls } from "../../Controls";
 import { Ground } from "../../Ground";
 import { Overlay } from "./Overlay";
+import { TrajectoryMarkerVisualizer } from "./TrajectoryMarker";
+import { Color } from "../../../../genproto/farm_ng_proto/tractor/v1/markers";
+import { TrajectorySE3Visualizer } from "./TrajectorySE3";
 
 const SampleMarker3D: React.FC<SingleElementVisualizerProps<
   BaseToCameraModelSample
@@ -44,19 +47,56 @@ const SampleMarker3D: React.FC<SingleElementVisualizerProps<
         <Controls />
 
         {cameraTrajectoryRig && (
-          <TrajectorySE3Visualizer.Marker3D
-            value={[0, cameraTrajectoryRig]}
-          ></TrajectorySE3Visualizer.Marker3D>
+          // <TrajectorySE3Visualizer.Marker3D
+          //   value={[0, cameraTrajectoryRig]}
+          // ></TrajectorySE3Visualizer.Marker3D>
+          <TrajectoryMarkerVisualizer.Marker3D
+            value={[
+              0,
+              {
+                trajectory: cameraTrajectoryRig,
+                angleTolerance: 0.1,
+                bufferSize: 10000,
+                color: Color.fromPartial({ rgba: { r: 1 } }),
+                positionTolerance: 0
+              }
+            ]}
+          />
         )}
         {odometryTrajectoryBase && (
-          <TrajectorySE3Visualizer.Marker3D
-            value={[0, odometryTrajectoryBase]}
-          ></TrajectorySE3Visualizer.Marker3D>
+          // <TrajectorySE3Visualizer.Marker3D
+          //   value={[0, odometryTrajectoryBase]}
+          // ></TrajectorySE3Visualizer.Marker3D>
+          <TrajectoryMarkerVisualizer.Marker3D
+            value={[
+              0,
+              {
+                trajectory: odometryTrajectoryBase,
+                angleTolerance: 0.1,
+                bufferSize: 10000,
+                color: Color.fromPartial({ rgba: { g: 1 } }),
+                positionTolerance: 0
+              }
+            ]}
+          />
         )}
+
         {visualOdometryTrajectoryBase && (
           <TrajectorySE3Visualizer.Marker3D
             value={[0, visualOdometryTrajectoryBase]}
           ></TrajectorySE3Visualizer.Marker3D>
+          // <TrajectoryMarkerVisualizer.Marker3D
+          //   value={[
+          //     0,
+          //     {
+          //       trajectory: visualOdometryTrajectoryBase,
+          //       angleTolerance: 0.1,
+          //       bufferSize: 10000,
+          //       color: Color.fromPartial({ rgba: { b: 1 } }),
+          //       positionTolerance: 0
+          //     }
+          //   ]}
+          // />
         )}
       </Canvas>
     </div>

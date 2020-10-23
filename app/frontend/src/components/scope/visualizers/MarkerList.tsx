@@ -34,6 +34,7 @@ const MarkerListElement: React.FC<SingleElementVisualizerProps<MarkerList>> = ({
   );
 };
 
+// TODO: Understand why Standard3DComponent is not working
 export const MarkerListVisualizer = {
   id: "MarkerList",
   types: ["type.googleapis.com/farm_ng_proto.tractor.v1.MarkerList"],

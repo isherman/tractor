@@ -40,7 +40,7 @@ message PointMarker {
   Color color = 2;
 }
 
-message TractoryMarker {
+message TrajectoryMarker {
   TrajectorySE3 trajectory = 1;
   double position_tolerance = 2;
   double angle_tolerance = 3;

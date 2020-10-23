@@ -4,13 +4,17 @@ import {
   SingleElementVisualizerProps,
   visualizersForEventType
 } from "../../../registry/visualization";
-import { OverlayOptions, OverlayVisualizerComponent } from "./Overlay";
 import { Marker } from "../../../../genproto/farm_ng_proto/tractor/v1/markers";
 import { EventTypeId } from "../../../registry/events";
 import { decodeAnyEvent } from "../../../models/decodeAnyEvent";
 import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
+import {
+  Standard3DComponent,
+  Standard3DComponentOptions,
+  Standard3DElement
+} from "./StandardComponent";
 
-const Marker3DElement: React.FC<SingleElementVisualizerProps<Marker>> = (
+const MarkerMarker3D: React.FC<SingleElementVisualizerProps<Marker>> = (
   props
 ) => {
   const {
@@ -48,15 +52,11 @@ const Marker3DElement: React.FC<SingleElementVisualizerProps<Marker>> = (
   );
 };
 
-const MarkerElement: React.FC<SingleElementVisualizerProps<Marker>> = () => {
-  return <p>TODO</p>;
-};
-
 export const MarkerVisualizer = {
   id: "Marker",
   types: ["type.googleapis.com/farm_ng_proto.tractor.v1.Marker"],
-  options: OverlayOptions,
-  Component: OverlayVisualizerComponent(MarkerElement),
-  Element: MarkerElement,
-  Marker3D: Marker3DElement
+  options: Standard3DComponentOptions,
+  Component: Standard3DComponent(MarkerMarker3D),
+  Element: Standard3DElement(MarkerMarker3D),
+  Marker3D: MarkerMarker3D
 };

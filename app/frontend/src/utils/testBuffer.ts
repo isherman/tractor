@@ -76,7 +76,7 @@ export const testBuffer: Buffer = {
             Marker.fromPartial({
               name: "yArrow",
               worldPoseSelf: SE3Pose.fromPartial({
-                position: Vec3.fromPartial({ x: 0, y: 1, z: 0 })
+                position: Vec3.fromPartial({ x: 1, y: 1, z: 0 })
               }),
               data: {
                 typeUrl:
@@ -84,11 +84,11 @@ export const testBuffer: Buffer = {
                 value: PoseMarker.encode(
                   PoseMarker.fromPartial({
                     arrow: PoseMarkerArrow.fromPartial({
-                      color: Color.fromPartial({ rgba: { g: 1 } }),
+                      color: Color.fromPartial({ rgba: { r: 1, g: 1 } }),
                       headLength: 0.2,
-                      headRadius: 0.2,
+                      headRadius: 0.1,
                       shaftLength: 1,
-                      shaftRadius: 0.1
+                      shaftRadius: 0.05
                     }),
                     pose: SE3Pose.fromPartial({
                       position: Vec3.fromPartial({ x: 0, y: 2, z: 1 })
