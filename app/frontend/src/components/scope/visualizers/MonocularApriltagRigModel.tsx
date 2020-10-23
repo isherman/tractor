@@ -8,18 +8,16 @@ import {
   solverStatusToJSON
 } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
 import { formatValue } from "../../../utils/formatValue";
-import { useState } from "react";
+import { cloneElement, useState } from "react";
 import {
   StandardComponentOptions,
   StandardComponent
 } from "./StandardComponent";
 import RangeSlider from "react-bootstrap-range-slider";
 import styles from "./MonocularApriltagRigModel.module.scss";
-import { Canvas } from "../../Canvas";
+import { Scene } from "./Scene";
 import { NamedSE3Pose } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
 
-import { Lights } from "../../Lights";
-import { Ground } from "../../Ground";
 import { getDagTransform } from "../../../utils/geometry";
 import { KeyValueTable } from "./KeyValueTable";
 import { ApriltagDetectionsVisualizer } from "./ApriltagDetections";
@@ -29,6 +27,7 @@ import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
 import { Euler, Quaternion } from "three";
 import { ApriltagRigVisualizer } from "./ApriltagRig";
 import { FisheyeEffect } from "./FisheyeEffect";
+import { Sky } from "drei";
 
 const MonocularApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
   MonocularApriltagRigModel
@@ -90,6 +89,7 @@ const MonocularApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
 
   // A 3D marker for the camera_pose_rig (if it exists)
   let camera = null;
+  let defaultCamera = null;
   if (cameraPoseRig && rigRootName) {
     const cameraTransform = getDagTransform(nodePoses, cameraPoseRig.frameA);
     const quaternion = toQuaternion(cameraTransform?.rotation);
@@ -101,7 +101,6 @@ const MonocularApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
 
     camera = (
       <PerspectiveCamera
-        makeDefault
         showHelper
         fov={80}
         zoom={0.5}
@@ -109,6 +108,10 @@ const MonocularApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
         quaternion={quaternion}
       />
     );
+    defaultCamera = cloneElement(camera, {
+      makeDefault: true,
+      showHelper: false
+    });
   }
 
   return (
@@ -147,14 +150,22 @@ const MonocularApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
 
       {markers && (
         <Card title="Apriltag Rig">
-          <Canvas>
-            <FisheyeEffect />
-            <Lights />
-            <Ground />
-            <fogExp2 args={[0xcccccc, 0.02]} />
-            {markers}
-            {camera}
-          </Canvas>
+          <div className={styles.scenePair}>
+            <Card>
+              <Scene groundTransparency={true}>
+                {markers}
+                {camera}
+              </Scene>
+            </Card>
+            <Card>
+              <Scene controls={false} ground={false}>
+                <Sky />
+                <FisheyeEffect />
+                {markers}
+                {defaultCamera}
+              </Scene>
+            </Card>
+          </div>
         </Card>
       )}
 
@@ -182,7 +193,7 @@ const MonocularApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
               />
             )}
           </div>
-          <Card className={styles.card}>
+          <Card>
             {Object.keys(tagRmses).length > 0 && (
               <Table striped bordered size="sm" responsive="md">
                 <thead>
