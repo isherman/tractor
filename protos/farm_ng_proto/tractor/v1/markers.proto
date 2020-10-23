@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+import "farm_ng_proto/tractor/v1/geometry.proto";
+import "google/protobuf/any.proto";
+
+package farm_ng_proto.tractor.v1;
+option go_package = "github.com/farm_ng/genproto";
+
+message MarkerList {
+  repeated Marker markers = 1;
+}
+
+message Marker {
+  string name = 1;
+  SE3Pose world_pose_self = 2;
+  google.protobuf.Any data = 3;
+}
+
+message PoseMarker {
+  message Arrow {
+    Color color = 1;
+    double shaft_length = 2;
+    double shaft_radius = 3;
+    double head_length = 4;
+    double head_radius = 5;
+  }
+  message Axes {
+    double length = 1;
+    double radius = 2;
+  }
+  SE3Pose pose = 1;
+  oneof shape {
+    Arrow arrow = 2;
+    Axes axes = 3;
+  }
+}
+
+message PointMarker {
+  double radius = 1;
+  Color color = 2;
+}
+
+message TractoryMarker {
+  TrajectorySE3 trajectory = 1;
+  double position_tolerance = 2;
+  double angle_tolerance = 3;
+  uint32 buffer_size = 4;
+  Color color = 5;
+}
+
+message Color {
+  message RGBAColor {
+    double r = 1;
+    double g = 2;
+    double b = 3;
+    double a = 4;
+  }
+  oneof color {
+    RGBAColor rgba = 1;
+  }
+}

@@ -3,7 +3,8 @@ import {
   Quaternion as QuaternionProto,
   SE3Pose as SE3PoseProto
 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
-import { Quaternion, Vector3, Matrix4 } from "three";
+import { Color as ColorProto } from "../../genproto/farm_ng_proto/tractor/v1/markers";
+import { Quaternion, Vector3, Matrix4, Color } from "three";
 import { Resource } from "../../genproto/farm_ng_proto/tractor/v1/resource";
 import { EventTypeId, eventTypeIds } from "../registry/events";
 
@@ -13,6 +14,10 @@ export function toVector3(v?: Vec3Proto): Vector3 {
 
 export function toQuaternion(q?: QuaternionProto): Quaternion {
   return q ? new Quaternion(q.x, q.y, q.z, q.w) : new Quaternion();
+}
+
+export function toColor(c?: ColorProto): Color {
+  return c && c.rgba ? new Color(c.rgba.r, c.rgba.g, c.rgba.b) : new Color();
 }
 
 export function matrix4ToSE3Pose(m: Matrix4): SE3PoseProto {

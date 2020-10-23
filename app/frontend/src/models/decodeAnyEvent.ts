@@ -1,8 +1,11 @@
 import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
+import { Marker } from "../../genproto/farm_ng_proto/tractor/v1/markers";
 import { eventRegistry, EventType, EventTypeId } from "../registry/events";
 import { Message } from "../types/common";
 
-export function decodeAnyEvent<T extends EventType>(event: BusEvent): T | null {
+export function decodeAnyEvent<T extends EventType>(
+  event: BusEvent | Marker
+): T | null {
   const { data } = event;
   if (!data) {
     return null;

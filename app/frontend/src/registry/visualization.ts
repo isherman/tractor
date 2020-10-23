@@ -24,6 +24,9 @@ import { CaptureVideoDatasetConfigurationVisualizer } from "../components/scope/
 import { CaptureVideoDatasetStatusVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetStatus";
 import { CaptureVideoDatasetResultVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetResult";
 import { ApriltagConfigVisualizer } from "../components/scope/visualizers/ApriltagConfig";
+import { MarkerListVisualizer } from "../components/scope/visualizers/MarkerList";
+import { PointMarkerVisualizer } from "../components/scope/visualizers/PointMarker";
+import { PoseMarkerVisualizer } from "../components/scope/visualizers/PoseMarker";
 
 export interface VisualizerOptionConfig {
   label: string;
@@ -77,6 +80,9 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   ImageVisualizer,
   MonocularApriltagRigModelVisualizer,
   NamedSE3PoseVisualizer,
+  PointMarkerVisualizer,
+  PoseMarkerVisualizer,
+  MarkerListVisualizer,
   SteeringCommandVisualizer,
   TrackingCameraPoseFrameVisualizer,
   TractorConfigVisualizer,

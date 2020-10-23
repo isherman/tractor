@@ -63,6 +63,12 @@ import {
   CalibrateBaseToCameraResult,
   CalibrateBaseToCameraStatus
 } from "../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
+import {
+  Marker,
+  MarkerList,
+  PointMarker,
+  PoseMarker
+} from "../../genproto/farm_ng_proto/tractor/v1/markers";
 import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
 
 export type EventType =
@@ -78,6 +84,10 @@ export type EventType =
   | Announce
   | Vec2
   | TrajectorySE3
+  | MarkerList
+  | Marker
+  | PointMarker
+  | PoseMarker
   | Image
   | TractorConfig
   | ApriltagConfig
@@ -130,6 +140,10 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng_proto.tractor.v1.Announce": Announce,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Vec2": Vec2,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TrajectorySE3": TrajectorySE3,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.MarkerList": MarkerList,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.Marker": Marker,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.PointMarker": PointMarker,
+  "type.googleapis.com/farm_ng_proto.tractor.v1.PoseMarker": PoseMarker,
   "type.googleapis.com/farm_ng_proto.tractor.v1.Image": Image,
   "type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig": TractorConfig,
   "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagConfig": ApriltagConfig,
