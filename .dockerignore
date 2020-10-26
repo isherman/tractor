@@ -3,9 +3,13 @@
 *.pyc
 *__pycache__
 
+# C++
+build
+third_party/build-*
+
 # Python
 venv
 
 # JS
-app/frontend/dist
-app/frontend/node_modules
+dist
+node_modules
