@@ -3,13 +3,44 @@ import {
   SE3Pose,
   NamedSE3Pose
 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
-import { matrix4ToSE3Pose, se3PoseToMatrix4 } from "./protoConversions";
+import {
+  matrix4ToSE3Pose,
+  se3PoseToMatrix4,
+  toQuaternion,
+  toVector3
+} from "./protoConversions";
 
-function getInverse(pose: SE3Pose): SE3Pose {
+export function getInverse(pose: SE3Pose): SE3Pose {
   const original = se3PoseToMatrix4(pose);
   const inverse = new Matrix4();
   inverse.getInverse(original);
-  return matrix4ToSE3Pose(inverse);
+  return {
+    ...matrix4ToSE3Pose(inverse),
+    stamp: pose.stamp
+  };
+}
+
+export function interpolateSE3Pose(
+  a: SE3Pose,
+  b: SE3Pose,
+  stamp: Date
+): SE3Pose | undefined {
+  if (!a.stamp || !b.stamp) {
+    return undefined;
+  }
+  const ratio =
+    (stamp.getTime() - a.stamp.getTime()) /
+    (b.stamp.getTime() - a.stamp.getTime());
+  const rotation = toQuaternion(a.rotation).slerp(
+    toQuaternion(b.rotation),
+    ratio
+  );
+  const position = toVector3(a.position).lerp(toVector3(b.position), ratio);
+  return SE3Pose.fromPartial({
+    position,
+    rotation,
+    stamp
+  });
 }
 
 // Given a DAG consisting of a list of NamedSE3Poses, return a path (a list of node indices) from
