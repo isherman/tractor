@@ -18,6 +18,11 @@ RUN protoc \
   --twirp_out=paths=source_relative:/go/genproto \
   /protos/farm_ng_proto/tractor/v1/*.proto
 
+# Twirp doesn't yet provide the 'module' flag to output generated code in a structure compatible
+# with Go Modules (https://github.com/twitchtv/twirp/issues/226), so clean it up manually.
+RUN find /go/genproto/farm_ng_proto -name *.twirp.go -print0 -exec mv {} /go/genproto \;
+RUN rm -rf /go/genproto/farm_ng_proto
+
 # Build the server as a static binary
 WORKDIR /go/webrtc
 RUN CGO_ENABLED=0 go build -o /bin/proxy-server cmd/proxy-server/main.go
