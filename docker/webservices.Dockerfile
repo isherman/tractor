@@ -42,5 +42,5 @@ RUN	cd app/frontend && yarn && yarn build
 # Copy binary into a single layer image
 FROM scratch
 COPY --from=backend_build /bin/proxy-server /bin/proxy-server
-COPY --from=frontend_build /farm_ng/app/frontend/dist /dist
+COPY --from=frontend_build /farm_ng/app/frontend/dist /farm_ng/build/frontend
 ENTRYPOINT ["/bin/proxy-server"]

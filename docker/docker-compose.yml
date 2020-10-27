@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.3"
 
 networks:
   farm_ng:
@@ -10,32 +10,53 @@ services:
   ipc_logger:
     container_name: farm_ng_ipc_logger
     image: farm_ng/cpp:latest
+    build:
+      context: ..
+      dockerfile: docker/cpp.Dockerfile
+    entrypoint: build/cpp/farm_ng/ipc_logger
     restart: always
-    # ports: ?
     volumes:
-      - "farm_ng:/var/lib/farm_ng"
+      - "farm_ng:/var/lib/farm_ng" #TODO(isherman)
     networks:
       - farm_ng
   tracking_camera:
     container_name: farm_ng_tracking_camera
     image: farm_ng/cpp:latest
+    build:
+      context: ..
+      dockerfile: docker/cpp.Dockerfile
+    entrypoint: build/cpp/farm_ng/tracking_camera
     restart: always
-    # ports: ?
     volumes:
-      - "farm_ng:/var/lib/farm_ng"
+      - "farm_ng:/var/lib/farm_ng" # TODO(isherman)
+      - "/dev:/dev"
+    privileged: true
     networks:
       - farm_ng
   programd:
     container_name: farm_ng_programd
+    command: farm_ng.program_supervisor
     image: farm_ng/python:latest
+    build:
+      context: ..
+      dockerfile: docker/python.Dockerfile
     restart: always
-    # ports: ?
     networks:
       - farm_ng
   webservices:
     container_name: farm_ng_webservices
     image: farm_ng/webservices:latest
+    build:
+      context: ..
+      dockerfile: docker/webservices.Dockerfile
+    environment:
+      - FARM_NG_ROOT=/farm_ng
+      - BLOBSTORE_ROOT=/mount/farm_ng # TODO(isherman)
+      - PORT=8989
     restart: always
-    ports: 80:8989
+    volumes:
+      - "farm_ng:/mount/farm_ng"
+    ports:
+      - 8989:8989
     networks:
       - farm_ng

@@ -1,22 +1,11 @@
 # Build on top of cpp image because programd depends on cpp binaries
-FROM farm_ng_cpp
+FROM farm_ng/cpp
 
 WORKDIR /farm_ng
 
-# Install system dependencies
-RUN apt-get update --fix-missing && \
-  apt-get install -y --no-install-recommends \
-  libdbus-glib-1-dev \
-  python3-dev \
-  python3-pip \
-  && apt-get clean
-
 # Install python deps in a virtualenv
-COPY setup.bash env.sh requirements.txt ./
-RUN pip3 install virtualenv
-RUN virtualenv ./env
-RUN . ./env/bin/activate
-RUN pip install -r ./requirements.txt
+COPY env.sh requirements.txt ./
+RUN . ./env/bin/activate && pip install -r ./requirements.txt
 
 # Build protos
 COPY python python
