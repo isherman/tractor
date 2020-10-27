@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine AS build
+FROM golang:1.15-alpine AS backend_build
 
 # Install tools required for project
 # Run `docker build --no-cache .` to update dependencies
@@ -22,7 +22,25 @@ RUN protoc \
 WORKDIR /go/webrtc
 RUN CGO_ENABLED=0 go build -o /bin/proxy-server cmd/proxy-server/main.go
 
+# Build frontend
+FROM node:12-alpine AS frontend_build
+
+WORKDIR /farm_ng
+
+RUN apk add --no-cache git protobuf protobuf-dev
+RUN npm install -g long ts-proto@^1.37.0
+COPY app/frontend app/frontend
+COPY protos /protos
+RUN protoc \
+  --proto_path=/protos \
+  --ts_proto_out=app/frontend/genproto \
+  --ts_proto_opt=forceLong=long \
+  /protos/farm_ng_proto/tractor/v1/*.proto
+
+RUN	cd app/frontend && yarn && yarn build
+
 # Copy binary into a single layer image
 FROM scratch
-COPY --from=build /bin/proxy-server /bin/proxy-server
+COPY --from=backend_build /bin/proxy-server /bin/proxy-server
+COPY --from=frontend_build /farm_ng/app/frontend/dist /dist
 ENTRYPOINT ["/bin/proxy-server"]
