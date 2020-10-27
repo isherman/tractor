@@ -1,7 +1,7 @@
+# Build backend
 FROM golang:1.15-alpine AS backend_build
 
-# Install tools required for project
-# Run `docker build --no-cache .` to update dependencies
+# Install system dependencies
 RUN apk add --no-cache git protobuf protobuf-dev
 
 # Copy source
@@ -18,7 +18,7 @@ RUN protoc \
   --twirp_out=paths=source_relative:/go/genproto \
   /protos/farm_ng_proto/tractor/v1/*.proto
 
-# Build static binary
+# Build the server as a static binary
 WORKDIR /go/webrtc
 RUN CGO_ENABLED=0 go build -o /bin/proxy-server cmd/proxy-server/main.go
 

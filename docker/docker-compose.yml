@@ -1,0 +1,41 @@
+version: "3.8"
+
+networks:
+  farm_ng:
+
+volumes:
+  farm_ng:
+
+services:
+  ipc_logger:
+    container_name: farm_ng_ipc_logger
+    image: farm_ng/cpp:latest
+    restart: always
+    # ports: ?
+    volumes:
+      - "farm_ng:/var/lib/farm_ng"
+    networks:
+      - farm_ng
+  tracking_camera:
+    container_name: farm_ng_tracking_camera
+    image: farm_ng/cpp:latest
+    restart: always
+    # ports: ?
+    volumes:
+      - "farm_ng:/var/lib/farm_ng"
+    networks:
+      - farm_ng
+  programd:
+    container_name: farm_ng_programd
+    image: farm_ng/python:latest
+    restart: always
+    # ports: ?
+    networks:
+      - farm_ng
+  webservices:
+    container_name: farm_ng_webservices
+    image: farm_ng/webservices:latest
+    restart: always
+    ports: 80:8989
+    networks:
+      - farm_ng

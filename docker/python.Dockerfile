@@ -1,25 +1,24 @@
-# TODO: Choose a different base image
-FROM ubuntu:18.04
+# Build on top of cpp image because programd depends on cpp binaries
+FROM farm_ng_cpp
 
-ARG DEBIAN_FRONTEND=noninteractive
 WORKDIR /farm_ng
 
+# Install system dependencies
 RUN apt-get update --fix-missing && \
   apt-get install -y --no-install-recommends \
-  build-essential \
-  git \
   libdbus-glib-1-dev \
-  libprotobuf-dev \
-  protobuf-compiler \
   python3-dev \
   python3-pip \
   && apt-get clean
 
+# Install python deps in a virtualenv
+COPY setup.bash env.sh requirements.txt ./
 RUN pip3 install virtualenv
+RUN virtualenv ./env
+RUN . ./env/bin/activate
+RUN pip install -r ./requirements.txt
 
-COPY setup.bash bootstrap*.sh env.sh requirements*.txt ./
-RUN ./bootstrap-venv.sh
-
+# Build protos
 COPY python python
 COPY protos /protos
 RUN protoc \
@@ -30,5 +29,5 @@ RUN protoc \
 ENTRYPOINT ["./env.sh", "python", "-m"]
 CMD ["farm_ng.ipc"]
 
-# TODO: Shrink w/ multi-stage build
-# TODO: Program_supervisor needs access to all binaries?
+# TODO(isherman): Reduce size of final image with multi-stage build
+# https://pythonspeed.com/articles/smaller-python-docker-images/

@@ -8,6 +8,7 @@ build
 third_party/build-*
 
 # Python
+env
 venv
 
 # JS
