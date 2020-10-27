@@ -1,5 +1,5 @@
 # Build on top of cpp image because programd depends on cpp binaries
-FROM farm_ng/cpp
+FROM farmng/cpp
 
 WORKDIR /farm_ng
 

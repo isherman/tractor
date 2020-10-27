@@ -7,7 +7,7 @@ version: "3.3"
 services:
   ipc_logger:
     container_name: farm_ng_ipc_logger
-    image: farm_ng/cpp:latest
+    image: farmng/cpp:latest
     build:
       context: ..
       dockerfile: docker/cpp.Dockerfile
@@ -18,7 +18,7 @@ services:
     network_mode: host
   tracking_camera:
     container_name: farm_ng_tracking_camera
-    image: farm_ng/cpp:latest
+    image: farmng/cpp:latest
     build:
       context: ..
       dockerfile: docker/cpp.Dockerfile
@@ -34,7 +34,7 @@ services:
   programd:
     container_name: farm_ng_programd
     command: farm_ng.program_supervisor
-    image: farm_ng/python:latest
+    image: farmng/python:latest
     build:
       context: ..
       dockerfile: docker/python.Dockerfile
@@ -42,7 +42,7 @@ services:
     network_mode: host
   webservices:
     container_name: farm_ng_webservices
-    image: farm_ng/webservices:latest
+    image: farmng/webservices:latest
     build:
       context: ..
       dockerfile: docker/webservices.Dockerfile
