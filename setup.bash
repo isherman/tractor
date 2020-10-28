@@ -16,7 +16,10 @@ if [ `dpkg --print-architecture` == "arm64" ]; then
   export SKIP=proto-lint
 fi
 
-export BLOBSTORE_ROOT=`dirname $FARM_NG_ROOT`/tractor-data
+# Set BLOBSTORE_ROOT if it's not already set
+: ${BLOBSTORE_ROOT:=`dirname $FARM_NG_ROOT`/tractor-data}
+
+export BLOBSTORE_ROOT
 export PYTHONPATH=$FARM_NG_ROOT/python:$FARM_NG_ROOT/python/genproto:$FARM_NG_ROOT/env/lib
 export LD_LIBRARY_PATH=$FARM_NG_ROOT/env/lib
 export PATH=$PATH:/usr/local/go/bin
