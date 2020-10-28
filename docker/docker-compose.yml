@@ -16,7 +16,7 @@ services:
     environment:
       - BLOBSTORE_ROOT=/farm_ng_data
     volumes:
-      - "${BLOBSTORE_ROOT}:/farm_ng_data"
+      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
     network_mode: host
   tracking_camera:
     container_name: farm_ng_tracking_camera
@@ -29,7 +29,7 @@ services:
     environment:
       - BLOBSTORE_ROOT=/farm_ng_data
     volumes:
-      - "${BLOBSTORE_ROOT}:/farm_ng_data"
+      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
       - /dev:/dev
     privileged: true
     network_mode: host
@@ -44,7 +44,7 @@ services:
     environment:
       - BLOBSTORE_ROOT=/farm_ng_data
     volumes:
-      - "${BLOBSTORE_ROOT}:/farm_ng_data"
+      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
     network_mode: host
   webservices:
     container_name: farm_ng_webservices
@@ -58,5 +58,5 @@ services:
       - PORT=8989
     restart: always
     volumes:
-      - "${BLOBSTORE_ROOT}:/farm_ng_data"
+      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
     network_mode: host
