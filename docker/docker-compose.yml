@@ -13,6 +13,8 @@ services:
       dockerfile: docker/cpp.Dockerfile
     entrypoint: build/cpp/farm_ng/ipc_logger
     restart: always
+    environment:
+      - BLOBSTORE_ROOT=/farm_ng_data
     volumes:
       - "${BLOBSTORE_ROOT}:/farm_ng_data"
     network_mode: host
@@ -39,6 +41,10 @@ services:
       context: ..
       dockerfile: docker/python.Dockerfile
     restart: always
+    environment:
+      - BLOBSTORE_ROOT=/farm_ng_data
+    volumes:
+      - "${BLOBSTORE_ROOT}:/farm_ng_data"
     network_mode: host
   webservices:
     container_name: farm_ng_webservices
