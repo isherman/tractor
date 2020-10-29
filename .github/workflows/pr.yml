@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: ["cpp", "webservices"]
+        image: ["base", "webservices"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2

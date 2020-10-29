@@ -39,18 +39,27 @@ RUN apt-key adv --keyserver keys.gnupg.net --recv-key F6E65AC044F831AC80A06380C8
 RUN add-apt-repository "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo bionic main" -u
 RUN apt-get update && apt-get install -y --no-install-recommends librealsense2-dev librealsense2-utils
 
-# Install minimum python configuration (required to build some third_party C++ libraries)
-# TODO(isherman): Should this really be necessary?
-COPY setup.bash ./
+# Install third-party python
+COPY setup.bash env.sh requirements.txt ./
 RUN pip3 install virtualenv
 RUN virtualenv ./env
-RUN . ./env/bin/activate
+RUN . ./env/bin/activate && pip install -r ./requirements.txt
 
-# Build third-party code
+# Install first-party python
+COPY python python
+
+# Install python protos
+COPY protos /protos
+RUN protoc \
+  --proto_path=/protos \
+  --python_out=python/genproto \
+  /protos/farm_ng_proto/tractor/v1/*.proto
+
+# Build third-party c++
 COPY third_party third_party
 RUN cd third_party && ./install.sh
 
-# Build first-party code
+# Build first-party c++
 COPY CMakeLists.txt .
 COPY cpp cpp
 COPY protos protos
