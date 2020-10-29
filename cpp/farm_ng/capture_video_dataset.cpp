@@ -16,7 +16,7 @@
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(name, "default",
               "a dataset name, used in the output archive name");
-DEFINE_bool(detect_apriltags, false, "detect apriltags");
+DEFINE_bool(detect_apriltags, false, "Detect apriltags.");
 
 typedef farm_ng_proto::tractor::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::BUCKET_VIDEO_DATASETS;
