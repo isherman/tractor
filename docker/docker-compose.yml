@@ -1,0 +1,58 @@
+version: "3.3"
+
+# TODO(isherman):
+# - Define non-host network
+# - Define re-usable volume
+
+services:
+  ipc_logger:
+    image: farmng/base:latest
+    build:
+      context: ..
+      dockerfile: docker/base.Dockerfile
+    entrypoint: build/cpp/farm_ng/ipc_logger
+    restart: always
+    environment:
+      - BLOBSTORE_ROOT=/farm_ng_data
+    volumes:
+      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
+    network_mode: host
+  tracking_camera:
+    image: farmng/base:latest
+    build:
+      context: ..
+      dockerfile: docker/base.Dockerfile
+    entrypoint: build/cpp/farm_ng/tracking_camera
+    restart: always
+    environment:
+      - BLOBSTORE_ROOT=/farm_ng_data
+    volumes:
+      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
+      - /dev:/dev
+    privileged: true
+    network_mode: host
+  programd:
+    entrypoint: ./env.sh python -m farm_ng.program_supervisor
+    image: farmng/base:latest
+    build:
+      context: ..
+      dockerfile: docker/python.Dockerfile
+    restart: always
+    environment:
+      - BLOBSTORE_ROOT=/farm_ng_data
+    volumes:
+      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
+    network_mode: host
+  webservices:
+    image: farmng/webservices:latest
+    build:
+      context: ..
+      dockerfile: docker/webservices.Dockerfile
+    environment:
+      - FARM_NG_ROOT=/farm_ng
+      - BLOBSTORE_ROOT=/farm_ng_data
+      - PORT=8989
+    restart: always
+    volumes:
+      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
+    network_mode: host
