@@ -20,6 +20,9 @@ export PYTHONPATH=$FARM_NG_ROOT/python:$FARM_NG_ROOT/python/genproto:$FARM_NG_RO
 export LD_LIBRARY_PATH=$FARM_NG_ROOT/env/lib
 export PATH=$PATH:/usr/local/go/bin
 
+# Import modules
+. modules/core/setup.bash
+
 # Set BLOBSTORE_ROOT if it's not already set
 : ${BLOBSTORE_ROOT:=`dirname $FARM_NG_ROOT`/tractor-data}
 export BLOBSTORE_ROOT
