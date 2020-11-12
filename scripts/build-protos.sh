@@ -5,6 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 CMD="protoc"
 CMD_ARGS="--proto_path=protos
           --proto_path=modules/core/protos
+          --proto_path=modules/perception_core/protos
           --python_out=python/genproto
           --go_out=module=github.com/farm_ng/genproto:go/genproto
           --twirp_out=paths=source_relative:go/genproto
