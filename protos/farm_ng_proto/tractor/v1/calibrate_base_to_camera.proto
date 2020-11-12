@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-import "farm_ng_proto/tractor/v1/calibrator.proto";
 import "farm_ng_proto/core/v1/resource.proto";
+import "farm_ng_proto/tractor/v1/calibrator.proto";
 import "google/protobuf/timestamp.proto";
 
 package farm_ng_proto.tractor.v1;

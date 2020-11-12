@@ -1,10 +1,10 @@
 syntax = "proto3";
 
+import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
-package farm_ng_proto.tractor.v1;
-option go_package = "github.com/farm_ng/genproto";
-import "google/protobuf/timestamp.proto";
+package farm_ng_proto.perception_core.v1;
+option go_package = "github.com/farm-ng/perception_core/genproto";
 
 message Vec2 {
   double x = 1;

@@ -10,9 +10,9 @@
 #include "farm_ng/ipc.h"
 #include "farm_ng/tracking_camera_utils.h"
 
-#include "farm_ng_proto/tractor/v1/apriltag.pb.h"
+#include "farm_ng_proto/perception_core/v1/apriltag.pb.h"
 #include "farm_ng_proto/tractor/v1/capture_calibration_dataset.pb.h"
-#include "farm_ng_proto/tractor/v1/tracking_camera.pb.h"
+#include "farm_ng_proto/perception_core/v1/tracking_camera.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(name, "default",
@@ -21,13 +21,13 @@ DEFINE_int32(num_frames, 16, "number of frames to capture");
 
 typedef farm_ng_proto::core::v1::Event EventPb;
 
-using farm_ng_proto::tractor::v1::ApriltagDetections;
+using farm_ng_proto::perception_core::v1::ApriltagDetections;
 using farm_ng_proto::core::v1::BUCKET_CALIBRATION_DATASETS;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetConfiguration;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetStatus;
 using farm_ng_proto::core::v1::Subscription;
-using farm_ng_proto::tractor::v1::TrackingCameraCommand;
+using farm_ng_proto::perception_core::v1::TrackingCameraCommand;
 
 namespace farm_ng {
 class CaptureCalibrationDatasetProgram {

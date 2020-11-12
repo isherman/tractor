@@ -22,29 +22,29 @@
 #include <farm_ng/ipc.h>
 #include <farm_ng/sophus_protobuf.h>
 #include <farm_ng/video_streamer.h>
-#include <farm_ng_proto/tractor/v1/apriltag.pb.h>
+#include <farm_ng_proto/perception_core/v1/apriltag.pb.h>
 #include <farm_ng_proto/tractor/v1/calibrate_base_to_camera.pb.h>
-#include <farm_ng_proto/tractor/v1/geometry.pb.h>
-#include <farm_ng_proto/tractor/v1/tracking_camera.pb.h>
+#include <farm_ng_proto/perception_core/v1/geometry.pb.h>
+#include <farm_ng_proto/perception_core/v1/tracking_camera.pb.h>
 
 typedef farm_ng_proto::core::v1::Event EventPb;
 
-using farm_ng_proto::tractor::v1::ApriltagConfig;
-using farm_ng_proto::tractor::v1::ApriltagDetection;
-using farm_ng_proto::tractor::v1::ApriltagDetections;
+using farm_ng_proto::perception_core::v1::ApriltagConfig;
+using farm_ng_proto::perception_core::v1::ApriltagDetection;
+using farm_ng_proto::perception_core::v1::ApriltagDetections;
 using farm_ng_proto::core::v1::BUCKET_CONFIGURATIONS;
 using farm_ng_proto::tractor::v1::CalibrateBaseToCameraResult;
-using farm_ng_proto::tractor::v1::CameraConfig;
-using farm_ng_proto::tractor::v1::CameraModel;
-using farm_ng_proto::tractor::v1::Image;
-using farm_ng_proto::tractor::v1::NamedSE3Pose;
+using farm_ng_proto::perception_core::v1::CameraConfig;
+using farm_ng_proto::perception_core::v1::CameraModel;
+using farm_ng_proto::perception_core::v1::Image;
+using farm_ng_proto::perception_core::v1::NamedSE3Pose;
 using farm_ng_proto::core::v1::Subscription;
-using farm_ng_proto::tractor::v1::TagConfig;
-using farm_ng_proto::tractor::v1::TagLibrary;
-using farm_ng_proto::tractor::v1::TrackingCameraCommand;
-using farm_ng_proto::tractor::v1::TrackingCameraConfig;
-using farm_ng_proto::tractor::v1::TrackingCameraPoseFrame;
-using farm_ng_proto::tractor::v1::Vec2;
+using farm_ng_proto::perception_core::v1::TagConfig;
+using farm_ng_proto::perception_core::v1::TagLibrary;
+using farm_ng_proto::perception_core::v1::TrackingCameraCommand;
+using farm_ng_proto::perception_core::v1::TrackingCameraConfig;
+using farm_ng_proto::perception_core::v1::TrackingCameraPoseFrame;
+using farm_ng_proto::perception_core::v1::Vec2;
 
 namespace farm_ng {
 

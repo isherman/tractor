@@ -10,10 +10,10 @@
 
 #include "farm_ng/calibration/time_series.h"
 
-#include "farm_ng_proto/tractor/v1/camera_model.pb.h"
+#include "farm_ng_proto/perception_core/v1/camera_model.pb.h"
 
 namespace farm_ng {
-using farm_ng_proto::tractor::v1::CameraModel;
+using farm_ng_proto::perception_core::v1::CameraModel;
 
 // An image space measurement of a flow point.
 struct FlowPointImage {

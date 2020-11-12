@@ -6,11 +6,11 @@
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 
-#include "farm_ng_proto/tractor/v1/image.pb.h"
+#include "farm_ng_proto/perception_core/v1/image.pb.h"
 #include "farm_ng_proto/core/v1/resource.pb.h"
 
 namespace farm_ng {
-using farm_ng_proto::tractor::v1::Image;
+using farm_ng_proto::perception_core::v1::Image;
 using farm_ng_proto::core::v1::Resource;
 
 class ImageLoader {

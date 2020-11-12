@@ -7,19 +7,19 @@
 
 #include <sophus/se3.hpp>
 
-#include "farm_ng_proto/tractor/v1/apriltag.pb.h"
+#include "farm_ng_proto/perception_core/v1/apriltag.pb.h"
 #include "farm_ng_proto/tractor/v1/calibrate_apriltag_rig.pb.h"
 #include "farm_ng_proto/tractor/v1/calibrator.pb.h"
-#include "farm_ng_proto/tractor/v1/image.pb.h"
+#include "farm_ng_proto/perception_core/v1/image.pb.h"
 
 namespace farm_ng {
-using farm_ng_proto::tractor::v1::ApriltagDetections;
-using farm_ng_proto::tractor::v1::ApriltagRig;
+using farm_ng_proto::perception_core::v1::ApriltagDetections;
+using farm_ng_proto::perception_core::v1::ApriltagRig;
 using farm_ng_proto::tractor::v1::ApriltagRigTagStats;
 using farm_ng_proto::tractor::v1::CalibrateApriltagRigConfiguration;
-using farm_ng_proto::tractor::v1::Image;
+using farm_ng_proto::perception_core::v1::Image;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
-using farm_ng_proto::tractor::v1::NamedSE3Pose;
+using farm_ng_proto::perception_core::v1::NamedSE3Pose;
 using farm_ng_proto::tractor::v1::SolverStatus;
 
 using Sophus::SE3d;

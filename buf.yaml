@@ -2,6 +2,7 @@ build:
   roots:
     - ./protos
     - ./modules/core/protos
+    - ./modules/perception_core/protos
 lint:
   use:
     - DEFAULT

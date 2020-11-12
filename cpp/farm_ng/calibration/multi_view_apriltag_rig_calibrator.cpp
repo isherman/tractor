@@ -24,7 +24,7 @@
 #include "farm_ng/calibration/pose_utils.h"
 #include "farm_ng/calibration/time_series.h"
 
-#include "farm_ng_proto/tractor/v1/apriltag.pb.h"
+#include "farm_ng_proto/perception_core/v1/apriltag.pb.h"
 #include "farm_ng_proto/tractor/v1/capture_video_dataset.pb.h"
 
 #include "farm_ng/image_loader.h"
@@ -380,7 +380,7 @@ class PoseGraph {
 
 using farm_ng_proto::tractor::v1::CaptureVideoDatasetResult;
 using farm_ng_proto::core::v1::Event;
-using farm_ng_proto::tractor::v1::MultiViewApriltagDetections;
+using farm_ng_proto::perception_core::v1::MultiViewApriltagDetections;
 using farm_ng_proto::tractor::v1::PerImageRmse;
 using Sophus::SE3d;
 

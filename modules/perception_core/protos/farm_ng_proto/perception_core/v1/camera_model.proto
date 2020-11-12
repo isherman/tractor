@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-import "farm_ng_proto/tractor/v1/geometry.proto";
+import "farm_ng_proto/perception_core/v1/geometry.proto";
 
-package farm_ng_proto.tractor.v1;
-option go_package = "github.com/farm_ng/genproto";
+package farm_ng_proto.perception_core.v1;
+option go_package = "github.com/farm-ng/perception_core/genproto";
 
 message CameraModel {
   // Image width in pixels.
