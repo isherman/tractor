@@ -11,9 +11,7 @@ set(PROTO_FILES
   ./farm_ng_proto/tractor/v1/capture_video_dataset.proto
   ./farm_ng_proto/tractor/v1/geometry.proto
   ./farm_ng_proto/tractor/v1/image.proto
-  ./farm_ng_proto/tractor/v1/io.proto
   ./farm_ng_proto/tractor/v1/motor.proto
-  ./farm_ng_proto/tractor/v1/resource.proto
   ./farm_ng_proto/tractor/v1/steering.proto
   ./farm_ng_proto/tractor/v1/tracking_camera.proto
   ./farm_ng_proto/tractor/v1/tractor.proto
@@ -30,11 +28,11 @@ foreach (_proto_path ${PROTO_FILES})
   add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${HDR} ${CMAKE_CURRENT_BINARY_DIR}/${SRC}
         COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-        ARGS --cpp_out ${CMAKE_CURRENT_BINARY_DIR} -I ${CMAKE_CURRENT_SOURCE_DIR} ${_full_proto_path}
+        ARGS --cpp_out ${CMAKE_CURRENT_BINARY_DIR} -I ${CMAKE_CURRENT_SOURCE_DIR} -I ${farm-ng-core_PROTOBUF_IMPORT_DIRS} ${_full_proto_path}
         DEPENDS ${_full_proto_path} ${PROTOBUF_PROTOC_EXECUTABLE}
         COMMENT "Generating cpp protobuf ${HDR} ${SRC} from ${_proto_path}"
         VERBATIM)
 endforeach()
 
 add_library(farm-ng-protobuf SHARED ${PROTO_SRCS} ${PROTO_HDRS})
-target_link_libraries(farm-ng-protobuf ${Protobuf_LIBRARIES})
+target_link_libraries(farm-ng-protobuf farm-ng-core-protobuf ${Protobuf_LIBRARIES})

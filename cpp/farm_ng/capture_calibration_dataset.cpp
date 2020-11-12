@@ -8,6 +8,7 @@
 #include "farm_ng/blobstore.h"
 #include "farm_ng/init.h"
 #include "farm_ng/ipc.h"
+#include "farm_ng/tracking_camera_utils.h"
 
 #include "farm_ng_proto/tractor/v1/apriltag.pb.h"
 #include "farm_ng_proto/tractor/v1/capture_calibration_dataset.pb.h"

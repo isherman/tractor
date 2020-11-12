@@ -1,0 +1,1 @@
+- `FindGlog.cmake`. Copied from ceres? Vendor in source?

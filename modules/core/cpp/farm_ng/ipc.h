@@ -13,13 +13,10 @@
 #include "farm_ng/blobstore.h"
 #include "farm_ng_proto/tractor/v1/io.pb.h"
 #include "farm_ng_proto/tractor/v1/resource.pb.h"
-#include "farm_ng_proto/tractor/v1/tracking_camera.pb.h"
 
 namespace farm_ng {
 using farm_ng_proto::tractor::v1::LoggingStatus;
 using farm_ng_proto::tractor::v1::Subscription;
-using farm_ng_proto::tractor::v1::TrackingCameraCommand;
-using farm_ng_proto::tractor::v1::TrackingCameraCommand_RecordStart_Mode;
 
 typedef boost::signals2::signal<void(const farm_ng_proto::tractor::v1::Event&)>
     EventSignal;
@@ -127,11 +124,6 @@ void WaitForServices(EventBus& bus,
 LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path);
 LoggingStatus StopLogging(EventBus& bus);
 void RequestStopLogging(EventBus& bus);
-void RequestStartCapturing(EventBus& bus,
-                           TrackingCameraCommand_RecordStart_Mode mode);
-void RequestStartCapturing(EventBus& bus, TrackingCameraCommand command);
-void RequestStopCapturing(EventBus& bus);
-
 }  // namespace farm_ng
 
 #endif
