@@ -27,18 +27,18 @@
 #include <farm_ng_proto/tractor/v1/geometry.pb.h>
 #include <farm_ng_proto/tractor/v1/tracking_camera.pb.h>
 
-typedef farm_ng_proto::tractor::v1::Event EventPb;
+typedef farm_ng_proto::core::v1::Event EventPb;
 
 using farm_ng_proto::tractor::v1::ApriltagConfig;
 using farm_ng_proto::tractor::v1::ApriltagDetection;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
-using farm_ng_proto::tractor::v1::BUCKET_CONFIGURATIONS;
+using farm_ng_proto::core::v1::BUCKET_CONFIGURATIONS;
 using farm_ng_proto::tractor::v1::CalibrateBaseToCameraResult;
 using farm_ng_proto::tractor::v1::CameraConfig;
 using farm_ng_proto::tractor::v1::CameraModel;
 using farm_ng_proto::tractor::v1::Image;
 using farm_ng_proto::tractor::v1::NamedSE3Pose;
-using farm_ng_proto::tractor::v1::Subscription;
+using farm_ng_proto::core::v1::Subscription;
 using farm_ng_proto::tractor::v1::TagConfig;
 using farm_ng_proto::tractor::v1::TagLibrary;
 using farm_ng_proto::tractor::v1::TrackingCameraCommand;

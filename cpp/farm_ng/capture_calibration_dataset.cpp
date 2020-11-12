@@ -19,14 +19,14 @@ DEFINE_string(name, "default",
               "a dataset name, used in the output archive name");
 DEFINE_int32(num_frames, 16, "number of frames to capture");
 
-typedef farm_ng_proto::tractor::v1::Event EventPb;
+typedef farm_ng_proto::core::v1::Event EventPb;
 
 using farm_ng_proto::tractor::v1::ApriltagDetections;
-using farm_ng_proto::tractor::v1::BUCKET_CALIBRATION_DATASETS;
+using farm_ng_proto::core::v1::BUCKET_CALIBRATION_DATASETS;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetConfiguration;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
 using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetStatus;
-using farm_ng_proto::tractor::v1::Subscription;
+using farm_ng_proto::core::v1::Subscription;
 using farm_ng_proto::tractor::v1::TrackingCameraCommand;
 
 namespace farm_ng {

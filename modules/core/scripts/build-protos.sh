@@ -6,7 +6,8 @@ MODULE="core"
 CMD="protoc"
 CMD_ARGS="--proto_path=protos
           --python_out=python/genproto
-          protos/farm_ng_proto/tractor/v1/*.proto"
+          --go_out=module=github.com/farm-ng/core/genproto:go/genproto
+          protos/farm_ng_proto/core/v1/*.proto"
 
 TAG="protoc-${MODULE}"
 

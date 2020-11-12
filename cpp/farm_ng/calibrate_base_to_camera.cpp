@@ -18,10 +18,10 @@
 #include "farm_ng_proto/tractor/v1/calibrator.pb.h"
 #include "farm_ng_proto/tractor/v1/capture_calibration_dataset.pb.h"
 
-typedef farm_ng_proto::tractor::v1::Event EventPb;
+typedef farm_ng_proto::core::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
 using farm_ng_proto::tractor::v1::BaseToCameraModel;
-using farm_ng_proto::tractor::v1::BUCKET_BASE_TO_CAMERA_MODELS;
+using farm_ng_proto::core::v1::BUCKET_BASE_TO_CAMERA_MODELS;
 using farm_ng_proto::tractor::v1::CalibrateApriltagRigResult;
 using farm_ng_proto::tractor::v1::CalibrateBaseToCameraConfiguration;
 using farm_ng_proto::tractor::v1::CalibrateBaseToCameraResult;
@@ -31,7 +31,7 @@ using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
 using farm_ng_proto::tractor::v1::SolverStatus;
 using farm_ng_proto::tractor::v1::SolverStatus_Name;
-using farm_ng_proto::tractor::v1::Subscription;
+using farm_ng_proto::core::v1::Subscription;
 using farm_ng_proto::tractor::v1::ViewDirection;
 using farm_ng_proto::tractor::v1::ViewDirection_Name;
 using farm_ng_proto::tractor::v1::ViewDirection_Parse;

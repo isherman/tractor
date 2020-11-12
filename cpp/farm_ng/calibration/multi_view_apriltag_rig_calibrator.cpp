@@ -379,7 +379,7 @@ class PoseGraph {
 };
 
 using farm_ng_proto::tractor::v1::CaptureVideoDatasetResult;
-using farm_ng_proto::tractor::v1::Event;
+using farm_ng_proto::core::v1::Event;
 using farm_ng_proto::tractor::v1::MultiViewApriltagDetections;
 using farm_ng_proto::tractor::v1::PerImageRmse;
 using Sophus::SE3d;

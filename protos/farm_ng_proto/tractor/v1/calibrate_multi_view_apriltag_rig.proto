@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
-import "farm_ng_proto/tractor/v1/resource.proto";
+import "farm_ng_proto/core/v1/resource.proto";
 import "farm_ng_proto/tractor/v1/calibrator.proto";
 
 package farm_ng_proto.tractor.v1;
@@ -9,7 +9,7 @@ option go_package = "github.com/farm_ng/genproto";
 
 message CalibrateMultiViewApriltagRigConfiguration {
   // Serialized CaptureVideoDatasetResult
-  Resource video_dataset = 1;
+  farm_ng_proto.core.v1.Resource video_dataset = 1;
   // A list of tag ids to consider as one rigid object or "rig".
   repeated int32 tag_ids = 2;
   // This tag id will be considered the root coordinate system of the
@@ -29,7 +29,7 @@ message CalibrateMultiViewApriltagRigStatus {
     CalibrateMultiViewApriltagRigConfiguration input_required_configuration = 1;
   }
   // Serialized CalibrateMultiViewApriltagRigResult
-  Resource result = 2;
+  farm_ng_proto.core.v1.Resource result = 2;
 
   SolverIterationSummary iteration_summary = 3;
 }
@@ -37,11 +37,11 @@ message CalibrateMultiViewApriltagRigStatus {
 message CalibrateMultiViewApriltagRigResult {
   // Configuration which initiated the computation of this result.
   CalibrateMultiViewApriltagRigConfiguration configuration = 1;
-  Resource multi_view_apriltag_rig_initial = 2;
-  Resource multi_view_apriltag_rig_solved = 3;
+  farm_ng_proto.core.v1.Resource multi_view_apriltag_rig_initial = 2;
+  farm_ng_proto.core.v1.Resource multi_view_apriltag_rig_solved = 3;
   SolverStatus solver_status = 4;
   double rmse = 5;
   google.protobuf.Timestamp stamp_end = 6;
   // Debug event log.
-  Resource event_log = 7;
+  farm_ng_proto.core.v1.Resource event_log = 7;
 }

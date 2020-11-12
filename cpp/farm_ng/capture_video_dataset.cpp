@@ -20,14 +20,14 @@ DEFINE_string(name, "default",
               "a dataset name, used in the output archive name");
 DEFINE_bool(detect_apriltags, false, "Detect apriltags.");
 
-typedef farm_ng_proto::tractor::v1::Event EventPb;
+typedef farm_ng_proto::core::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::ApriltagDetection;
-using farm_ng_proto::tractor::v1::BUCKET_VIDEO_DATASETS;
+using farm_ng_proto::core::v1::BUCKET_VIDEO_DATASETS;
 using farm_ng_proto::tractor::v1::CaptureVideoDatasetConfiguration;
 using farm_ng_proto::tractor::v1::CaptureVideoDatasetResult;
 using farm_ng_proto::tractor::v1::CaptureVideoDatasetStatus;
 using farm_ng_proto::tractor::v1::Image;
-using farm_ng_proto::tractor::v1::Subscription;
+using farm_ng_proto::core::v1::Subscription;
 using farm_ng_proto::tractor::v1::TrackingCameraCommand;
 
 void Cleanup(farm_ng::EventBus& bus) {

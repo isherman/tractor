@@ -37,16 +37,16 @@ DEFINE_bool(filter_stable_tags, false, "Run filter for stable tags.");
 DEFINE_string(root_camera_name, "tracking_camera/front/left",
               "Which camera to treat as the root.");
 
-typedef farm_ng_proto::tractor::v1::Event EventPb;
+typedef farm_ng_proto::core::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
-using farm_ng_proto::tractor::v1::BUCKET_APRILTAG_RIG_MODELS;
+using farm_ng_proto::core::v1::BUCKET_APRILTAG_RIG_MODELS;
 using farm_ng_proto::tractor::v1::CalibrateMultiViewApriltagRigConfiguration;
 using farm_ng_proto::tractor::v1::CalibrateMultiViewApriltagRigResult;
 using farm_ng_proto::tractor::v1::CalibrateMultiViewApriltagRigStatus;
 using farm_ng_proto::tractor::v1::CaptureVideoDatasetResult;
 
 using farm_ng_proto::tractor::v1::MultiViewApriltagRigModel;
-using farm_ng_proto::tractor::v1::Subscription;
+using farm_ng_proto::core::v1::Subscription;
 
 namespace farm_ng {
 

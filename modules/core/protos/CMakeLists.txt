@@ -1,8 +1,8 @@
 set(${PROJECT_NAME}_PROTOBUF_IMPORT_DIRS ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Path to this project's protobuf sources")
 
 set(PROTO_FILES
-  ./farm_ng_proto/tractor/v1/io.proto
-  ./farm_ng_proto/tractor/v1/resource.proto
+  ./farm_ng_proto/core/v1/io.proto
+  ./farm_ng_proto/core/v1/resource.proto
  )
 
 foreach (_proto_path ${PROTO_FILES})

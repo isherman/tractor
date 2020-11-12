@@ -11,8 +11,8 @@ import (
 	"sync"
 	"time"
 
-	pb "github.com/farm-ng/tractor/genproto"
-	"github.com/farm-ng/tractor/webrtc/internal/eventbus"
+	corepb "github.com/farm-ng/core/genproto"
+	"github.com/farm-ng/tractor/core/pkg/eventbus"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v3"
@@ -143,7 +143,7 @@ type EventBusProxy struct {
 // EventBusProxyConfig configures an EventBusProxy
 type EventBusProxyConfig struct {
 	EventBus    *eventbus.EventBus
-	EventSource chan *pb.Event
+	EventSource chan *corepb.Event
 }
 
 // NewEventBusProxy constructs an EventBusProxy
@@ -202,7 +202,7 @@ func (p *EventBusProxy) start() {
 	}
 }
 
-func (p *EventBusProxy) sendEvent(e *pb.Event) {
+func (p *EventBusProxy) sendEvent(e *corepb.Event) {
 	p.config.EventBus.SendEvent(e)
 }
 
@@ -323,7 +323,7 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) (*webrtc.SessionDescrip
 					}
 					// TODO: Security issue that we allow unauthenticated clients to send traffic on the eventbus
 					// We unmarshal the event to discover its name, so it can be forwarded to the right peers
-					event := &pb.Event{}
+					event := &corepb.Event{}
 					err = proto.Unmarshal(buffer[:n], event)
 					if err != nil {
 						log.Fatalln("event parsing failed:", err, event)
@@ -348,11 +348,11 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) (*webrtc.SessionDescrip
 
 			// Immediately announce ourselves to fill the data channel's write buffers
 			announceSelf := func(t *timestamppb.Timestamp) error {
-				event := &pb.Event{}
+				event := &corepb.Event{}
 				event.RecvStamp = t
 				event.Stamp = t
 				event.Name = "ipc/announcement/webrtc-proxy"
-				event.Data, err = ptypes.MarshalAny(&pb.Announce{
+				event.Data, err = ptypes.MarshalAny(&corepb.Announce{
 					Service: "webrtc-proxy",
 					Stamp:   t,
 				})

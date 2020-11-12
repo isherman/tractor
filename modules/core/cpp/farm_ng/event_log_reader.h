@@ -3,11 +3,11 @@
 #include <memory>
 #include <string>
 
-#include "farm_ng_proto/tractor/v1/io.pb.h"
-#include "farm_ng_proto/tractor/v1/resource.pb.h"
+#include "farm_ng_proto/core/v1/io.pb.h"
+#include "farm_ng_proto/core/v1/resource.pb.h"
 namespace farm_ng {
-using farm_ng_proto::tractor::v1::Resource;
-typedef farm_ng_proto::tractor::v1::Event EventPb;
+using farm_ng_proto::core::v1::Resource;
+typedef farm_ng_proto::core::v1::Event EventPb;
 
 class EventLogReaderImpl;
 class EventLogReader {

@@ -20,7 +20,7 @@
 
 namespace farm_ng {
 
-typedef farm_ng_proto::tractor::v1::Event EventPb;
+typedef farm_ng_proto::core::v1::Event EventPb;
 using farm_ng_proto::tractor::v1::ApriltagDetections;
 using farm_ng_proto::tractor::v1::BaseToCameraModel;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;

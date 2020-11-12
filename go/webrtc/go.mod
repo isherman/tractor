@@ -3,7 +3,9 @@ module github.com/farm-ng/tractor/webrtc
 go 1.14
 
 require (
+	github.com/farm-ng/tractor/core v0.0.0-00010101000000-000000000000
 	github.com/farm-ng/tractor/genproto v0.0.0-00010101000000-000000000000
+	github.com/farm-ng/core/genproto v0.0.0-00010101000000-000000000000
 	github.com/golang/protobuf v1.4.2
 	github.com/gorilla/mux v1.8.0
 	github.com/pion/rtp v1.6.0
@@ -14,5 +16,9 @@ require (
 	golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a
 	google.golang.org/protobuf v1.25.0
 )
+
+replace github.com/farm-ng/tractor/core => ../../modules/core/go/core
+
+replace github.com/farm-ng/core/genproto => ../../modules/core/go/genproto
 
 replace github.com/farm-ng/tractor/genproto => ../genproto

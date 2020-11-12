@@ -5,7 +5,7 @@ import "google/protobuf/timestamp.proto";
 import "farm_ng_proto/tractor/v1/geometry.proto";
 import "farm_ng_proto/tractor/v1/apriltag.proto";
 import "farm_ng_proto/tractor/v1/image.proto";
-import "farm_ng_proto/tractor/v1/resource.proto";
+import "farm_ng_proto/core/v1/resource.proto";
 import "farm_ng_proto/tractor/v1/camera_model.proto";
 
 
@@ -56,7 +56,7 @@ message CalibratorStatus {
     int32 num_frames = 1;
     // The rig model saved to disk.
     // Will be a json encoded protobuf with type MonocularApriltagRigModel.
-    Resource rig_model_resource = 3;
+    farm_ng_proto.core.v1.Resource rig_model_resource = 3;
     bool finished = 4;
   }
 
