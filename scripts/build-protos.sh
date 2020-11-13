@@ -32,4 +32,4 @@ docker run \
        --rm -v $PWD:/src:rw,Z -u $(id -u):$(id -g) --workdir /src \
        --entrypoint $CMD $TAG $CMD_ARGS
 
-cp go/genproto/go.{mod,sum} build/go/github.com/farm-ng/genproto/.
+cp scripts/go.mod.template build/go/github.com/farm-ng/genproto/go.mod

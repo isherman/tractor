@@ -16,6 +16,6 @@ require (
 	google.golang.org/protobuf v1.25.0
 )
 
-replace github.com/farm-ng/core => ../../modules/core/go/core
+replace github.com/farm-ng/core => ../../../core/go/core
 
-replace github.com/farm-ng/genproto => ../../build/go/github.com/farm-ng/genproto/
+replace github.com/farm-ng/genproto => ../../../../build/go/github.com/farm-ng/genproto/
