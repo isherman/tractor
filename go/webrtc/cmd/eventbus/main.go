@@ -6,7 +6,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/farm-ng/tractor/core/pkg/eventbus"
+	"github.com/farm-ng/core/pkg/eventbus"
 )
 
 func prettyPrint(i interface{}) string {

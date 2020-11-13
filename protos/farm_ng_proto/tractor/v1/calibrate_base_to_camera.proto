@@ -1,18 +1,18 @@
 syntax = "proto3";
 
-import "farm_ng_proto/core/v1/resource.proto";
+import "farm_ng/v1/resource.proto";
 import "farm_ng_proto/tractor/v1/calibrator.proto";
 import "google/protobuf/timestamp.proto";
 
 package farm_ng_proto.tractor.v1;
-option go_package = "github.com/farm_ng/genproto";
+option go_package = "github.com/farm-ng/genproto";
 
 message CalibrateBaseToCameraConfiguration {
   // Serialized CaptureCalibrationDatasetResult
-  farm_ng_proto.core.v1.Resource calibration_dataset = 1;
+  farm_ng.v1.Resource calibration_dataset = 1;
 
   // Serialized ApriltagRigCalibrationResult
-  farm_ng_proto.core.v1.Resource apriltag_rig_result = 2;
+  farm_ng.v1.Resource apriltag_rig_result = 2;
 
   BaseToCameraInitialization initialization = 3;
 
@@ -26,7 +26,7 @@ message CalibrateBaseToCameraStatus {
   }
 
   // Serialized CalibrateBaseToCameraResult
-  farm_ng_proto.core.v1.Resource result = 2;
+  farm_ng.v1.Resource result = 2;
 
   SolverIterationSummary iteration_summary = 3;
 }
@@ -36,12 +36,12 @@ message CalibrateBaseToCameraResult {
   CalibrateBaseToCameraConfiguration configuration = 1;
 
   // A resource of type BaseToCameraModel
-  farm_ng_proto.core.v1.Resource base_to_camera_model_initial = 2;
-  farm_ng_proto.core.v1.Resource base_to_camera_model_solved = 3;
+  farm_ng.v1.Resource base_to_camera_model_initial = 2;
+  farm_ng.v1.Resource base_to_camera_model_solved = 3;
 
   SolverStatus solver_status = 4;
   double rmse = 5;
   google.protobuf.Timestamp stamp_end = 6;
   // Debug event log.
-  farm_ng_proto.core.v1.Resource event_log = 7;
+  farm_ng.v1.Resource event_log = 7;
 }

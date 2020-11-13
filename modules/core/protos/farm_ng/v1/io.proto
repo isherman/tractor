@@ -3,8 +3,8 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/any.proto";
 
-package farm_ng_proto.core.v1;
-option go_package = "github.com/farm-ng/core/genproto";
+package farm_ng.v1;
+option go_package = "github.com/farm-ng/genproto";
 
 message Event {
   google.protobuf.Timestamp stamp = 1;

@@ -3,8 +3,8 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
-package farm_ng_proto.core.v1;
-option go_package = "github.com/farm-ng/core/genproto";
+package farm_ng.v1;
+option go_package = "github.com/farm-ng/genproto";
 
 message Resource {
   // The normalized path of this resource within a resource archive.

@@ -1,6 +1,0 @@
-FROM alpine
-
-# Install protoc
-RUN apk add --update-cache \
-  protobuf \
-  protobuf-dev

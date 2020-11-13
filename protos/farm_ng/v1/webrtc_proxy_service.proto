@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package farm_ng_proto.tractor.v1;
-option go_package = "github.com/farm_ng/genproto";
+package farm_ng.v1;
+option go_package = "github.com/farm-ng/genproto";
 
 message InitiatePeerConnectionRequest {
   // The offerer's Session Description Protocol description, as base64-encoded

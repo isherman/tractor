@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	pb "github.com/farm-ng/core/genproto"
+	pb "github.com/farm-ng/genproto"
 	"github.com/golang/protobuf/ptypes"
 	"golang.org/x/net/ipv4"
 	"golang.org/x/sys/unix"
