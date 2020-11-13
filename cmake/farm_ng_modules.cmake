@@ -18,7 +18,7 @@ macro(farm_ng_add_protobufs target)
       --ts_proto_opt=forceLong=long
       )
   else()
-    set(addtional_args)
+    set(additional_args)
   endif()
   foreach (_proto_path ${FARM_NG_ADD_PROTOBUFS_PROTO_FILES})
     get_filename_component(_file_we ${_proto_path} NAME_WE)

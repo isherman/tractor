@@ -1,4 +1,4 @@
-find_package(Boost REQUIRED system filesystem regex)
+find_package(Boost REQUIRED system filesystem)
 find_package(Glog REQUIRED)
 find_package(gflags REQUIRED)
 

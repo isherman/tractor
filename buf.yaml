@@ -1,8 +1,9 @@
 build:
   roots:
-    - ./protos
+    - ./modules/calibration/protos
     - ./modules/core/protos
     - ./modules/perception_core/protos
+    - ./modules/tractor/protos
 lint:
   use:
     - DEFAULT
