@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package farm_ng_proto.tractor.v1;
+package farm_ng.v1;
 option go_package = "github.com/farm-ng/genproto";
 
 message SteeringCommand {

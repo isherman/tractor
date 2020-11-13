@@ -2,9 +2,9 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 import "farm_ng/v1/resource.proto";
-import "farm_ng_proto/tractor/v1/calibrator.proto";
+import "farm_ng/v1/calibrator.proto";
 
-package farm_ng_proto.tractor.v1;
+package farm_ng.v1;
 option go_package = "github.com/farm-ng/genproto";
 
 message CalibrateMultiViewApriltagRigConfiguration {

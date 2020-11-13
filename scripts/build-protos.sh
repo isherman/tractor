@@ -18,8 +18,7 @@ CMD_ARGS="--proto_path=protos
           --ts_proto_opt=forceLong=long
           modules/core/protos/farm_ng/v1/*.proto
           modules/perception_core/protos/farm_ng/v1/*.proto
-          protos/farm_ng/v1/*.proto
-          protos/farm_ng_proto/tractor/v1/*.proto"
+          protos/farm_ng/v1/*.proto"
 
 TAG="protoc"
 
@@ -28,4 +27,4 @@ docker run \
        --rm -v $PWD:/src:rw,Z -u $(id -u):$(id -g) --workdir /src \
        --entrypoint $CMD $TAG $CMD_ARGS
 
-cp "go/genproto/go.(mod|sum)" "build/go/github.com/farm-ng/genproto/."
+cp go/genproto/go.{mod,sum} build/go/github.com/farm-ng/genproto/.

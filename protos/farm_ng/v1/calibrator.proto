@@ -7,7 +7,7 @@ import "farm_ng/v1/geometry.proto";
 import "farm_ng/v1/image.proto";
 import "google/protobuf/timestamp.proto";
 
-package farm_ng_proto.tractor.v1;
+package farm_ng.v1;
 option go_package = "github.com/farm-ng/genproto";
 
 // The solver status, relatively generic and used to denote if a model is just
