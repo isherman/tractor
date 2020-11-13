@@ -3,8 +3,8 @@ import argparse
 import google.protobuf.json_format as json_format
 
 from farm_ng.core.blobstore import Blobstore
-from farm_ng_proto.tractor.v1.calibrate_multi_view_apriltag_rig_pb2 import CalibrateMultiViewApriltagRigResult
-from farm_ng_proto.tractor.v1.calibrator_pb2 import MultiViewApriltagRigModel
+from farm_ng.v1.calibrate_multi_view_apriltag_rig_pb2 import CalibrateMultiViewApriltagRigResult
+from farm_ng.v1.calibrator_pb2 import MultiViewApriltagRigModel
 
 
 def App():

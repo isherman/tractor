@@ -20,10 +20,10 @@ from farm_ng.periodic import Periodic
 from farm_ng.proto_utils import proto_to_se3
 from farm_ng.proto_utils import se3_to_proto
 from farm_ng.steering import SteeringClient
-from farm_ng_proto.tractor.v1.geometry_pb2 import NamedSE3Pose
-from farm_ng_proto.tractor.v1.steering_pb2 import SteeringCommand
-from farm_ng_proto.tractor.v1.tractor_pb2 import TractorConfig
-from farm_ng_proto.tractor.v1.tractor_pb2 import TractorState
+from farm_ng.v1.geometry_pb2 import NamedSE3Pose
+from farm_ng.v1.steering_pb2 import SteeringCommand
+from farm_ng.v1.tractor_pb2 import TractorConfig
+from farm_ng.v1.tractor_pb2 import TractorState
 
 logger = logging.getLogger('tractor')
 logger.setLevel(logging.INFO)

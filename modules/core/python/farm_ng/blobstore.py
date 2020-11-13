@@ -4,7 +4,7 @@ import pathlib
 
 import google.protobuf.json_format as json_format
 
-from farm_ng_proto.tractor.v1.resource_pb2 import Bucket
+from farm_ng.v1.resource_pb2 import Bucket
 
 logger = logging.getLogger('blobstore')
 logger.setLevel(logging.INFO)

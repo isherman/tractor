@@ -17,9 +17,9 @@ from google.protobuf.timestamp_pb2 import Timestamp
 # loads all the protos for pretty print of any (isort:skip)
 import farm_ng.proto_utils  # noqa: F401
 from farm_ng.periodic import Periodic
-from farm_ng_proto.tractor.v1.io_pb2 import Announce
-from farm_ng_proto.tractor.v1.io_pb2 import Event
-from farm_ng_proto.tractor.v1.io_pb2 import Subscription
+from farm_ng.v1.io_pb2 import Announce
+from farm_ng.v1.io_pb2 import Event
+from farm_ng.v1.io_pb2 import Subscription
 
 logger = logging.getLogger('ipc')
 logger.setLevel(logging.INFO)

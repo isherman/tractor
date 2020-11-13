@@ -4,13 +4,13 @@ import os
 from google.protobuf.json_format import MessageToJson
 from google.protobuf.wrappers_pb2 import Int32Value
 
-from farm_ng.core.blobstore import Blobstore
-from farm_ng_proto.tractor.v1.apriltag_pb2 import ApriltagConfig
-from farm_ng_proto.tractor.v1.apriltag_pb2 import TagConfig
-from farm_ng_proto.tractor.v1.resource_pb2 import BUCKET_CONFIGURATIONS
-from farm_ng_proto.tractor.v1.tracking_camera_pb2 import CameraConfig
-from farm_ng_proto.tractor.v1.tracking_camera_pb2 import TrackingCameraConfig
-from farm_ng_proto.tractor.v1.tractor_pb2 import TractorConfig
+from farm_ng.blobstore import Blobstore
+from farm_ng.v1.apriltag_pb2 import ApriltagConfig
+from farm_ng.v1.apriltag_pb2 import TagConfig
+from farm_ng.v1.resource_pb2 import BUCKET_CONFIGURATIONS
+from farm_ng.v1.tracking_camera_pb2 import CameraConfig
+from farm_ng.v1.tracking_camera_pb2 import TrackingCameraConfig
+from farm_ng.v1.tractor_pb2 import TractorConfig
 
 
 def _in2m(inches: float) -> float:

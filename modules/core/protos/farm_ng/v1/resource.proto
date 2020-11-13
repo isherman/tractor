@@ -28,7 +28,7 @@ message Resource {
   // Text encoding: `text/protobuf; type=<typeUrl>`
   //
   // where `<typeUrl>` looks like
-  // `type.googleapis.com/type.googleapis.com/farm_ng_proto.tractor.v1.Vec2`
+  // `type.googleapis.com/type.googleapis.com/farm_ng.v1.Vec2`
   string content_type = 3;
 
   // (Optional) The uncompressed size of the resource in bytes.

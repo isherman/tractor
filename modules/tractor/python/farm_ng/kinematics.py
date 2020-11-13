@@ -2,7 +2,7 @@ from typing import Tuple
 
 from liegroups import SE3
 
-from farm_ng_proto.tractor.v1.tractor_pb2 import TractorConfig
+from farm_ng.v1.tractor_pb2 import TractorConfig
 
 
 class TractorKinematics:
