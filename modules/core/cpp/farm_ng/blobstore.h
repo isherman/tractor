@@ -9,12 +9,12 @@
 #include <boost/filesystem.hpp>
 #include "glog/logging.h"
 
-#include "farm_ng_proto/core/v1/resource.pb.h"
+#include "farm_ng/v1/resource.pb.h"
 
 namespace farm_ng {
 
-using farm_ng_proto::core::v1::Bucket;
-using farm_ng_proto::core::v1::Resource;
+using farm_ng::v1::Bucket;
+using farm_ng::v1::Resource;
 
 boost::filesystem::path GetBlobstoreRoot();
 boost::filesystem::path GetBucketRelativePath(Bucket id);
@@ -49,9 +49,9 @@ const std::string& ContentTypeProtobufJson() {
 boost::filesystem::path MakePathUnique(boost::filesystem::path root,
                                        boost::filesystem::path path);
 template <typename ProtobufT>
-farm_ng_proto::core::v1::Resource WriteProtobufAsJsonResource(
+farm_ng::v1::Resource WriteProtobufAsJsonResource(
     Bucket id, const std::string& path, const ProtobufT& message) {
-  farm_ng_proto::core::v1::Resource resource;
+  farm_ng::v1::Resource resource;
   resource.set_content_type(ContentTypeProtobufJson<ProtobufT>());
 
   boost::filesystem::path write_path =
@@ -63,9 +63,9 @@ farm_ng_proto::core::v1::Resource WriteProtobufAsJsonResource(
 }
 
 template <typename ProtobufT>
-farm_ng_proto::core::v1::Resource WriteProtobufAsBinaryResource(
+farm_ng::v1::Resource WriteProtobufAsBinaryResource(
     Bucket id, const std::string& path, const ProtobufT& message) {
-  farm_ng_proto::core::v1::Resource resource;
+  farm_ng::v1::Resource resource;
   resource.set_content_type(ContentTypeProtobufBinary<ProtobufT>());
 
   boost::filesystem::path write_path =
@@ -112,7 +112,7 @@ ProtobufT ReadProtobufFromBinaryFile(const boost::filesystem::path& path) {
 
 template <typename ProtobufT>
 ProtobufT ReadProtobufFromResource(
-    const farm_ng_proto::core::v1::Resource& resource) {
+    const farm_ng::v1::Resource& resource) {
   if (ContentTypeProtobufJson<ProtobufT>() == resource.content_type()) {
     return ReadProtobufFromJsonFile<ProtobufT>(GetBlobstoreRoot() /
                                                resource.path());

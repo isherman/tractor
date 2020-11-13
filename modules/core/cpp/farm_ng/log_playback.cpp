@@ -93,7 +93,7 @@ class IpcLogPlayback {
   EventLogReader log_reader_;
   boost::asio::steady_timer log_timer_;
   boost::optional<google::protobuf::Timestamp> last_message_stamp_;
-  boost::optional<farm_ng_proto::core::v1::Event> next_message_;
+  boost::optional<farm_ng::v1::Event> next_message_;
 };
 }  // namespace farm_ng
 

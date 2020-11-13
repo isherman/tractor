@@ -5,16 +5,16 @@
 #include <Eigen/Dense>
 #include <opencv2/core.hpp>
 
-#include "farm_ng_proto/perception_core/v1/apriltag.pb.h"
-#include "farm_ng_proto/perception_core/v1/camera_model.pb.h"
+#include "farm_ng/v1/apriltag.pb.h"
+#include "farm_ng/v1/camera_model.pb.h"
 
 namespace farm_ng {
 
-using farm_ng_proto::perception_core::v1::ApriltagConfig;
-using farm_ng_proto::perception_core::v1::ApriltagDetection;
-using farm_ng_proto::perception_core::v1::ApriltagDetections;
-using farm_ng_proto::perception_core::v1::CameraModel;
-using farm_ng_proto::perception_core::v1::TagLibrary;
+using farm_ng::v1::ApriltagConfig;
+using farm_ng::v1::ApriltagDetection;
+using farm_ng::v1::ApriltagDetections;
+using farm_ng::v1::CameraModel;
+using farm_ng::v1::TagLibrary;
 
 class EventBus;
 

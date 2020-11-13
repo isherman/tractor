@@ -17,7 +17,7 @@
 #include "farm_ng/sophus_protobuf.h"
 
 namespace farm_ng {
-using farm_ng_proto::perception_core::v1::ApriltagRig;
+using farm_ng::v1::ApriltagRig;
 
 Sophus::optional<SE3d> CameraPoseRigRootInit(
     const std::unordered_map<int, SE3d>& tag_poses_root,

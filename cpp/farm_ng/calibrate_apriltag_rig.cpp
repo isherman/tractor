@@ -13,7 +13,7 @@
 #include "farm_ng/init.h"
 #include "farm_ng/ipc.h"
 
-#include "farm_ng_proto/perception_core/v1/apriltag.pb.h"
+#include "farm_ng/v1/apriltag.pb.h"
 #include "farm_ng_proto/tractor/v1/calibrate_apriltag_rig.pb.h"
 #include "farm_ng_proto/tractor/v1/calibrator.pb.h"
 #include "farm_ng_proto/tractor/v1/capture_calibration_dataset.pb.h"
@@ -34,9 +34,9 @@ DEFINE_bool(filter_stable_tags, false, "Run filter for stable tags.");
 DEFINE_string(camera_name, "tracking_camera/front/left",
               "Which camera to run on.");
 
-typedef farm_ng_proto::core::v1::Event EventPb;
-using farm_ng_proto::perception_core::v1::ApriltagDetections;
-using farm_ng_proto::core::v1::BUCKET_APRILTAG_RIG_MODELS;
+typedef farm_ng::v1::Event EventPb;
+using farm_ng::v1::ApriltagDetections;
+using farm_ng::v1::BUCKET_APRILTAG_RIG_MODELS;
 using farm_ng_proto::tractor::v1::CalibrateApriltagRigConfiguration;
 using farm_ng_proto::tractor::v1::CalibrateApriltagRigResult;
 using farm_ng_proto::tractor::v1::CalibrateApriltagRigStatus;
@@ -44,7 +44,7 @@ using farm_ng_proto::tractor::v1::CaptureCalibrationDatasetResult;
 using farm_ng_proto::tractor::v1::CaptureVideoDatasetResult;
 
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
-using farm_ng_proto::core::v1::Subscription;
+using farm_ng::v1::Subscription;
 
 namespace farm_ng {
 

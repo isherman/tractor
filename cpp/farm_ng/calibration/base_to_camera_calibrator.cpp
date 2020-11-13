@@ -20,11 +20,11 @@
 
 namespace farm_ng {
 
-typedef farm_ng_proto::core::v1::Event EventPb;
-using farm_ng_proto::perception_core::v1::ApriltagDetections;
+typedef farm_ng::v1::Event EventPb;
+using farm_ng::v1::ApriltagDetections;
 using farm_ng_proto::tractor::v1::BaseToCameraModel;
 using farm_ng_proto::tractor::v1::MonocularApriltagRigModel;
-using farm_ng_proto::perception_core::v1::NamedSE3Pose;
+using farm_ng::v1::NamedSE3Pose;
 using farm_ng_proto::tractor::v1::SolverStatus;
 using farm_ng_proto::tractor::v1::TractorState;
 

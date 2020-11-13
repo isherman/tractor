@@ -14,12 +14,12 @@
 #include "farm_ng/calibration/time_series.h"
 
 #include "farm_ng_proto/tractor/v1/calibrate_base_to_camera.pb.h"
-#include "farm_ng_proto/perception_core/v1/camera_model.pb.h"
+#include "farm_ng/v1/camera_model.pb.h"
 
 namespace farm_ng {
 using farm_ng_proto::tractor::v1::BaseToCameraModel;
-using farm_ng_proto::perception_core::v1::CameraModel;
-using farm_ng_proto::perception_core::v1::NamedSE3Pose;
+using farm_ng::v1::CameraModel;
+using farm_ng::v1::NamedSE3Pose;
 
 struct VisualOdometerResult {
   NamedSE3Pose odometry_vo_pose_base;

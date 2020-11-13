@@ -2,11 +2,11 @@
 
 #include <glog/logging.h>
 
-#include "farm_ng_proto/perception_core/v1/tracking_camera.pb.h"
+#include "farm_ng/v1/tracking_camera.pb.h"
 
 namespace farm_ng {
-using farm_ng_proto::perception_core::v1::TrackingCameraCommand;
-using farm_ng_proto::perception_core::v1::TrackingCameraCommand_RecordStart_Mode;
+using farm_ng::v1::TrackingCameraCommand;
+using farm_ng::v1::TrackingCameraCommand_RecordStart_Mode;
 
 void RequestStartCapturing(EventBus& bus,
                            TrackingCameraCommand_RecordStart_Mode mode) {

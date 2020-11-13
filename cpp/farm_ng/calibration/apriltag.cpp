@@ -12,8 +12,8 @@
 #include "farm_ng/sophus_protobuf.h"
 
 namespace farm_ng {
-using farm_ng_proto::perception_core::v1::TagConfig;
-using farm_ng_proto::perception_core::v1::Vec2;
+using farm_ng::v1::TagConfig;
+using farm_ng::v1::Vec2;
 
 std::array<Eigen::Vector3d, 4> PointsTag(const ApriltagDetection& detection) {
   CHECK(detection.tag_size() > 0.0);

@@ -15,7 +15,7 @@
 #include "farm_ng/init.h"
 #include "farm_ng/ipc.h"
 
-#include "farm_ng_proto/perception_core/v1/apriltag.pb.h"
+#include "farm_ng/v1/apriltag.pb.h"
 #include "farm_ng_proto/tractor/v1/calibrate_multi_view_apriltag_rig.pb.h"
 #include "farm_ng_proto/tractor/v1/calibrator.pb.h"
 #include "farm_ng_proto/tractor/v1/capture_calibration_dataset.pb.h"
@@ -37,16 +37,16 @@ DEFINE_bool(filter_stable_tags, false, "Run filter for stable tags.");
 DEFINE_string(root_camera_name, "tracking_camera/front/left",
               "Which camera to treat as the root.");
 
-typedef farm_ng_proto::core::v1::Event EventPb;
-using farm_ng_proto::perception_core::v1::ApriltagDetections;
-using farm_ng_proto::core::v1::BUCKET_APRILTAG_RIG_MODELS;
+typedef farm_ng::v1::Event EventPb;
+using farm_ng::v1::ApriltagDetections;
+using farm_ng::v1::BUCKET_APRILTAG_RIG_MODELS;
 using farm_ng_proto::tractor::v1::CalibrateMultiViewApriltagRigConfiguration;
 using farm_ng_proto::tractor::v1::CalibrateMultiViewApriltagRigResult;
 using farm_ng_proto::tractor::v1::CalibrateMultiViewApriltagRigStatus;
 using farm_ng_proto::tractor::v1::CaptureVideoDatasetResult;
 
 using farm_ng_proto::tractor::v1::MultiViewApriltagRigModel;
-using farm_ng_proto::core::v1::Subscription;
+using farm_ng::v1::Subscription;
 
 namespace farm_ng {
 
