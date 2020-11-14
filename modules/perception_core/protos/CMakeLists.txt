@@ -4,6 +4,7 @@ farm_ng_add_protobufs(farm-ng-perception_core-protobuf
   ./farm_ng/v1/camera_model.proto
   ./farm_ng/v1/geometry.proto
   ./farm_ng/v1/image.proto
+  ./farm_ng/v1/capture_calibration_dataset.proto
   ./farm_ng/v1/capture_video_dataset.proto
   ./farm_ng/v1/tracking_camera.proto
   DEPENDENCIES
