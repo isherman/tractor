@@ -1,4 +1,4 @@
-#include "farm_ng/calibration/apriltag.h"
+#include "farm_ng/apriltag.h"
 
 #include <apriltag.h>
 #include <apriltag_pose.h>
@@ -7,7 +7,7 @@
 #include <sophus/se3.hpp>
 
 #include "farm_ng/blobstore.h"
-#include "farm_ng/calibration/camera_model.h"
+#include "farm_ng/camera_model.h"
 #include "farm_ng/ipc.h"
 #include "farm_ng/sophus_protobuf.h"
 

@@ -6,8 +6,8 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
+#include "farm_ng/apriltag.h"
 #include "farm_ng/blobstore.h"
-#include "farm_ng/calibration/apriltag.h"
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/event_log_reader.h"
 #include "farm_ng/init.h"
@@ -120,7 +120,8 @@ class CalibrateApriltagRigProgram {
 
     // Output under the same directory as the dataset.
     SetArchivePath(
-        (output_dir / "apriltag_rig_model" / configuration_.camera_name()).string());
+        (output_dir / "apriltag_rig_model" / configuration_.camera_name())
+            .string());
     ApriltagRigModel model = LoadCalibrationDataset(dataset_result);
     LOG(INFO) << "Initial model computed.";
 

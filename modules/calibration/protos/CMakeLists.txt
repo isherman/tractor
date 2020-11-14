@@ -4,9 +4,6 @@ farm_ng_add_protobufs(farm-ng-calibration-protobuf
   ./farm_ng/v1/calibrate_base_to_camera.proto
   ./farm_ng/v1/calibrate_multi_view_apriltag_rig.proto
   ./farm_ng/v1/calibrator.proto
-  ./farm_ng/v1/capture_calibration_dataset.proto
-  ./farm_ng/v1/capture_video_dataset.proto
-  ./farm_ng/v1/tracking_camera.proto
   DEPENDENCIES
   farm-ng-core-protobuf
   farm-ng-perception_core-protobuf

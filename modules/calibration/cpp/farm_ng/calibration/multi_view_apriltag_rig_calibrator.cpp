@@ -15,14 +15,14 @@
 #include "farm_ng/ipc.h"
 #include "farm_ng/sophus_protobuf.h"
 
-#include "farm_ng/calibration/apriltag.h"
-#include "farm_ng/calibration/camera_model.h"
+#include "farm_ng/apriltag.h"
+#include "farm_ng/camera_model.h"
 
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/calibration/kinematics.h"
 #include "farm_ng/calibration/local_parameterization.h"
-#include "farm_ng/calibration/pose_utils.h"
-#include "farm_ng/calibration/time_series.h"
+#include "farm_ng/pose_utils.h"
+#include "farm_ng/time_series.h"
 
 #include "farm_ng/v1/apriltag.pb.h"
 #include "farm_ng/v1/capture_video_dataset.pb.h"
@@ -605,10 +605,9 @@ void ModelError(MultiViewApriltagRigModel* model) {
     reprojection_image.mutable_camera_model()->set_image_width(image_width);
     reprojection_image.mutable_camera_model()->set_image_height(image_height);
     auto resource_path = GetUniqueArchiveResource(
-        FrameNameNumber(
-            "reprojection-" + farm_ng::v1::SolverStatus_Name(
-                                  model->solver_status()),
-            frame_num),
+        FrameNameNumber("reprojection-" + farm_ng::v1::SolverStatus_Name(
+                                              model->solver_status()),
+                        frame_num),
         "png", "image/png");
     reprojection_image.mutable_resource()->CopyFrom(resource_path.first);
     LOG(INFO) << resource_path.second.string();

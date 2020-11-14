@@ -11,7 +11,7 @@
 #include <sophus/se3.hpp>
 
 #include "farm_ng/calibration/flow_book_keeper.h"
-#include "farm_ng/calibration/time_series.h"
+#include "farm_ng/time_series.h"
 
 #include "farm_ng/v1/calibrate_base_to_camera.pb.h"
 #include "farm_ng/v1/camera_model.pb.h"

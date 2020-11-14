@@ -13,10 +13,10 @@
 #include "farm_ng/ipc.h"
 #include "farm_ng/sophus_protobuf.h"
 
-#include "farm_ng/calibration/camera_model.h"
-#include "farm_ng/calibration/eigen_cv.h"
 #include "farm_ng/calibration/kinematics.h"
 #include "farm_ng/calibration/local_parameterization.h"
+#include "farm_ng/camera_model.h"
+#include "farm_ng/eigen_cv.h"
 
 namespace farm_ng {
 namespace {

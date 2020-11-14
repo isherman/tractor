@@ -13,7 +13,6 @@
 #include <opencv2/opencv.hpp>
 
 #include <farm_ng/calibration/apriltag.h>
-#include <farm_ng/calibration/base_to_camera_calibrator.h>
 #include <farm_ng/calibration/camera_model.h>
 #include <farm_ng/calibration/time_series.h>
 #include <farm_ng/frame_grabber.h>
@@ -21,11 +20,10 @@
 #include <farm_ng/init.h>
 #include <farm_ng/ipc.h>
 #include <farm_ng/sophus_protobuf.h>
-#include <farm_ng/video_streamer.h>
 #include <farm_ng/v1/apriltag.pb.h>
-#include <farm_ng/v1/calibrate_base_to_camera.pb.h>
 #include <farm_ng/v1/geometry.pb.h>
 #include <farm_ng/v1/tracking_camera.pb.h>
+#include <farm_ng/video_streamer.h>
 
 typedef farm_ng::v1::Event EventPb;
 

@@ -6,10 +6,10 @@
 #include <opencv2/imgproc.hpp>
 #include <sophus/average.hpp>
 
-#include "farm_ng/calibration/apriltag.h"
-#include "farm_ng/calibration/camera_model.h"
+#include "farm_ng/apriltag.h"
 #include "farm_ng/calibration/local_parameterization.h"
-#include "farm_ng/calibration/pose_utils.h"
+#include "farm_ng/camera_model.h"
+#include "farm_ng/pose_utils.h"
 
 #include "farm_ng/image_loader.h"
 #include "farm_ng/ipc.h"
@@ -198,8 +198,7 @@ void ModelError(ApriltagRigModel& model) {
     reprojection_image.CopyFrom(detections.image());
     auto resource_path = GetUniqueArchiveResource(
         FrameNameNumber(
-            "reprojection-" +
-                farm_ng::v1::SolverStatus_Name(model.status),
+            "reprojection-" + farm_ng::v1::SolverStatus_Name(model.status),
             frame_n),
         "png", "image/png");
     reprojection_image.mutable_resource()->CopyFrom(resource_path.first);

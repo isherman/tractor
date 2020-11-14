@@ -8,7 +8,7 @@
 #include <opencv2/core.hpp>
 #include <sophus/se3.hpp>
 
-#include "farm_ng/calibration/time_series.h"
+#include "farm_ng/time_series.h"
 
 #include "farm_ng/v1/camera_model.pb.h"
 

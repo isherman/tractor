@@ -1,4 +1,4 @@
-#include "farm_ng/calibration/camera_model.h"
+#include "farm_ng/camera_model.h"
 #include "glog/logging.h"
 #include "gtest/gtest.h"
 
