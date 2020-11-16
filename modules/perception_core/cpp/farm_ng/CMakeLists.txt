@@ -21,6 +21,8 @@ foreach(src_prefix
 endforeach()
 
 add_library(farm-ng-perception_core SHARED
+  frame_grabber.h
+  frame_grabber.cpp
   image_loader.cpp
   image_loader.h
   video_streamer.h

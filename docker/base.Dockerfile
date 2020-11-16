@@ -57,23 +57,28 @@ RUN cd third_party && ./install.sh
 
 # Build first-party c++
 COPY CMakeLists.txt .
-COPY cpp cpp
-COPY protos protos
+COPY cmake cmake
+COPY modules modules
 RUN	mkdir -p build && \
   cd build && \
   cmake -DCMAKE_PREFIX_PATH=`pwd`/../env -DCMAKE_BUILD_TYPE=Release .. && \
   make -j`nproc --ignore=1`
 
-# Install first-party python
-COPY python python
-
 # Install python protos
-COPY protos /protos
+RUN mkdir -p build/python/genproto
 RUN protoc \
-  --proto_path=/protos \
-  --python_out=python/genproto \
-  /protos/farm_ng_proto/tractor/v1/*.proto
-
+  --proto_path=modules/calibration/protos \
+  --proto_path=modules/core/protos \
+  --proto_path=modules/frontend_core/protos \
+  --proto_path=modules/perception_core/protos \
+  --proto_path=modules/tractor/protos \
+  --proto_path=third_party/api-common-protos \
+  --python_out=build/python/genproto \
+  modules/calibration/protos/farm_ng/v1/*.proto \
+  modules/core/protos/farm_ng/v1/*.proto \
+  modules/frontend_core/protos/farm_ng/v1/*.proto \
+  modules/perception_core/protos/farm_ng/v1/*.proto \
+  modules/tractor/protos/farm_ng/v1/*.proto
 
 # TODO(isherman): Reduce size of final image with multi-stage build
 # https://devblogs.microsoft.com/cppblog/using-multi-stage-containers-for-c-development/

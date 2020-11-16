@@ -10,9 +10,8 @@ find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIRS})
 add_subdirectory(calibration)
 
-# TODO: Enable
-# add_executable(tracking_camera tracking_camera.cpp)
-# target_link_libraries(tracking_camera farm-ng-calibration ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${realsense2_LIBRARY}  ${OpenCV_LIBS} Sophus::Sophus ${GLOG_LIBRARIES})
+add_executable(tracking_camera tracking_camera.cpp)
+target_link_libraries(tracking_camera farm-ng-calibration ${Boost_FILESYSTEM_LIBRARY} ${Boost_SYSTEM_LIBRARY} ${realsense2_LIBRARY}  ${OpenCV_LIBS} Sophus::Sophus ${GLOG_LIBRARIES})
 
 add_executable(calibrate_apriltag_rig calibrate_apriltag_rig.cpp)
 target_link_libraries(calibrate_apriltag_rig farm-ng-calibration gflags)
