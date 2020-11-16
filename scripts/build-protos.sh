@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-mkdir -p build/frontend/genproto
+mkdir -p build/ts/genproto
 mkdir -p build/go/github.com/farm-ng/genproto
 mkdir -p build/python/genproto
 
@@ -17,7 +17,7 @@ CMD_ARGS="--proto_path=modules/calibration/protos
           --go_out=build/go/github.com/farm-ng/genproto
           --go_opt=module=github.com/farm-ng/genproto
           --twirp_out=build/go
-          --ts_proto_out=build/frontend/genproto
+          --ts_proto_out=build/ts/genproto
           --ts_proto_opt=forceLong=long
           modules/calibration/protos/farm_ng/v1/*.proto
           modules/core/protos/farm_ng/v1/*.proto
@@ -33,3 +33,5 @@ docker run \
        --entrypoint $CMD $TAG $CMD_ARGS
 
 cp scripts/go.mod.template build/go/github.com/farm-ng/genproto/go.mod
+cp scripts/package.json.template build/ts/genproto/package.json
+cd build/ts/genproto && yarn
