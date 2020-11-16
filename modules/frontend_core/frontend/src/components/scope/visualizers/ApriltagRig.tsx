@@ -87,7 +87,7 @@ const ApriltagRig3DElement: React.FC<SingleElementVisualizerProps<
 
 export const ApriltagRigVisualizer = {
   id: "ApriltagRig",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagRig"],
+  types: ["type.googleapis.com/farm_ng.v1.ApriltagRig"],
   options: Standard3DComponentOptions,
   Component: Standard3DComponent(ApriltagRig3DElement),
   Element: Standard3DElement(ApriltagRig3DElement),

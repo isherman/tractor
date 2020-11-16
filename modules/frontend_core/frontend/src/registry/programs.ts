@@ -1,4 +1,3 @@
-import { CaptureCalibrationDatasetProgram } from "../components/programs/CaptureCalibrationDataset";
 import { CalibrateApriltagRigProgram } from "../components/programs/CalibrateApriltagRig";
 import { CalibrateBaseToCameraProgram } from "../components/programs/CalibrateBaseToCamera";
 import { CaptureVideoDatasetProgram } from "../components/programs/CaptureVideoDataset";
@@ -19,7 +18,6 @@ export interface ProgramProps<T extends EventType = EventType> {
 
 export const programRegistry: Program[] = [
   CaptureVideoDatasetProgram as Program,
-  CaptureCalibrationDatasetProgram as Program,
   CalibrateApriltagRigProgram as Program,
   CalibrateBaseToCameraProgram as Program,
   CalibrateMultiViewApriltagRigProgram as Program,

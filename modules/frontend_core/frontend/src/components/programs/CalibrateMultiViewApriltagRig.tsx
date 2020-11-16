@@ -27,7 +27,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
   ): void => {
     e.preventDefault();
     busClient.send(
-      "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateMultiViewApriltagRigConfiguration",
+      "type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigConfiguration",
       `${programId}/configure`,
       Configuration.encode(Configuration.fromJSON(configuration)).finish()
     );

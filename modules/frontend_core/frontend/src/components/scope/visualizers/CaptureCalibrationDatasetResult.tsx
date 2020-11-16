@@ -47,9 +47,7 @@ const CaptureCalibrationDatasetResultElement: React.FC<SingleElementVisualizerPr
 
 export const CaptureCalibrationDatasetResultVisualizer = {
   id: "CaptureCalibrationDatasetResult",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetResult"],
   options: StandardComponentOptions,
   Component: StandardComponent(CaptureCalibrationDatasetResultElement),
   Element: CaptureCalibrationDatasetResultElement,

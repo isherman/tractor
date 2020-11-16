@@ -54,9 +54,7 @@ const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisualizerPr
 
 export const CaptureCalibrationDatasetStatusVisualizer = {
   id: "CaptureCalibrationDatasetStatus",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetStatus",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetStatus"],
   options: StandardComponentOptions,
   Component: StandardComponent(CaptureCalibrationDatasetStatusElement),
   Element: CaptureCalibrationDatasetStatusElement,

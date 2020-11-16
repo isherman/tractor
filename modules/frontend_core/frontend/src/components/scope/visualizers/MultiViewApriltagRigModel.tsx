@@ -264,9 +264,7 @@ const MultiViewApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
 
 export const MultiViewApriltagRigModelVisualizer = {
   id: "MultiViewApriltagRigModel",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.MultiViewApriltagRigModel",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.MultiViewApriltagRigModel"],
   options: StandardComponentOptions,
   Component: StandardComponent(MultiViewApriltagRigModelElement),
   Element: MultiViewApriltagRigModelElement,

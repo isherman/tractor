@@ -75,7 +75,7 @@ export const PoseViz: React.FC = () => {
 
   useEffect(() => {
     const handle = busEventEmitter.on(
-      "type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose",
+      "type.googleapis.com/farm_ng.v1.NamedSE3Pose",
       (event: BusEvent) => {
         const pose = decodeAnyEvent(event) as NamedSE3Pose;
 

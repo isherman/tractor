@@ -179,7 +179,7 @@ const TractorConfigElement: React.FC<SingleElementVisualizerProps<
 
 export const TractorConfigVisualizer = {
   id: "TractorConfig",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig"],
+  types: ["type.googleapis.com/farm_ng.v1.TractorConfig"],
   options: StandardComponentOptions,
   Component: StandardComponent(TractorConfigElement),
   Element: TractorConfigElement,

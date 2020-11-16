@@ -103,7 +103,7 @@ const CameraConfigElement: React.FC<SingleElementVisualizerProps<
 
 export const CameraConfigVisualizer = {
   id: "CameraConfig",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.CameraConfig"],
+  types: ["type.googleapis.com/farm_ng.v1.CameraConfig"],
   options: StandardComponentOptions,
   Component: StandardComponent(CameraConfigElement),
   Element: CameraConfigElement,

@@ -71,7 +71,7 @@ const CaptureCalibrationDatasetConfigurationElement: React.FC<SingleElementVisua
 export const CaptureCalibrationDatasetConfigurationVisualizer = {
   id: "CaptureCalibrationDatasetConfiguration",
   types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetConfiguration",
+    "type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetConfiguration",
   ],
   options: StandardComponentOptions,
   Component: StandardComponent(CaptureCalibrationDatasetConfigurationElement),

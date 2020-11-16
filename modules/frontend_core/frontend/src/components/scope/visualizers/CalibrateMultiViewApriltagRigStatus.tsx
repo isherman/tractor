@@ -43,9 +43,7 @@ const CalibrateMultiViewApriltagRigStatusElement: React.FC<SingleElementVisualiz
 
 export const CalibrateMultiViewApriltagRigStatusVisualizer = {
   id: "CalibrateMultiViewApriltagRigStatus",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateMultiViewApriltagRigStatus",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigStatus"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateMultiViewApriltagRigStatusElement),
   Element: CalibrateMultiViewApriltagRigStatusElement,

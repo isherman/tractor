@@ -73,7 +73,7 @@ const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = (props) => {
 
 export const ImageVisualizer = {
   id: "Image",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.Image"],
+  types: ["type.googleapis.com/farm_ng.v1.Image"],
   options: StandardComponentOptions,
   Component: StandardComponent(ImageElement),
   Element: ImageElement,

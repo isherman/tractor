@@ -73,7 +73,7 @@ export class ProgramsStore {
       }
       if (
         busEvent.data.typeUrl ===
-        "type.googleapis.com/farm_ng_proto.tractor.v1.ProgramSupervisorStatus"
+        "type.googleapis.com/farm_ng.v1.ProgramSupervisorStatus"
       ) {
         this.supervisorStatus = decodeAnyEvent(busEvent);
       }

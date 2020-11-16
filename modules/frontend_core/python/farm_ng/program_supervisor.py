@@ -22,40 +22,34 @@ ProgramInfo = namedtuple('ProgramInfo', 'path args name description')
 
 library = {
     'calibrate_apriltag_rig_playback': ProgramInfo(
-        path=f'{farm_ng_root}/build/cpp/farm_ng/log_playback',
+        path=f'{farm_ng_root}/build/modules/core/cpp/farm_ng/log_playback',
         args=['-send', '-log', f'{farm_ng_root}/../tractor-data/cal01/events-02498-00000.log'],
         name='Apriltag Rig Calibration Playback',
         description='Log playback',
     ),
-    'capture_calibration_dataset': ProgramInfo(
-        path=f'{farm_ng_root}/build/cpp/farm_ng/capture_calibration_dataset',
-        args=['-interactive'],
-        name='Capture Calibration Dataset',
-        description='Capture apriltag detections, for use in other calibration programs',
-    ),
     'calibrate_apriltag_rig': ProgramInfo(
-        path=f'{farm_ng_root}/build/cpp/farm_ng/calibrate_apriltag_rig',
+        path=f'{farm_ng_root}/build/modules/calibration/cpp/farm_ng/calibrate_apriltag_rig',
         args=['-interactive'],
         name='Apriltag Rig Calibration',
         description='Solves an apriltag rig from data collected with capture_calibration_dataset',
     ),
-    'calibrate_base_to_camera': ProgramInfo(
-        path=f'{farm_ng_root}/build/cpp/farm_ng/calibrate_base_to_camera',
-        args=['-interactive'],
-        name='Base-to-Camera Calibration',
-        description=(
-            'Solves a base_pose_camera and other base calibration parameters from '
-            'an apriltag rig and data collected with capture_calibration_dataset'
-        ),
-    ),
+    # 'calibrate_base_to_camera': ProgramInfo(
+    #     path=f'{farm_ng_root}/build/cpp/farm_ng/calibrate_base_to_camera',
+    #     args=['-interactive'],
+    #     name='Base-to-Camera Calibration',
+    #     description=(
+    #         'Solves a base_pose_camera and other base calibration parameters from '
+    #         'an apriltag rig and data collected with capture_calibration_dataset'
+    #     ),
+    # ),
     'capture_video_dataset': ProgramInfo(
-        path=f'{farm_ng_root}/build/cpp/farm_ng/capture_video_dataset',
+        path=f'{farm_ng_root}/build/modules/perception_core/cpp/farm_ng/capture_video_dataset',
         args=['-interactive'],
         name='Capture Video Dataset',
         description='Capture video segments, for use in other programs',
     ),
     'calibrate_multi_view_apriltag_rig': ProgramInfo(
-        path=f'{farm_ng_root}/build/cpp/farm_ng/calibrate_multi_view_apriltag_rig',
+        path=f'{farm_ng_root}/build/modules/calibration/cpp/farm_ng/calibrate_multi_view_apriltag_rig',
         args=['-interactive'],
         name='Multi View Apriltag Rig Calibration',
         description='Solves a multiview apriltag rig from data collected with capture_calibration_dataset',

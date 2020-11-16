@@ -38,7 +38,7 @@ const CalibrateMultiViewApriltagRigConfigurationForm: React.FC<FormProps<
             videoDataset: Resource.fromPartial({
               path,
               contentType:
-                "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CaptureVideoDatasetResult",
+                "application/json; type=type.googleapis.com/farm_ng.v1.CaptureVideoDatasetResult",
             }),
           }));
         }}
@@ -152,7 +152,7 @@ const CalibrateMultiViewApriltagRigConfigurationElement: React.FC<SingleElementV
 export const CalibrateMultiViewApriltagRigConfigurationVisualizer = {
   id: "CalibrateMultiViewApriltagRigConfiguration",
   types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateMultiViewApriltagRigConfiguration",
+    "type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigConfiguration",
   ],
   options: StandardComponentOptions,
   Component: StandardComponent(

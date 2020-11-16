@@ -74,7 +74,7 @@ const TagConfigElement: React.FC<SingleElementVisualizerProps<TagConfig>> = (
 
 export const TagConfigVisualizer = {
   id: "TagConfig",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.TagConfig"],
+  types: ["type.googleapis.com/farm_ng.v1.TagConfig"],
   options: StandardComponentOptions,
   Component: StandardComponent(TagConfigElement),
   Element: TagConfigElement,

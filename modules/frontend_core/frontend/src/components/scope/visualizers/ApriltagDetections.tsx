@@ -92,7 +92,7 @@ const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
 
 export const ApriltagDetectionsVisualizer = {
   id: "ApriltagDetections",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagDetections"],
+  types: ["type.googleapis.com/farm_ng.v1.ApriltagDetections"],
   options: StandardComponentOptions,
   Component: StandardComponent(ApriltagDetectionsElement),
   Element: ApriltagDetectionsElement,

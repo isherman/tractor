@@ -78,9 +78,7 @@ const BaseToCameraInitializationElement: React.FC<SingleElementVisualizerProps<
 
 export const BaseToCameraInitializationVisualizer = {
   id: "BaseToCameraInitialization",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.BaseToCameraInitialization",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.BaseToCameraInitialization"],
   options: StandardComponentOptions,
   Component: StandardComponent(BaseToCameraInitializationElement),
   Element: BaseToCameraInitializationElement,

@@ -40,7 +40,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
             calibrationDataset: Resource.fromPartial({
               path,
               contentType:
-                "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CaptureVideoDatasetResult",
+                "application/json; type=type.googleapis.com/farm_ng.v1.CaptureVideoDatasetResult",
             }),
           }));
         }}
@@ -142,9 +142,7 @@ const CalibrateApriltagRigConfigurationElement: React.FC<SingleElementVisualizer
 
 export const CalibrateApriltagRigConfigurationVisualizer = {
   id: "CalibrateApriltagRigConfiguration",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigConfiguration",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.CalibrateApriltagRigConfiguration"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateApriltagRigConfigurationElement),
   Element: CalibrateApriltagRigConfigurationElement,

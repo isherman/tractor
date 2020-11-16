@@ -144,7 +144,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
 
 export const SE3PoseVisualizer = {
   id: "SE3Pose",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.SE3Pose"],
+  types: ["type.googleapis.com/farm_ng.v1.SE3Pose"],
   options: Standard3DComponentOptions,
   Component: Standard3DComponent(SE3PoseMarker3D),
   Element: Standard3DElement(SE3PoseMarker3D),

@@ -28,7 +28,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
   ): void => {
     e.preventDefault();
     busClient.send(
-      "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureVideoDatasetConfiguration",
+      "type.googleapis.com/farm_ng.v1.CaptureVideoDatasetConfiguration",
       `${programId}/configure`,
       Configuration.encode(Configuration.fromJSON(configuration)).finish()
     );

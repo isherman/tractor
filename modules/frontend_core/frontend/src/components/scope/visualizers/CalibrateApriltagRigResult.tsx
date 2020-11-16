@@ -75,9 +75,7 @@ const CalibrateApriltagRigResultElement: React.FC<SingleElementVisualizerProps<
 
 export const CalibrateApriltagRigResultVisualizer = {
   id: "CalibrateApriltagRigResult",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigResult",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.CalibrateApriltagRigResult"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateApriltagRigResultElement),
   Element: CalibrateApriltagRigResultElement,

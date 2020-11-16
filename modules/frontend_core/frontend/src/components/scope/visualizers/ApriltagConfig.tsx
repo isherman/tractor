@@ -100,7 +100,7 @@ const ApriltagConfigElement: React.FC<SingleElementVisualizerProps<
 
 export const ApriltagConfigVisualizer = {
   id: "ApriltagConfig",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagConfig"],
+  types: ["type.googleapis.com/farm_ng.v1.ApriltagConfig"],
   options: StandardComponentOptions,
   Component: StandardComponent(ApriltagConfigElement),
   Element: ApriltagConfigElement,

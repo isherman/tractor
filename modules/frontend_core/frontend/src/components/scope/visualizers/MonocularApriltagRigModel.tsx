@@ -221,9 +221,7 @@ const MonocularApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
 
 export const MonocularApriltagRigModelVisualizer = {
   id: "MonocularApriltagRigModel",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.MonocularApriltagRigModel",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.MonocularApriltagRigModel"],
   options: StandardComponentOptions,
   Component: StandardComponent(MonocularApriltagRigModelElement),
   Element: MonocularApriltagRigModelElement,

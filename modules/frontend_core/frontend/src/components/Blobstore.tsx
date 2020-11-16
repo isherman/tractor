@@ -37,24 +37,24 @@ const bestGuessEventType = (
   selectedPath: string
 ): EventTypeId | undefined => {
   if (folderChain.map((_) => _.name).includes("apriltag_rig_models")) {
-    return "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateMultiViewApriltagRigResult";
+    return "type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigResult";
   }
   if (folderChain.map((_) => _.name).includes("configurations")) {
     if (selectedPath.endsWith("tractor.json")) {
-      return "type.googleapis.com/farm_ng_proto.tractor.v1.TractorConfig";
+      return "type.googleapis.com/farm_ng.v1.TractorConfig";
     }
     if (selectedPath.endsWith("apriltag.json")) {
-      return "type.googleapis.com/farm_ng_proto.tractor.v1.ApriltagConfig";
+      return "type.googleapis.com/farm_ng.v1.ApriltagConfig";
     }
     if (selectedPath.endsWith("camera.json")) {
-      return "type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraConfig";
+      return "type.googleapis.com/farm_ng.v1.TrackingCameraConfig";
     }
   }
   if (folderChain.map((_) => _.name).includes("base_to_camera_models")) {
-    return "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraResult";
+    return "type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraResult";
   }
   if (folderChain.map((_) => _.name).includes("calibration-datasets")) {
-    return "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult";
+    return "type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetResult";
   }
   return undefined;
 };

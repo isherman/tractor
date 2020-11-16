@@ -64,9 +64,7 @@ const CaptureVideoDatasetConfigurationElement: React.FC<SingleElementVisualizerP
 
 export const CaptureVideoDatasetConfigurationVisualizer = {
   id: "CaptureVideoDatasetConfiguration",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CaptureVideoDatasetConfiguration",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.CaptureVideoDatasetConfiguration"],
   options: StandardComponentOptions,
   Component: StandardComponent(CaptureVideoDatasetConfigurationElement),
   Element: CaptureVideoDatasetConfigurationElement,

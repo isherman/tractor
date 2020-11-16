@@ -21,7 +21,7 @@ export const Programs: React.FC = () => {
 
   const handleStart = (id: string): void => {
     busClient.send(
-      "type.googleapis.com/farm_ng_proto.tractor.v1.StartProgramRequest",
+      "type.googleapis.com/farm_ng.v1.StartProgramRequest",
       "program_supervisor/request",
       StartProgramRequest.encode(StartProgramRequest.fromJSON({ id })).finish()
     );
@@ -29,7 +29,7 @@ export const Programs: React.FC = () => {
 
   const handleStop = (id: string): void => {
     busClient.send(
-      "type.googleapis.com/farm_ng_proto.tractor.v1.StopProgramRequest",
+      "type.googleapis.com/farm_ng.v1.StopProgramRequest",
       "program_supervisor/request",
       StopProgramRequest.encode(StopProgramRequest.fromJSON({ id })).finish()
     );

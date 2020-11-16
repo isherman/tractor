@@ -81,7 +81,7 @@ const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
 
 export const NamedSE3PoseVisualizer = {
   id: "NamedSE3Pose",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.NamedSE3Pose"],
+  types: ["type.googleapis.com/farm_ng.v1.NamedSE3Pose"],
   options: Standard3DComponentOptions,
   Component: Standard3DComponent(NamedSE3Pose3DElement),
   Element: Standard3DElement(NamedSE3Pose3DElement),

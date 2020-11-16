@@ -96,7 +96,7 @@ const TrackingCameraConfigElement: React.FC<SingleElementVisualizerProps<
 
 export const TrackingCameraConfigVisualizer = {
   id: "TrackingCameraConfig",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.TrackingCameraConfig"],
+  types: ["type.googleapis.com/farm_ng.v1.TrackingCameraConfig"],
   options: StandardComponentOptions,
   Component: StandardComponent(TrackingCameraConfigElement),
   Element: TrackingCameraConfigElement,

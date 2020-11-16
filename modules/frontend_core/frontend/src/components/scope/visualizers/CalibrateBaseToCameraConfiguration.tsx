@@ -40,7 +40,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
             calibrationDataset: Resource.fromPartial({
               path,
               contentType:
-                "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CaptureCalibrationDatasetResult",
+                "application/json; type=type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetResult",
             }),
           }));
         }}
@@ -58,7 +58,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
             apriltagRigResult: Resource.fromPartial({
               path,
               contentType:
-                "application/json; type=type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigResult",
+                "application/json; type=type.googleapis.com/farm_ng.v1.CalibrateApriltagRigResult",
             }),
           }));
         }}
@@ -138,9 +138,7 @@ const CalibrateBaseToCameraConfigurationElement: React.FC<SingleElementVisualize
 
 export const CalibrateBaseToCameraConfigurationVisualizer = {
   id: "CalibrateBaseToCameraConfiguration",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraConfiguration",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraConfiguration"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateBaseToCameraConfigurationElement),
   Element: CalibrateBaseToCameraConfigurationElement,

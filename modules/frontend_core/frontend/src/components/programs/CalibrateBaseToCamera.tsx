@@ -26,7 +26,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
   ): void => {
     e.preventDefault();
     busClient.send(
-      "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraConfiguration",
+      "type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraConfiguration",
       `${programId}/configure`,
       Configuration.encode(
         Configuration.fromPartial(configuration || {})

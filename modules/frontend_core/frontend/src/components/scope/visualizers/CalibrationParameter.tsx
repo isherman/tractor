@@ -40,7 +40,7 @@ const CalibrationParameterForm: React.FC<IFormProps> = ({
 
 export const CalibrationParameterVisualizer = {
   id: "CalibrationParameter",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.CalibrationParameter"],
+  types: ["type.googleapis.com/farm_ng.v1.CalibrationParameter"],
   options: StandardComponentOptions,
   Form: CalibrationParameterForm,
 };

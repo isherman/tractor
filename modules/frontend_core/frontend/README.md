@@ -35,5 +35,5 @@ BASE_URL="http://tractor.local:8081" yarn dev-start-remote --port 8080
 
 - Generate protobuf descriptors
   ```
-  yarn run pbjs -t json -o descriptors.json $FARM_NG_ROOT/protos/farm_ng_proto/tractor/v1/*.proto
+  yarn run pbjs -t json -o descriptors.json $FARM_NG_ROOT/protos/farm_ng.v1/*.proto
   ```

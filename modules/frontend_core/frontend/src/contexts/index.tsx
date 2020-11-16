@@ -10,7 +10,7 @@ import { env } from "../config";
 const baseUrl = env.BASE_URL || window.location.origin;
 
 const [busEventEmitter, mediaStreamEmitter, busClient] = getWebRTCEmitters(
-  `${baseUrl}/twirp/farm_ng_proto.tractor.v1.WebRTCProxyService/InitiatePeerConnection`
+  `${baseUrl}/twirp/farm_ng.v1.WebRTCProxyService/InitiatePeerConnection`
 );
 
 const httpResourceArchive = new HttpResourceArchive(`${baseUrl}/blobstore`);
@@ -25,5 +25,5 @@ export const storesContext = React.createContext({
   ),
   baseUrl,
   httpResourceArchive,
-  busClient
+  busClient,
 });

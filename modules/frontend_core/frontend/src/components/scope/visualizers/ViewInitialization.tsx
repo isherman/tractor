@@ -86,7 +86,7 @@ const ViewInitializationElement: React.FC<SingleElementVisualizerProps<
 
 export const ViewInitializationVisualizer = {
   id: "ViewInitialization",
-  types: ["type.googleapis.com/farm_ng_proto.tractor.v1.ViewInitialization"],
+  types: ["type.googleapis.com/farm_ng.v1.ViewInitialization"],
   options: StandardComponentOptions,
   Component: StandardComponent(ViewInitializationElement),
   Element: ViewInitializationElement,

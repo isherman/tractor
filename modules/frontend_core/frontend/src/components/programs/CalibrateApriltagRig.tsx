@@ -27,7 +27,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
     e.preventDefault();
     // TODO: Provide a better API to busClient.send
     busClient.send(
-      "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateApriltagRigConfiguration",
+      "type.googleapis.com/farm_ng.v1.CalibrateApriltagRigConfiguration",
       `${programId}/configure`,
       Configuration.encode(Configuration.fromJSON(configuration)).finish()
     );

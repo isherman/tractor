@@ -76,9 +76,7 @@ const CalibrateBaseToCameraResultElement: React.FC<SingleElementVisualizerProps<
 
 export const CalibrateBaseToCameraResultVisualizer = {
   id: "CalibrateBaseToCameraResult",
-  types: [
-    "type.googleapis.com/farm_ng_proto.tractor.v1.CalibrateBaseToCameraResult",
-  ],
+  types: ["type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraResult"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateBaseToCameraResultElement),
   Element: CalibrateBaseToCameraResultElement,
