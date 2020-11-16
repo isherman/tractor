@@ -8,11 +8,26 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "module": "es6",
-    "lib": ["DOM", "ES2019"],
+    "lib": [
+      "DOM",
+      "ES2019"
+    ],
     "jsx": "react",
     "target": "es5",
-    "typeRoots": ["./typings", "node_modules/@types"],
-    "moduleResolution": "node" // required by Three.js
+    "typeRoots": [
+      "./typings",
+      "node_modules/@types"
+    ],
+    "moduleResolution": "node", // required by Three.js
+    "baseUrl": ".",
+    "paths": {
+      "@farm_ng": [
+        "../../../build/ts/genproto"
+      ]
+    }
   },
-  "include": ["src", "test"]
+  "include": [
+    "src",
+    "test"
+  ]
 }
