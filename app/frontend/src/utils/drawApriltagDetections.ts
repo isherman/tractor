@@ -1,5 +1,5 @@
-import { ApriltagDetections } from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
-import { Vec2 } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
+import { ApriltagDetections } from "../../genproto/farm_ng/v1/apriltag";
+import { Vec2 } from "../../genproto/farm_ng/v1/geometry";
 
 export const drawAprilTagDetections = (
   detections: ApriltagDetections | null,

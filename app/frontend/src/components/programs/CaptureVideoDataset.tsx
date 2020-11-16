@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { useStores } from "../../hooks/useStores";
-import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../../genproto/farm_ng/v1/io";
 import { useState } from "react";
 import Form from "../scope/visualizers/Form";
 import {
   CaptureVideoDatasetConfiguration,
   CaptureVideoDatasetConfiguration as Configuration,
   CaptureVideoDatasetStatus as Status
-} from "../../../genproto/farm_ng_proto/tractor/v1/capture_video_dataset";
+} from "../../../genproto/farm_ng/v1/capture_video_dataset";
 import { CaptureVideoDatasetConfigurationVisualizer } from "../scope/visualizers/CaptureVideoDatasetConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";

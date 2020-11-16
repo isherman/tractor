@@ -1,13 +1,13 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { useStores } from "../../hooks/useStores";
-import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../../genproto/farm_ng/v1/io";
 import { useState } from "react";
 import Form from "../scope/visualizers/Form";
 import {
   CalibrateMultiViewApriltagRigConfiguration as Configuration,
   CalibrateMultiViewApriltagRigStatus as Status
-} from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_multi_view_apriltag_rig";
+} from "../../../genproto/farm_ng/v1/calibrate_multi_view_apriltag_rig";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";
 import { CalibrateMultiViewApriltagRigConfigurationVisualizer } from "../scope/visualizers/CalibrateMultiViewApriltagRigConfiguration";

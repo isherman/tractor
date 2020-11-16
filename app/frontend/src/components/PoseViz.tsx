@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import * as React from "react";
 import { Vector3 } from "three";
-import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
-import { NamedSE3Pose } from "../../genproto/farm_ng_proto/tractor/v1/geometry";
+import { Event as BusEvent } from "../../genproto/farm_ng/v1/io";
+import { NamedSE3Pose } from "../../genproto/farm_ng/v1/geometry";
 import { Html } from "drei";
 import { useFrame } from "react-three-fiber";
 import { decodeAnyEvent } from "../models/decodeAnyEvent";

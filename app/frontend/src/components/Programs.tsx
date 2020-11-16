@@ -4,7 +4,7 @@ import { useStores } from "../hooks/useStores";
 import {
   StartProgramRequest,
   StopProgramRequest
-} from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
+} from "../../genproto/farm_ng/v1/program_supervisor";
 import { useObserver } from "mobx-react-lite";
 import { useEffect } from "react";
 import { formatValue } from "../utils/formatValue";

@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { VisualizerProps } from "../../../registry/visualization";
-import { TrackingCameraPoseFrame } from "../../../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
+import { TrackingCameraPoseFrame } from "../../../../genproto/farm_ng/v1/tracking_camera";
 import { Plot } from "./Plot";
-import { Vec3 } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
+import { Vec3 } from "../../../../genproto/farm_ng/v1/geometry";
 import { colorGenerator } from "../../../utils/colorGenerator";
 
 const norm = (v?: Vec3): number => {

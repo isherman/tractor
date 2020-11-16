@@ -6,7 +6,7 @@ import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import {
   MultiViewApriltagRigModel,
   solverStatusToJSON
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
+} from "../../../../genproto/farm_ng/v1/calibrator";
 import { formatValue } from "../../../utils/formatValue";
 import {
   StandardComponentOptions,
@@ -31,8 +31,8 @@ import { ImageVisualizer } from "./Image";
 import { ApriltagDetectionsVisualizer } from "./ApriltagDetections";
 import styles from "./MultiViewApriltagRigModel.module.scss";
 import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
-import { NamedSE3Pose } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
-import { CameraModel } from "../../../../genproto/farm_ng_proto/tractor/v1/camera_model";
+import { NamedSE3Pose } from "../../../../genproto/farm_ng/v1/geometry";
+import { CameraModel } from "../../../../genproto/farm_ng/v1/camera_model";
 
 function openCVPoseToThreeJSPose(pose: NamedSE3Pose): NamedSE3Pose {
   if (!pose.aPoseB) {

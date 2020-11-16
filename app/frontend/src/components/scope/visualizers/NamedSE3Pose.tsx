@@ -7,7 +7,7 @@ import {
 import {
   NamedSE3Pose,
   SE3Pose
-} from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
+} from "../../../../genproto/farm_ng/v1/geometry";
 import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";

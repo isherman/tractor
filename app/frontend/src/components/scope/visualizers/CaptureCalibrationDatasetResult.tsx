@@ -7,7 +7,7 @@ import {
 } from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CaptureCalibrationDatasetResult } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
+import { CaptureCalibrationDatasetResult } from "../../../../genproto/farm_ng/v1/capture_calibration_dataset";
 import { CaptureCalibrationDatasetConfigurationVisualizer } from "./CaptureCalibrationDatasetConfiguration";
 
 const CaptureCalibrationDatasetResultElement: React.FC<SingleElementVisualizerProps<

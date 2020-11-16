@@ -6,7 +6,7 @@ import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import {
   MonocularApriltagRigModel,
   solverStatusToJSON
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
+} from "../../../../genproto/farm_ng/v1/calibrator";
 import { formatValue } from "../../../utils/formatValue";
 import { cloneElement, useState } from "react";
 import {
@@ -16,7 +16,7 @@ import {
 import RangeSlider from "react-bootstrap-range-slider";
 import styles from "./MonocularApriltagRigModel.module.scss";
 import { Scene } from "./Scene";
-import { NamedSE3Pose } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
+import { NamedSE3Pose } from "../../../../genproto/farm_ng/v1/geometry";
 
 import { getDagTransform } from "../../../utils/geometry";
 import { KeyValueTable } from "./KeyValueTable";

@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { useState, useEffect } from "react";
-import { Resource } from "../../genproto/farm_ng_proto/tractor/v1/resource";
+import { Resource } from "../../genproto/farm_ng/v1/resource";
 import { ResourceArchive } from "../models/ResourceArchive";
 
 export function useFetchDataUrl(

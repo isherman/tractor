@@ -10,7 +10,7 @@ import {
 } from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CaptureCalibrationDatasetConfiguration } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
+import { CaptureCalibrationDatasetConfiguration } from "../../../../genproto/farm_ng/v1/capture_calibration_dataset";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 

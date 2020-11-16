@@ -4,7 +4,7 @@ import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import {
   BaseToCameraModel,
   solverStatusToJSON
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
+} from "../../../../genproto/farm_ng/v1/calibrator";
 import {
   StandardComponentOptions,
   StandardComponent

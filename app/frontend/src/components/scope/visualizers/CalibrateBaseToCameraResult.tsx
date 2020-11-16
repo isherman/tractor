@@ -7,11 +7,11 @@ import {
 } from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CalibrateBaseToCameraResult } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
+import { CalibrateBaseToCameraResult } from "../../../../genproto/farm_ng/v1/calibrate_base_to_camera";
 import {
   BaseToCameraModel,
   solverStatusToJSON
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
+} from "../../../../genproto/farm_ng/v1/calibrator";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { BaseToCameraModelVisualizer } from "./BaseToCameraModel";
 import { CalibrateBaseToCameraConfigurationVisualizer } from "./CalibrateBaseToCameraConfiguration";

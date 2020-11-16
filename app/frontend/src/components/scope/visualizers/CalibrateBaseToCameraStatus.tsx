@@ -6,7 +6,7 @@ import { Card } from "./Card";
 import {
   CalibrateBaseToCameraResult,
   CalibrateBaseToCameraStatus
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
+} from "../../../../genproto/farm_ng/v1/calibrate_base_to_camera";
 import {
   StandardComponentOptions,
   StandardComponent

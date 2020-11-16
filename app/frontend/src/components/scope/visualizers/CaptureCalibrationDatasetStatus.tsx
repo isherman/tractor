@@ -10,7 +10,7 @@ import { Card } from "./Card";
 import {
   CaptureCalibrationDatasetResult,
   CaptureCalibrationDatasetStatus
-} from "../../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
+} from "../../../../genproto/farm_ng/v1/capture_calibration_dataset";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
 

@@ -12,7 +12,7 @@ import {
 import * as React from "react";
 import "chonky/style/main.css";
 import { useEffect, useState } from "react";
-import { File } from "../../genproto/farm_ng_proto/tractor/v1/resource";
+import { File } from "../../genproto/farm_ng/v1/resource";
 import styles from "./Blobstore.module.scss";
 import { eventRegistry, EventType, EventTypeId } from "../registry/events";
 import { visualizersForEventType } from "../registry/visualization";

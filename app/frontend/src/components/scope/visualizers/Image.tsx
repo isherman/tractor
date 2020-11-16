@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card } from "./Card";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { Image } from "../../../../genproto/farm_ng_proto/tractor/v1/image";
+import { Image } from "../../../../genproto/farm_ng/v1/image";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import {
   StandardComponentOptions,

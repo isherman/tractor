@@ -3,12 +3,12 @@ import * as React from "react";
 
 import { useStores } from "../../hooks/useStores";
 import { useState } from "react";
-import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../../genproto/farm_ng/v1/io";
 import {
   CaptureCalibrationDatasetConfiguration,
   CaptureCalibrationDatasetConfiguration as Configuration,
   CaptureCalibrationDatasetStatus as Status
-} from "../../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
+} from "../../../genproto/farm_ng/v1/capture_calibration_dataset";
 import { CaptureCalibrationDatasetConfigurationVisualizer } from "../scope/visualizers/CaptureCalibrationDatasetConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";

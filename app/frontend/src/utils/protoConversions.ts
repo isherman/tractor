@@ -2,9 +2,9 @@ import {
   Vec3 as Vec3Proto,
   Quaternion as QuaternionProto,
   SE3Pose as SE3PoseProto
-} from "../../genproto/farm_ng_proto/tractor/v1/geometry";
+} from "../../genproto/farm_ng/v1/geometry";
 import { Quaternion, Vector3, Matrix4 } from "three";
-import { Resource } from "../../genproto/farm_ng_proto/tractor/v1/resource";
+import { Resource } from "../../genproto/farm_ng/v1/resource";
 import { EventTypeId, eventTypeIds } from "../registry/events";
 
 export function toVector3(v?: Vec3Proto): Vector3 {

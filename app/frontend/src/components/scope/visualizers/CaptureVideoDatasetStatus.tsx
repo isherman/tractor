@@ -6,7 +6,7 @@ import { Card } from "./Card";
 import {
   CaptureVideoDatasetResult,
   CaptureVideoDatasetStatus
-} from "../../../../genproto/farm_ng_proto/tractor/v1/capture_video_dataset";
+} from "../../../../genproto/farm_ng/v1/capture_video_dataset";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import {
   StandardComponent,

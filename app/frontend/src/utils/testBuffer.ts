@@ -1,7 +1,7 @@
 import { Buffer, TimestampedEvent } from "../types/common";
-import { Image } from "../../genproto/farm_ng_proto/tractor/v1/image";
-import { CalibrateApriltagRigStatus } from "../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
-import { CalibrateBaseToCameraStatus } from "../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
+import { Image } from "../../genproto/farm_ng/v1/image";
+import { CalibrateApriltagRigStatus } from "../../genproto/farm_ng/v1/calibrate_apriltag_rig";
+import { CalibrateBaseToCameraStatus } from "../../genproto/farm_ng/v1/calibrate_base_to_camera";
 
 export const testBuffer: Buffer = {
   "type.googleapis.com/farm_ng_proto.tractor.v1.Image": {

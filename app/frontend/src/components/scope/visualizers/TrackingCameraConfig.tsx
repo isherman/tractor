@@ -13,7 +13,7 @@ import { useFormState } from "../../../hooks/useFormState";
 import {
   CameraConfig,
   TrackingCameraConfig
-} from "../../../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
+} from "../../../../genproto/farm_ng/v1/tracking_camera";
 import { CameraConfigVisualizer } from "./CameraConfig";
 import Form from "./Form";
 import styles from "./TrackingCameraConfig.module.scss";

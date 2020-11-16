@@ -2,12 +2,12 @@
 import * as React from "react";
 import { useState } from "react";
 import { useStores } from "../../hooks/useStores";
-import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../../genproto/farm_ng/v1/io";
 import {
   CalibrateBaseToCameraConfiguration,
   CalibrateBaseToCameraConfiguration as Configuration,
   CalibrateBaseToCameraStatus as Status
-} from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
+} from "../../../genproto/farm_ng/v1/calibrate_base_to_camera";
 import { CalibrateBaseToCameraConfigurationVisualizer } from "../scope/visualizers/CalibrateBaseToCameraConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";

@@ -9,7 +9,7 @@ import {
   StandardComponent
 } from "./StandardComponent";
 import { Card } from "./Card";
-import { TagConfig } from "../../../../genproto/farm_ng_proto/tractor/v1/apriltag";
+import { TagConfig } from "../../../../genproto/farm_ng/v1/apriltag";
 import { KeyValueTable } from "./KeyValueTable";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";

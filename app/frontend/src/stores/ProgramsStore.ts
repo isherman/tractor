@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { computed, observable } from "mobx";
 import { decodeAnyEvent } from "../models/decodeAnyEvent";
-import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../genproto/farm_ng/v1/io";
 import {
   BusEventEmitter,
   BusEventEmitterHandle
@@ -10,7 +10,7 @@ import { EventType } from "../registry/events";
 import {
   ProgramExecution,
   ProgramSupervisorStatus
-} from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
+} from "../../genproto/farm_ng/v1/program_supervisor";
 import { Program, programForProgramId } from "../registry/programs";
 import { TimestampedEventVector } from "../types/common";
 

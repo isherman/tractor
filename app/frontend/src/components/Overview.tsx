@@ -1,8 +1,8 @@
 import * as React from "react";
 import { ListGroup, Card, CardColumns, Table } from "react-bootstrap";
 import { useObserver } from "mobx-react-lite";
-import { TractorState } from "../../genproto/farm_ng_proto/tractor/v1/tractor";
-import { MotorControllerState } from "../../genproto/farm_ng_proto/tractor/v1/motor";
+import { TractorState } from "../../genproto/farm_ng/v1/tractor";
+import { MotorControllerState } from "../../genproto/farm_ng/v1/motor";
 import { formatValue } from "../utils/formatValue";
 import { useStores } from "../hooks/useStores";
 import styles from "./Overview.module.scss";

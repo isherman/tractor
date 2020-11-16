@@ -5,11 +5,11 @@ import {
   StandardComponentOptions,
   StandardComponent
 } from "./StandardComponent";
-import { CalibrateApriltagRigResult } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
+import { CalibrateApriltagRigResult } from "../../../../genproto/farm_ng/v1/calibrate_apriltag_rig";
 import {
   MonocularApriltagRigModel,
   solverStatusToJSON
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
+} from "../../../../genproto/farm_ng/v1/calibrator";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";

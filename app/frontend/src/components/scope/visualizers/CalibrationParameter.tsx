@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CalibrationParameter } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
+import { CalibrationParameter } from "../../../../genproto/farm_ng/v1/calibrator";
 import { useFormState } from "../../../hooks/useFormState";
 import { FormProps } from "../../../registry/visualization";
 import Form from "./Form";

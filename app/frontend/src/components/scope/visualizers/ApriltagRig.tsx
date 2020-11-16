@@ -6,8 +6,8 @@ import { NearestFilter, TextureLoader } from "three";
 import {
   ApriltagRig,
   ApriltagRig_Node as ApriltagRigNode
-} from "../../../../genproto/farm_ng_proto/tractor/v1/apriltag";
-import { NamedSE3Pose } from "../../../../genproto/farm_ng_proto/tractor/v1/geometry";
+} from "../../../../genproto/farm_ng/v1/apriltag";
+import { NamedSE3Pose } from "../../../../genproto/farm_ng/v1/geometry";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { getDagTransform } from "../../../utils/geometry";
 import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";

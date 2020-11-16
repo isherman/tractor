@@ -3,12 +3,12 @@ import {
   ApriltagDetections,
   ApriltagRig,
   TagConfig
-} from "../../genproto/farm_ng_proto/tractor/v1/apriltag";
+} from "../../genproto/farm_ng/v1/apriltag";
 import {
   NamedSE3Pose,
   SE3Pose,
   Vec2
-} from "../../genproto/farm_ng_proto/tractor/v1/geometry";
+} from "../../genproto/farm_ng/v1/geometry";
 import {
   BaseToCameraInitialization,
   BaseToCameraModel,
@@ -18,58 +18,55 @@ import {
   MonocularApriltagRigModel,
   MultiViewApriltagRigModel,
   ViewInitialization
-} from "../../genproto/farm_ng_proto/tractor/v1/calibrator";
+} from "../../genproto/farm_ng/v1/calibrator";
 import {
   Announce,
   LoggingCommand,
   LoggingStatus
-} from "../../genproto/farm_ng_proto/tractor/v1/io";
-import { Image } from "../../genproto/farm_ng_proto/tractor/v1/image";
-import { MotorControllerState } from "../../genproto/farm_ng_proto/tractor/v1/motor";
-import { SteeringCommand } from "../../genproto/farm_ng_proto/tractor/v1/steering";
+} from "../../genproto/farm_ng/v1/io";
+import { Image } from "../../genproto/farm_ng/v1/image";
+import { MotorControllerState } from "../../genproto/farm_ng/v1/motor";
+import { SteeringCommand } from "../../genproto/farm_ng/v1/steering";
 import {
   TrackingCameraPoseFrame,
   TrackingCameraMotionFrame,
   TrackingCameraCommand,
   TrackingCameraConfig,
   CameraConfig
-} from "../../genproto/farm_ng_proto/tractor/v1/tracking_camera";
-import {
-  TractorConfig,
-  TractorState
-} from "../../genproto/farm_ng_proto/tractor/v1/tractor";
+} from "../../genproto/farm_ng/v1/tracking_camera";
+import { TractorConfig, TractorState } from "../../genproto/farm_ng/v1/tractor";
 import { Message } from "../types/common";
 import {
   ProgramSupervisorStatus,
   StartProgramRequest,
   StopProgramRequest
-} from "../../genproto/farm_ng_proto/tractor/v1/program_supervisor";
+} from "../../genproto/farm_ng/v1/program_supervisor";
 import {
   CaptureCalibrationDatasetConfiguration,
   CaptureCalibrationDatasetResult,
   CaptureCalibrationDatasetStatus
-} from "../../genproto/farm_ng_proto/tractor/v1/capture_calibration_dataset";
+} from "../../genproto/farm_ng/v1/capture_calibration_dataset";
 import {
   CaptureVideoDatasetConfiguration,
   CaptureVideoDatasetResult,
   CaptureVideoDatasetStatus
-} from "../../genproto/farm_ng_proto/tractor/v1/capture_video_dataset";
+} from "../../genproto/farm_ng/v1/capture_video_dataset";
 import {
   CalibrateApriltagRigConfiguration,
   CalibrateApriltagRigResult,
   CalibrateApriltagRigStatus
-} from "../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
+} from "../../genproto/farm_ng/v1/calibrate_apriltag_rig";
 import {
   CalibrateBaseToCameraConfiguration,
   CalibrateBaseToCameraResult,
   CalibrateBaseToCameraStatus
-} from "../../genproto/farm_ng_proto/tractor/v1/calibrate_base_to_camera";
-import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
+} from "../../genproto/farm_ng/v1/calibrate_base_to_camera";
+import { Event as BusEvent } from "../../genproto/farm_ng/v1/io";
 import {
   CalibrateMultiViewApriltagRigConfiguration,
   CalibrateMultiViewApriltagRigResult,
   CalibrateMultiViewApriltagRigStatus
-} from "../../genproto/farm_ng_proto/tractor/v1/calibrate_multi_view_apriltag_rig";
+} from "../../genproto/farm_ng/v1/calibrate_multi_view_apriltag_rig";
 
 export type EventType =
   | BusEvent

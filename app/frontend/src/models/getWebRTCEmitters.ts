@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../genproto/farm_ng/v1/io";
 import { BusClient } from "./BusClient";
 import { BusEventEmitter } from "./BusEventEmitter";
 import { MediaStreamEmitter } from "./MediaStreamEmitter";

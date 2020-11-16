@@ -4,7 +4,7 @@ import {
   ViewDirection,
   viewDirectionToJSON,
   ViewInitialization
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
+} from "../../../../genproto/farm_ng/v1/calibrator";
 import { useFormState } from "../../../hooks/useFormState";
 import {
   FormProps,

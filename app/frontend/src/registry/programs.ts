@@ -3,7 +3,7 @@ import { CalibrateApriltagRigProgram } from "../components/programs/CalibrateApr
 import { CalibrateBaseToCameraProgram } from "../components/programs/CalibrateBaseToCamera";
 import { CaptureVideoDatasetProgram } from "../components/programs/CaptureVideoDataset";
 import { EventType } from "./events";
-import { Event as BusEvent } from "../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../genproto/farm_ng/v1/io";
 import { CalibrateMultiViewApriltagRigProgram } from "../components/programs/CalibrateMultiViewApriltagRig";
 
 export interface Program<T extends EventType = EventType> {

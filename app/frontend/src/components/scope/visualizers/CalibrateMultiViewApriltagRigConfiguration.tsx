@@ -9,15 +9,15 @@ import {
   StandardComponent
 } from "./StandardComponent";
 import { Card } from "./Card";
-import { CalibrateMultiViewApriltagRigConfiguration } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_multi_view_apriltag_rig";
+import { CalibrateMultiViewApriltagRigConfiguration } from "../../../../genproto/farm_ng/v1/calibrate_multi_view_apriltag_rig";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
-import { Resource } from "../../../../genproto/farm_ng_proto/tractor/v1/resource";
+import { Resource } from "../../../../genproto/farm_ng/v1/resource";
 import { RepeatedIntForm } from "./RepeatedIntForm";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { KeyValueTable } from "./KeyValueTable";
 import { CaptureVideoDatasetResultVisualizer } from "./CaptureVideoDatasetResult";
-import { CaptureVideoDatasetResult } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_video_dataset";
+import { CaptureVideoDatasetResult } from "../../../../genproto/farm_ng/v1/capture_video_dataset";
 
 const CalibrateMultiViewApriltagRigConfigurationForm: React.FC<FormProps<
   CalibrateMultiViewApriltagRigConfiguration

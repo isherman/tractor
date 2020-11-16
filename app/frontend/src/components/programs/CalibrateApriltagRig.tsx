@@ -2,12 +2,12 @@
 import * as React from "react";
 import { useState } from "react";
 import { useStores } from "../../hooks/useStores";
-import { Event as BusEvent } from "../../../genproto/farm_ng_proto/tractor/v1/io";
+import { Event as BusEvent } from "../../../genproto/farm_ng/v1/io";
 import {
   CalibrateApriltagRigConfiguration,
   CalibrateApriltagRigConfiguration as Configuration,
   CalibrateApriltagRigStatus as Status
-} from "../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
+} from "../../../genproto/farm_ng/v1/calibrate_apriltag_rig";
 import { CalibrateApriltagRigConfigurationVisualizer } from "../scope/visualizers/CalibrateApriltagRigConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";

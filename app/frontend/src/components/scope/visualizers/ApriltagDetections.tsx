@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card } from "./Card";
 import styles from "./ApriltagDetections.module.scss";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { ApriltagDetections } from "../../../../genproto/farm_ng_proto/tractor/v1/apriltag";
+import { ApriltagDetections } from "../../../../genproto/farm_ng/v1/apriltag";
 import { autorun } from "mobx";
 import { drawAprilTagDetections } from "../../../utils/drawApriltagDetections";
 import {

@@ -6,7 +6,7 @@ import {
 } from "../../../registry/visualization";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CaptureVideoDatasetConfiguration } from "../../../../genproto/farm_ng_proto/tractor/v1/capture_video_dataset";
+import { CaptureVideoDatasetConfiguration } from "../../../../genproto/farm_ng/v1/capture_video_dataset";
 import {
   StandardComponent,
   StandardComponentOptions

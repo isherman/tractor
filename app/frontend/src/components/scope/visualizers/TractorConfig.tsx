@@ -13,7 +13,7 @@ import {
   TractorConfig,
   TractorConfig_Topology as Topology,
   tractorConfig_TopologyToJSON as TopologyToJSON
-} from "../../../../genproto/farm_ng_proto/tractor/v1/tractor";
+} from "../../../../genproto/farm_ng/v1/tractor";
 import { KeyValueTable } from "./KeyValueTable";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";

@@ -6,12 +6,12 @@ import {
   StandardComponent
 } from "./StandardComponent";
 import { Card } from "./Card";
-import { CalibrateMultiViewApriltagRigResult } from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_multi_view_apriltag_rig";
+import { CalibrateMultiViewApriltagRigResult } from "../../../../genproto/farm_ng/v1/calibrate_multi_view_apriltag_rig";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import {
   MultiViewApriltagRigModel,
   solverStatusToJSON
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrator";
+} from "../../../../genproto/farm_ng/v1/calibrator";
 import { CalibrateMultiViewApriltagRigConfigurationVisualizer } from "./CalibrateMultiViewApriltagRigConfiguration";
 import { KeyValueTable } from "./KeyValueTable";
 import { MultiViewApriltagRigModelVisualizer } from "./MultiViewApriltagRigModel";

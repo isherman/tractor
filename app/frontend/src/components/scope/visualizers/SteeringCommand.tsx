@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SteeringCommand } from "../../../../genproto/farm_ng_proto/tractor/v1/steering";
+import { SteeringCommand } from "../../../../genproto/farm_ng/v1/steering";
 import { VisualizerProps } from "../../../registry/visualization";
 import { colorGenerator } from "../../../utils/colorGenerator";
 import { Plot } from "./Plot";

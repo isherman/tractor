@@ -10,7 +10,7 @@ import { Card } from "./Card";
 import {
   CalibrateMultiViewApriltagRigResult,
   CalibrateMultiViewApriltagRigStatus
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_multi_view_apriltag_rig";
+} from "../../../../genproto/farm_ng/v1/calibrate_multi_view_apriltag_rig";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { CalibrateMultiViewApriltagRigResultVisualizer } from "./CalibrateMultiViewApriltagRigResult";
 

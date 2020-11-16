@@ -8,7 +8,7 @@ import {
 import {
   CalibrateApriltagRigResult,
   CalibrateApriltagRigStatus
-} from "../../../../genproto/farm_ng_proto/tractor/v1/calibrate_apriltag_rig";
+} from "../../../../genproto/farm_ng/v1/calibrate_apriltag_rig";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { Card } from "./Card";
 import { CalibrateApriltagRigResultVisualizer } from "./CalibrateApriltagRigResult";
