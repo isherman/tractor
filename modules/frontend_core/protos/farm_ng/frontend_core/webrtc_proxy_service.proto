@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package farm_ng.v1;
+package farm_ng.frontend_core;
 option go_package = "github.com/farm-ng/genproto/frontend_core";
 
 message InitiatePeerConnectionRequest {
