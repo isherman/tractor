@@ -16,6 +16,6 @@ RUN echo 'farmer:farmer' | chpasswd
 USER farmer
 WORKDIR /home/farmer
 
-RUN git clone --branch master --recursive https://github.com/farm-ng/tractor.git
+RUN git clone --branch bootstrap-debug --recursive https://github.com/isherman/tractor.git
 
 WORKDIR /home/farmer/tractor
