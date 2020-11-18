@@ -17,9 +17,9 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "farm_ng/event_log_reader.h"
-#include "farm_ng/init.h"
-#include "farm_ng/ipc.h"
+#include "farm_ng/core/event_log_reader.h"
+#include "farm_ng/core/init.h"
+#include "farm_ng/core/ipc.h"
 
 DEFINE_string(log, "/tmp/farm-ng-event.log",
               "Path to log file, recorded with ipc_logger");

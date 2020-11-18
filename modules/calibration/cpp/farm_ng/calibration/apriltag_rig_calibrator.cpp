@@ -6,15 +6,15 @@
 #include <opencv2/imgproc.hpp>
 #include <sophus/average.hpp>
 
-#include "farm_ng/apriltag.h"
+#include "farm_ng/perception_core/apriltag.h"
 #include "farm_ng/calibration/local_parameterization.h"
-#include "farm_ng/camera_model.h"
-#include "farm_ng/pose_utils.h"
+#include "farm_ng/perception_core/camera_model.h"
+#include "farm_ng/perception_core/pose_utils.h"
 
-#include "farm_ng/image_loader.h"
-#include "farm_ng/ipc.h"
+#include "farm_ng/perception_core/image_loader.h"
+#include "farm_ng/core/ipc.h"
 
-#include "farm_ng/sophus_protobuf.h"
+#include "farm_ng/perception_core/sophus_protobuf.h"
 
 namespace farm_ng {
 using farm_ng::perception_core::ApriltagRig;

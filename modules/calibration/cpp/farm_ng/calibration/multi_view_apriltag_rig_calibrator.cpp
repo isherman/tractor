@@ -8,26 +8,26 @@
 #include <google/protobuf/util/time_util.h>
 #include <sophus/average.hpp>
 
-#include "farm_ng/blobstore.h"
+#include "farm_ng/core/blobstore.h"
 
-#include "farm_ng/event_log_reader.h"
-#include "farm_ng/image_utils.h"
-#include "farm_ng/ipc.h"
-#include "farm_ng/sophus_protobuf.h"
+#include "farm_ng/core/event_log_reader.h"
+#include "farm_ng/perception_core/image_utils.h"
+#include "farm_ng/core/ipc.h"
+#include "farm_ng/perception_core/sophus_protobuf.h"
 
-#include "farm_ng/apriltag.h"
-#include "farm_ng/camera_model.h"
+#include "farm_ng/perception_core/apriltag.h"
+#include "farm_ng/perception_core/camera_model.h"
 
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/calibration/kinematics.h"
 #include "farm_ng/calibration/local_parameterization.h"
-#include "farm_ng/pose_utils.h"
-#include "farm_ng/time_series.h"
+#include "farm_ng/perception_core/pose_utils.h"
+#include "farm_ng/perception_core/time_series.h"
 
 #include "farm_ng/perception_core/apriltag.pb.h"
 #include "farm_ng/perception_core/capture_video_dataset.pb.h"
 
-#include "farm_ng/image_loader.h"
+#include "farm_ng/perception_core/image_loader.h"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>

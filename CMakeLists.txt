@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(farm-ng-tractor)
+project(farm-ng-root)
 
 include(CMakeToolsHelpers OPTIONAL)
 
@@ -12,19 +12,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(cmake/farm_ng_modules.cmake)
-
-# if(BUILD_ONLY_PROTO)
-  # message(STATUS "Build only proto.")
-  # add_subdirectory(modules/core/protos)
-  # add_subdirectory(modules/perception_core/protos)
-  # add_subdirectory(modules/calibration/protos)
-  # add_subdirectory(modules/tractor/protos)
-  # return()
-# endif()
-
-#include_directories(${Protobuf_INCLUDE_DIRS})
-#include_directories(${CERES_INCLUDE_DIRS})
-#include_directories(${CMAKE_CURRENT_BINARY_DIR}/protos)
 
 add_subdirectory(third_party)
 add_subdirectory(third_party/googletest)

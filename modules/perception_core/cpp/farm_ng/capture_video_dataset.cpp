@@ -5,10 +5,10 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "farm_ng/blobstore.h"
-#include "farm_ng/init.h"
-#include "farm_ng/ipc.h"
-#include "farm_ng/tracking_camera_utils.h"
+#include "farm_ng/core/blobstore.h"
+#include "farm_ng/core/init.h"
+#include "farm_ng/core/ipc.h"
+#include "farm_ng/perception_core/tracking_camera_utils.h"
 
 #include "farm_ng/perception_core/apriltag.pb.h"
 #include "farm_ng/perception_core/capture_video_dataset.pb.h"

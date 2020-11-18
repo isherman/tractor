@@ -15,21 +15,21 @@ tractor/build/cpp/farm_ng/tracking_study \
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "farm_ng/blobstore.h"
-#include "farm_ng/event_log_reader.h"
-#include "farm_ng/image_loader.h"
-#include "farm_ng/init.h"
-#include "farm_ng/ipc.h"
+#include "farm_ng/core/blobstore.h"
+#include "farm_ng/core/event_log_reader.h"
+#include "farm_ng/perception_core/image_loader.h"
+#include "farm_ng/core/init.h"
+#include "farm_ng/core/ipc.h"
 
-#include "farm_ng/calibration/base_to_camera_calibrator.h"
+#include "farm_ng/tractor/base_to_camera_calibrator.h"
 #include "farm_ng/calibration/visual_odometer.h"
 
-#include "farm_ng/v1/calibrate_base_to_camera.pb.h"
-#include "farm_ng/v1/capture_video_dataset.pb.h"
+#include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
+#include "farm_ng/perception_core/capture_video_dataset.pb.h"
 
-using farm_ng::v1::CalibrateBaseToCameraResult;
+using farm_ng::calibration::CalibrateBaseToCameraResult;
 using farm_ng::perception_core::CaptureVideoDatasetResult;
-using farm_ng::v1::TractorState;
+using farm_ng::tractor::TractorState;
 
 DEFINE_string(video_dataset_result, "",
               "The path to a serialized CaptureVideoDatasetResult");

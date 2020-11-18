@@ -9,14 +9,14 @@
 
 #include <ceres/ceres.h>
 
-#include "farm_ng/blobstore.h"
-#include "farm_ng/ipc.h"
-#include "farm_ng/sophus_protobuf.h"
+#include "farm_ng/core/blobstore.h"
+#include "farm_ng/core/ipc.h"
+#include "farm_ng/perception_core/sophus_protobuf.h"
 
 #include "farm_ng/calibration/kinematics.h"
 #include "farm_ng/calibration/local_parameterization.h"
-#include "farm_ng/camera_model.h"
-#include "farm_ng/eigen_cv.h"
+#include "farm_ng/perception_core/camera_model.h"
+#include "farm_ng/perception_core/eigen_cv.h"
 
 namespace farm_ng {
 namespace {

@@ -6,12 +6,12 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "farm_ng/apriltag.h"
-#include "farm_ng/blobstore.h"
+#include "farm_ng/perception_core/apriltag.h"
+#include "farm_ng/core/blobstore.h"
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
-#include "farm_ng/event_log_reader.h"
-#include "farm_ng/init.h"
-#include "farm_ng/ipc.h"
+#include "farm_ng/core/event_log_reader.h"
+#include "farm_ng/core/init.h"
+#include "farm_ng/core/ipc.h"
 
 #include "farm_ng/calibration/calibrate_apriltag_rig.pb.h"
 #include "farm_ng/calibration/calibrator.pb.h"

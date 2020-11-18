@@ -8,13 +8,23 @@ macro(farm_ng_add_protobufs target)
     list(APPEND DEP_PROTO_INCLUDES  -I ${${_dep_target}_PROTOBUF_IMPORT_DIRS})
   endforeach()
 
+  # Create build directories for all supported languages
   list(APPEND _proto_languages cpp python go ts)
   foreach(_proto_language ${_proto_languages})
     set("_proto_output_dir_${_proto_language}" ${CMAKE_CURRENT_BINARY_DIR}/${_proto_language})
     file(MAKE_DIRECTORY "${_proto_output_dir_${_proto_language}}")
   endforeach()
 
-  set(additional_args
+  # Extract the module name from the target
+  string(REGEX REPLACE "farm-ng-|-protobuf" "" _module ${target})
+
+  # With this configuration, .pb.go and .twirp.go files are generated in
+  # ${_proto_output_dir_go}/github.com/farm-ng/genproto/${_module}.
+  # The fully qualified directory structure isn't necessary for Go modules,
+  # but the Twirp generator doesn't yet support --go_opt=module
+  # (https://github.com/twitchtv/twirp/issues/226).
+  set(protoc_args
+    --cpp_out ${_proto_output_dir_cpp}
     --python_out=${_proto_output_dir_python}
     --go_out=${_proto_output_dir_go}
     --twirp_out=${_proto_output_dir_go}
@@ -33,9 +43,9 @@ macro(farm_ng_add_protobufs target)
     add_custom_command(
       OUTPUT ${_proto_output_dir_cpp}/${HDR} ${_proto_output_dir_cpp}/${SRC}
       COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
-      ARGS ${additional_args} --cpp_out ${_proto_output_dir_cpp} -I ${CMAKE_CURRENT_SOURCE_DIR} ${DEP_PROTO_INCLUDES} ${_full_proto_path}
+      ARGS ${protoc_args} -I ${CMAKE_CURRENT_SOURCE_DIR} ${DEP_PROTO_INCLUDES} ${_full_proto_path}
       DEPENDS ${_full_proto_path} ${PROTOBUF_PROTOC_EXECUTABLE}
-      COMMENT "Generating cpp protobuf ${HDR} ${SRC} from ${_proto_path}"
+      COMMENT "Generating protobuf code for ${_proto_path}"
       VERBATIM)
   endforeach()
 
@@ -43,14 +53,14 @@ macro(farm_ng_add_protobufs target)
   target_include_directories(${target} PUBLIC ${_proto_output_dir_cpp})
   target_link_libraries(${target} ${Protobuf_LIBRARIES} ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
 
-  string(REGEX REPLACE "farm-ng-|-protobuf" "" _module ${target})
+  # Copy a go.mod file to expose the generated Go code as a Go module
   configure_file(
     ${CMAKE_HOME_DIRECTORY}/cmake/go.mod.template
     ${_proto_output_dir_go}/github.com/farm-ng/genproto/${_module}/go.mod)
 
+  # Copy a package.json file to expose the generated TS code as an NPM package
   configure_file(
     ${CMAKE_HOME_DIRECTORY}/cmake/package.json.template
-    ${_proto_output_dir_ts}/package.json
-    COPYONLY)
+    ${_proto_output_dir_ts}/package.json)
 
 endmacro()

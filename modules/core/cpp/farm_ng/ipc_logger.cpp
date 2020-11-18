@@ -1,6 +1,6 @@
-#include "farm_ng/event_log.h"
-#include "farm_ng/init.h"
-#include "farm_ng/ipc.h"
+#include "farm_ng/core/event_log.h"
+#include "farm_ng/core/init.h"
+#include "farm_ng/core/ipc.h"
 
 #include <glog/logging.h>
 #include <iostream>

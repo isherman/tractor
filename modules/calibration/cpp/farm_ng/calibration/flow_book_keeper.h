@@ -8,7 +8,7 @@
 #include <opencv2/core.hpp>
 #include <sophus/se3.hpp>
 
-#include "farm_ng/time_series.h"
+#include "farm_ng/perception_core/time_series.h"
 
 #include "farm_ng/perception_core/camera_model.pb.h"
 

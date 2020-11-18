@@ -17,12 +17,16 @@ if [ `dpkg --print-architecture` == "arm64" ]; then
 fi
 
 export PYTHONPATH=$FARM_NG_ROOT/env/lib
-export PYTHONPATH=build/python/genproto:$PYTHONPATH
 export PYTHONPATH=modules/calibration/python:$PYTHONPATH
+export PYTHONPATH=build/modules/calibration/protos/python:$PYTHONPATH
 export PYTHONPATH=modules/core/python:$PYTHONPATH
+export PYTHONPATH=build/modules/core/protos/python:$PYTHONPATH
 export PYTHONPATH=modules/frontend_core/python:$PYTHONPATH
+export PYTHONPATH=build/modules/frontend_core/protos/python:$PYTHONPATH
 export PYTHONPATH=modules/perception_core/python:$PYTHONPATH
+export PYTHONPATH=build/modules/perception_core/protos/python:$PYTHONPATH
 export PYTHONPATH=modules/tractor/python:$PYTHONPATH
+export PYTHONPATH=build/modules/tractor/protos/python:$PYTHONPATH
 export LD_LIBRARY_PATH=$FARM_NG_ROOT/env/lib
 export PATH=$PATH:/usr/local/go/bin
 
@@ -31,12 +35,12 @@ export PATH=$PATH:/usr/local/go/bin
 export BLOBSTORE_ROOT
 
 # Bootstrap blobstore if necessary
-for config in `python -m farm_ng.config list`
+for config in `python -m farm_ng.tractor.config list`
 do
   configpath=$BLOBSTORE_ROOT/configurations/$config.json
   if [ ! -f $configpath  ]; then
     echo "No configuration detected at $configpath; generating now."
     mkdir -p `dirname $configpath`
-	  python -m farm_ng.config gen$config > $configpath
+	  python -m farm_ng.tractor.config gen$config > $configpath
   fi
 done
