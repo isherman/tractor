@@ -17,7 +17,7 @@
 #include "farm_ng/sophus_protobuf.h"
 
 namespace farm_ng {
-using farm_ng::v1::ApriltagRig;
+using farm_ng::perception_core::ApriltagRig;
 
 Sophus::optional<SE3d> CameraPoseRigRootInit(
     const std::unordered_map<int, SE3d>& tag_poses_root,
@@ -198,7 +198,7 @@ void ModelError(ApriltagRigModel& model) {
     reprojection_image.CopyFrom(detections.image());
     auto resource_path = GetUniqueArchiveResource(
         FrameNameNumber(
-            "reprojection-" + farm_ng::v1::SolverStatus_Name(model.status),
+            "reprojection-" + farm_ng::calibration::SolverStatus_Name(model.status),
             frame_n),
         "png", "image/png");
     reprojection_image.mutable_resource()->CopyFrom(resource_path.first);

@@ -10,25 +10,25 @@
 #include "farm_ng/ipc.h"
 #include "farm_ng/tracking_camera_utils.h"
 
-#include "farm_ng/v1/apriltag.pb.h"
-#include "farm_ng/v1/capture_video_dataset.pb.h"
-#include "farm_ng/v1/image.pb.h"
-#include "farm_ng/v1/tracking_camera.pb.h"
+#include "farm_ng/perception_core/apriltag.pb.h"
+#include "farm_ng/perception_core/capture_video_dataset.pb.h"
+#include "farm_ng/perception_core/image.pb.h"
+#include "farm_ng/perception_core/tracking_camera.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(name, "default",
               "a dataset name, used in the output archive name");
 DEFINE_bool(detect_apriltags, false, "Detect apriltags.");
 
-typedef farm_ng::v1::Event EventPb;
-using farm_ng::v1::ApriltagDetection;
-using farm_ng::v1::BUCKET_VIDEO_DATASETS;
-using farm_ng::v1::CaptureVideoDatasetConfiguration;
-using farm_ng::v1::CaptureVideoDatasetResult;
-using farm_ng::v1::CaptureVideoDatasetStatus;
-using farm_ng::v1::Image;
-using farm_ng::v1::Subscription;
-using farm_ng::v1::TrackingCameraCommand;
+typedef farm_ng::core::Event EventPb;
+using farm_ng::core::BUCKET_VIDEO_DATASETS;
+using farm_ng::core::Subscription;
+using farm_ng::perception_core::ApriltagDetection;
+using farm_ng::perception_core::CaptureVideoDatasetConfiguration;
+using farm_ng::perception_core::CaptureVideoDatasetResult;
+using farm_ng::perception_core::CaptureVideoDatasetStatus;
+using farm_ng::perception_core::Image;
+using farm_ng::perception_core::TrackingCameraCommand;
 
 void Cleanup(farm_ng::EventBus& bus) {
   farm_ng::RequestStopCapturing(bus);

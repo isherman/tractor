@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	pb "github.com/farm-ng/genproto"
+	pb "github.com/farm-ng/genproto/core"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/protobuf/proto"

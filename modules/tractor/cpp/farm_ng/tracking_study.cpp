@@ -28,7 +28,7 @@ tractor/build/cpp/farm_ng/tracking_study \
 #include "farm_ng/v1/capture_video_dataset.pb.h"
 
 using farm_ng::v1::CalibrateBaseToCameraResult;
-using farm_ng::v1::CaptureVideoDatasetResult;
+using farm_ng::perception_core::CaptureVideoDatasetResult;
 using farm_ng::v1::TractorState;
 
 DEFINE_string(video_dataset_result, "",

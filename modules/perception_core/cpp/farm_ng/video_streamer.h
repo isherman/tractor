@@ -5,12 +5,12 @@
 #include <opencv2/videoio.hpp>
 
 #include "farm_ng/ipc.h"
-#include "farm_ng/v1/camera_model.pb.h"
-#include "farm_ng/v1/image.pb.h"
+#include "farm_ng/perception_core/camera_model.pb.h"
+#include "farm_ng/perception_core/image.pb.h"
 
 namespace farm_ng {
-using farm_ng::v1::CameraModel;
-using farm_ng::v1::Image;
+using farm_ng::perception_core::CameraModel;
+using farm_ng::perception_core::Image;
 
 class VideoStreamer {
  public:

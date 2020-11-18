@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package farm_ng.v1;
-option go_package = "github.com/farm-ng/genproto";
+package farm_ng.tractor;
+option go_package = "github.com/farm-ng/genproto/tractor";
 
 message SteeringCommand {
   enum Mode {

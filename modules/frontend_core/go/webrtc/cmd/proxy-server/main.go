@@ -13,7 +13,8 @@ import (
 
 	"github.com/farm-ng/core/pkg/blobstore"
 	"github.com/farm-ng/core/pkg/eventbus"
-	pb "github.com/farm-ng/genproto"
+	corepb "github.com/farm-ng/genproto/core"
+	pb "github.com/farm-ng/genproto/frontend_core"
 	"github.com/farm-ng/tractor/webrtc/internal/api"
 	"github.com/farm-ng/tractor/webrtc/internal/proxy"
 	"github.com/farm-ng/tractor/webrtc/internal/spa"
@@ -32,7 +33,7 @@ const (
 
 func main() {
 	// Create EventBus proxy
-	eventChan := make(chan *pb.Event)
+	eventChan := make(chan *corepb.Event)
 	eventBus := eventbus.NewEventBus(&eventbus.EventBusConfig{
 		MulticastGroup: (net.UDPAddr{IP: net.ParseIP(eventBusAddr), Port: eventBusPort}),
 		ServiceName:    "webrtc-proxy",

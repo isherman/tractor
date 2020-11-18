@@ -24,8 +24,8 @@
 #include "farm_ng/pose_utils.h"
 #include "farm_ng/time_series.h"
 
-#include "farm_ng/v1/apriltag.pb.h"
-#include "farm_ng/v1/capture_video_dataset.pb.h"
+#include "farm_ng/perception_core/apriltag.pb.h"
+#include "farm_ng/perception_core/capture_video_dataset.pb.h"
 
 #include "farm_ng/image_loader.h"
 
@@ -378,10 +378,10 @@ class PoseGraph {
   GraphT graph_;
 };
 
-using farm_ng::v1::CaptureVideoDatasetResult;
-using farm_ng::v1::Event;
-using farm_ng::v1::MultiViewApriltagDetections;
-using farm_ng::v1::PerImageRmse;
+using farm_ng::perception_core::CaptureVideoDatasetResult;
+using farm_ng::core::Event;
+using farm_ng::perception_core::MultiViewApriltagDetections;
+using farm_ng::calibration::PerImageRmse;
 using Sophus::SE3d;
 
 struct CameraRigApriltagRigCostFunctor {
@@ -605,7 +605,7 @@ void ModelError(MultiViewApriltagRigModel* model) {
     reprojection_image.mutable_camera_model()->set_image_width(image_width);
     reprojection_image.mutable_camera_model()->set_image_height(image_height);
     auto resource_path = GetUniqueArchiveResource(
-        FrameNameNumber("reprojection-" + farm_ng::v1::SolverStatus_Name(
+        FrameNameNumber("reprojection-" + farm_ng::calibration::SolverStatus_Name(
                                               model->solver_status()),
                         frame_num),
         "png", "image/png");

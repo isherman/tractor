@@ -7,12 +7,12 @@
 
 namespace farm_ng {
 
-using farm_ng::v1::Announce;
-typedef farm_ng::v1::Event EventPb;
-using farm_ng::v1::LoggingCommand;
-using farm_ng::v1::LoggingStatus;
-using farm_ng::v1::Resource;
-using farm_ng::v1::Subscription;
+using farm_ng::core::Announce;
+typedef farm_ng::core::Event EventPb;
+using farm_ng::core::LoggingCommand;
+using farm_ng::core::LoggingStatus;
+using farm_ng::core::Resource;
+using farm_ng::core::Subscription;
 
 class IpcLogger {
  public:

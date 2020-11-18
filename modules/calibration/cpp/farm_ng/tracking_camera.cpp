@@ -20,31 +20,31 @@
 #include <farm_ng/init.h>
 #include <farm_ng/ipc.h>
 #include <farm_ng/sophus_protobuf.h>
-#include <farm_ng/v1/apriltag.pb.h>
-#include <farm_ng/v1/calibrate_base_to_camera.pb.h>
-#include <farm_ng/v1/geometry.pb.h>
-#include <farm_ng/v1/tracking_camera.pb.h>
+#include <farm_ng/perception_core/apriltag.pb.h>
+#include <farm_ng/calibration/calibrate_base_to_camera.pb.h>
+#include <farm_ng/perception_core/geometry.pb.h>
+#include <farm_ng/perception_core/tracking_camera.pb.h>
 #include <farm_ng/video_streamer.h>
 
-typedef farm_ng::v1::Event EventPb;
+typedef farm_ng::core::Event EventPb;
 
-using farm_ng::v1::ApriltagConfig;
-using farm_ng::v1::ApriltagDetection;
-using farm_ng::v1::ApriltagDetections;
-using farm_ng::v1::BaseToCameraModel;
-using farm_ng::v1::BUCKET_CONFIGURATIONS;
-using farm_ng::v1::CalibrateBaseToCameraResult;
-using farm_ng::v1::CameraConfig;
-using farm_ng::v1::CameraModel;
-using farm_ng::v1::Image;
-using farm_ng::v1::NamedSE3Pose;
-using farm_ng::v1::Subscription;
-using farm_ng::v1::TagConfig;
-using farm_ng::v1::TagLibrary;
-using farm_ng::v1::TrackingCameraCommand;
-using farm_ng::v1::TrackingCameraConfig;
-using farm_ng::v1::TrackingCameraPoseFrame;
-using farm_ng::v1::Vec2;
+using farm_ng::perception_core::ApriltagConfig;
+using farm_ng::perception_core::ApriltagDetection;
+using farm_ng::perception_core::ApriltagDetections;
+using farm_ng::calibration::BaseToCameraModel;
+using farm_ng::core::BUCKET_CONFIGURATIONS;
+using farm_ng::calibration::CalibrateBaseToCameraResult;
+using farm_ng::perception_core::CameraConfig;
+using farm_ng::perception_core::CameraModel;
+using farm_ng::perception_core::Image;
+using farm_ng::perception_core::NamedSE3Pose;
+using farm_ng::core::Subscription;
+using farm_ng::perception_core::TagConfig;
+using farm_ng::perception_core::TagLibrary;
+using farm_ng::perception_core::TrackingCameraCommand;
+using farm_ng::perception_core::TrackingCameraConfig;
+using farm_ng::perception_core::TrackingCameraPoseFrame;
+using farm_ng::perception_core::Vec2;
 
 namespace farm_ng {
 

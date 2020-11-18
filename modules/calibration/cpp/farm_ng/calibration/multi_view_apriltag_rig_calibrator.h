@@ -1,12 +1,12 @@
 #ifndef FARM_NG_CALIBRATION_BASE_TO_CAMERA_CALIBRATOR_H_
 #define FARM_NG_CALIBRATION_BASE_TO_CAMERA_CALIBRATOR_H_
 
-#include "farm_ng/v1/calibrate_multi_view_apriltag_rig.pb.h"
-#include "farm_ng/v1/calibrator.pb.h"
+#include "farm_ng/calibration/calibrate_multi_view_apriltag_rig.pb.h"
+#include "farm_ng/calibration/calibrator.pb.h"
 
 namespace farm_ng {
-using farm_ng::v1::CalibrateMultiViewApriltagRigConfiguration;
-using farm_ng::v1::MultiViewApriltagRigModel;
+using farm_ng::calibration::CalibrateMultiViewApriltagRigConfiguration;
+using farm_ng::calibration::MultiViewApriltagRigModel;
 
 MultiViewApriltagRigModel SolveMultiViewApriltagModel(
     MultiViewApriltagRigModel model);

@@ -95,6 +95,11 @@ if ! prometheus --version | grep 2.21.0; then
   sudo cp /tmp/prometheus-2.21.0.linux-${arch}/prometheus /usr/local/bin
 fi
 
+# Protobuf generators
+go get -u github.com/golang/protobuf/protoc-gen-go
+go get -u github.com/twitchtv/twirp/protoc-gen-twirp
+sudo npm install -g long ts-proto@^1.37.0
+
 # TODO: @jin this requires special permission
 # # tractor-logs
 # if [ ! -d "$HOME/tractor-logs" ]; then

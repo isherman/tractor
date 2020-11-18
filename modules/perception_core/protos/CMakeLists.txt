@@ -1,12 +1,12 @@
 farm_ng_add_protobufs(farm-ng-perception_core-protobuf
   PROTO_FILES
-  ./farm_ng/v1/apriltag.proto
-  ./farm_ng/v1/camera_model.proto
-  ./farm_ng/v1/geometry.proto
-  ./farm_ng/v1/image.proto
-  ./farm_ng/v1/capture_calibration_dataset.proto
-  ./farm_ng/v1/capture_video_dataset.proto
-  ./farm_ng/v1/tracking_camera.proto
+  ./farm_ng/perception_core/apriltag.proto
+  ./farm_ng/perception_core/camera_model.proto
+  ./farm_ng/perception_core/geometry.proto
+  ./farm_ng/perception_core/image.proto
+  ./farm_ng/perception_core/capture_calibration_dataset.proto
+  ./farm_ng/perception_core/capture_video_dataset.proto
+  ./farm_ng/perception_core/tracking_camera.proto
   DEPENDENCIES
   farm-ng-core-protobuf
   )

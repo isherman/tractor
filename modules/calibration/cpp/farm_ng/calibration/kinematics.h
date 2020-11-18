@@ -1,10 +1,10 @@
 #ifndef FARM_NG_CALIBRATION_KINEMATICS_H_
 #define FARM_NG_CALIBRATION_KINEMATICS_H_
 #include <sophus/se3.hpp>
-#include "farm_ng/v1/calibrator.pb.h"
+#include "farm_ng/calibration/calibrator.pb.h"
 
 namespace farm_ng {
-using farm_ng::v1::BaseToCameraModel;
+using farm_ng::calibration::BaseToCameraModel;
 
 template <typename T>
 Sophus::SE3<T> TractorPoseDelta(const T& wheel_radius, const T& wheel_baseline,

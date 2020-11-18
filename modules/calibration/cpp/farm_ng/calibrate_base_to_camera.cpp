@@ -12,14 +12,14 @@
 
 #include "farm_ng/calibration/base_to_camera_calibrator.h"
 
-#include "farm_ng/v1/apriltag.pb.h"
+#include "farm_ng/perception_core/apriltag.pb.h"
 #include "farm_ng/v1/calibrate_apriltag_rig.pb.h"
 #include "farm_ng/v1/calibrate_base_to_camera.pb.h"
 #include "farm_ng/v1/calibrator.pb.h"
 #include "farm_ng/v1/capture_calibration_dataset.pb.h"
 
-typedef farm_ng::v1::Event EventPb;
-using farm_ng::v1::ApriltagDetections;
+typedef farm_ng::core::Event EventPb;
+using farm_ng::perception_core::ApriltagDetections;
 using farm_ng::v1::BaseToCameraModel;
 using farm_ng::v1::BUCKET_BASE_TO_CAMERA_MODELS;
 using farm_ng::v1::CalibrateApriltagRigResult;
@@ -29,9 +29,9 @@ using farm_ng::v1::CalibrateBaseToCameraStatus;
 
 using farm_ng::v1::CaptureCalibrationDatasetResult;
 using farm_ng::v1::MonocularApriltagRigModel;
-using farm_ng::v1::SolverStatus;
-using farm_ng::v1::SolverStatus_Name;
-using farm_ng::v1::Subscription;
+using farm_ng::calibration::SolverStatus;
+using farm_ng::calibration::SolverStatus_Name;
+using farm_ng::core::Subscription;
 using farm_ng::v1::ViewDirection;
 using farm_ng::v1::ViewDirection_Name;
 using farm_ng::v1::ViewDirection_Parse;

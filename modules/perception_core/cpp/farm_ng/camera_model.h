@@ -7,10 +7,10 @@
 #include <Eigen/Dense>
 #include <opencv2/core.hpp>
 
-#include "farm_ng/v1/camera_model.pb.h"
+#include "farm_ng/perception_core/camera_model.pb.h"
 
 namespace farm_ng {
-using farm_ng::v1::CameraModel;
+using farm_ng::perception_core::CameraModel;
 
 inline cv::Size GetCvSize(const CameraModel& model) {
   return cv::Size(model.image_width(), model.image_height());

@@ -18,15 +18,15 @@
 #include <glog/logging.h>
 
 #include "farm_ng/blobstore.h"
-#include "farm_ng/v1/io.pb.h"
+#include "farm_ng/core/io.pb.h"
 
 namespace farm_ng {
-using farm_ng::v1::Announce;
-using farm_ng::v1::BUCKET_LOGS;
-using farm_ng::v1::Event;
-using farm_ng::v1::LoggingCommand;
-using farm_ng::v1::LoggingStatus;
-using farm_ng::v1::Subscription;
+using farm_ng::core::Announce;
+using farm_ng::core::BUCKET_LOGS;
+using farm_ng::core::Event;
+using farm_ng::core::LoggingCommand;
+using farm_ng::core::LoggingStatus;
+using farm_ng::core::Subscription;
 namespace {
 
 class ArchiveManager {
@@ -393,10 +393,10 @@ void SetArchivePath(const std::string& name) {
 boost::filesystem::path GetArchivePath() { return get_archive().path(); }
 boost::filesystem::path GetArchiveRoot() { return get_archive().root(); }
 
-std::pair<farm_ng::v1::Resource, boost::filesystem::path>
+std::pair<farm_ng::core::Resource, boost::filesystem::path>
 GetUniqueArchiveResource(const std::string& prefix, const std::string& ext,
                          const std::string& content_type) {
-  farm_ng::v1::Resource resource;
+  farm_ng::core::Resource resource;
   resource.set_content_type(content_type);
 
   pid_t pid = getpid();

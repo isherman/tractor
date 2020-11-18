@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/farm-ng/core/pkg/eventbus"
-	pb "github.com/farm-ng/genproto"
+	pb "github.com/farm-ng/genproto/core"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pion/rtp"
 	"github.com/pion/webrtc/v3"

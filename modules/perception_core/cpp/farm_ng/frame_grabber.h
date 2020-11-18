@@ -7,12 +7,12 @@
 #include <opencv2/core.hpp>
 
 #include "farm_ng/ipc.h"
-#include "farm_ng/v1/camera_model.pb.h"
-#include "farm_ng/v1/tracking_camera.pb.h"
+#include "farm_ng/perception_core/camera_model.pb.h"
+#include "farm_ng/perception_core/tracking_camera.pb.h"
 
 namespace farm_ng {
-using farm_ng::v1::CameraConfig;
-using farm_ng::v1::CameraModel;
+using farm_ng::perception_core::CameraConfig;
+using farm_ng::perception_core::CameraModel;
 struct FrameData {
   CameraConfig config;
   CameraModel camera_model;

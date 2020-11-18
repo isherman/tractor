@@ -1,15 +1,15 @@
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
-import "farm_ng/v1/resource.proto";
-import "farm_ng/v1/calibrator.proto";
+import "farm_ng/core/resource.proto";
+import "farm_ng/calibration/calibrator.proto";
 
-package farm_ng.v1;
-option go_package = "github.com/farm-ng/genproto";
+package farm_ng.calibration;
+option go_package = "github.com/farm-ng/genproto/calibration";
 
 message CalibrateApriltagRigConfiguration {
   // Serialized CaptureCalibrationDatasetResult
-  farm_ng.v1.Resource calibration_dataset = 1;
+  farm_ng.core.Resource calibration_dataset = 1;
   // A list of tag ids to consider as one rigid object or "rig".
   repeated int32 tag_ids = 2;
   // This tag id will be considered the root coordinate system of the
@@ -28,7 +28,7 @@ message CalibrateApriltagRigStatus {
     CalibrateApriltagRigConfiguration input_required_configuration = 1;
   }
   // Serialized CalibrateApriltagRigResult
-  farm_ng.v1.Resource result = 2;
+  farm_ng.core.Resource result = 2;
 
   SolverIterationSummary iteration_summary = 3;
 }
@@ -36,11 +36,11 @@ message CalibrateApriltagRigStatus {
 message CalibrateApriltagRigResult {
   // Configuration which initiated the computation of this result.
   CalibrateApriltagRigConfiguration configuration = 1;
-  farm_ng.v1.Resource monocular_apriltag_rig_initial = 2;
-  farm_ng.v1.Resource monocular_apriltag_rig_solved = 3;
+  farm_ng.core.Resource monocular_apriltag_rig_initial = 2;
+  farm_ng.core.Resource monocular_apriltag_rig_solved = 3;
   SolverStatus solver_status = 4;
   double rmse = 5;
   google.protobuf.Timestamp stamp_end = 6;
   // Debug event log.
-  farm_ng.v1.Resource event_log = 7;
+  farm_ng.core.Resource event_log = 7;
 }

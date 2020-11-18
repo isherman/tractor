@@ -14,7 +14,7 @@ class EventLogReaderImpl {
     }
   }
 
-  farm_ng::v1::Event ReadNext() {
+  farm_ng::core::Event ReadNext() {
     uint16_t n_bytes;
     in_.read(reinterpret_cast<char*>(&n_bytes), sizeof(n_bytes));
     if (!in_) {
@@ -26,7 +26,7 @@ class EventLogReaderImpl {
     if (!in_) {
       throw std::runtime_error("Could not read event data.");
     }
-    farm_ng::v1::Event event;
+    farm_ng::core::Event event;
     event.ParseFromString(ss);
     return event;
   }
@@ -37,7 +37,7 @@ class EventLogReaderImpl {
 EventLogReader::EventLogReader(std::string log_path)
     : impl_(new EventLogReaderImpl(log_path)) {}
 
-EventLogReader::EventLogReader(farm_ng::v1::Resource resource)
+EventLogReader::EventLogReader(farm_ng::core::Resource resource)
     : impl_(new EventLogReaderImpl(
           (GetBlobstoreRoot() / resource.path()).string())) {}
 
@@ -47,7 +47,7 @@ void EventLogReader::Reset(std::string log_path) {
   impl_.reset(new EventLogReaderImpl(log_path));
 }
 
-farm_ng::v1::Event EventLogReader::ReadNext() {
+farm_ng::core::Event EventLogReader::ReadNext() {
   return impl_->ReadNext();
 }
 

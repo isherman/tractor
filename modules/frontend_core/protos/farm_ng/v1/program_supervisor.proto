@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 
 package farm_ng.v1;
-option go_package = "github.com/farm-ng/genproto";
+option go_package = "github.com/farm-ng/genproto/frontend_core";
 
 message Program {
   string id = 1;

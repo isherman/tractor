@@ -14,11 +14,11 @@
 #include "farm_ng/ipc.h"
 #include "farm_ng/time_series.h"
 
-#include "farm_ng/v1/apriltag.pb.h"
-#include "farm_ng/v1/calibrate_multi_view_apriltag_rig.pb.h"
-#include "farm_ng/v1/calibrator.pb.h"
-#include "farm_ng/v1/capture_calibration_dataset.pb.h"
-#include "farm_ng/v1/capture_video_dataset.pb.h"
+#include "farm_ng/perception_core/apriltag.pb.h"
+#include "farm_ng/calibration/calibrate_multi_view_apriltag_rig.pb.h"
+#include "farm_ng/calibration/calibrator.pb.h"
+#include "farm_ng/perception_core/capture_calibration_dataset.pb.h"
+#include "farm_ng/perception_core/capture_video_dataset.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(video_dataset, "",
@@ -36,16 +36,16 @@ DEFINE_bool(filter_stable_tags, false, "Run filter for stable tags.");
 DEFINE_string(root_camera_name, "tracking_camera/front/left",
               "Which camera to treat as the root.");
 
-typedef farm_ng::v1::Event EventPb;
-using farm_ng::v1::ApriltagDetections;
-using farm_ng::v1::BUCKET_APRILTAG_RIG_MODELS;
-using farm_ng::v1::CalibrateMultiViewApriltagRigConfiguration;
-using farm_ng::v1::CalibrateMultiViewApriltagRigResult;
-using farm_ng::v1::CalibrateMultiViewApriltagRigStatus;
-using farm_ng::v1::CaptureVideoDatasetResult;
+typedef farm_ng::core::Event EventPb;
+using farm_ng::perception_core::ApriltagDetections;
+using farm_ng::core::BUCKET_APRILTAG_RIG_MODELS;
+using farm_ng::calibration::CalibrateMultiViewApriltagRigConfiguration;
+using farm_ng::calibration::CalibrateMultiViewApriltagRigResult;
+using farm_ng::calibration::CalibrateMultiViewApriltagRigStatus;
+using farm_ng::perception_core::CaptureVideoDatasetResult;
 
-using farm_ng::v1::MultiViewApriltagRigModel;
-using farm_ng::v1::Subscription;
+using farm_ng::calibration::MultiViewApriltagRigModel;
+using farm_ng::core::Subscription;
 
 namespace farm_ng {
 

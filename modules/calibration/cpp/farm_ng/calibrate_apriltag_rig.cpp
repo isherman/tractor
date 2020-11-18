@@ -13,11 +13,11 @@
 #include "farm_ng/init.h"
 #include "farm_ng/ipc.h"
 
-#include "farm_ng/v1/apriltag.pb.h"
-#include "farm_ng/v1/calibrate_apriltag_rig.pb.h"
-#include "farm_ng/v1/calibrator.pb.h"
-#include "farm_ng/v1/capture_calibration_dataset.pb.h"
-#include "farm_ng/v1/capture_video_dataset.pb.h"
+#include "farm_ng/calibration/calibrate_apriltag_rig.pb.h"
+#include "farm_ng/calibration/calibrator.pb.h"
+#include "farm_ng/perception_core/capture_calibration_dataset.pb.h"
+#include "farm_ng/perception_core/apriltag.pb.h"
+#include "farm_ng/perception_core/capture_video_dataset.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(calibration_dataset, "",
@@ -34,17 +34,17 @@ DEFINE_bool(filter_stable_tags, false, "Run filter for stable tags.");
 DEFINE_string(camera_name, "tracking_camera/front/left",
               "Which camera to run on.");
 
-typedef farm_ng::v1::Event EventPb;
-using farm_ng::v1::ApriltagDetections;
-using farm_ng::v1::BUCKET_APRILTAG_RIG_MODELS;
-using farm_ng::v1::CalibrateApriltagRigConfiguration;
-using farm_ng::v1::CalibrateApriltagRigResult;
-using farm_ng::v1::CalibrateApriltagRigStatus;
-using farm_ng::v1::CaptureCalibrationDatasetResult;
-using farm_ng::v1::CaptureVideoDatasetResult;
+typedef farm_ng::core::Event EventPb;
+using farm_ng::perception_core::ApriltagDetections;
+using farm_ng::core::BUCKET_APRILTAG_RIG_MODELS;
+using farm_ng::calibration::CalibrateApriltagRigConfiguration;
+using farm_ng::calibration::CalibrateApriltagRigResult;
+using farm_ng::calibration::CalibrateApriltagRigStatus;
+using farm_ng::perception_core::CaptureCalibrationDatasetResult;
+using farm_ng::perception_core::CaptureVideoDatasetResult;
 
-using farm_ng::v1::MonocularApriltagRigModel;
-using farm_ng::v1::Subscription;
+using farm_ng::calibration::MonocularApriltagRigModel;
+using farm_ng::core::Subscription;
 
 namespace farm_ng {
 

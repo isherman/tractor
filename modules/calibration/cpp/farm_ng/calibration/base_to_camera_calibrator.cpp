@@ -20,12 +20,12 @@
 
 namespace farm_ng {
 
-typedef farm_ng::v1::Event EventPb;
-using farm_ng::v1::ApriltagDetections;
+typedef farm_ng::core::Event EventPb;
+using farm_ng::perception_core::ApriltagDetections;
 using farm_ng::v1::BaseToCameraModel;
 using farm_ng::v1::MonocularApriltagRigModel;
-using farm_ng::v1::NamedSE3Pose;
-using farm_ng::v1::SolverStatus;
+using farm_ng::perception_core::NamedSE3Pose;
+using farm_ng::calibration::SolverStatus;
 using farm_ng::v1::TractorState;
 
 using farm_ng::v1::ViewDirection;

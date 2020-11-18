@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 
-	pb "github.com/farm-ng/genproto"
+	pb "github.com/farm-ng/genproto/frontend_core"
 	"github.com/farm-ng/tractor/webrtc/internal/proxy"
 	"github.com/pion/webrtc/v3"
 	"github.com/twitchtv/twirp"

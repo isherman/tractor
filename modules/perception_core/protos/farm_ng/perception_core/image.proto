@@ -1,15 +1,15 @@
 syntax = "proto3";
 
-import "farm_ng/v1/resource.proto";
-import "farm_ng/v1/camera_model.proto";
+import "farm_ng/core/resource.proto";
+import "farm_ng/perception_core/camera_model.proto";
 import "google/protobuf/wrappers.proto";
 
-package farm_ng.v1;
-option go_package = "github.com/farm-ng/genproto";
+package farm_ng.perception_core;
+option go_package = "github.com/farm-ng/genproto/perception_core";
 
 message Image {
   // The associated image or video resource
-  farm_ng.v1.Resource resource = 1;
+  farm_ng.core.Resource resource = 1;
   CameraModel camera_model = 2;
 
   // If resource is a video, a frame number offset into the video file

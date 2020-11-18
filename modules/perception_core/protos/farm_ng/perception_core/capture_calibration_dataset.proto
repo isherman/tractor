@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-import "farm_ng/v1/resource.proto";
+import "farm_ng/core/resource.proto";
 import "google/protobuf/timestamp.proto";
 
-package farm_ng.v1;
-option go_package = "github.com/farm-ng/genproto";
+package farm_ng.perception_core;
+option go_package = "github.com/farm-ng/genproto/perception_core";
 
 message CaptureCalibrationDatasetConfiguration {
   // Number of frames to capture
@@ -24,7 +24,7 @@ message CaptureCalibrationDatasetStatus {
   }
 
   // Serialized CaptureCalibrationDatasetResult
-  farm_ng.v1.Resource result = 4;
+  farm_ng.core.Resource result = 4;
 }
 
 message CaptureCalibrationDatasetResult {
@@ -41,5 +41,5 @@ message CaptureCalibrationDatasetResult {
   google.protobuf.Timestamp stamp_end = 4;
 
   // The calibration data, an IPC log, saved to disk in protobuf binary format.
-  farm_ng.v1.Resource dataset = 5;
+  farm_ng.core.Resource dataset = 5;
 }

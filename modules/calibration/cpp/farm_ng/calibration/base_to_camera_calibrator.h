@@ -2,7 +2,7 @@
 #define FARM_NG_CALIBRATION_BASE_TO_CAMERA_CALIBRATOR_H_
 
 #include "farm_ng/v1/calibrator.pb.h"
-#include "farm_ng/v1/resource.pb.h"
+#include "farm_ng/core/resource.pb.h"
 #include "farm_ng/v1/tractor.pb.h"
 
 namespace farm_ng {
@@ -10,7 +10,7 @@ using farm_ng::v1::BaseToCameraInitialization;
 using farm_ng::v1::BaseToCameraModel;
 using farm_ng::v1::TractorState;
 
-using farm_ng::v1::Resource;
+using farm_ng::core::Resource;
 
 void CopyTractorStateToWheelState(
     const TractorState& tractor_state,
