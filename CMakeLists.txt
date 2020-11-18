@@ -13,6 +13,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(cmake/farm_ng_modules.cmake)
 
+if(BUILD_ONLY_PROTO)
+  message(STATUS "Build only proto.")
+  add_subdirectory(modules/core/protos)
+  add_subdirectory(modules/perception_core/protos)
+  add_subdirectory(modules/calibration/protos)
+  add_subdirectory(modules/tractor/protos)
+  add_subdirectory(modules/frontend_core/protos)
+  return()
+endif()
+
 add_subdirectory(third_party)
 add_subdirectory(third_party/googletest)
 

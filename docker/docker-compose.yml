@@ -32,7 +32,7 @@ services:
     privileged: true
     network_mode: host
   programd:
-    entrypoint: ./env.sh python -m farm_ng.program_supervisor
+    entrypoint: ./env.sh python -m farm_ng.frontend_core.program_supervisor
     image: farmng/base:n_cameras
     build:
       context: ..
