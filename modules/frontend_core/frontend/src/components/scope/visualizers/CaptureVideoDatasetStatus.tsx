@@ -6,7 +6,7 @@ import { Card } from "./Card";
 import {
   CaptureVideoDatasetResult,
   CaptureVideoDatasetStatus,
-} from "@farm-ng/genproto/farm_ng/v1/capture_video_dataset";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_video_dataset";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import {
   StandardComponent,
@@ -64,7 +64,7 @@ const CaptureVideoDatasetStatusElement: React.FC<SingleElementVisualizerProps<
 
 export const CaptureVideoDatasetStatusVisualizer = {
   id: "CaptureVideoDatasetStatus",
-  types: ["type.googleapis.com/farm_ng.v1.CaptureVideoDatasetStatus"],
+  types: ["type.googleapis.com/farm_ng.perception_core.CaptureVideoDatasetStatus"],
   options: StandardComponentOptions,
   Component: StandardComponent(CaptureVideoDatasetStatusElement),
   Element: CaptureVideoDatasetStatusElement,

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { decodeAnyEvent } from "./decodeAnyEvent";
-import { Event as BusEvent } from "@farm-ng/genproto/farm_ng/v1/io";
+import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import { Buffer } from "../types/common";
 import { EventTypeId } from "../registry/events";
 import { TarResourceArchive } from "./ResourceArchive";

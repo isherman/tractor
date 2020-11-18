@@ -12,7 +12,7 @@ import {
 import * as React from "react";
 import "chonky/style/main.css";
 import { useEffect, useState } from "react";
-import { File } from "@farm-ng/genproto/farm_ng/v1/resource";
+import { File } from "@farm-ng/genproto-core/farm_ng/core/resource";
 import styles from "./Blobstore.module.scss";
 import { eventRegistry, EventType, EventTypeId } from "../registry/events";
 import { visualizersForEventType } from "../registry/visualization";
@@ -37,24 +37,24 @@ const bestGuessEventType = (
   selectedPath: string
 ): EventTypeId | undefined => {
   if (folderChain.map((_) => _.name).includes("apriltag_rig_models")) {
-    return "type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigResult";
+    return "type.googleapis.com/farm_ng.calibration.CalibrateMultiViewApriltagRigResult";
   }
   if (folderChain.map((_) => _.name).includes("configurations")) {
     if (selectedPath.endsWith("tractor.json")) {
-      return "type.googleapis.com/farm_ng.v1.TractorConfig";
+      return "type.googleapis.com/farm_ng.tractor.TractorConfig";
     }
     if (selectedPath.endsWith("apriltag.json")) {
-      return "type.googleapis.com/farm_ng.v1.ApriltagConfig";
+      return "type.googleapis.com/farm_ng.perception_core.ApriltagConfig";
     }
     if (selectedPath.endsWith("camera.json")) {
-      return "type.googleapis.com/farm_ng.v1.TrackingCameraConfig";
+      return "type.googleapis.com/farm_ng.perception_core.TrackingCameraConfig";
     }
   }
   if (folderChain.map((_) => _.name).includes("base_to_camera_models")) {
-    return "type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraResult";
+    return "type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraResult";
   }
   if (folderChain.map((_) => _.name).includes("calibration-datasets")) {
-    return "type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetResult";
+    return "type.googleapis.com/farm_ng.perception_core.CaptureCalibrationDatasetResult";
   }
   return undefined;
 };

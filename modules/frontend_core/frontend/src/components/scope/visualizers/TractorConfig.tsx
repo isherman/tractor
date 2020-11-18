@@ -13,7 +13,7 @@ import {
   TractorConfig,
   TractorConfig_Topology as Topology,
   tractorConfig_TopologyToJSON as TopologyToJSON,
-} from "@farm-ng/genproto/farm_ng/v1/tractor";
+} from "@farm-ng/genproto-tractor/farm_ng/tractor/tractor";
 import { KeyValueTable } from "./KeyValueTable";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
@@ -179,7 +179,7 @@ const TractorConfigElement: React.FC<SingleElementVisualizerProps<
 
 export const TractorConfigVisualizer = {
   id: "TractorConfig",
-  types: ["type.googleapis.com/farm_ng.v1.TractorConfig"],
+  types: ["type.googleapis.com/farm_ng.tractor.TractorConfig"],
   options: StandardComponentOptions,
   Component: StandardComponent(TractorConfigElement),
   Element: TractorConfigElement,

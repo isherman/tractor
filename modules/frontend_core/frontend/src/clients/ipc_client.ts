@@ -1,4 +1,4 @@
-import { Event } from "@farm-ng/genproto/farm_ng/v1/io";
+import { Event } from "@farm-ng/genproto-core/farm_ng/core/io";
 
 type ICallback = (event: Event) => void;
 

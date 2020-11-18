@@ -6,7 +6,7 @@ import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import {
   MonocularApriltagRigModel,
   solverStatusToJSON,
-} from "@farm-ng/genproto/farm_ng/v1/calibrator";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { formatValue } from "../../../utils/formatValue";
 import { cloneElement, useState } from "react";
 import {
@@ -16,7 +16,7 @@ import {
 import RangeSlider from "react-bootstrap-range-slider";
 import styles from "./MonocularApriltagRigModel.module.scss";
 import { Scene } from "./Scene";
-import { NamedSE3Pose } from "@farm-ng/genproto/farm_ng/v1/geometry";
+import { NamedSE3Pose } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/geometry";
 
 import { getDagTransform } from "../../../utils/geometry";
 import { KeyValueTable } from "./KeyValueTable";
@@ -221,7 +221,7 @@ const MonocularApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
 
 export const MonocularApriltagRigModelVisualizer = {
   id: "MonocularApriltagRigModel",
-  types: ["type.googleapis.com/farm_ng.v1.MonocularApriltagRigModel"],
+  types: ["type.googleapis.com/farm_ng.calibration.MonocularApriltagRigModel"],
   options: StandardComponentOptions,
   Component: StandardComponent(MonocularApriltagRigModelElement),
   Element: MonocularApriltagRigModelElement,

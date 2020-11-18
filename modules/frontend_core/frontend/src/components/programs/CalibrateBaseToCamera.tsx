@@ -2,12 +2,12 @@
 import * as React from "react";
 import { useState } from "react";
 import { useStores } from "../../hooks/useStores";
-import { Event as BusEvent } from "@farm-ng/genproto/farm_ng/v1/io";
+import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import {
   CalibrateBaseToCameraConfiguration,
   CalibrateBaseToCameraConfiguration as Configuration,
   CalibrateBaseToCameraStatus as Status,
-} from "@farm-ng/genproto/farm_ng/v1/calibrate_base_to_camera";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_base_to_camera";
 import { CalibrateBaseToCameraConfigurationVisualizer } from "../scope/visualizers/CalibrateBaseToCameraConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";
@@ -26,7 +26,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
   ): void => {
     e.preventDefault();
     busClient.send(
-      "type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraConfiguration",
+      "type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraConfiguration",
       `${programId}/configure`,
       Configuration.encode(
         Configuration.fromPartial(configuration || {})

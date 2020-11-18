@@ -9,7 +9,7 @@ import {
   StandardComponentOptions,
   StandardComponent,
 } from "./StandardComponent";
-import { Event as BusEvent } from "@farm-ng/genproto/farm_ng/v1/io";
+import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import { EventTypeId } from "../../../registry/events";
 import { decodeAnyEvent } from "../../../models/decodeAnyEvent";
 

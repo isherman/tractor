@@ -10,7 +10,7 @@ import { Card } from "./Card";
 import {
   CalibrateMultiViewApriltagRigResult,
   CalibrateMultiViewApriltagRigStatus,
-} from "@farm-ng/genproto/farm_ng/v1/calibrate_multi_view_apriltag_rig";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_multi_view_apriltag_rig";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { CalibrateMultiViewApriltagRigResultVisualizer } from "./CalibrateMultiViewApriltagRigResult";
 
@@ -43,7 +43,7 @@ const CalibrateMultiViewApriltagRigStatusElement: React.FC<SingleElementVisualiz
 
 export const CalibrateMultiViewApriltagRigStatusVisualizer = {
   id: "CalibrateMultiViewApriltagRigStatus",
-  types: ["type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigStatus"],
+  types: ["type.googleapis.com/farm_ng.calibration.CalibrateMultiViewApriltagRigStatus"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateMultiViewApriltagRigStatusElement),
   Element: CalibrateMultiViewApriltagRigStatusElement,

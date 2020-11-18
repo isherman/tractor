@@ -13,7 +13,7 @@ import { useFormState } from "../../../hooks/useFormState";
 import {
   CameraConfig,
   TrackingCameraConfig,
-} from "@farm-ng/genproto/farm_ng/v1/tracking_camera";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/tracking_camera";
 import { CameraConfigVisualizer } from "./CameraConfig";
 import Form from "./Form";
 import styles from "./TrackingCameraConfig.module.scss";
@@ -96,7 +96,7 @@ const TrackingCameraConfigElement: React.FC<SingleElementVisualizerProps<
 
 export const TrackingCameraConfigVisualizer = {
   id: "TrackingCameraConfig",
-  types: ["type.googleapis.com/farm_ng.v1.TrackingCameraConfig"],
+  types: ["type.googleapis.com/farm_ng.perception_core.TrackingCameraConfig"],
   options: StandardComponentOptions,
   Component: StandardComponent(TrackingCameraConfigElement),
   Element: TrackingCameraConfigElement,

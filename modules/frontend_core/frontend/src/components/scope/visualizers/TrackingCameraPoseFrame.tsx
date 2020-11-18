@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { VisualizerProps } from "../../../registry/visualization";
-import { TrackingCameraPoseFrame } from "@farm-ng/genproto/farm_ng/v1/tracking_camera";
+import { TrackingCameraPoseFrame } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/tracking_camera";
 import { Plot } from "./Plot";
-import { Vec3 } from "@farm-ng/genproto/farm_ng/v1/geometry";
+import { Vec3 } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/geometry";
 import { colorGenerator } from "../../../utils/colorGenerator";
 
 const norm = (v?: Vec3): number => {
@@ -41,7 +41,7 @@ const TrackingCameraPoseFrameVisualizerComponent: React.FC<VisualizerProps<
 
 export const TrackingCameraPoseFrameVisualizer = {
   id: "TrackingCameraPoseFrame",
-  types: ["type.googleapis.com/farm_ng.v1.TrackingCameraPoseFrame"],
+  types: ["type.googleapis.com/farm_ng.perception_core.TrackingCameraPoseFrame"],
   options: [],
   component: TrackingCameraPoseFrameVisualizerComponent,
 };

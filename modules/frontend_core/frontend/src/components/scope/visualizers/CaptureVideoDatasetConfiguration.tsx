@@ -6,7 +6,7 @@ import {
 } from "../../../registry/visualization";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CaptureVideoDatasetConfiguration } from "@farm-ng/genproto/farm_ng/v1/capture_video_dataset";
+import { CaptureVideoDatasetConfiguration } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_video_dataset";
 import {
   StandardComponent,
   StandardComponentOptions,
@@ -64,7 +64,7 @@ const CaptureVideoDatasetConfigurationElement: React.FC<SingleElementVisualizerP
 
 export const CaptureVideoDatasetConfigurationVisualizer = {
   id: "CaptureVideoDatasetConfiguration",
-  types: ["type.googleapis.com/farm_ng.v1.CaptureVideoDatasetConfiguration"],
+  types: ["type.googleapis.com/farm_ng.perception_core.CaptureVideoDatasetConfiguration"],
   options: StandardComponentOptions,
   Component: StandardComponent(CaptureVideoDatasetConfigurationElement),
   Element: CaptureVideoDatasetConfigurationElement,

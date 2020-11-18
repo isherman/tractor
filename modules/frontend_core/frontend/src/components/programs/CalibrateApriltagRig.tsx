@@ -2,12 +2,12 @@
 import * as React from "react";
 import { useState } from "react";
 import { useStores } from "../../hooks/useStores";
-import { Event as BusEvent } from "@farm-ng/genproto/farm_ng/v1/io";
+import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import {
   CalibrateApriltagRigConfiguration,
   CalibrateApriltagRigConfiguration as Configuration,
   CalibrateApriltagRigStatus as Status,
-} from "@farm-ng/genproto/farm_ng/v1/calibrate_apriltag_rig";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_apriltag_rig";
 import { CalibrateApriltagRigConfigurationVisualizer } from "../scope/visualizers/CalibrateApriltagRigConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";
@@ -27,7 +27,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
     e.preventDefault();
     // TODO: Provide a better API to busClient.send
     busClient.send(
-      "type.googleapis.com/farm_ng.v1.CalibrateApriltagRigConfiguration",
+      "type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigConfiguration",
       `${programId}/configure`,
       Configuration.encode(Configuration.fromJSON(configuration)).finish()
     );

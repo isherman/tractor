@@ -12,7 +12,7 @@ import { Card } from "./Card";
 import {
   ApriltagConfig,
   TagConfig,
-} from "@farm-ng/genproto/farm_ng/v1/apriltag";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/apriltag";
 import { KeyValueTable } from "./KeyValueTable";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
@@ -100,7 +100,7 @@ const ApriltagConfigElement: React.FC<SingleElementVisualizerProps<
 
 export const ApriltagConfigVisualizer = {
   id: "ApriltagConfig",
-  types: ["type.googleapis.com/farm_ng.v1.ApriltagConfig"],
+  types: ["type.googleapis.com/farm_ng.perception_core.ApriltagConfig"],
   options: StandardComponentOptions,
   Component: StandardComponent(ApriltagConfigElement),
   Element: ApriltagConfigElement,

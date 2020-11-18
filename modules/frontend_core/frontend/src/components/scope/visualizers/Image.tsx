@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card } from "./Card";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { Image } from "@farm-ng/genproto/farm_ng/v1/image";
+import { Image } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/image";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import {
   StandardComponentOptions,
@@ -73,7 +73,7 @@ const ImageElement: React.FC<SingleElementVisualizerProps<Image>> = (props) => {
 
 export const ImageVisualizer = {
   id: "Image",
-  types: ["type.googleapis.com/farm_ng.v1.Image"],
+  types: ["type.googleapis.com/farm_ng.perception_core.Image"],
   options: StandardComponentOptions,
   Component: StandardComponent(ImageElement),
   Element: ImageElement,

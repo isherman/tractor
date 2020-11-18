@@ -4,7 +4,7 @@ import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import {
   BaseToCameraModel,
   solverStatusToJSON,
-} from "@farm-ng/genproto/farm_ng/v1/calibrator";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import {
   StandardComponentOptions,
   StandardComponent,
@@ -58,7 +58,7 @@ const BaseToCameraModelElement: React.FC<SingleElementVisualizerProps<
 
 export const BaseToCameraModelVisualizer = {
   id: "BaseToCameraModel",
-  types: ["type.googleapis.com/farm_ng.v1.BaseToCameraModel"],
+  types: ["type.googleapis.com/farm_ng.calibration.BaseToCameraModel"],
   options: StandardComponentOptions,
   Component: StandardComponent(BaseToCameraModelElement),
   Element: BaseToCameraModelElement,

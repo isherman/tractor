@@ -9,15 +9,15 @@ import {
   StandardComponent,
 } from "./StandardComponent";
 import { Card } from "./Card";
-import { CalibrateMultiViewApriltagRigConfiguration } from "@farm-ng/genproto/farm_ng/v1/calibrate_multi_view_apriltag_rig";
+import { CalibrateMultiViewApriltagRigConfiguration } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_multi_view_apriltag_rig";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
-import { Resource } from "@farm-ng/genproto/farm_ng/v1/resource";
+import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 import { RepeatedIntForm } from "./RepeatedIntForm";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { KeyValueTable } from "./KeyValueTable";
 import { CaptureVideoDatasetResultVisualizer } from "./CaptureVideoDatasetResult";
-import { CaptureVideoDatasetResult } from "@farm-ng/genproto/farm_ng/v1/capture_video_dataset";
+import { CaptureVideoDatasetResult } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_video_dataset";
 
 const CalibrateMultiViewApriltagRigConfigurationForm: React.FC<FormProps<
   CalibrateMultiViewApriltagRigConfiguration
@@ -38,7 +38,7 @@ const CalibrateMultiViewApriltagRigConfigurationForm: React.FC<FormProps<
             videoDataset: Resource.fromPartial({
               path,
               contentType:
-                "application/json; type=type.googleapis.com/farm_ng.v1.CaptureVideoDatasetResult",
+                "application/json; type=type.googleapis.com/farm_ng.perception_core.CaptureVideoDatasetResult",
             }),
           }));
         }}
@@ -152,7 +152,7 @@ const CalibrateMultiViewApriltagRigConfigurationElement: React.FC<SingleElementV
 export const CalibrateMultiViewApriltagRigConfigurationVisualizer = {
   id: "CalibrateMultiViewApriltagRigConfiguration",
   types: [
-    "type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigConfiguration",
+    "type.googleapis.com/farm_ng.calibration.CalibrateMultiViewApriltagRigConfiguration",
   ],
   options: StandardComponentOptions,
   Component: StandardComponent(

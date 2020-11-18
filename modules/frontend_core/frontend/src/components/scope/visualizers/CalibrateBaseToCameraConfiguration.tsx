@@ -10,14 +10,14 @@ import {
 } from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CalibrateBaseToCameraConfiguration } from "@farm-ng/genproto/farm_ng/v1/calibrate_base_to_camera";
+import { CalibrateBaseToCameraConfiguration } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_base_to_camera";
 import { useFetchResource } from "../../../hooks/useFetchResource";
-import { CaptureCalibrationDatasetResult } from "@farm-ng/genproto/farm_ng/v1/capture_calibration_dataset";
-import { CalibrateApriltagRigResult } from "@farm-ng/genproto/farm_ng/v1/calibrate_apriltag_rig";
+import { CaptureCalibrationDatasetResult } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_calibration_dataset";
+import { CalibrateApriltagRigResult } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_apriltag_rig";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
-import { Resource } from "@farm-ng/genproto/farm_ng/v1/resource";
-import { BaseToCameraInitialization } from "@farm-ng/genproto/farm_ng/v1/calibrator";
+import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
+import { BaseToCameraInitialization } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
 import { CalibrateApriltagRigResultVisualizer } from "./CalibrateApriltagRigResult";
 import { BaseToCameraInitializationVisualizer } from "./BaseToCameraInitialization";
@@ -40,7 +40,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
             calibrationDataset: Resource.fromPartial({
               path,
               contentType:
-                "application/json; type=type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetResult",
+                "application/json; type=type.googleapis.com/farm_ng.perception_core.CaptureCalibrationDatasetResult",
             }),
           }));
         }}
@@ -58,7 +58,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
             apriltagRigResult: Resource.fromPartial({
               path,
               contentType:
-                "application/json; type=type.googleapis.com/farm_ng.v1.CalibrateApriltagRigResult",
+                "application/json; type=type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigResult",
             }),
           }));
         }}
@@ -138,7 +138,7 @@ const CalibrateBaseToCameraConfigurationElement: React.FC<SingleElementVisualize
 
 export const CalibrateBaseToCameraConfigurationVisualizer = {
   id: "CalibrateBaseToCameraConfiguration",
-  types: ["type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraConfiguration"],
+  types: ["type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraConfiguration"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateBaseToCameraConfigurationElement),
   Element: CalibrateBaseToCameraConfigurationElement,

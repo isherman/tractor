@@ -19,12 +19,12 @@
       "node_modules/@types"
     ],
     "moduleResolution": "node", // required by Three.js
-    "baseUrl": ".",
-    "paths": {
-      "@farm_ng": [
-        "../../../build/ts/genproto"
-      ]
-    }
+    // "baseUrl": ".",
+    // "paths": {
+    //   "@farm_ng": [
+    //     "../../../build/ts/genproto"
+    //   ]
+    // }
   },
   "include": [
     "src",

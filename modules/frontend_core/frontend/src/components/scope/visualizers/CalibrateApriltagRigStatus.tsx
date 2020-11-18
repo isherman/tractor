@@ -8,7 +8,7 @@ import {
 import {
   CalibrateApriltagRigResult,
   CalibrateApriltagRigStatus,
-} from "@farm-ng/genproto/farm_ng/v1/calibrate_apriltag_rig";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_apriltag_rig";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { Card } from "./Card";
 import { CalibrateApriltagRigResultVisualizer } from "./CalibrateApriltagRigResult";
@@ -42,7 +42,7 @@ const CalibrateApriltagRigStatusElement: React.FC<SingleElementVisualizerProps<
 
 export const CalibrateApriltagRigStatusVisualizer = {
   id: "CalibrateApriltagRigStatus",
-  types: ["type.googleapis.com/farm_ng.v1.CalibrateApriltagRigStatus"],
+  types: ["type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigStatus"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateApriltagRigStatusElement),
   Element: CalibrateApriltagRigStatusElement,

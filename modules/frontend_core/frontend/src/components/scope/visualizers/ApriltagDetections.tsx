@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Card } from "./Card";
 import styles from "./ApriltagDetections.module.scss";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { ApriltagDetections } from "@farm-ng/genproto/farm_ng/v1/apriltag";
+import { ApriltagDetections } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/apriltag";
 import { autorun } from "mobx";
 import { drawAprilTagDetections } from "../../../utils/drawApriltagDetections";
 import {
@@ -92,7 +92,7 @@ const ApriltagDetectionsElement: React.FC<SingleElementVisualizerProps<
 
 export const ApriltagDetectionsVisualizer = {
   id: "ApriltagDetections",
-  types: ["type.googleapis.com/farm_ng.v1.ApriltagDetections"],
+  types: ["type.googleapis.com/farm_ng.perception_core.ApriltagDetections"],
   options: StandardComponentOptions,
   Component: StandardComponent(ApriltagDetectionsElement),
   Element: ApriltagDetectionsElement,

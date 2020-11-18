@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SteeringCommand } from "@farm-ng/genproto/farm_ng/v1/steering";
+import { SteeringCommand } from "@farm-ng/genproto-tractor/farm_ng/tractor/steering";
 import { VisualizerProps } from "../../../registry/visualization";
 import { colorGenerator } from "../../../utils/colorGenerator";
 import { Plot } from "./Plot";
@@ -38,7 +38,7 @@ const SteeringCommandComponent: React.FC<VisualizerProps<SteeringCommand>> = ({
 
 export const SteeringCommandVisualizer = {
   id: "SteeringCommand",
-  types: ["type.googleapis.com/farm_ng.v1.SteeringCommand"],
+  types: ["type.googleapis.com/farm_ng.tractor.SteeringCommand"],
   options: [{ label: "strokeWidth", options: ["1", "2", "3", "4"] }],
   Component: SteeringCommandComponent,
 };

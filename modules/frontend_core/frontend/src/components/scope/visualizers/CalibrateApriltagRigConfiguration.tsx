@@ -8,14 +8,14 @@ import {
   StandardComponentOptions,
   StandardComponent,
 } from "./StandardComponent";
-import { CalibrateApriltagRigConfiguration } from "@farm-ng/genproto/farm_ng/v1/calibrate_apriltag_rig";
+import { CalibrateApriltagRigConfiguration } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_apriltag_rig";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CaptureCalibrationDatasetResult } from "@farm-ng/genproto/farm_ng/v1/capture_calibration_dataset";
+import { CaptureCalibrationDatasetResult } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_calibration_dataset";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
-import { Resource } from "@farm-ng/genproto/farm_ng/v1/resource";
+import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
 import { RepeatedIntForm } from "./RepeatedIntForm";
 
@@ -40,7 +40,7 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
             calibrationDataset: Resource.fromPartial({
               path,
               contentType:
-                "application/json; type=type.googleapis.com/farm_ng.v1.CaptureVideoDatasetResult",
+                "application/json; type=type.googleapis.com/farm_ng.perception_core.CaptureVideoDatasetResult",
             }),
           }));
         }}
@@ -142,7 +142,7 @@ const CalibrateApriltagRigConfigurationElement: React.FC<SingleElementVisualizer
 
 export const CalibrateApriltagRigConfigurationVisualizer = {
   id: "CalibrateApriltagRigConfiguration",
-  types: ["type.googleapis.com/farm_ng.v1.CalibrateApriltagRigConfiguration"],
+  types: ["type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigConfiguration"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateApriltagRigConfigurationElement),
   Element: CalibrateApriltagRigConfigurationElement,

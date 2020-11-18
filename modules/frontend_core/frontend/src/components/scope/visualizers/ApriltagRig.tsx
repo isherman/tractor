@@ -6,8 +6,8 @@ import { NearestFilter, TextureLoader } from "three";
 import {
   ApriltagRig,
   ApriltagRig_Node as ApriltagRigNode,
-} from "@farm-ng/genproto/farm_ng/v1/apriltag";
-import { NamedSE3Pose } from "@farm-ng/genproto/farm_ng/v1/geometry";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/apriltag";
+import { NamedSE3Pose } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/geometry";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { getDagTransform } from "../../../utils/geometry";
 import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
@@ -87,7 +87,7 @@ const ApriltagRig3DElement: React.FC<SingleElementVisualizerProps<
 
 export const ApriltagRigVisualizer = {
   id: "ApriltagRig",
-  types: ["type.googleapis.com/farm_ng.v1.ApriltagRig"],
+  types: ["type.googleapis.com/farm_ng.perception_core.ApriltagRig"],
   options: Standard3DComponentOptions,
   Component: Standard3DComponent(ApriltagRig3DElement),
   Element: Standard3DElement(ApriltagRig3DElement),

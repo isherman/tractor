@@ -1,5 +1,5 @@
 import { Matrix4 } from "three/src/math/Matrix4";
-import { SE3Pose, NamedSE3Pose } from "@farm-ng/genproto/farm_ng/v1/geometry";
+import { SE3Pose, NamedSE3Pose } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/geometry";
 import { matrix4ToSE3Pose, se3PoseToMatrix4 } from "./protoConversions";
 
 export function rad2deg(radians: number): number {

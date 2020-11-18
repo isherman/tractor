@@ -1,10 +1,10 @@
 import { Buffer, TimestampedEvent } from "../types/common";
-import { Image } from "@farm-ng/genproto/farm_ng/v1/image";
-import { CalibrateApriltagRigStatus } from "@farm-ng/genproto/farm_ng/v1/calibrate_apriltag_rig";
-import { CalibrateBaseToCameraStatus } from "@farm-ng/genproto/farm_ng/v1/calibrate_base_to_camera";
+import { Image } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/image"
+import { CalibrateApriltagRigStatus } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_apriltag_rig";
+import { CalibrateBaseToCameraStatus } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_base_to_camera";
 
 export const testBuffer: Buffer = {
-  "type.googleapis.com/farm_ng.v1.Image": {
+  "type.googleapis.com/farm_ng.perception_core.Image": {
     test: [
       ...Array(100)
         .fill(0)
@@ -21,7 +21,7 @@ export const testBuffer: Buffer = {
         ]),
     ],
   },
-  "type.googleapis.com/farm_ng.v1.CalibrateApriltagRigStatus": {
+  "type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigStatus": {
     test: [
       [
         99,
@@ -29,13 +29,13 @@ export const testBuffer: Buffer = {
           result: {
             path: "apriltag_rig_models/rig.json",
             contentType:
-              "application/json; type=type.googleapis.com/farm_ng.v1.CalibrateApriltagRigResult",
+              "application/json; type=type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigResult",
           },
         }),
       ],
     ],
   },
-  "type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraStatus": {
+  "type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraStatus": {
     test: [
       [
         199,
@@ -43,7 +43,7 @@ export const testBuffer: Buffer = {
           result: {
             path: "base_to_camera_models/base_to_camera.json",
             contentType:
-              "application/json; type=type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraResult",
+              "application/json; type=type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraResult",
           },
         }),
       ],

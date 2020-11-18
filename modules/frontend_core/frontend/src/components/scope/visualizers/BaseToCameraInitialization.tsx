@@ -3,7 +3,7 @@ import {
   BaseToCameraInitialization,
   CalibrationParameter,
   ViewInitialization,
-} from "@farm-ng/genproto/farm_ng/v1/calibrator";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { useFormState } from "../../../hooks/useFormState";
 import {
   FormProps,
@@ -78,7 +78,7 @@ const BaseToCameraInitializationElement: React.FC<SingleElementVisualizerProps<
 
 export const BaseToCameraInitializationVisualizer = {
   id: "BaseToCameraInitialization",
-  types: ["type.googleapis.com/farm_ng.v1.BaseToCameraInitialization"],
+  types: ["type.googleapis.com/farm_ng.calibration.BaseToCameraInitialization"],
   options: StandardComponentOptions,
   Component: StandardComponent(BaseToCameraInitializationElement),
   Element: BaseToCameraInitializationElement,

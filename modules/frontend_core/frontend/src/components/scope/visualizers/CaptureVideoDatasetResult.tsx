@@ -3,7 +3,7 @@ import * as React from "react";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CaptureVideoDatasetResult } from "@farm-ng/genproto/farm_ng/v1/capture_video_dataset";
+import { CaptureVideoDatasetResult } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_video_dataset";
 import {
   StandardComponent,
   StandardComponentOptions,
@@ -68,7 +68,7 @@ const CaptureVideoDatasetResultElement: React.FC<SingleElementVisualizerProps<
 
 export const CaptureVideoDatasetResultVisualizer = {
   id: "CaptureVideoDatasetResult",
-  types: ["type.googleapis.com/farm_ng.v1.CaptureVideoDatasetResult"],
+  types: ["type.googleapis.com/farm_ng.perception_core.CaptureVideoDatasetResult"],
   options: StandardComponentOptions,
   Component: StandardComponent(CaptureVideoDatasetResultElement),
   Element: CaptureVideoDatasetResultElement,

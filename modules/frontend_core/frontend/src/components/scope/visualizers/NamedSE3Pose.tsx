@@ -4,7 +4,7 @@ import {
   FormProps,
   SingleElementVisualizerProps,
 } from "../../../registry/visualization";
-import { NamedSE3Pose, SE3Pose } from "@farm-ng/genproto/farm_ng/v1/geometry";
+import { NamedSE3Pose, SE3Pose } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/geometry";
 import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
@@ -81,7 +81,7 @@ const NamedSE3PoseForm: React.FC<FormProps<NamedSE3Pose>> = (props) => {
 
 export const NamedSE3PoseVisualizer = {
   id: "NamedSE3Pose",
-  types: ["type.googleapis.com/farm_ng.v1.NamedSE3Pose"],
+  types: ["type.googleapis.com/farm_ng.perception_core.NamedSE3Pose"],
   options: Standard3DComponentOptions,
   Component: Standard3DComponent(NamedSE3Pose3DElement),
   Element: Standard3DElement(NamedSE3Pose3DElement),

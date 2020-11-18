@@ -10,7 +10,7 @@ import { Card } from "./Card";
 import {
   CaptureCalibrationDatasetResult,
   CaptureCalibrationDatasetStatus,
-} from "@farm-ng/genproto/farm_ng/v1/capture_calibration_dataset";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_calibration_dataset";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
 
@@ -54,7 +54,7 @@ const CaptureCalibrationDatasetStatusElement: React.FC<SingleElementVisualizerPr
 
 export const CaptureCalibrationDatasetStatusVisualizer = {
   id: "CaptureCalibrationDatasetStatus",
-  types: ["type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetStatus"],
+  types: ["type.googleapis.com/farm_ng.perception_core.CaptureCalibrationDatasetStatus"],
   options: StandardComponentOptions,
   Component: StandardComponent(CaptureCalibrationDatasetStatusElement),
   Element: CaptureCalibrationDatasetStatusElement,

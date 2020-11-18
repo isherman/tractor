@@ -8,7 +8,7 @@ import {
   Quaternion,
   SE3Pose,
   Vec3,
-} from "@farm-ng/genproto/farm_ng/v1/geometry";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/geometry";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 import { toQuaternion, toVector3 } from "../../../utils/protoConversions";
@@ -144,7 +144,7 @@ const SE3PoseForm: React.FC<FormProps<SE3Pose>> = (props) => {
 
 export const SE3PoseVisualizer = {
   id: "SE3Pose",
-  types: ["type.googleapis.com/farm_ng.v1.SE3Pose"],
+  types: ["type.googleapis.com/farm_ng.perception_core.SE3Pose"],
   options: Standard3DComponentOptions,
   Component: Standard3DComponent(SE3PoseMarker3D),
   Element: Standard3DElement(SE3PoseMarker3D),

@@ -10,7 +10,7 @@ import {
 } from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CaptureCalibrationDatasetConfiguration } from "@farm-ng/genproto/farm_ng/v1/capture_calibration_dataset";
+import { CaptureCalibrationDatasetConfiguration } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_calibration_dataset";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 
@@ -71,7 +71,7 @@ const CaptureCalibrationDatasetConfigurationElement: React.FC<SingleElementVisua
 export const CaptureCalibrationDatasetConfigurationVisualizer = {
   id: "CaptureCalibrationDatasetConfiguration",
   types: [
-    "type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetConfiguration",
+    "type.googleapis.com/farm_ng.perception_core.CaptureCalibrationDatasetConfiguration",
   ],
   options: StandardComponentOptions,
   Component: StandardComponent(CaptureCalibrationDatasetConfigurationElement),

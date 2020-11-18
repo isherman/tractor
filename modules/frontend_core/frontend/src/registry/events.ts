@@ -3,12 +3,12 @@ import {
   ApriltagDetections,
   ApriltagRig,
   TagConfig,
-} from "@farm-ng/genproto/farm_ng/v1/apriltag";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/apriltag";
 import {
   NamedSE3Pose,
   SE3Pose,
   Vec2,
-} from "@farm-ng/genproto/farm_ng/v1/geometry";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/geometry";
 import {
   BaseToCameraInitialization,
   BaseToCameraModel,
@@ -18,107 +18,107 @@ import {
   MonocularApriltagRigModel,
   MultiViewApriltagRigModel,
   ViewInitialization,
-} from "@farm-ng/genproto/farm_ng/v1/calibrator";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import {
   Announce,
   LoggingCommand,
   LoggingStatus,
-} from "@farm-ng/genproto/farm_ng/v1/io";
-import { Image } from "@farm-ng/genproto/farm_ng/v1/image";
-import { MotorControllerState } from "@farm-ng/genproto/farm_ng/v1/motor";
-import { SteeringCommand } from "@farm-ng/genproto/farm_ng/v1/steering";
+} from "@farm-ng/genproto-core/farm_ng/core/io";
+import { Image } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/image";
+import { MotorControllerState } from "@farm-ng/genproto-tractor/farm_ng/tractor/motor";
+import { SteeringCommand } from "@farm-ng/genproto-tractor/farm_ng/tractor/steering";
 import {
   TrackingCameraPoseFrame,
   TrackingCameraMotionFrame,
   TrackingCameraCommand,
   TrackingCameraConfig,
   CameraConfig,
-} from "@farm-ng/genproto/farm_ng/v1/tracking_camera";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/tracking_camera";
 import {
   TractorConfig,
   TractorState,
-} from "@farm-ng/genproto/farm_ng/v1/tractor";
+} from "@farm-ng/genproto-tractor/farm_ng/tractor/tractor";
 import { Message } from "../types/common";
 import {
   ProgramSupervisorStatus,
   StartProgramRequest,
   StopProgramRequest,
-} from "@farm-ng/genproto/farm_ng/v1/program_supervisor";
+} from "@farm-ng/genproto-frontend_core/farm_ng/frontend_core/program_supervisor";
 import {
   CaptureCalibrationDatasetConfiguration,
   CaptureCalibrationDatasetResult,
   CaptureCalibrationDatasetStatus,
-} from "@farm-ng/genproto/farm_ng/v1/capture_calibration_dataset";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_calibration_dataset";
 import {
   CaptureVideoDatasetConfiguration,
   CaptureVideoDatasetResult,
   CaptureVideoDatasetStatus,
-} from "@farm-ng/genproto/farm_ng/v1/capture_video_dataset";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_video_dataset";
 import {
   CalibrateApriltagRigConfiguration,
   CalibrateApriltagRigResult,
   CalibrateApriltagRigStatus,
-} from "@farm-ng/genproto/farm_ng/v1/calibrate_apriltag_rig";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_apriltag_rig";
 import {
   CalibrateBaseToCameraConfiguration,
   CalibrateBaseToCameraResult,
   CalibrateBaseToCameraStatus,
-} from "@farm-ng/genproto/farm_ng/v1/calibrate_base_to_camera";
-import { Event as BusEvent } from "@farm-ng/genproto/farm_ng/v1/io";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_base_to_camera";
+import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import {
   CalibrateMultiViewApriltagRigConfiguration,
   CalibrateMultiViewApriltagRigResult,
   CalibrateMultiViewApriltagRigStatus,
-} from "@farm-ng/genproto/farm_ng/v1/calibrate_multi_view_apriltag_rig";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_multi_view_apriltag_rig";
 
 export type EventType =
-  | BusEvent
-  | SteeringCommand
-  | TrackingCameraPoseFrame
-  | TrackingCameraMotionFrame
-  | SE3Pose
-  | NamedSE3Pose
-  | MotorControllerState
-  | ApriltagDetections
-  | TractorState
   | Announce
-  | Vec2
-  | Image
-  | TractorConfig
   | ApriltagConfig
-  | TrackingCameraConfig
-  | CameraConfig
-  | TagConfig
+  | ApriltagDetections
+  | ApriltagRig
+  | BaseToCameraInitialization
+  | BaseToCameraModel
+  | BusEvent
+  | CalibrateApriltagRigConfiguration
+  | CalibrateApriltagRigResult
+  | CalibrateApriltagRigStatus
+  | CalibrateBaseToCameraConfiguration
+  | CalibrateBaseToCameraResult
+  | CalibrateBaseToCameraStatus
+  | CalibrateMultiViewApriltagRigConfiguration
+  | CalibrateMultiViewApriltagRigResult
+  | CalibrateMultiViewApriltagRigStatus
   | CalibrationParameter
-  | ViewInitialization
-  | LoggingCommand
-  | TrackingCameraCommand
   | CalibratorCommand
   | CalibratorStatus
-  | LoggingStatus
-  | ProgramSupervisorStatus
-  | StartProgramRequest
-  | ApriltagRig
-  | StopProgramRequest
-  | MonocularApriltagRigModel
-  | MultiViewApriltagRigModel
-  | BaseToCameraModel
-  | BaseToCameraInitialization
+  | CameraConfig
   | CaptureCalibrationDatasetConfiguration
-  | CaptureCalibrationDatasetStatus
   | CaptureCalibrationDatasetResult
+  | CaptureCalibrationDatasetStatus
   | CaptureVideoDatasetConfiguration
-  | CaptureVideoDatasetStatus
   | CaptureVideoDatasetResult
-  | CalibrateApriltagRigConfiguration
-  | CalibrateApriltagRigStatus
-  | CalibrateApriltagRigResult
-  | CalibrateBaseToCameraConfiguration
-  | CalibrateBaseToCameraStatus
-  | CalibrateBaseToCameraResult
-  | CalibrateMultiViewApriltagRigConfiguration
-  | CalibrateMultiViewApriltagRigStatus
-  | CalibrateMultiViewApriltagRigResult;
+  | CaptureVideoDatasetStatus
+  | Image
+  | LoggingCommand
+  | LoggingStatus
+  | MonocularApriltagRigModel
+  | MotorControllerState
+  | MultiViewApriltagRigModel
+  | NamedSE3Pose
+  | ProgramSupervisorStatus
+  | SE3Pose
+  | StartProgramRequest
+  | SteeringCommand
+  | StopProgramRequest
+  | TagConfig
+  | TrackingCameraCommand
+  | TrackingCameraConfig
+  | TrackingCameraMotionFrame
+  | TrackingCameraPoseFrame
+  | TractorConfig
+  | TractorState
+  | Vec2
+  | ViewInitialization;
 
 // Infer the keys, but restrict values to Message<EventType>
 // https://stackoverflow.com/a/54598743
@@ -127,53 +127,53 @@ const inferKeys = <T>(
 ): { [K in keyof T]: Message<EventType> } => o;
 
 export const eventRegistry = inferKeys({
-  "type.googleapis.com/farm_ng.v1.Event": BusEvent,
-  "type.googleapis.com/farm_ng.v1.SteeringCommand": SteeringCommand,
-  "type.googleapis.com/farm_ng.v1.TrackingCameraPoseFrame": TrackingCameraPoseFrame,
-  "type.googleapis.com/farm_ng.v1.TrackingCameraMotionFrame": TrackingCameraMotionFrame,
-  "type.googleapis.com/farm_ng.v1.SE3Pose": SE3Pose,
-  "type.googleapis.com/farm_ng.v1.NamedSE3Pose": NamedSE3Pose,
-  "type.googleapis.com/farm_ng.v1.MotorControllerState": MotorControllerState,
-  "type.googleapis.com/farm_ng.v1.ApriltagDetections": ApriltagDetections,
-  "type.googleapis.com/farm_ng.v1.ApriltagRig": ApriltagRig,
-  "type.googleapis.com/farm_ng.v1.TractorState": TractorState,
-  "type.googleapis.com/farm_ng.v1.Announce": Announce,
-  "type.googleapis.com/farm_ng.v1.Vec2": Vec2,
-  "type.googleapis.com/farm_ng.v1.Image": Image,
-  "type.googleapis.com/farm_ng.v1.TractorConfig": TractorConfig,
-  "type.googleapis.com/farm_ng.v1.ApriltagConfig": ApriltagConfig,
-  "type.googleapis.com/farm_ng.v1.TrackingCameraConfig": TrackingCameraConfig,
-  "type.googleapis.com/farm_ng.v1.CameraConfig": CameraConfig,
-  "type.googleapis.com/farm_ng.v1.TagConfig": TagConfig,
-  "type.googleapis.com/farm_ng.v1.ViewInitialization": ViewInitialization,
-  "type.googleapis.com/farm_ng.v1.BaseToCameraInitialization": BaseToCameraInitialization,
-  "type.googleapis.com/farm_ng.v1.CalibrationParameter": CalibrationParameter,
-  "type.googleapis.com/farm_ng.v1.LoggingCommand": LoggingCommand,
-  "type.googleapis.com/farm_ng.v1.TrackingCameraCommand": TrackingCameraCommand,
-  "type.googleapis.com/farm_ng.v1.CalibratorCommand": CalibratorCommand,
-  "type.googleapis.com/farm_ng.v1.CalibratorStatus": CalibratorStatus,
-  "type.googleapis.com/farm_ng.v1.LoggingStatus": LoggingStatus,
-  "type.googleapis.com/farm_ng.v1.MonocularApriltagRigModel": MonocularApriltagRigModel,
-  "type.googleapis.com/farm_ng.v1.MultiViewApriltagRigModel": MultiViewApriltagRigModel,
-  "type.googleapis.com/farm_ng.v1.BaseToCameraModel": BaseToCameraModel,
-  "type.googleapis.com/farm_ng.v1.ProgramSupervisorStatus": ProgramSupervisorStatus,
-  "type.googleapis.com/farm_ng.v1.StartProgramRequest": StartProgramRequest,
-  "type.googleapis.com/farm_ng.v1.StopProgramRequest": StopProgramRequest,
-  "type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetConfiguration": CaptureCalibrationDatasetConfiguration,
-  "type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetStatus": CaptureCalibrationDatasetStatus,
-  "type.googleapis.com/farm_ng.v1.CaptureCalibrationDatasetResult": CaptureCalibrationDatasetResult,
-  "type.googleapis.com/farm_ng.v1.CaptureVideoDatasetConfiguration": CaptureVideoDatasetConfiguration,
-  "type.googleapis.com/farm_ng.v1.CaptureVideoDatasetStatus": CaptureVideoDatasetStatus,
-  "type.googleapis.com/farm_ng.v1.CaptureVideoDatasetResult": CaptureVideoDatasetResult,
-  "type.googleapis.com/farm_ng.v1.CalibrateApriltagRigConfiguration": CalibrateApriltagRigConfiguration,
-  "type.googleapis.com/farm_ng.v1.CalibrateApriltagRigStatus": CalibrateApriltagRigStatus,
-  "type.googleapis.com/farm_ng.v1.CalibrateApriltagRigResult": CalibrateApriltagRigResult,
-  "type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraConfiguration": CalibrateBaseToCameraConfiguration,
-  "type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraStatus": CalibrateBaseToCameraStatus,
-  "type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraResult": CalibrateBaseToCameraResult,
-  "type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigConfiguration": CalibrateMultiViewApriltagRigConfiguration,
-  "type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigStatus": CalibrateMultiViewApriltagRigStatus,
-  "type.googleapis.com/farm_ng.v1.CalibrateMultiViewApriltagRigResult": CalibrateMultiViewApriltagRigResult,
+  "type.googleapis.com/farm_ng.calibration.BaseToCameraInitialization": BaseToCameraInitialization,
+  "type.googleapis.com/farm_ng.calibration.BaseToCameraModel": BaseToCameraModel,
+  "type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigConfiguration": CalibrateApriltagRigConfiguration,
+  "type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigResult": CalibrateApriltagRigResult,
+  "type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigStatus": CalibrateApriltagRigStatus,
+  "type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraConfiguration": CalibrateBaseToCameraConfiguration,
+  "type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraResult": CalibrateBaseToCameraResult,
+  "type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraStatus": CalibrateBaseToCameraStatus,
+  "type.googleapis.com/farm_ng.calibration.CalibrateMultiViewApriltagRigConfiguration": CalibrateMultiViewApriltagRigConfiguration,
+  "type.googleapis.com/farm_ng.calibration.CalibrateMultiViewApriltagRigResult": CalibrateMultiViewApriltagRigResult,
+  "type.googleapis.com/farm_ng.calibration.CalibrateMultiViewApriltagRigStatus": CalibrateMultiViewApriltagRigStatus,
+  "type.googleapis.com/farm_ng.calibration.CalibrationParameter": CalibrationParameter,
+  "type.googleapis.com/farm_ng.calibration.CalibratorCommand": CalibratorCommand,
+  "type.googleapis.com/farm_ng.calibration.CalibratorStatus": CalibratorStatus,
+  "type.googleapis.com/farm_ng.calibration.MonocularApriltagRigModel": MonocularApriltagRigModel,
+  "type.googleapis.com/farm_ng.calibration.MultiViewApriltagRigModel": MultiViewApriltagRigModel,
+  "type.googleapis.com/farm_ng.calibration.ViewInitialization": ViewInitialization,
+  "type.googleapis.com/farm_ng.core.Announce": Announce,
+  "type.googleapis.com/farm_ng.core.Event": BusEvent,
+  "type.googleapis.com/farm_ng.core.LoggingCommand": LoggingCommand,
+  "type.googleapis.com/farm_ng.core.LoggingStatus": LoggingStatus,
+  "type.googleapis.com/farm_ng.frontend_core.ProgramSupervisorStatus": ProgramSupervisorStatus,
+  "type.googleapis.com/farm_ng.frontend_core.StartProgramRequest": StartProgramRequest,
+  "type.googleapis.com/farm_ng.frontend_core.StopProgramRequest": StopProgramRequest,
+  "type.googleapis.com/farm_ng.perception_core.ApriltagConfig": ApriltagConfig,
+  "type.googleapis.com/farm_ng.perception_core.ApriltagDetections": ApriltagDetections,
+  "type.googleapis.com/farm_ng.perception_core.ApriltagRig": ApriltagRig,
+  "type.googleapis.com/farm_ng.perception_core.CameraConfig": CameraConfig,
+  "type.googleapis.com/farm_ng.perception_core.CaptureCalibrationDatasetConfiguration": CaptureCalibrationDatasetConfiguration,
+  "type.googleapis.com/farm_ng.perception_core.CaptureCalibrationDatasetResult": CaptureCalibrationDatasetResult,
+  "type.googleapis.com/farm_ng.perception_core.CaptureCalibrationDatasetStatus": CaptureCalibrationDatasetStatus,
+  "type.googleapis.com/farm_ng.perception_core.CaptureVideoDatasetConfiguration": CaptureVideoDatasetConfiguration,
+  "type.googleapis.com/farm_ng.perception_core.CaptureVideoDatasetResult": CaptureVideoDatasetResult,
+  "type.googleapis.com/farm_ng.perception_core.CaptureVideoDatasetStatus": CaptureVideoDatasetStatus,
+  "type.googleapis.com/farm_ng.perception_core.Image": Image,
+  "type.googleapis.com/farm_ng.perception_core.NamedSE3Pose": NamedSE3Pose,
+  "type.googleapis.com/farm_ng.perception_core.SE3Pose": SE3Pose,
+  "type.googleapis.com/farm_ng.perception_core.TagConfig": TagConfig,
+  "type.googleapis.com/farm_ng.perception_core.TrackingCameraCommand": TrackingCameraCommand,
+  "type.googleapis.com/farm_ng.perception_core.TrackingCameraConfig": TrackingCameraConfig,
+  "type.googleapis.com/farm_ng.perception_core.Vec2": Vec2,
+  "type.googleapis.com/farm_ng.tractor.MotorControllerState": MotorControllerState,
+  "type.googleapis.com/farm_ng.tractor.SteeringCommand": SteeringCommand,
+  "type.googleapis.com/farm_ng.tractor.TrackingCameraMotionFrame": TrackingCameraMotionFrame,
+  "type.googleapis.com/farm_ng.tractor.TrackingCameraPoseFrame": TrackingCameraPoseFrame,
+  "type.googleapis.com/farm_ng.tractor.TractorConfig": TractorConfig,
+  "type.googleapis.com/farm_ng.tractor.TractorState": TractorState,
 });
 
 export const eventTypeIds = Object.keys(

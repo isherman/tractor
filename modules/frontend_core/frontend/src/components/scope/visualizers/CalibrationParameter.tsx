@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CalibrationParameter } from "@farm-ng/genproto/farm_ng/v1/calibrator";
+import { CalibrationParameter } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { useFormState } from "../../../hooks/useFormState";
 import { FormProps } from "../../../registry/visualization";
 import Form from "./Form";
@@ -40,7 +40,7 @@ const CalibrationParameterForm: React.FC<IFormProps> = ({
 
 export const CalibrationParameterVisualizer = {
   id: "CalibrationParameter",
-  types: ["type.googleapis.com/farm_ng.v1.CalibrationParameter"],
+  types: ["type.googleapis.com/farm_ng.calibration.CalibrationParameter"],
   options: StandardComponentOptions,
   Form: CalibrationParameterForm,
 };

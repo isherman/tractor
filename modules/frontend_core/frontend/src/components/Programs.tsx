@@ -4,7 +4,7 @@ import { useStores } from "../hooks/useStores";
 import {
   StartProgramRequest,
   StopProgramRequest,
-} from "@farm-ng/genproto/farm_ng/v1/program_supervisor";
+} from "@farm-ng/genproto-frontend_core/farm_ng/frontend_core/program_supervisor";
 import { useObserver } from "mobx-react-lite";
 import { useEffect } from "react";
 import { formatValue } from "../utils/formatValue";
@@ -21,7 +21,7 @@ export const Programs: React.FC = () => {
 
   const handleStart = (id: string): void => {
     busClient.send(
-      "type.googleapis.com/farm_ng.v1.StartProgramRequest",
+      "type.googleapis.com/farm_ng.frontend_core.StartProgramRequest",
       "program_supervisor/request",
       StartProgramRequest.encode(StartProgramRequest.fromJSON({ id })).finish()
     );
@@ -29,7 +29,7 @@ export const Programs: React.FC = () => {
 
   const handleStop = (id: string): void => {
     busClient.send(
-      "type.googleapis.com/farm_ng.v1.StopProgramRequest",
+      "type.googleapis.com/farm_ng.frontend_core.StopProgramRequest",
       "program_supervisor/request",
       StopProgramRequest.encode(StopProgramRequest.fromJSON({ id })).finish()
     );

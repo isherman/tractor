@@ -7,11 +7,11 @@ import {
 } from "./StandardComponent";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CalibrateBaseToCameraResult } from "@farm-ng/genproto/farm_ng/v1/calibrate_base_to_camera";
+import { CalibrateBaseToCameraResult } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_base_to_camera";
 import {
   BaseToCameraModel,
   solverStatusToJSON,
-} from "@farm-ng/genproto/farm_ng/v1/calibrator";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { BaseToCameraModelVisualizer } from "./BaseToCameraModel";
 import { CalibrateBaseToCameraConfigurationVisualizer } from "./CalibrateBaseToCameraConfiguration";
@@ -76,7 +76,7 @@ const CalibrateBaseToCameraResultElement: React.FC<SingleElementVisualizerProps<
 
 export const CalibrateBaseToCameraResultVisualizer = {
   id: "CalibrateBaseToCameraResult",
-  types: ["type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraResult"],
+  types: ["type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraResult"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateBaseToCameraResultElement),
   Element: CalibrateBaseToCameraResultElement,

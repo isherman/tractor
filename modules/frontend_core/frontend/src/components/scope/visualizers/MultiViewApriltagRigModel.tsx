@@ -6,7 +6,7 @@ import { SingleElementVisualizerProps } from "../../../registry/visualization";
 import {
   MultiViewApriltagRigModel,
   solverStatusToJSON,
-} from "@farm-ng/genproto/farm_ng/v1/calibrator";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { formatValue } from "../../../utils/formatValue";
 import {
   StandardComponentOptions,
@@ -31,8 +31,8 @@ import { ImageVisualizer } from "./Image";
 import { ApriltagDetectionsVisualizer } from "./ApriltagDetections";
 import styles from "./MultiViewApriltagRigModel.module.scss";
 import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
-import { NamedSE3Pose } from "@farm-ng/genproto/farm_ng/v1/geometry";
-import { CameraModel } from "@farm-ng/genproto/farm_ng/v1/camera_model";
+import { NamedSE3Pose } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/geometry";
+import { CameraModel } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/camera_model";
 
 function openCVPoseToThreeJSPose(pose: NamedSE3Pose): NamedSE3Pose {
   if (!pose.aPoseB) {
@@ -264,7 +264,7 @@ const MultiViewApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
 
 export const MultiViewApriltagRigModelVisualizer = {
   id: "MultiViewApriltagRigModel",
-  types: ["type.googleapis.com/farm_ng.v1.MultiViewApriltagRigModel"],
+  types: ["type.googleapis.com/farm_ng.calibration.MultiViewApriltagRigModel"],
   options: StandardComponentOptions,
   Component: StandardComponent(MultiViewApriltagRigModelElement),
   Element: MultiViewApriltagRigModelElement,

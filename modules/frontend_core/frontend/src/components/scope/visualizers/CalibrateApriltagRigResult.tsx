@@ -5,11 +5,11 @@ import {
   StandardComponentOptions,
   StandardComponent,
 } from "./StandardComponent";
-import { CalibrateApriltagRigResult } from "@farm-ng/genproto/farm_ng/v1/calibrate_apriltag_rig";
+import { CalibrateApriltagRigResult } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_apriltag_rig";
 import {
   MonocularApriltagRigModel,
   solverStatusToJSON,
-} from "@farm-ng/genproto/farm_ng/v1/calibrator";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
@@ -75,7 +75,7 @@ const CalibrateApriltagRigResultElement: React.FC<SingleElementVisualizerProps<
 
 export const CalibrateApriltagRigResultVisualizer = {
   id: "CalibrateApriltagRigResult",
-  types: ["type.googleapis.com/farm_ng.v1.CalibrateApriltagRigResult"],
+  types: ["type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigResult"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateApriltagRigResultElement),
   Element: CalibrateApriltagRigResultElement,

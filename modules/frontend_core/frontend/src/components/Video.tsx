@@ -2,7 +2,7 @@ import * as React from "react";
 import { useEffect, useRef } from "react";
 import { useObserver } from "mobx-react-lite";
 
-import { ApriltagDetections } from "@farm-ng/genproto/farm_ng/v1/apriltag";
+import { ApriltagDetections } from "@farm-ng/genproto-perception_core/farm_ng/perception_core/apriltag";
 import { autorun } from "mobx";
 import styles from "./Video.module.scss";
 import { useStores } from "../hooks/useStores";

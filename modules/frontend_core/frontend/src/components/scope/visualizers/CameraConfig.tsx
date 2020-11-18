@@ -17,7 +17,7 @@ import {
   CameraConfig,
   CameraConfig_Model as Model,
   cameraConfig_ModelToJSON as ModelToJSON,
-} from "@farm-ng/genproto/farm_ng/v1/tracking_camera";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/tracking_camera";
 
 const CameraConfigForm: React.FC<FormProps<CameraConfig>> = (props) => {
   const [value, setValue] = useFormState(props);
@@ -103,7 +103,7 @@ const CameraConfigElement: React.FC<SingleElementVisualizerProps<
 
 export const CameraConfigVisualizer = {
   id: "CameraConfig",
-  types: ["type.googleapis.com/farm_ng.v1.CameraConfig"],
+  types: ["type.googleapis.com/farm_ng.perception_core.CameraConfig"],
   options: StandardComponentOptions,
   Component: StandardComponent(CameraConfigElement),
   Element: CameraConfigElement,

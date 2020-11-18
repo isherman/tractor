@@ -1,4 +1,4 @@
-import { Event as BusEvent } from "@farm-ng/genproto/farm_ng/v1/io";
+import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import { eventRegistry, EventType, EventTypeId } from "../registry/events";
 import { Message } from "../types/common";
 

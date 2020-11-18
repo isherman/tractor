@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Table } from "react-bootstrap";
-import { CalibrationParameter } from "@farm-ng/genproto/farm_ng/v1/calibrator";
+import { CalibrationParameter } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { formatValue } from "../../../utils/formatValue";
 
 interface IProps {

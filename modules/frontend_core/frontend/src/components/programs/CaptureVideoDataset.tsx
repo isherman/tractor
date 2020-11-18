@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { useStores } from "../../hooks/useStores";
-import { Event as BusEvent } from "@farm-ng/genproto/farm_ng/v1/io";
+import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import { useState } from "react";
 import Form from "../scope/visualizers/Form";
 import {
   CaptureVideoDatasetConfiguration,
   CaptureVideoDatasetConfiguration as Configuration,
   CaptureVideoDatasetStatus as Status,
-} from "@farm-ng/genproto/farm_ng/v1/capture_video_dataset";
+} from "@farm-ng/genproto-perception_core/farm_ng/perception_core/capture_video_dataset";
 import { CaptureVideoDatasetConfigurationVisualizer } from "../scope/visualizers/CaptureVideoDatasetConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";
@@ -28,7 +28,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
   ): void => {
     e.preventDefault();
     busClient.send(
-      "type.googleapis.com/farm_ng.v1.CaptureVideoDatasetConfiguration",
+      "type.googleapis.com/farm_ng.perception_core.CaptureVideoDatasetConfiguration",
       `${programId}/configure`,
       Configuration.encode(Configuration.fromJSON(configuration)).finish()
     );

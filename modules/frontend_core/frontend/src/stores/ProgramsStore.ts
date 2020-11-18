@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { computed, observable } from "mobx";
 import { decodeAnyEvent } from "../models/decodeAnyEvent";
-import { Event as BusEvent } from "@farm-ng/genproto/farm_ng/v1/io";
+import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import {
   BusEventEmitter,
   BusEventEmitterHandle,
@@ -10,7 +10,7 @@ import { EventType } from "../registry/events";
 import {
   ProgramExecution,
   ProgramSupervisorStatus,
-} from "@farm-ng/genproto/farm_ng/v1/program_supervisor";
+} from "@farm-ng/genproto-frontend_core/farm_ng/frontend_core/program_supervisor";
 import { Program, programForProgramId } from "../registry/programs";
 import { TimestampedEventVector } from "../types/common";
 
@@ -73,7 +73,7 @@ export class ProgramsStore {
       }
       if (
         busEvent.data.typeUrl ===
-        "type.googleapis.com/farm_ng.v1.ProgramSupervisorStatus"
+        "type.googleapis.com/farm_ng.frontend_core.ProgramSupervisorStatus"
       ) {
         this.supervisorStatus = decodeAnyEvent(busEvent);
       }

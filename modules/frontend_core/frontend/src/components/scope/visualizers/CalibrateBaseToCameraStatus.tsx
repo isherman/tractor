@@ -6,7 +6,7 @@ import { Card } from "./Card";
 import {
   CalibrateBaseToCameraResult,
   CalibrateBaseToCameraStatus,
-} from "@farm-ng/genproto/farm_ng/v1/calibrate_base_to_camera";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_base_to_camera";
 import {
   StandardComponentOptions,
   StandardComponent,
@@ -42,7 +42,7 @@ const CalibrateBaseToCameraStatusElement: React.FC<SingleElementVisualizerProps<
 
 export const CalibrateBaseToCameraStatusVisualizer = {
   id: "CalibrateBaseToCameraStatus",
-  types: ["type.googleapis.com/farm_ng.v1.CalibrateBaseToCameraStatus"],
+  types: ["type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraStatus"],
   options: StandardComponentOptions,
   Component: StandardComponent(CalibrateBaseToCameraStatusElement),
   Element: CalibrateBaseToCameraStatusElement,

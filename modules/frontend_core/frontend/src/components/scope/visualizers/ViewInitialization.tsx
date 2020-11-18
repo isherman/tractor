@@ -4,7 +4,7 @@ import {
   ViewDirection,
   viewDirectionToJSON,
   ViewInitialization,
-} from "@farm-ng/genproto/farm_ng/v1/calibrator";
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { useFormState } from "../../../hooks/useFormState";
 import {
   FormProps,
@@ -86,7 +86,7 @@ const ViewInitializationElement: React.FC<SingleElementVisualizerProps<
 
 export const ViewInitializationVisualizer = {
   id: "ViewInitialization",
-  types: ["type.googleapis.com/farm_ng.v1.ViewInitialization"],
+  types: ["type.googleapis.com/farm_ng.calibration.ViewInitialization"],
   options: StandardComponentOptions,
   Component: StandardComponent(ViewInitializationElement),
   Element: ViewInitializationElement,
