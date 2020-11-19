@@ -73,6 +73,7 @@ message CameraConfig {
   Model model = 3;
 
   google.protobuf.Int32Value udp_stream_port = 4;
+  string frame_grabber_name = 5; // Which frame_grabber driver to use?
 }
 
 message TrackingCameraConfig {

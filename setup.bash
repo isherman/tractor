@@ -34,13 +34,14 @@ export PATH=$PATH:/usr/local/go/bin
 : ${BLOBSTORE_ROOT:=`dirname $FARM_NG_ROOT`/tractor-data}
 export BLOBSTORE_ROOT
 
-# Bootstrap blobstore if necessary
-for config in `python -m farm_ng.tractor.config list`
-do
-  configpath=$BLOBSTORE_ROOT/configurations/$config.json
-  if [ ! -f $configpath  ]; then
-    echo "No configuration detected at $configpath; generating now."
-    mkdir -p `dirname $configpath`
-	  python -m farm_ng.tractor.config gen$config > $configpath
-  fi
-done
+
+# # Bootstrap blobstore if necessary
+# for config in `python -m farm_ng.tractor.config list`
+# do
+#   configpath=$BLOBSTORE_ROOT/configurations/$config.json
+#   if [ ! -f $configpath  ]; then
+#     echo "No configuration detected at $configpath; generating now."
+#     mkdir -p `dirname $configpath`
+# 	  python -m farm_ng.tractor.config gen$config > $configpath
+#   fi
+# done

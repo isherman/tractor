@@ -58,10 +58,8 @@ class MultiCameraSync {
       : event_bus_(event_bus), timer_(event_bus.get_io_service()) {}
 
   CameraModel AddCameraConfig(const CameraConfig& camera_config) {
-    frame_grabbers_.emplace_back(
-        std::make_unique<FrameGrabber>(event_bus_, camera_config));
+    frame_grabbers_.emplace_back(FrameGrabber::MakeFrameGrabber(event_bus_, camera_config));
     frame_grabbers_.back()->VisualFrameSignal().connect(
-
         std::bind(&MultiCameraSync::OnFrame, this, std::placeholders::_1));
     return frame_grabbers_.back()->GetCameraModel();
   }
@@ -402,5 +400,6 @@ int Main(farm_ng::EventBus& bus) {
 }
 
 int main(int argc, char* argv[]) {
+  std::cerr << "And here." << std::endl;
   return farm_ng::Main(argc, argv, &Main, &Cleanup);
 }

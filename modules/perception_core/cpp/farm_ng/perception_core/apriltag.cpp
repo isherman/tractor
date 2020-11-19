@@ -7,8 +7,8 @@
 #include <sophus/se3.hpp>
 
 #include "farm_ng/core/blobstore.h"
-#include "farm_ng/perception_core/camera_model.h"
 #include "farm_ng/core/ipc.h"
+#include "farm_ng/perception_core/camera_model.h"
 #include "farm_ng/perception_core/sophus_protobuf.h"
 
 namespace farm_ng {

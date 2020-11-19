@@ -22,20 +22,23 @@ struct FrameData {
 
   google::protobuf::Timestamp stamp_;
 };
+
 class FrameGrabber {
  public:
+  typedef std::function<std::unique_ptr<FrameGrabber>(EventBus& event_bus,
+                                                      CameraConfig config)>
+      FrameGrabberFactory;
+  static std::unique_ptr<FrameGrabber> MakeFrameGrabber(EventBus& event_bus,
+                                                        CameraConfig config);
+  static int AddFrameGrabberFactory(const std::string& frame_grabber_name,
+                                    FrameGrabberFactory);
+
   typedef boost::signals2::signal<void(const FrameData&)> Signal;
-
-  FrameGrabber(EventBus& event_bus, CameraConfig config);
-  ~FrameGrabber();
-  const CameraConfig& GetCameraConfig() const;
-  const CameraModel& GetCameraModel() const;
-
-  Signal& VisualFrameSignal() const;
-
- private:
-  class Impl;
-  std::shared_ptr<Impl> impl_;
+  virtual ~FrameGrabber();
+  virtual const CameraConfig& GetCameraConfig() const = 0;
+  virtual const CameraModel& GetCameraModel() const = 0;
+  virtual Signal& VisualFrameSignal() = 0;
 };
+
 }  // namespace farm_ng
 #endif

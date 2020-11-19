@@ -19,6 +19,7 @@ endforeach()
 add_library(farm-ng-perception_core SHARED
   frame_grabber.h
   frame_grabber.cpp
+  frame_grabber_intel.cpp
   image_loader.cpp
   image_loader.h
   video_streamer.h
@@ -41,8 +42,9 @@ target_link_libraries(
   apriltag::apriltag
   opencv_imgcodecs
   ${OpenCV_LIBS}
-  ${realsense2_LIBRARY}
-  Sophus::Sophus)
+  Sophus::Sophus
+  ${realsense2_LIBRARY})
+
 
 # TODO add tests!
 # add_executable(farm-ng-perception_core-test
