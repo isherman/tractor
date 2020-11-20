@@ -2,7 +2,7 @@ find_package(Boost REQUIRED system filesystem)
 find_package(gflags REQUIRED)
 find_package(Glog REQUIRED)
 
-add_library(farm-ng-core SHARED
+add_library(farm_ng_core SHARED
   blobstore.cpp
   blobstore.h
   event_log_reader.cpp
@@ -14,10 +14,10 @@ add_library(farm-ng-core SHARED
   ipc.cpp
   ipc.h)
 
-target_include_directories(farm-ng-core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+target_include_directories(farm_ng_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 target_link_libraries(
-  farm-ng-core
-  farm-ng-core-protobuf
+  farm_ng_core
+  farm_ng_core_protobuf
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   dl

@@ -16,7 +16,7 @@ foreach(src_prefix
   list(APPEND test_files ${src_prefix}_test.cpp)
 endforeach()
 
-add_library(farm-ng-perception SHARED
+add_library(farm_ng_perception SHARED
   frame_grabber.h
   frame_grabber.cpp
   frame_grabber_intel.cpp
@@ -30,15 +30,15 @@ add_library(farm-ng-perception SHARED
   )
 
 target_include_directories(
-  farm-ng-perception
+  farm_ng_perception
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}/../..
   ${EIGEN3_INCLUDE_DIRS})
 
 target_link_libraries(
-  farm-ng-perception
-  farm-ng-perception-protobuf
-  farm-ng-core
+  farm_ng_perception
+  farm_ng_perception_protobuf
+  farm_ng_core
   apriltag::apriltag
   opencv_imgcodecs
   ${OpenCV_LIBS}
@@ -47,12 +47,12 @@ target_link_libraries(
 
 
 # TODO add tests!
-# add_executable(farm-ng-perception-test
+# add_executable(farm_ng_perception-test
 #   ${test_files}
 #  )
 
-# target_link_libraries(farm-ng-perception-test
-#     farm-ng-perception
+# target_link_libraries(farm_ng_perception-test
+#     farm_ng_perception
 #     gtest gmock gtest_main
 #  )
-# gtest_discover_tests(farm-ng-perception-test)
+# gtest_discover_tests(farm_ng_perception-test)

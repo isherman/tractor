@@ -13,12 +13,12 @@ foreach(src_prefix
    list(APPEND test_files ${src_prefix}_test.cpp)
 endforeach()
 
-add_library(farm-ng-calibration
+add_library(farm_ng_calibration
   ${cpp_files}
   ${h_files}
 )
-target_include_directories(farm-ng-calibration PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
-target_link_libraries(farm-ng-calibration farm-ng-calibration-protobuf farm-ng-perception ${CERES_LIBRARIES})
+target_include_directories(farm_ng_calibration PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+target_link_libraries(farm_ng_calibration farm_ng_calibration_protobuf farm_ng_perception ${CERES_LIBRARIES})
 
 
 # TODO add tests!
@@ -27,7 +27,7 @@ target_link_libraries(farm-ng-calibration farm-ng-calibration-protobuf farm-ng-p
 # )
 
 # target_link_libraries(farm_ng_calibration_test
-#     farm-ng-calibration
+#     farm_ng_calibration
 #     gtest gmock gtest_main
 # )
 # gtest_discover_tests(farm_ng_calibration_test)

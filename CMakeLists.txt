@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(farm-ng-root)
+project(farm_ng_root)
 
 include(CMakeToolsHelpers OPTIONAL)
 

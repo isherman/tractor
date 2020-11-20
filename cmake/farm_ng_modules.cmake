@@ -16,7 +16,7 @@ macro(farm_ng_add_protobufs target)
   endforeach()
 
   # Extract the module name from the target
-  string(REGEX REPLACE "farm-ng-|-protobuf" "" _module ${target})
+  string(REGEX REPLACE "farm_ng_|_protobuf" "" _module ${target})
 
   # With this configuration, .pb.go and .twirp.go files are generated in
   # ${_proto_output_dir_go}/github.com/farm-ng/genproto/${_module}.
