@@ -81,6 +81,9 @@ if ! nodejs --version | grep 12.18.3; then
   nodejs --version
 fi
 
+# TS protobuf generator
+sudo npm install -g long ts-proto@^1.37.0
+
 # Prometheus Node Exporter
 if ! node_exporter --version | grep 1.0.1; then
   wget https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-${arch}.tar.gz -P /tmp/
@@ -94,11 +97,6 @@ if ! prometheus --version | grep 2.21.0; then
   tar -C /tmp -xzf /tmp/prometheus-2.21.0.linux-${arch}.tar.gz
   sudo cp /tmp/prometheus-2.21.0.linux-${arch}/prometheus /usr/local/bin
 fi
-
-# Protobuf generators
-go get -u github.com/golang/protobuf/protoc-gen-go
-go get -u github.com/twitchtv/twirp/protoc-gen-twirp
-sudo npm install -g long ts-proto@^1.37.0
 
 # TODO: @jin this requires special permission
 # # tractor-logs

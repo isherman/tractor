@@ -27,7 +27,6 @@ done
 export LD_LIBRARY_PATH=$FARM_NG_ROOT/env/lib
 
 FARM_NG_GOPATH=$FARM_NG_ROOT/env/go
-mkdir -p $FARM_NG_GOPATH
 export GOPATH=$FARM_NG_GOPATH:$GOPATH
 export PATH=$FARM_NG_GOPATH/bin:/usr/local/go/bin:$PATH
 
