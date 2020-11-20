@@ -17,7 +17,7 @@ import {
   CameraConfig,
   CameraConfig_Model as Model,
   cameraConfig_ModelToJSON as ModelToJSON,
-} from "@farm-ng/genproto-perception/farm_ng/perception/tracking_camera";
+} from "@farm-ng/genproto-perception/farm_ng/perception/camera_pipeline";
 
 const CameraConfigForm: React.FC<FormProps<CameraConfig>> = (props) => {
   const [value, setValue] = useFormState(props);

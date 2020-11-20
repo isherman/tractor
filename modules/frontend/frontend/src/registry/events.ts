@@ -31,7 +31,7 @@ import {
   CameraPipelineCommand,
   CameraPipelineConfig,
   CameraConfig,
-} from "@farm-ng/genproto-perception/farm_ng/perception/tracking_camera";
+} from "@farm-ng/genproto-perception/farm_ng/perception/camera_pipeline";
 import {
   TractorConfig,
   TractorState,

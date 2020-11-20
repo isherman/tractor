@@ -16,6 +16,8 @@ import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 import { RepeatedIntForm } from "./RepeatedIntForm";
+import { CaptureVideoDatasetResult } from "@farm-ng/genproto-perception/farm_ng/perception/capture_video_dataset";
+import { CaptureVideoDatasetResultVisualizer } from "./CaptureVideoDatasetResult";
 
 const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
   CalibrateApriltagRigConfiguration

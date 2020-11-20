@@ -13,7 +13,7 @@ import { useFormState } from "../../../hooks/useFormState";
 import {
   CameraConfig,
   CameraPipelineConfig,
-} from "@farm-ng/genproto-perception/farm_ng/perception/tracking_camera";
+} from "@farm-ng/genproto-perception/farm_ng/perception/camera_pipeline";
 import { CameraConfigVisualizer } from "./CameraConfig";
 import Form from "./Form";
 import styles from "./CameraPipelineConfig.module.scss";

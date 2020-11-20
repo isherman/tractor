@@ -19,6 +19,8 @@ import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 import { BaseToCameraInitialization } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { CalibrateApriltagRigResultVisualizer } from "./CalibrateApriltagRigResult";
 import { BaseToCameraInitializationVisualizer } from "./BaseToCameraInitialization";
+import { CaptureVideoDatasetResult } from "@farm-ng/genproto-perception/farm_ng/perception/capture_video_dataset";
+import { CaptureVideoDatasetResultVisualizer } from "./CaptureVideoDatasetResult";
 
 const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
   CalibrateBaseToCameraConfiguration
