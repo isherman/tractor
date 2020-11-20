@@ -3,16 +3,16 @@
 
 #include "farm_ng/core/ipc.h"
 
-#include "farm_ng/perception/tracking_camera.pb.h"
+#include "farm_ng/perception/camera_pipeline.pb.h"
 
 namespace farm_ng {
 
-using farm_ng::perception::TrackingCameraCommand;
-using farm_ng::perception::TrackingCameraCommand_RecordStart_Mode;
+using farm_ng::perception::CameraPipelineCommand;
+using farm_ng::perception::CameraPipelineCommand_RecordStart_Mode;
 
 void RequestStartCapturing(EventBus& bus,
-                           TrackingCameraCommand_RecordStart_Mode mode);
-void RequestStartCapturing(EventBus& bus, TrackingCameraCommand command);
+                           CameraPipelineCommand_RecordStart_Mode mode);
+void RequestStartCapturing(EventBus& bus, CameraPipelineCommand command);
 void RequestStopCapturing(EventBus& bus);
 
 }  // namespace farm_ng

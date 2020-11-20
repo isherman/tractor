@@ -16,18 +16,18 @@
 #include "farm_ng/calibration/calibrate_apriltag_rig.pb.h"
 #include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
 #include "farm_ng/calibration/calibrator.pb.h"
-#include "farm_ng/perception/capture_calibration_dataset.pb.h"
+#include "farm_ng/perception/capture_video_dataset.pb.h"
 
 typedef farm_ng::core::Event EventPb;
 using farm_ng::core::Subscription;
 using farm_ng::core::BUCKET_BASE_TO_CAMERA_MODELS;
 using farm_ng::perception::ApriltagDetections;
+using farm_ng::perception::CaptureVideoDatasetResult;
 using farm_ng::calibration::BaseToCameraModel;
 using farm_ng::calibration::CalibrateApriltagRigResult;
 using farm_ng::calibration::CalibrateBaseToCameraConfiguration;
 using farm_ng::calibration::CalibrateBaseToCameraResult;
 using farm_ng::calibration::CalibrateBaseToCameraStatus;
-using farm_ng::perception::CaptureCalibrationDatasetResult;
 using farm_ng::calibration::MonocularApriltagRigModel;
 using farm_ng::calibration::SolverStatus;
 using farm_ng::calibration::SolverStatus_Name;
@@ -38,7 +38,7 @@ using farm_ng::calibration::ViewDirection_Parse;
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 
 DEFINE_string(calibration_dataset, "",
-              "The path to a serialized CaptureCalibrationDatasetResult");
+              "The path to a serialized CaptureVideoDatasetResult");
 DEFINE_string(apriltag_rig_result, "",
               "The path to a serialized ApriltagRigCalibrationResult");
 DEFINE_double(wheel_baseline, 42, "The wheel baseline parameter");
@@ -92,7 +92,7 @@ class CalibrateBaseToCameraProgram {
     }
 
     auto dataset_result =
-        ReadProtobufFromResource<CaptureCalibrationDatasetResult>(
+        ReadProtobufFromResource<CaptureVideoDatasetResult>(
             configuration_.calibration_dataset());
 
     auto rig_result = ReadProtobufFromResource<CalibrateApriltagRigResult>(
@@ -213,7 +213,7 @@ int Main(farm_ng::EventBus& bus) {
   CalibrateBaseToCameraConfiguration config;
   config.mutable_calibration_dataset()->set_path(FLAGS_calibration_dataset);
   config.mutable_calibration_dataset()->set_content_type(
-      farm_ng::ContentTypeProtobufJson<CaptureCalibrationDatasetResult>());
+      farm_ng::ContentTypeProtobufJson<CaptureVideoDatasetResult>());
 
   config.mutable_apriltag_rig_result()->set_path(FLAGS_apriltag_rig_result);
   config.mutable_apriltag_rig_result()->set_content_type(

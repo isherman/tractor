@@ -9,7 +9,7 @@ from farm_ng.core.resource_pb2 import BUCKET_CONFIGURATIONS
 from farm_ng.perception.apriltag_pb2 import ApriltagConfig
 from farm_ng.perception.apriltag_pb2 import TagConfig
 from farm_ng.perception.tracking_camera_pb2 import CameraConfig
-from farm_ng.perception.tracking_camera_pb2 import TrackingCameraConfig
+from farm_ng.perception.tracking_camera_pb2 import CameraPipelineConfig
 from farm_ng.tractor.tractor_pb2 import TractorConfig
 
 
@@ -61,7 +61,7 @@ class CameraConfigManager:
     @staticmethod
     def saved():
         blobstore = Blobstore()
-        config = TrackingCameraConfig()
+        config = CameraPipelineConfig()
         blobstore.read_protobuf_from_json_file(
             os.path.join(blobstore.bucket_relative_path(BUCKET_CONFIGURATIONS), 'camera.json'),
             config,
@@ -70,7 +70,7 @@ class CameraConfigManager:
 
     @staticmethod
     def default():
-        config = TrackingCameraConfig()
+        config = CameraPipelineConfig()
         config.camera_configs.extend(
             [
                 CameraConfig(

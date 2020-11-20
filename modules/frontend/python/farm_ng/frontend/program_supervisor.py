@@ -31,7 +31,7 @@ library = {
         path=f'{farm_ng_root}/build/modules/calibration/cpp/farm_ng/calibrate_apriltag_rig',
         args=['-interactive'],
         name='Apriltag Rig Calibration',
-        description='Solves an apriltag rig from data collected with capture_calibration_dataset',
+        description='Solves an apriltag rig from data collected with capture_video_dataset',
     ),
     'calibrate_base_to_camera': ProgramInfo(
         path=f'{farm_ng_root}/build/modules/tractor/cpp/farm_ng/calibrate_base_to_camera',
@@ -39,7 +39,7 @@ library = {
         name='Base-to-Camera Calibration',
         description=(
             'Solves a base_pose_camera and other base calibration parameters from '
-            'an apriltag rig and data collected with capture_calibration_dataset'
+            'an apriltag rig and data collected with capture_video_dataset'
         ),
     ),
     'capture_video_dataset': ProgramInfo(
@@ -52,7 +52,7 @@ library = {
         path=f'{farm_ng_root}/build/modules/calibration/cpp/farm_ng/calibrate_multi_view_apriltag_rig',
         args=['-interactive'],
         name='Multi View Apriltag Rig Calibration',
-        description='Solves a multiview apriltag rig from data collected with capture_calibration_dataset',
+        description='Solves a multiview apriltag rig from data collected with capture_video_dataset',
     ),
     'sleep-5': ProgramInfo(path='sleep', args=['5'], name='Sleep 5', description='Take a nap'),
 }

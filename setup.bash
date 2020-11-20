@@ -17,31 +17,16 @@ if [ `dpkg --print-architecture` == "arm64" ]; then
 fi
 
 export PYTHONPATH=$FARM_NG_ROOT/env/lib
-export PYTHONPATH=modules/calibration/python:$PYTHONPATH
-export PYTHONPATH=build/modules/calibration/protos/python:$PYTHONPATH
-export PYTHONPATH=modules/core/python:$PYTHONPATH
-export PYTHONPATH=build/modules/core/protos/python:$PYTHONPATH
-export PYTHONPATH=modules/frontend/python:$PYTHONPATH
-export PYTHONPATH=build/modules/frontend/protos/python:$PYTHONPATH
-export PYTHONPATH=modules/perception/python:$PYTHONPATH
-export PYTHONPATH=build/modules/perception/protos/python:$PYTHONPATH
-export PYTHONPATH=modules/tractor/python:$PYTHONPATH
-export PYTHONPATH=build/modules/tractor/protos/python:$PYTHONPATH
+
+for module in core calibration frontend perception tractor
+do
+  export PYTHONPATH=modules/$module/python:$PYTHONPATH
+  export PYTHONPATH=build/modules/$module/protos/python:$PYTHONPATH
+done
+
 export LD_LIBRARY_PATH=$FARM_NG_ROOT/env/lib
 export PATH=$PATH:/usr/local/go/bin
 
 # Set BLOBSTORE_ROOT if it's not already set
 : ${BLOBSTORE_ROOT:=`dirname $FARM_NG_ROOT`/tractor-data}
 export BLOBSTORE_ROOT
-
-
-# # Bootstrap blobstore if necessary
-# for config in `python -m farm_ng.tractor.config list`
-# do
-#   configpath=$BLOBSTORE_ROOT/configurations/$config.json
-#   if [ ! -f $configpath  ]; then
-#     echo "No configuration detected at $configpath; generating now."
-#     mkdir -p `dirname $configpath`
-# 	  python -m farm_ng.tractor.config gen$config > $configpath
-#   fi
-# done

@@ -15,7 +15,6 @@ bootstrap:
 	./bootstrap.sh
 
 cpp:
-	make protos
 	mkdir -p build
 	cd build && rm -rf ./* && cmake -DCMAKE_PREFIX_PATH=`pwd`/../env -DCMAKE_BUILD_TYPE=Release .. && make -j`nproc --ignore=1`
 
@@ -24,7 +23,8 @@ frontend:
 	cp -rT app/frontend/dist build/frontend
 
 protos:
-	scripts/build-protos.sh
+	mkdir -p build
+	cd build && rm -rf ./* && cmake -DCMAKE_PREFIX_PATH=`pwd`/../env -DCMAKE_BUILD_TYPE=Release .. && make -j`nproc --ignore=1` farm_ng_core_protobuf farm_ng_perception_protobuf farm_ng_calibration_protobuf farm_ng_tractor_protobuf farm_ng_frontend_protobuf
 
 systemd:
 	cd jetson && sudo ./install.sh

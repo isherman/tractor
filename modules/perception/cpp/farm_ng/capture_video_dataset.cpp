@@ -13,7 +13,7 @@
 #include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/perception/capture_video_dataset.pb.h"
 #include "farm_ng/perception/image.pb.h"
-#include "farm_ng/perception/tracking_camera.pb.h"
+#include "farm_ng/perception/camera_pipeline.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(name, "default",
@@ -28,7 +28,7 @@ using farm_ng::perception::CaptureVideoDatasetConfiguration;
 using farm_ng::perception::CaptureVideoDatasetResult;
 using farm_ng::perception::CaptureVideoDatasetStatus;
 using farm_ng::perception::Image;
-using farm_ng::perception::TrackingCameraCommand;
+using farm_ng::perception::CameraPipelineCommand;
 
 void Cleanup(farm_ng::EventBus& bus) {
   farm_ng::RequestStopCapturing(bus);
@@ -74,13 +74,13 @@ class CaptureVideoDatasetProgram {
 
     WaitForServices(bus_, {"ipc_logger", "tracking_camera"});
     LoggingStatus log = StartLogging(bus_, configuration_.name());
-    TrackingCameraCommand tracking_camera_command;
+    CameraPipelineCommand tracking_camera_command;
     if (configuration_.detect_apriltags()) {
       tracking_camera_command.mutable_record_start()->set_mode(
-          TrackingCameraCommand::RecordStart::MODE_EVERY_APRILTAG_FRAME);
+          CameraPipelineCommand::RecordStart::MODE_EVERY_APRILTAG_FRAME);
     } else {
       tracking_camera_command.mutable_record_start()->set_mode(
-          TrackingCameraCommand::RecordStart::MODE_EVERY_FRAME);
+          CameraPipelineCommand::RecordStart::MODE_EVERY_FRAME);
     }
     RequestStartCapturing(bus_, tracking_camera_command);
 

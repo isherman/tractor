@@ -12,13 +12,11 @@ import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
 import { CalibrateBaseToCameraConfiguration } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_base_to_camera";
 import { useFetchResource } from "../../../hooks/useFetchResource";
-import { CaptureCalibrationDatasetResult } from "@farm-ng/genproto-perception/farm_ng/perception/capture_calibration_dataset";
 import { CalibrateApriltagRigResult } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_apriltag_rig";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 import { BaseToCameraInitialization } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
-import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
 import { CalibrateApriltagRigResultVisualizer } from "./CalibrateApriltagRigResult";
 import { BaseToCameraInitializationVisualizer } from "./BaseToCameraInitialization";
 
@@ -40,7 +38,7 @@ const CalibrateBaseToCameraConfigurationForm: React.FC<FormProps<
             calibrationDataset: Resource.fromPartial({
               path,
               contentType:
-                "application/json; type=type.googleapis.com/farm_ng.perception.CaptureCalibrationDatasetResult",
+                "application/json; type=type.googleapis.com/farm_ng.perception.CaptureVideoDatasetResult",
             }),
           }));
         }}
@@ -94,7 +92,7 @@ const CalibrateBaseToCameraConfigurationElement: React.FC<SingleElementVisualize
     resources,
   } = props;
 
-  const calibrationDataset = useFetchResource<CaptureCalibrationDatasetResult>(
+  const calibrationDataset = useFetchResource<CaptureVideoDatasetResult>(
     value.calibrationDataset,
     resources
   );
@@ -118,7 +116,7 @@ const CalibrateBaseToCameraConfigurationElement: React.FC<SingleElementVisualize
       )}
       {calibrationDataset && (
         <Card title="Calibration Dataset">
-          <CaptureCalibrationDatasetResultVisualizer.Element
+          <CaptureVideoDatasetResultVisualizer.Element
             {...props}
             value={[0, calibrationDataset]}
           />

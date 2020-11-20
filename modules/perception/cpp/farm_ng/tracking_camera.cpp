@@ -21,9 +21,8 @@
 #include "farm_ng/core/ipc.h"
 #include "farm_ng/perception/sophus_protobuf.h"
 #include "farm_ng/perception/apriltag.pb.h"
-#include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
 #include "farm_ng/perception/geometry.pb.h"
-#include "farm_ng/perception/tracking_camera.pb.h"
+#include "farm_ng/perception/camera_pipeline.pb.h"
 #include "farm_ng/perception/video_streamer.h"
 
 typedef farm_ng::core::Event EventPb;
@@ -31,9 +30,7 @@ typedef farm_ng::core::Event EventPb;
 using farm_ng::perception::ApriltagConfig;
 using farm_ng::perception::ApriltagDetection;
 using farm_ng::perception::ApriltagDetections;
-using farm_ng::calibration::BaseToCameraModel;
 using farm_ng::core::BUCKET_CONFIGURATIONS;
-using farm_ng::calibration::CalibrateBaseToCameraResult;
 using farm_ng::perception::CameraConfig;
 using farm_ng::perception::CameraModel;
 using farm_ng::perception::Image;
@@ -41,9 +38,8 @@ using farm_ng::perception::NamedSE3Pose;
 using farm_ng::core::Subscription;
 using farm_ng::perception::TagConfig;
 using farm_ng::perception::TagLibrary;
-using farm_ng::perception::TrackingCameraCommand;
-using farm_ng::perception::TrackingCameraConfig;
-using farm_ng::perception::TrackingCameraPoseFrame;
+using farm_ng::perception::CameraPipelineCommand;
+using farm_ng::perception::CameraPipelineConfig;
 using farm_ng::perception::Vec2;
 
 namespace farm_ng {
@@ -179,7 +175,7 @@ class SingleCameraPipeline {
     }
   }
 
-  void Post(TrackingCameraCommand command) {
+  void Post(CameraPipelineCommand command) {
     strand_.post([this, command] {
       latest_command_.CopyFrom(command);
       LOG(INFO) << "Camera pipeline: " << camera_model_.frame_name()
@@ -202,10 +198,10 @@ class SingleCameraPipeline {
       udp_streamer_->AddFrame(frame_data.image, frame_data.stamp());
     }
     switch (latest_command_.record_start().mode()) {
-      case TrackingCameraCommand::RecordStart::MODE_EVERY_FRAME: {
+      case CameraPipelineCommand::RecordStart::MODE_EVERY_FRAME: {
         video_file_writer_.AddFrame(frame_data.image, frame_data.stamp());
       } break;
-      case TrackingCameraCommand::RecordStart::MODE_EVERY_APRILTAG_FRAME: {
+      case CameraPipelineCommand::RecordStart::MODE_EVERY_APRILTAG_FRAME: {
         cv::Mat gray;
         if (frame_data.image.channels() != 1) {
           cv::cvtColor(frame_data.image, gray, cv::COLOR_BGR2GRAY);
@@ -220,7 +216,7 @@ class SingleCameraPipeline {
             frame_data.camera_model.frame_name() + "/apriltags", apriltags,
             frame_data.stamp()));
       } break;
-      case TrackingCameraCommand::RecordStart::MODE_APRILTAG_STABLE:
+      case CameraPipelineCommand::RecordStart::MODE_APRILTAG_STABLE:
         LOG(INFO) << "Mode not support.";
         break;
       default:
@@ -242,7 +238,7 @@ class SingleCameraPipeline {
   ApriltagDetector detector_;
   VideoStreamer video_file_writer_;
   std::unique_ptr<VideoStreamer> udp_streamer_;
-  TrackingCameraCommand latest_command_;
+  CameraPipelineCommand latest_command_;
   std::atomic<int> post_count_;
 };
 CameraModel GridCameraModel() {
@@ -268,7 +264,7 @@ class MultiCameraPipeline {
                                              camera_config, camera_model));
   }
 
-  void Post(TrackingCameraCommand command) {
+  void Post(CameraPipelineCommand command) {
     for (auto& pipeline : pipelines_) {
       pipeline.second.Post(command);
     }
@@ -331,24 +327,8 @@ class TrackingCameraClient {
          // tractor states for VO
          std::string("^tractor_state$")});
 
-    auto base_to_camera_path =
-        GetBucketRelativePath(Bucket::BUCKET_BASE_TO_CAMERA_MODELS) /
-        "base_to_camera.json";
-
-    if (boost::filesystem::exists(base_to_camera_path)) {
-      auto base_to_camera_result =
-          ReadProtobufFromJsonFile<CalibrateBaseToCameraResult>(
-              base_to_camera_path);
-
-      base_to_camera_model_ = ReadProtobufFromResource<BaseToCameraModel>(
-          base_to_camera_result.base_to_camera_model_solved());
-      base_to_camera_model_->clear_samples();
-      LOG(INFO) << "Loaded base_to_camera_model_"
-                << base_to_camera_model_->ShortDebugString();
-    }
-
-    TrackingCameraConfig config =
-        ReadProtobufFromJsonFile<TrackingCameraConfig>(
+    CameraPipelineConfig config =
+        ReadProtobufFromJsonFile<CameraPipelineConfig>(
             GetBucketAbsolutePath(Bucket::BUCKET_CONFIGURATIONS) /
             "camera.json");
 
@@ -365,13 +345,13 @@ class TrackingCameraClient {
                   std::placeholders::_1));
   }
 
-  void on_command(const TrackingCameraCommand& command) {
+  void on_command(const CameraPipelineCommand& command) {
     latest_command_ = command;
     multi_camera_pipeline_.Post(latest_command_);
   }
 
   void on_event(const EventPb& event) {
-    TrackingCameraCommand command;
+    CameraPipelineCommand command;
     if (event.data().UnpackTo(&command)) {
       on_command(command);
       return;
@@ -382,9 +362,8 @@ class TrackingCameraClient {
   EventBus& event_bus_;
   MultiCameraPipeline multi_camera_pipeline_;
   MultiCameraSync multi_camera_;
-  TrackingCameraConfig config_;
-  TrackingCameraCommand latest_command_;
-  std::optional<BaseToCameraModel> base_to_camera_model_;
+  CameraPipelineConfig config_;
+  CameraPipelineCommand latest_command_;
 };  // namespace farm_ng
 }  // namespace farm_ng
 

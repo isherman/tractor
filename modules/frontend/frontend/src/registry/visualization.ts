@@ -7,7 +7,6 @@ import { ResourceArchive } from "../models/ResourceArchive";
 import { ImageVisualizer } from "../components/scope/visualizers/Image";
 import { ApriltagDetectionsVisualizer } from "../components/scope/visualizers/ApriltagDetections";
 import { NamedSE3PoseVisualizer } from "../components/scope/visualizers/NamedSE3Pose";
-import { TrackingCameraPoseFrameVisualizer } from "../components/scope/visualizers/TrackingCameraPoseFrame";
 import { CalibrateApriltagRigStatusVisualizer } from "../components/scope/visualizers/CalibrateApriltagRigStatus";
 import { CalibrateBaseToCameraStatusVisualizer } from "../components/scope/visualizers/CalibrateBaseToCameraStatus";
 import { BaseToCameraModelVisualizer } from "../components/scope/visualizers/BaseToCameraModel";
@@ -15,9 +14,6 @@ import { CalibrateApriltagRigConfigurationVisualizer } from "../components/scope
 import { CalibrateApriltagRigResultVisualizer } from "../components/scope/visualizers/CalibrateApriltagRigResult";
 import { CalibrateBaseToCameraConfigurationVisualizer } from "../components/scope/visualizers/CalibrateBaseToCameraConfiguration";
 import { CalibrateBaseToCameraResultVisualizer } from "../components/scope/visualizers/CalibrateBaseToCameraResult";
-import { CaptureCalibrationDatasetConfigurationVisualizer } from "../components/scope/visualizers/CaptureCalibrationDatasetConfiguration";
-import { CaptureCalibrationDatasetStatusVisualizer } from "../components/scope/visualizers/CaptureCalibrationDatasetStatus";
-import { CaptureCalibrationDatasetResultVisualizer } from "../components/scope/visualizers/CaptureCalibrationDatasetResult";
 import { MonocularApriltagRigModelVisualizer } from "../components/scope/visualizers/MonocularApriltagRigModel";
 import { TractorConfigVisualizer } from "../components/scope/visualizers/TractorConfig";
 import { CaptureVideoDatasetConfigurationVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetConfiguration";
@@ -25,7 +21,7 @@ import { CaptureVideoDatasetStatusVisualizer } from "../components/scope/visuali
 import { CaptureVideoDatasetResultVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetResult";
 import { ApriltagConfigVisualizer } from "../components/scope/visualizers/ApriltagConfig";
 import { CameraConfigVisualizer } from "../components/scope/visualizers/CameraConfig";
-import { TrackingCameraConfigVisualizer } from "../components/scope/visualizers/TrackingCameraConfig";
+import { CameraPipelineConfigVisualizer } from "../components/scope/visualizers/CameraPipelineConfig";
 import { CalibrateMultiViewApriltagRigConfigurationVisualizer } from "../components/scope/visualizers/CalibrateMultiViewApriltagRigConfiguration";
 import { CalibrateMultiViewApriltagRigResultVisualizer } from "../components/scope/visualizers/CalibrateMultiViewApriltagRigResult";
 import { CalibrateMultiViewApriltagRigStatusVisualizer } from "../components/scope/visualizers/CalibrateMultiViewApriltagRigStatus";
@@ -78,9 +74,6 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   CalibrateMultiViewApriltagRigResultVisualizer,
   CalibrateMultiViewApriltagRigStatusVisualizer,
   CameraConfigVisualizer,
-  CaptureCalibrationDatasetConfigurationVisualizer,
-  CaptureCalibrationDatasetResultVisualizer,
-  CaptureCalibrationDatasetStatusVisualizer,
   CaptureVideoDatasetConfigurationVisualizer,
   CaptureVideoDatasetResultVisualizer,
   CaptureVideoDatasetStatusVisualizer,
@@ -89,12 +82,11 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   MultiViewApriltagRigModelVisualizer,
   NamedSE3PoseVisualizer,
   SteeringCommandVisualizer,
-  TrackingCameraConfigVisualizer,
-  TrackingCameraPoseFrameVisualizer,
+  CameraPipelineConfigVisualizer,
   TractorConfigVisualizer,
   // Low priority, should stay at the end of the list
   JSONVisualizer,
-  TimeSkewVisualizer
+  TimeSkewVisualizer,
 ].reduce((acc, visualizer) => ({ ...acc, [visualizer.id]: visualizer }), {});
 
 export const visualizerIds = Object.keys(visualizerRegistry);

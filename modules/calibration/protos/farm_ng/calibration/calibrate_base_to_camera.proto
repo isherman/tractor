@@ -8,7 +8,7 @@ package farm_ng.calibration;
 option go_package = "github.com/farm-ng/genproto/calibration";
 
 message CalibrateBaseToCameraConfiguration {
-  // Serialized CaptureCalibrationDatasetResult
+  // Serialized CaptureVideoDatasetResult
   farm_ng.core.Resource calibration_dataset = 1;
 
   // Serialized ApriltagRigCalibrationResult

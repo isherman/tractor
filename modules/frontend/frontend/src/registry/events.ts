@@ -28,10 +28,8 @@ import { Image } from "@farm-ng/genproto-perception/farm_ng/perception/image";
 import { MotorControllerState } from "@farm-ng/genproto-tractor/farm_ng/tractor/motor";
 import { SteeringCommand } from "@farm-ng/genproto-tractor/farm_ng/tractor/steering";
 import {
-  TrackingCameraPoseFrame,
-  TrackingCameraMotionFrame,
-  TrackingCameraCommand,
-  TrackingCameraConfig,
+  CameraPipelineCommand,
+  CameraPipelineConfig,
   CameraConfig,
 } from "@farm-ng/genproto-perception/farm_ng/perception/tracking_camera";
 import {
@@ -44,11 +42,6 @@ import {
   StartProgramRequest,
   StopProgramRequest,
 } from "@farm-ng/genproto-frontend/farm_ng/frontend/program_supervisor";
-import {
-  CaptureCalibrationDatasetConfiguration,
-  CaptureCalibrationDatasetResult,
-  CaptureCalibrationDatasetStatus,
-} from "@farm-ng/genproto-perception/farm_ng/perception/capture_calibration_dataset";
 import {
   CaptureVideoDatasetConfiguration,
   CaptureVideoDatasetResult,
@@ -92,9 +85,6 @@ export type EventType =
   | CalibratorCommand
   | CalibratorStatus
   | CameraConfig
-  | CaptureCalibrationDatasetConfiguration
-  | CaptureCalibrationDatasetResult
-  | CaptureCalibrationDatasetStatus
   | CaptureVideoDatasetConfiguration
   | CaptureVideoDatasetResult
   | CaptureVideoDatasetStatus
@@ -111,10 +101,8 @@ export type EventType =
   | SteeringCommand
   | StopProgramRequest
   | TagConfig
-  | TrackingCameraCommand
-  | TrackingCameraConfig
-  | TrackingCameraMotionFrame
-  | TrackingCameraPoseFrame
+  | CameraPipelineCommand
+  | CameraPipelineConfig
   | TractorConfig
   | TractorState
   | Vec2
@@ -155,9 +143,6 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.perception.ApriltagDetections": ApriltagDetections,
   "type.googleapis.com/farm_ng.perception.ApriltagRig": ApriltagRig,
   "type.googleapis.com/farm_ng.perception.CameraConfig": CameraConfig,
-  "type.googleapis.com/farm_ng.perception.CaptureCalibrationDatasetConfiguration": CaptureCalibrationDatasetConfiguration,
-  "type.googleapis.com/farm_ng.perception.CaptureCalibrationDatasetResult": CaptureCalibrationDatasetResult,
-  "type.googleapis.com/farm_ng.perception.CaptureCalibrationDatasetStatus": CaptureCalibrationDatasetStatus,
   "type.googleapis.com/farm_ng.perception.CaptureVideoDatasetConfiguration": CaptureVideoDatasetConfiguration,
   "type.googleapis.com/farm_ng.perception.CaptureVideoDatasetResult": CaptureVideoDatasetResult,
   "type.googleapis.com/farm_ng.perception.CaptureVideoDatasetStatus": CaptureVideoDatasetStatus,
@@ -165,13 +150,11 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.perception.NamedSE3Pose": NamedSE3Pose,
   "type.googleapis.com/farm_ng.perception.SE3Pose": SE3Pose,
   "type.googleapis.com/farm_ng.perception.TagConfig": TagConfig,
-  "type.googleapis.com/farm_ng.perception.TrackingCameraCommand": TrackingCameraCommand,
-  "type.googleapis.com/farm_ng.perception.TrackingCameraConfig": TrackingCameraConfig,
+  "type.googleapis.com/farm_ng.perception.CameraPipelineCommand": CameraPipelineCommand,
+  "type.googleapis.com/farm_ng.perception.CameraPipelineConfig": CameraPipelineConfig,
   "type.googleapis.com/farm_ng.perception.Vec2": Vec2,
   "type.googleapis.com/farm_ng.tractor.MotorControllerState": MotorControllerState,
   "type.googleapis.com/farm_ng.tractor.SteeringCommand": SteeringCommand,
-  "type.googleapis.com/farm_ng.tractor.TrackingCameraMotionFrame": TrackingCameraMotionFrame,
-  "type.googleapis.com/farm_ng.tractor.TrackingCameraPoseFrame": TrackingCameraPoseFrame,
   "type.googleapis.com/farm_ng.tractor.TractorConfig": TractorConfig,
   "type.googleapis.com/farm_ng.tractor.TractorState": TractorState,
 });

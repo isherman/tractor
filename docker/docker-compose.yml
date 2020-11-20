@@ -22,7 +22,7 @@ services:
     build:
       context: ..
       dockerfile: docker/base.Dockerfile
-    entrypoint: build/modules/calibration/cpp/farm_ng/tracking_camera
+    entrypoint: build/modules/perception/cpp/farm_ng/tracking_camera
     restart: always
     environment:
       - BLOBSTORE_ROOT=/farm_ng_data

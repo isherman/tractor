@@ -12,14 +12,10 @@ import { CalibrateApriltagRigConfiguration } from "@farm-ng/genproto-calibration
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CaptureCalibrationDatasetResult } from "@farm-ng/genproto-perception/farm_ng/perception/capture_calibration_dataset";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
-import { CaptureCalibrationDatasetResultVisualizer } from "./CaptureCalibrationDatasetResult";
 import { RepeatedIntForm } from "./RepeatedIntForm";
-
-CaptureCalibrationDatasetResultVisualizer.Element;
 
 const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
   CalibrateApriltagRigConfiguration
@@ -110,7 +106,7 @@ const CalibrateApriltagRigConfigurationElement: React.FC<SingleElementVisualizer
 
   const { tagIds, rootTagId, name, filterStableTags, cameraName } = value;
 
-  const calibrationDataset = useFetchResource<CaptureCalibrationDatasetResult>(
+  const calibrationDataset = useFetchResource<CaptureVideoDatasetResult>(
     value.calibrationDataset,
     resources
   );
@@ -130,7 +126,7 @@ const CalibrateApriltagRigConfigurationElement: React.FC<SingleElementVisualizer
       </Card>
       {calibrationDataset && (
         <Card title="Calibration Dataset">
-          <CaptureCalibrationDatasetResultVisualizer.Element
+          <CaptureVideoDatasetResultVisualizer.Element
             {...props}
             value={[0, calibrationDataset]}
           />

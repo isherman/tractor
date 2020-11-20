@@ -12,14 +12,14 @@ import { Card } from "./Card";
 import { useFormState } from "../../../hooks/useFormState";
 import {
   CameraConfig,
-  TrackingCameraConfig,
+  CameraPipelineConfig,
 } from "@farm-ng/genproto-perception/farm_ng/perception/tracking_camera";
 import { CameraConfigVisualizer } from "./CameraConfig";
 import Form from "./Form";
-import styles from "./TrackingCameraConfig.module.scss";
+import styles from "./CameraPipelineConfig.module.scss";
 import { useStableKey } from "../../../hooks/useStableKey";
 
-const TrackingCameraConfigForm: React.FC<FormProps<TrackingCameraConfig>> = (
+const CameraPipelineConfigForm: React.FC<FormProps<CameraPipelineConfig>> = (
   props
 ) => {
   const [value, setValue] = useFormState(props);
@@ -71,8 +71,8 @@ const TrackingCameraConfigForm: React.FC<FormProps<TrackingCameraConfig>> = (
   );
 };
 
-const TrackingCameraConfigElement: React.FC<SingleElementVisualizerProps<
-  TrackingCameraConfig
+const CameraPipelineConfigElement: React.FC<SingleElementVisualizerProps<
+  CameraPipelineConfig
 >> = (props) => {
   const {
     value: [timestamp, value],
@@ -94,11 +94,11 @@ const TrackingCameraConfigElement: React.FC<SingleElementVisualizerProps<
   );
 };
 
-export const TrackingCameraConfigVisualizer = {
-  id: "TrackingCameraConfig",
-  types: ["type.googleapis.com/farm_ng.perception.TrackingCameraConfig"],
+export const CameraPipelineConfigVisualizer = {
+  id: "CameraPipelineConfig",
+  types: ["type.googleapis.com/farm_ng.perception.CameraPipelineConfig"],
   options: StandardComponentOptions,
-  Component: StandardComponent(TrackingCameraConfigElement),
-  Element: TrackingCameraConfigElement,
-  Form: TrackingCameraConfigForm,
+  Component: StandardComponent(CameraPipelineConfigElement),
+  Element: CameraPipelineConfigElement,
+  Form: CameraPipelineConfigForm,
 };

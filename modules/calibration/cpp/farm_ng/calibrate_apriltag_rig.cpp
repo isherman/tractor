@@ -15,13 +15,12 @@
 
 #include "farm_ng/calibration/calibrate_apriltag_rig.pb.h"
 #include "farm_ng/calibration/calibrator.pb.h"
-#include "farm_ng/perception/capture_calibration_dataset.pb.h"
 #include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/perception/capture_video_dataset.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(calibration_dataset, "",
-              "The path to a serialized CaptureCalibrationDatasetResult");
+              "The path to a serialized CaptureVideoDatasetResult");
 
 DEFINE_string(tag_ids, "", "List of tag ids, comma separated list of ints.");
 DEFINE_string(name, "rig", "Name of the rig.");
@@ -40,7 +39,6 @@ using farm_ng::core::BUCKET_APRILTAG_RIG_MODELS;
 using farm_ng::calibration::CalibrateApriltagRigConfiguration;
 using farm_ng::calibration::CalibrateApriltagRigResult;
 using farm_ng::calibration::CalibrateApriltagRigStatus;
-using farm_ng::perception::CaptureCalibrationDatasetResult;
 using farm_ng::perception::CaptureVideoDatasetResult;
 
 using farm_ng::calibration::MonocularApriltagRigModel;

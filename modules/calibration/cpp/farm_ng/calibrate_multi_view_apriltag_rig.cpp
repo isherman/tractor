@@ -17,7 +17,6 @@
 #include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/calibration/calibrate_multi_view_apriltag_rig.pb.h"
 #include "farm_ng/calibration/calibrator.pb.h"
-#include "farm_ng/perception/capture_calibration_dataset.pb.h"
 #include "farm_ng/perception/capture_video_dataset.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");

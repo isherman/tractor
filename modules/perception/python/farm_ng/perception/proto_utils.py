@@ -1,11 +1,6 @@
 import numpy as np
 from liegroups import SE3
 
-# loads all the protos for the type registry (isort:skip)
-import farm_ng.core.io_pb2  # noqa: F401
-import farm_ng.perception.tracking_camera_pb2  # noqa: F401
-import farm_ng.tractor.motor_pb2  # noqa: F401
-import farm_ng.tractor.steering_pb2  # noqa: F401
 from farm_ng.perception import geometry_pb2
 
 

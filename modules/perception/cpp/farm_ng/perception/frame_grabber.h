@@ -8,7 +8,7 @@
 
 #include "farm_ng/core/ipc.h"
 #include "farm_ng/perception/camera_model.pb.h"
-#include "farm_ng/perception/tracking_camera.pb.h"
+#include "farm_ng/perception/camera_pipeline.pb.h"
 
 namespace farm_ng {
 using farm_ng::perception::CameraConfig;
