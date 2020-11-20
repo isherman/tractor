@@ -375,6 +375,5 @@ int Main(farm_ng::core::EventBus& bus) {
 }
 
 int main(int argc, char* argv[]) {
-  std::cerr << "And here." << std::endl;
   return farm_ng::core::Main(argc, argv, &Main, &Cleanup);
 }
