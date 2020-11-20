@@ -12,9 +12,9 @@ from farm_ng.core.ipc import EventBus
 from farm_ng.core.ipc import get_event_bus
 from farm_ng.core.ipc import make_event
 from farm_ng.core.periodic import Periodic
-from farm_ng.perception_core.geometry_pb2 import NamedSE3Pose
-from farm_ng.perception_core.proto_utils import se3_to_proto
-from farm_ng.perception_coreproto_utils import proto_to_se3
+from farm_ng.perception.geometry_pb2 import NamedSE3Pose
+from farm_ng.perception.proto_utils import se3_to_proto
+from farm_ng.perceptionproto_utils import proto_to_se3
 from farm_ng.tractor.canbus import CANSocket
 from farm_ng.tractor.config import TractorConfigManager
 from farm_ng.tractor.controller import TractorMoveToGoalController

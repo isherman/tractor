@@ -4,5 +4,5 @@ farm_ng_add_protobufs(farm-ng-tractor-protobuf
   ./farm_ng/tractor/steering.proto
   ./farm_ng/tractor/tractor.proto
   DEPENDENCIES
-  farm-ng-perception_core-protobuf
+  farm-ng-perception-protobuf
   )

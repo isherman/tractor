@@ -15,7 +15,7 @@ from google.protobuf.text_format import MessageToString
 from google.protobuf.timestamp_pb2 import Timestamp
 
 # loads all the protos for pretty print of any (isort:skip)
-import farm_ng.perception_core.proto_utils  # noqa: F401
+import farm_ng.perception.proto_utils  # noqa: F401
 from farm_ng.core.io_pb2 import Announce
 from farm_ng.core.io_pb2 import Event
 from farm_ng.core.io_pb2 import Subscription

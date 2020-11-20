@@ -11,23 +11,23 @@
 #include "farm_ng/core/blobstore.h"
 
 #include "farm_ng/core/event_log_reader.h"
-#include "farm_ng/perception_core/image_utils.h"
+#include "farm_ng/perception/image_utils.h"
 #include "farm_ng/core/ipc.h"
-#include "farm_ng/perception_core/sophus_protobuf.h"
+#include "farm_ng/perception/sophus_protobuf.h"
 
-#include "farm_ng/perception_core/apriltag.h"
-#include "farm_ng/perception_core/camera_model.h"
+#include "farm_ng/perception/apriltag.h"
+#include "farm_ng/perception/camera_model.h"
 
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/calibration/kinematics.h"
 #include "farm_ng/calibration/local_parameterization.h"
-#include "farm_ng/perception_core/pose_utils.h"
-#include "farm_ng/perception_core/time_series.h"
+#include "farm_ng/perception/pose_utils.h"
+#include "farm_ng/perception/time_series.h"
 
-#include "farm_ng/perception_core/apriltag.pb.h"
-#include "farm_ng/perception_core/capture_video_dataset.pb.h"
+#include "farm_ng/perception/apriltag.pb.h"
+#include "farm_ng/perception/capture_video_dataset.pb.h"
 
-#include "farm_ng/perception_core/image_loader.h"
+#include "farm_ng/perception/image_loader.h"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
@@ -378,9 +378,9 @@ class PoseGraph {
   GraphT graph_;
 };
 
-using farm_ng::perception_core::CaptureVideoDatasetResult;
+using farm_ng::perception::CaptureVideoDatasetResult;
 using farm_ng::core::Event;
-using farm_ng::perception_core::MultiViewApriltagDetections;
+using farm_ng::perception::MultiViewApriltagDetections;
 using farm_ng::calibration::PerImageRmse;
 using Sophus::SE3d;
 

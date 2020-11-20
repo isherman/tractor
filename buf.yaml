@@ -2,7 +2,7 @@ build:
   roots:
     - ./modules/calibration/protos
     - ./modules/core/protos
-    - ./modules/perception_core/protos
+    - ./modules/perception/protos
     - ./modules/tractor/protos
 lint:
   use:

@@ -18,7 +18,7 @@ add_library(farm-ng-calibration
   ${h_files}
 )
 target_include_directories(farm-ng-calibration PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
-target_link_libraries(farm-ng-calibration farm-ng-calibration-protobuf farm-ng-perception_core ${CERES_LIBRARIES})
+target_link_libraries(farm-ng-calibration farm-ng-calibration-protobuf farm-ng-perception ${CERES_LIBRARIES})
 
 
 # TODO add tests!

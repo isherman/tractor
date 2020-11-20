@@ -8,12 +8,12 @@
 #include <opencv2/core.hpp>
 #include <sophus/se3.hpp>
 
-#include "farm_ng/perception_core/time_series.h"
+#include "farm_ng/perception/time_series.h"
 
-#include "farm_ng/perception_core/camera_model.pb.h"
+#include "farm_ng/perception/camera_model.pb.h"
 
 namespace farm_ng {
-using farm_ng::perception_core::CameraModel;
+using farm_ng::perception::CameraModel;
 
 // An image space measurement of a flow point.
 struct FlowPointImage {

@@ -6,5 +6,5 @@ farm_ng_add_protobufs(farm-ng-calibration-protobuf
   ./farm_ng/calibration/calibrator.proto
   DEPENDENCIES
   farm-ng-core-protobuf
-  farm-ng-perception_core-protobuf
+  farm-ng-perception-protobuf
   )

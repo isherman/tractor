@@ -12,39 +12,39 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "farm_ng/perception_core/apriltag.h"
-#include "farm_ng/perception_core/camera_model.h"
-#include "farm_ng/perception_core/time_series.h"
-#include "farm_ng/perception_core/frame_grabber.h"
-#include "farm_ng/perception_core/image_utils.h"
+#include "farm_ng/perception/apriltag.h"
+#include "farm_ng/perception/camera_model.h"
+#include "farm_ng/perception/time_series.h"
+#include "farm_ng/perception/frame_grabber.h"
+#include "farm_ng/perception/image_utils.h"
 #include "farm_ng/core/init.h"
 #include "farm_ng/core/ipc.h"
-#include "farm_ng/perception_core/sophus_protobuf.h"
-#include "farm_ng/perception_core/apriltag.pb.h"
+#include "farm_ng/perception/sophus_protobuf.h"
+#include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
-#include "farm_ng/perception_core/geometry.pb.h"
-#include "farm_ng/perception_core/tracking_camera.pb.h"
-#include "farm_ng/perception_core/video_streamer.h"
+#include "farm_ng/perception/geometry.pb.h"
+#include "farm_ng/perception/tracking_camera.pb.h"
+#include "farm_ng/perception/video_streamer.h"
 
 typedef farm_ng::core::Event EventPb;
 
-using farm_ng::perception_core::ApriltagConfig;
-using farm_ng::perception_core::ApriltagDetection;
-using farm_ng::perception_core::ApriltagDetections;
+using farm_ng::perception::ApriltagConfig;
+using farm_ng::perception::ApriltagDetection;
+using farm_ng::perception::ApriltagDetections;
 using farm_ng::calibration::BaseToCameraModel;
 using farm_ng::core::BUCKET_CONFIGURATIONS;
 using farm_ng::calibration::CalibrateBaseToCameraResult;
-using farm_ng::perception_core::CameraConfig;
-using farm_ng::perception_core::CameraModel;
-using farm_ng::perception_core::Image;
-using farm_ng::perception_core::NamedSE3Pose;
+using farm_ng::perception::CameraConfig;
+using farm_ng::perception::CameraModel;
+using farm_ng::perception::Image;
+using farm_ng::perception::NamedSE3Pose;
 using farm_ng::core::Subscription;
-using farm_ng::perception_core::TagConfig;
-using farm_ng::perception_core::TagLibrary;
-using farm_ng::perception_core::TrackingCameraCommand;
-using farm_ng::perception_core::TrackingCameraConfig;
-using farm_ng::perception_core::TrackingCameraPoseFrame;
-using farm_ng::perception_core::Vec2;
+using farm_ng::perception::TagConfig;
+using farm_ng::perception::TagLibrary;
+using farm_ng::perception::TrackingCameraCommand;
+using farm_ng::perception::TrackingCameraConfig;
+using farm_ng::perception::TrackingCameraPoseFrame;
+using farm_ng::perception::Vec2;
 
 namespace farm_ng {
 

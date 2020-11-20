@@ -8,23 +8,23 @@
 
 #include "farm_ng/core/event_log_reader.h"
 #include "farm_ng/core/ipc.h"
-#include "farm_ng/perception_core/sophus_protobuf.h"
+#include "farm_ng/perception/sophus_protobuf.h"
 
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/calibration/kinematics.h"
 #include "farm_ng/calibration/local_parameterization.h"
-#include "farm_ng/perception_core/pose_utils.h"
-#include "farm_ng/perception_core/time_series.h"
+#include "farm_ng/perception/pose_utils.h"
+#include "farm_ng/perception/time_series.h"
 
 #include "farm_ng/tractor/tractor.pb.h"
 
 namespace farm_ng {
 
 typedef farm_ng::core::Event EventPb;
-using farm_ng::perception_core::ApriltagDetections;
+using farm_ng::perception::ApriltagDetections;
 using farm_ng::calibration::BaseToCameraModel;
 using farm_ng::calibration::MonocularApriltagRigModel;
-using farm_ng::perception_core::NamedSE3Pose;
+using farm_ng::perception::NamedSE3Pose;
 using farm_ng::calibration::SolverStatus;
 using farm_ng::tractor::TractorState;
 using farm_ng::calibration::ViewDirection;

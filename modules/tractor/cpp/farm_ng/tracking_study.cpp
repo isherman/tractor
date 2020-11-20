@@ -17,7 +17,7 @@ tractor/build/cpp/farm_ng/tracking_study \
 
 #include "farm_ng/core/blobstore.h"
 #include "farm_ng/core/event_log_reader.h"
-#include "farm_ng/perception_core/image_loader.h"
+#include "farm_ng/perception/image_loader.h"
 #include "farm_ng/core/init.h"
 #include "farm_ng/core/ipc.h"
 
@@ -25,10 +25,10 @@ tractor/build/cpp/farm_ng/tracking_study \
 #include "farm_ng/calibration/visual_odometer.h"
 
 #include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
-#include "farm_ng/perception_core/capture_video_dataset.pb.h"
+#include "farm_ng/perception/capture_video_dataset.pb.h"
 
 using farm_ng::calibration::CalibrateBaseToCameraResult;
-using farm_ng::perception_core::CaptureVideoDatasetResult;
+using farm_ng::perception::CaptureVideoDatasetResult;
 using farm_ng::tractor::TractorState;
 
 DEFINE_string(video_dataset_result, "",

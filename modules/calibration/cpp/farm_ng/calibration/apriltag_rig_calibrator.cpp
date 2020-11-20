@@ -6,18 +6,18 @@
 #include <opencv2/imgproc.hpp>
 #include <sophus/average.hpp>
 
-#include "farm_ng/perception_core/apriltag.h"
+#include "farm_ng/perception/apriltag.h"
 #include "farm_ng/calibration/local_parameterization.h"
-#include "farm_ng/perception_core/camera_model.h"
-#include "farm_ng/perception_core/pose_utils.h"
+#include "farm_ng/perception/camera_model.h"
+#include "farm_ng/perception/pose_utils.h"
 
-#include "farm_ng/perception_core/image_loader.h"
+#include "farm_ng/perception/image_loader.h"
 #include "farm_ng/core/ipc.h"
 
-#include "farm_ng/perception_core/sophus_protobuf.h"
+#include "farm_ng/perception/sophus_protobuf.h"
 
 namespace farm_ng {
-using farm_ng::perception_core::ApriltagRig;
+using farm_ng::perception::ApriltagRig;
 
 Sophus::optional<SE3d> CameraPoseRigRootInit(
     const std::unordered_map<int, SE3d>& tag_poses_root,

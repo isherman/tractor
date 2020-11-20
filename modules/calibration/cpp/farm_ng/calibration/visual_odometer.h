@@ -11,15 +11,15 @@
 #include <sophus/se3.hpp>
 
 #include "farm_ng/calibration/flow_book_keeper.h"
-#include "farm_ng/perception_core/time_series.h"
+#include "farm_ng/perception/time_series.h"
 
 #include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
-#include "farm_ng/perception_core/camera_model.pb.h"
+#include "farm_ng/perception/camera_model.pb.h"
 
 namespace farm_ng {
 using farm_ng::calibration::BaseToCameraModel;
-using farm_ng::perception_core::CameraModel;
-using farm_ng::perception_core::NamedSE3Pose;
+using farm_ng::perception::CameraModel;
+using farm_ng::perception::NamedSE3Pose;
 
 struct VisualOdometerResult {
   NamedSE3Pose odometry_vo_pose_base;

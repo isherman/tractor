@@ -31,8 +31,7 @@ jobs:
     needs: create-release
     strategy:
       matrix:
-        module:
-          ["calibration", "core", "frontend_core", "perception_core", "tractor"]
+        module: ["calibration", "core", "frontend", "perception", "tractor"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2

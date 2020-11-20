@@ -6,7 +6,7 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "farm_ng/perception_core/apriltag.h"
+#include "farm_ng/perception/apriltag.h"
 #include "farm_ng/core/blobstore.h"
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/core/event_log_reader.h"
@@ -15,9 +15,9 @@
 
 #include "farm_ng/calibration/calibrate_apriltag_rig.pb.h"
 #include "farm_ng/calibration/calibrator.pb.h"
-#include "farm_ng/perception_core/capture_calibration_dataset.pb.h"
-#include "farm_ng/perception_core/apriltag.pb.h"
-#include "farm_ng/perception_core/capture_video_dataset.pb.h"
+#include "farm_ng/perception/capture_calibration_dataset.pb.h"
+#include "farm_ng/perception/apriltag.pb.h"
+#include "farm_ng/perception/capture_video_dataset.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(calibration_dataset, "",
@@ -35,13 +35,13 @@ DEFINE_string(camera_name, "tracking_camera/front/left",
               "Which camera to run on.");
 
 typedef farm_ng::core::Event EventPb;
-using farm_ng::perception_core::ApriltagDetections;
+using farm_ng::perception::ApriltagDetections;
 using farm_ng::core::BUCKET_APRILTAG_RIG_MODELS;
 using farm_ng::calibration::CalibrateApriltagRigConfiguration;
 using farm_ng::calibration::CalibrateApriltagRigResult;
 using farm_ng::calibration::CalibrateApriltagRigStatus;
-using farm_ng::perception_core::CaptureCalibrationDatasetResult;
-using farm_ng::perception_core::CaptureVideoDatasetResult;
+using farm_ng::perception::CaptureCalibrationDatasetResult;
+using farm_ng::perception::CaptureVideoDatasetResult;
 
 using farm_ng::calibration::MonocularApriltagRigModel;
 using farm_ng::core::Subscription;

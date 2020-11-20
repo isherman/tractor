@@ -7,8 +7,8 @@
 #include <opencv2/video.hpp>
 
 #include "farm_ng/core/blobstore.h"
-#include "farm_ng/perception_core/camera_model.h"
-#include "farm_ng/perception_core/eigen_cv.h"
+#include "farm_ng/perception/camera_model.h"
+#include "farm_ng/perception/eigen_cv.h"
 
 namespace farm_ng {
 

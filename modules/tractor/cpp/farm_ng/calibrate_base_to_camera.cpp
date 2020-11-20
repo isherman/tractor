@@ -12,22 +12,22 @@
 
 #include "farm_ng/tractor/base_to_camera_calibrator.h"
 
-#include "farm_ng/perception_core/apriltag.pb.h"
+#include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/calibration/calibrate_apriltag_rig.pb.h"
 #include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
 #include "farm_ng/calibration/calibrator.pb.h"
-#include "farm_ng/perception_core/capture_calibration_dataset.pb.h"
+#include "farm_ng/perception/capture_calibration_dataset.pb.h"
 
 typedef farm_ng::core::Event EventPb;
 using farm_ng::core::Subscription;
 using farm_ng::core::BUCKET_BASE_TO_CAMERA_MODELS;
-using farm_ng::perception_core::ApriltagDetections;
+using farm_ng::perception::ApriltagDetections;
 using farm_ng::calibration::BaseToCameraModel;
 using farm_ng::calibration::CalibrateApriltagRigResult;
 using farm_ng::calibration::CalibrateBaseToCameraConfiguration;
 using farm_ng::calibration::CalibrateBaseToCameraResult;
 using farm_ng::calibration::CalibrateBaseToCameraStatus;
-using farm_ng::perception_core::CaptureCalibrationDatasetResult;
+using farm_ng::perception::CaptureCalibrationDatasetResult;
 using farm_ng::calibration::MonocularApriltagRigModel;
 using farm_ng::calibration::SolverStatus;
 using farm_ng::calibration::SolverStatus_Name;

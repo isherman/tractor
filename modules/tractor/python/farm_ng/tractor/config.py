@@ -6,10 +6,10 @@ from google.protobuf.wrappers_pb2 import Int32Value
 
 from farm_ng.core.blobstore import Blobstore
 from farm_ng.core.resource_pb2 import BUCKET_CONFIGURATIONS
-from farm_ng.perception_core.apriltag_pb2 import ApriltagConfig
-from farm_ng.perception_core.apriltag_pb2 import TagConfig
-from farm_ng.perception_core.tracking_camera_pb2 import CameraConfig
-from farm_ng.perception_core.tracking_camera_pb2 import TrackingCameraConfig
+from farm_ng.perception.apriltag_pb2 import ApriltagConfig
+from farm_ng.perception.apriltag_pb2 import TagConfig
+from farm_ng.perception.tracking_camera_pb2 import CameraConfig
+from farm_ng.perception.tracking_camera_pb2 import TrackingCameraConfig
 from farm_ng.tractor.tractor_pb2 import TractorConfig
 
 

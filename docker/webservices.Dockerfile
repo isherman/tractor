@@ -22,11 +22,11 @@ RUN	mkdir -p build && \
   make -j`nproc --ignore=1`
 
 # Build the server as a static binary
-WORKDIR /farm_ng/modules/frontend_core/go/webrtc
+WORKDIR /farm_ng/modules/frontend/go/webrtc
 RUN CGO_ENABLED=0 go build -o /bin/proxy-server cmd/proxy-server/main.go
 
 # Build the web application
-WORKDIR /farm_ng/modules/frontend_core/frontend
+WORKDIR /farm_ng/modules/frontend/frontend
 RUN yarn
 RUN npm rebuild node-sass
 RUN FARM_NG_ROOT=/farm_ng yarn build
@@ -34,5 +34,5 @@ RUN FARM_NG_ROOT=/farm_ng yarn build
 # Copy binary into a single layer image
 FROM scratch
 COPY --from=build /bin/proxy-server /bin/proxy-server
-COPY --from=build /farm_ng/modules/frontend_core/frontend/dist /farm_ng/build/frontend
+COPY --from=build /farm_ng/modules/frontend/frontend/dist /farm_ng/build/frontend
 ENTRYPOINT ["/bin/proxy-server"]
