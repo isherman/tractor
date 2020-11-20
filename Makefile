@@ -24,7 +24,7 @@ frontend:
 
 protos:
 	mkdir -p build
-	cd build && rm -rf ./* && cmake -DCMAKE_PREFIX_PATH=`pwd`/../env -DCMAKE_BUILD_TYPE=Release .. && make -j`nproc --ignore=1` farm_ng_core_protobuf farm_ng_perception_protobuf farm_ng_calibration_protobuf farm_ng_tractor_protobuf farm_ng_frontend_protobuf
+	cd build && rm -rf ./* && cmake .. && make -j`nproc --ignore=1` farm_ng_all_protobuf_go farm_ng_all_protobuf_ts
 
 systemd:
 	cd jetson && sudo ./install.sh
