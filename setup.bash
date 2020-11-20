@@ -25,7 +25,11 @@ do
 done
 
 export LD_LIBRARY_PATH=$FARM_NG_ROOT/env/lib
-export PATH=$PATH:/usr/local/go/bin
+
+FARM_NG_GOPATH=$FARM_NG_ROOT/env/go
+mkdir -p $FARM_NG_GOPATH
+export GOPATH=$FARM_NG_GOPATH:$GOPATH
+export PATH=$FARM_NG_GOPATH/bin:/usr/local/go/bin:$PATH
 
 # Set BLOBSTORE_ROOT if it's not already set
 : ${BLOBSTORE_ROOT:=`dirname $FARM_NG_ROOT`/tractor-data}
