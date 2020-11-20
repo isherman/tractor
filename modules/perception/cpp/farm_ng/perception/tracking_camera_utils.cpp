@@ -4,9 +4,11 @@
 
 #include "farm_ng/perception/camera_pipeline.pb.h"
 
+using farm_ng::core::EventBus;
+using farm_ng::core::MakeEvent;
+
 namespace farm_ng {
-using farm_ng::perception::CameraPipelineCommand;
-using farm_ng::perception::CameraPipelineCommand_RecordStart_Mode;
+namespace perception {
 
 void RequestStartCapturing(EventBus& bus,
                            CameraPipelineCommand_RecordStart_Mode mode) {
@@ -16,15 +18,15 @@ void RequestStartCapturing(EventBus& bus,
 }
 void RequestStartCapturing(EventBus& bus, CameraPipelineCommand command) {
   LOG(INFO) << "RequestStartCapturing: "
-            << farm_ng::MakeEvent("tracking_camera/command", command)
-                   .ShortDebugString();
-  bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
+            << MakeEvent("tracking_camera/command", command).ShortDebugString();
+  bus.Send(MakeEvent("tracking_camera/command", command));
 }
 
 void RequestStopCapturing(EventBus& bus) {
   CameraPipelineCommand command;
   command.mutable_record_stop();
-  bus.Send(farm_ng::MakeEvent("tracking_camera/command", command));
+  bus.Send(MakeEvent("tracking_camera/command", command));
 }
 
+}  // namespace perception
 }  // namespace farm_ng

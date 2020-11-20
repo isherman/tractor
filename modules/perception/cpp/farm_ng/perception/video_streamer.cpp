@@ -4,7 +4,13 @@
 
 DEFINE_bool(jetson, false, "Use jetson hardware encoding.");
 
+using farm_ng::core::EventBus;
+using farm_ng::core::GetUniqueArchiveResource;
+using farm_ng::core::MakeEvent;
+
 namespace farm_ng {
+namespace perception {
+
 VideoStreamer::VideoStreamer(EventBus& bus, const CameraModel& camera_model,
                              Mode mode, uint64_t port)
     : bus_(bus), mode_(mode), port_(port) {
@@ -95,4 +101,5 @@ Image VideoStreamer::AddFrame(const cv::Mat& image,
 
 void VideoStreamer::Close() { writer_.reset(); }
 
+}  // namespace perception
 }  // namespace farm_ng

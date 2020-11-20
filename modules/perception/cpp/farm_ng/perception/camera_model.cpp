@@ -1,6 +1,7 @@
 #include "farm_ng/perception/camera_model.h"
 
 namespace farm_ng {
+namespace perception {
 
 CameraModel DefaultFishEyeT265CameraModel() {
   CameraModel model;
@@ -39,4 +40,5 @@ CameraModel Default1080HDCameraModel() {
   return model;
 }
 
+}  // namespace perception
 }  // namespace farm_ng

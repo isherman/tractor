@@ -2,7 +2,10 @@
 #define FARM_NG_IMAGE_UTILS_H_
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
+
 namespace farm_ng {
+namespace perception {
+
 inline cv::Mat ConstructGridImage(const std::vector<cv::Mat>& images,
                                   cv::Size out_size, int n_cols) {
   cv::Mat grid_image = cv::Mat::zeros(out_size, CV_8UC3);
@@ -33,5 +36,7 @@ inline cv::Mat ConstructGridImage(const std::vector<cv::Mat>& images,
   }
   return grid_image;
 }
+
+}  // namespace perception
 }  // namespace farm_ng
 #endif

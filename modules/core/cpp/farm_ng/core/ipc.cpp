@@ -21,12 +21,8 @@
 #include "farm_ng/core/io.pb.h"
 
 namespace farm_ng {
-using farm_ng::core::Announce;
-using farm_ng::core::BUCKET_LOGS;
-using farm_ng::core::Event;
-using farm_ng::core::LoggingCommand;
-using farm_ng::core::LoggingStatus;
-using farm_ng::core::Subscription;
+namespace core {
+
 namespace {
 
 class ArchiveManager {
@@ -494,7 +490,7 @@ LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path) {
                                       .string();
   command.mutable_record_start()->set_archive_path(full_archive_path);
   LOG(INFO) << "start: " << command.ShortDebugString();
-  bus.Send(farm_ng::MakeEvent("logger/command", command));
+  bus.Send(MakeEvent("logger/command", command));
   return WaitForLoggerStart(bus, full_archive_path);
 }
 
@@ -506,7 +502,8 @@ LoggingStatus StopLogging(EventBus& bus) {
 void RequestStopLogging(EventBus& bus) {
   LoggingCommand command;
   command.mutable_record_stop();
-  bus.Send(farm_ng::MakeEvent("logger/command", command));
+  bus.Send(MakeEvent("logger/command", command));
 }
 
+}  // namespace core
 }  // namespace farm_ng

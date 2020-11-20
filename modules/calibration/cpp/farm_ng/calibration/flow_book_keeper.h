@@ -8,12 +8,11 @@
 #include <opencv2/core.hpp>
 #include <sophus/se3.hpp>
 
+#include "farm_ng/perception/camera_model.pb.h"
 #include "farm_ng/perception/time_series.h"
 
-#include "farm_ng/perception/camera_model.pb.h"
-
 namespace farm_ng {
-using farm_ng::perception::CameraModel;
+namespace calibration {
 
 // An image space measurement of a flow point.
 struct FlowPointImage {
@@ -60,7 +59,8 @@ typedef std::unordered_map<uint64_t, std::vector<FlowBlock>> FlowBlocks;
 
 class FlowBookKeeper {
  public:
-  FlowBookKeeper(CameraModel camera_model, size_t max_history);
+  FlowBookKeeper(farm_ng::perception::CameraModel camera_model,
+                 size_t max_history);
 
   // Add an image, assumed to be from the same camera, and close to periodic,
   // meaning from the same consecutive time series of images captured from the
@@ -101,7 +101,7 @@ class FlowBookKeeper {
   // Maximum number of images to keep in memory
   size_t max_history_;
 
-  CameraModel camera_model_;
+  farm_ng::perception::CameraModel camera_model_;
   cv::Mat lens_exclusion_mask_;
   std::vector<cv::Scalar> colors_;
   uint64_t image_id_gen_ = 0;
@@ -113,5 +113,7 @@ class FlowBookKeeper {
   cv::Size flow_window_;
   int flow_max_levels_;
 };
+
+}  // namespace calibration
 }  // namespace farm_ng
 #endif

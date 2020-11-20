@@ -10,7 +10,7 @@
 #include "farm_ng/perception/camera_model.pb.h"
 
 namespace farm_ng {
-using farm_ng::perception::CameraModel;
+namespace perception {
 
 inline cv::Size GetCvSize(const CameraModel& model) {
   return cv::Size(model.image_width(), model.image_height());
@@ -154,6 +154,7 @@ Eigen::Matrix<T, 3, 1> ReprojectPixelToPoint(
 CameraModel DefaultFishEyeT265CameraModel();
 CameraModel Default1080HDCameraModel();
 
+}  // namespace perception
 }  // namespace farm_ng
 
 #endif  // FARM_NG_CALIBRATION_CAMERA_MODEL_H_

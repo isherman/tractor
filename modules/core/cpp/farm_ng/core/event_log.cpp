@@ -4,6 +4,8 @@
 #include <stdexcept>
 
 namespace farm_ng {
+namespace core {
+
 class EventLogWriterImpl {
  public:
   EventLogWriterImpl(const boost::filesystem::path& log_path)
@@ -32,4 +34,5 @@ void EventLogWriter::Write(const farm_ng::core::Event& event) {
   impl_->Write(event);
 }
 
+}  // namespace core
 }  // namespace farm_ng

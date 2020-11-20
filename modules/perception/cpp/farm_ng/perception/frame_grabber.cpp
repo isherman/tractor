@@ -1,6 +1,8 @@
 #include "farm_ng/perception/frame_grabber.h"
 
 namespace farm_ng {
+namespace perception {
+
 namespace {
 std::map<std::string, FrameGrabber::FrameGrabberFactory>&
 FrameGrabberFactoryRegistry() {
@@ -10,7 +12,7 @@ FrameGrabberFactoryRegistry() {
 }  // namespace
 
 std::unique_ptr<FrameGrabber> FrameGrabber::MakeFrameGrabber(
-    EventBus& event_bus, CameraConfig config) {
+    farm_ng::core::EventBus& event_bus, CameraConfig config) {
   std::string frame_grabber_name = config.frame_grabber_name();
   if (frame_grabber_name.empty()) {
     frame_grabber_name = CameraConfig::Model_Name(config.model());
@@ -33,4 +35,5 @@ int FrameGrabber::AddFrameGrabberFactory(const std::string& frame_grabber_name,
 
 FrameGrabber::~FrameGrabber() = default;
 
+}  // namespace perception
 }  // namespace farm_ng

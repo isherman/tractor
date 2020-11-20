@@ -9,16 +9,23 @@
 
 #include <ceres/ceres.h>
 
-#include "farm_ng/core/blobstore.h"
-#include "farm_ng/core/ipc.h"
-#include "farm_ng/perception/sophus_protobuf.h"
-
 #include "farm_ng/calibration/kinematics.h"
 #include "farm_ng/calibration/local_parameterization.h"
+#include "farm_ng/core/blobstore.h"
+#include "farm_ng/core/ipc.h"
 #include "farm_ng/perception/camera_model.h"
 #include "farm_ng/perception/eigen_cv.h"
+#include "farm_ng/perception/sophus_protobuf.h"
+
+using farm_ng::core::MakeTimestampNow;
+using farm_ng::perception::CameraModel;
+using farm_ng::perception::EigenToCvPoint;
+using farm_ng::perception::EigenToCvPoint2f;
+using farm_ng::perception::ProjectPointToPixel;
 
 namespace farm_ng {
+namespace calibration {
+
 namespace {
 
 void SavePly(std::string ply_path, const std::vector<Eigen::Vector3d>& points) {
@@ -85,7 +92,9 @@ struct PoseCostFunctor {
   }
   Sophus::SE3d camera_end_pose_camera_start_;
 };
+
 }  // namespace
+
 VisualOdometer::VisualOdometer(const CameraModel& camera_model,
                                const BaseToCameraModel& base_to_camera_model,
                                size_t max_history)
@@ -490,4 +499,5 @@ void VisualOdometer::AdjustGoalAngle(double theta) {
   camera_pose_base_goal_ = camera_pose_base_goal_ * Sophus::SE3d::rotZ(theta);
 }
 
+}  // namespace calibration
 }  // namespace farm_ng

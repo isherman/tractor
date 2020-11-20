@@ -5,7 +5,11 @@
 #include <librealsense2/rs.hpp>
 #include <opencv2/imgproc.hpp>
 
+using farm_ng::core::EventBus;
+
 namespace farm_ng {
+namespace perception {
+
 namespace {
 // Convert rs2::frame to cv::Mat
 // https://raw.githubusercontent.com/IntelRealSense/librealsense/master/wrappers/opencv/cv-helpers.hpp
@@ -180,4 +184,5 @@ static int _t435i = FrameGrabber::AddFrameGrabberFactory(
     CameraConfig::Model_Name(CameraConfig::MODEL_INTEL_D415), intel_factory);
 }  // namespace
 
+}  // namespace perception
 }  // namespace farm_ng

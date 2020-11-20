@@ -4,6 +4,8 @@
 #include <sophus/se3.hpp>
 
 namespace farm_ng {
+namespace calibration {
+
 template <typename Scalar>
 Eigen::Matrix<Scalar, 3, 3> SkewMatrix(const Eigen::Matrix<Scalar, 3, 1>& x) {
   Eigen::Matrix<Scalar, 3, 3> c;
@@ -61,5 +63,7 @@ struct EpipolarCostFunctor {
   Eigen::Vector3d point_image_rect_start_;
   Eigen::Vector3d point_image_rect_end_;
 };
+
+}  // namespace calibration
 }  // namespace farm_ng
 #endif

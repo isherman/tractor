@@ -31,6 +31,8 @@ DEFINE_bool(send, false, "Send on event bus?");
 DEFINE_double(speed, 1.0, "How fast to play log, multiple of realtime");
 
 namespace farm_ng {
+namespace core {
+
 std::chrono::microseconds ToChronoDuration(
     google::protobuf::Duration duration) {
   return std::chrono::microseconds(
@@ -95,16 +97,18 @@ class IpcLogPlayback {
   boost::optional<google::protobuf::Timestamp> last_message_stamp_;
   boost::optional<farm_ng::core::Event> next_message_;
 };
+
+}  // namespace core
 }  // namespace farm_ng
 
-void Cleanup(farm_ng::EventBus& bus) {}
+void Cleanup(farm_ng::core::EventBus& bus) {}
 
-int Main(farm_ng::EventBus& bus) {
-  farm_ng::IpcLogPlayback playback(bus);
+int Main(farm_ng::core::EventBus& bus) {
+  farm_ng::core::IpcLogPlayback playback(bus);
   bus.get_io_service().run();
   return EXIT_SUCCESS;
 }
 
 int main(int argc, char* argv[]) {
-  return farm_ng::Main(argc, argv, &Main, &Cleanup);
+  return farm_ng::core::Main(argc, argv, &Main, &Cleanup);
 }

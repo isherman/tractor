@@ -3,12 +3,14 @@
 #include <ceres/ceres.h>
 #include <sophus/se3.hpp>
 
-namespace farm_ng {
 using Sophus::SE3;
 using Sophus::SE3d;
 using Sophus::SO3;
 using Sophus::SO3d;
 using Sophus::Vector6d;
+
+namespace farm_ng {
+namespace calibration {
 
 LocalParameterizationAbs::LocalParameterizationAbs(int size) : size_(size) {}
 
@@ -166,4 +168,6 @@ void AddSE3ParameterBlockSubsetTranslation(
           new LocalParameterizationSO3(),
           new ceres::SubsetParameterization(3, translation_subset)));
 }
+
+}  // namespace calibration
 }  // namespace farm_ng

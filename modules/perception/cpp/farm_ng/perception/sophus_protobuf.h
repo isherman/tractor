@@ -2,13 +2,11 @@
 #define FARM_NG_SOPHUS_PROTOBUF_H_
 
 #include <sophus/se3.hpp>
+
 #include "farm_ng/perception/geometry.pb.h"
 
 namespace farm_ng {
-using farm_ng::perception::NamedSE3Pose;
-using farm_ng::perception::Quaternion;
-using farm_ng::perception::SE3Pose;
-using farm_ng::perception::Vec3;
+namespace perception {
 
 inline void EigenToProto(const Sophus::SE3d::TranslationType& t, Vec3* pt) {
   pt->set_x(t.x());
@@ -73,5 +71,7 @@ inline void ProtoToSophus(const SE3Pose& ppose, Sophus::SE3d* pose) {
   pose->setQuaternion(q);
   ProtoToEigen(ppose.position(), &(pose->translation()));
 }
+
+}  // namespace perception
 }  // namespace farm_ng
 #endif  // FARM_NG_SOPHUS_PROTOBUF_H_

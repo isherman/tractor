@@ -5,6 +5,8 @@
 #include <stdexcept>
 
 namespace farm_ng {
+namespace core {
+
 class EventLogReaderImpl {
  public:
   EventLogReaderImpl(std::string log_path)
@@ -47,8 +49,7 @@ void EventLogReader::Reset(std::string log_path) {
   impl_.reset(new EventLogReaderImpl(log_path));
 }
 
-farm_ng::core::Event EventLogReader::ReadNext() {
-  return impl_->ReadNext();
-}
+farm_ng::core::Event EventLogReader::ReadNext() { return impl_->ReadNext(); }
 
+}  // namespace core
 }  // namespace farm_ng

@@ -10,8 +10,7 @@
 #include "farm_ng/perception/image.pb.h"
 
 namespace farm_ng {
-using farm_ng::core::Resource;
-using farm_ng::perception::Image;
+namespace perception {
 
 class ImageLoader {
  public:
@@ -20,12 +19,13 @@ class ImageLoader {
   cv::Mat LoadImage(const Image& image);
 
  private:
-  void OpenVideo(const Resource& resource);
+  void OpenVideo(const farm_ng::core::Resource& resource);
   std::unique_ptr<cv::VideoCapture> capture_;
   std::string video_name_;
   bool zero_indexed_;
 };
 
+}  // namespace perception
 }  // namespace farm_ng
 
 #endif

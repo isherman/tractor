@@ -12,37 +12,30 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "farm_ng/perception/apriltag.h"
-#include "farm_ng/perception/camera_model.h"
-#include "farm_ng/perception/time_series.h"
-#include "farm_ng/perception/frame_grabber.h"
-#include "farm_ng/perception/image_utils.h"
 #include "farm_ng/core/init.h"
 #include "farm_ng/core/ipc.h"
-#include "farm_ng/perception/sophus_protobuf.h"
+#include "farm_ng/perception/apriltag.h"
 #include "farm_ng/perception/apriltag.pb.h"
-#include "farm_ng/perception/geometry.pb.h"
-#include "farm_ng/perception/camera_pipeline.pb.h"
+#include "farm_ng/perception/camera_model.h"
+#include "farm_ng/perception/frame_grabber.h"
+#include "farm_ng/perception/image_utils.h"
+#include "farm_ng/perception/sophus_protobuf.h"
+#include "farm_ng/perception/time_series.h"
 #include "farm_ng/perception/video_streamer.h"
 
-typedef farm_ng::core::Event EventPb;
+#include "farm_ng/perception/camera_pipeline.pb.h"
+#include "farm_ng/perception/geometry.pb.h"
 
-using farm_ng::perception::ApriltagConfig;
-using farm_ng::perception::ApriltagDetection;
-using farm_ng::perception::ApriltagDetections;
+typedef farm_ng::core::Event EventPb;
+using farm_ng::core::Bucket;
 using farm_ng::core::BUCKET_CONFIGURATIONS;
-using farm_ng::perception::CameraConfig;
-using farm_ng::perception::CameraModel;
-using farm_ng::perception::Image;
-using farm_ng::perception::NamedSE3Pose;
+using farm_ng::core::EventBus;
+using farm_ng::core::MakeEvent;
+using farm_ng::core::ReadProtobufFromJsonFile;
 using farm_ng::core::Subscription;
-using farm_ng::perception::TagConfig;
-using farm_ng::perception::TagLibrary;
-using farm_ng::perception::CameraPipelineCommand;
-using farm_ng::perception::CameraPipelineConfig;
-using farm_ng::perception::Vec2;
 
 namespace farm_ng {
+namespace perception {
 
 class MultiCameraSync {
  public:
@@ -54,7 +47,8 @@ class MultiCameraSync {
       : event_bus_(event_bus), timer_(event_bus.get_io_service()) {}
 
   CameraModel AddCameraConfig(const CameraConfig& camera_config) {
-    frame_grabbers_.emplace_back(FrameGrabber::MakeFrameGrabber(event_bus_, camera_config));
+    frame_grabbers_.emplace_back(
+        FrameGrabber::MakeFrameGrabber(event_bus_, camera_config));
     frame_grabbers_.back()->VisualFrameSignal().connect(
         std::bind(&MultiCameraSync::OnFrame, this, std::placeholders::_1));
     return frame_grabbers_.back()->GetCameraModel();
@@ -212,9 +206,9 @@ class SingleCameraPipeline {
         auto image_pb =
             video_file_writer_.AddFrame(frame_data.image, frame_data.stamp());
         apriltags.mutable_image()->CopyFrom(image_pb);
-        event_bus_.AsyncSend(farm_ng::MakeEvent(
-            frame_data.camera_model.frame_name() + "/apriltags", apriltags,
-            frame_data.stamp()));
+        event_bus_.AsyncSend(
+            MakeEvent(frame_data.camera_model.frame_name() + "/apriltags",
+                      apriltags, frame_data.stamp()));
       } break;
       case CameraPipelineCommand::RecordStart::MODE_APRILTAG_STABLE:
         LOG(INFO) << "Mode not support.";
@@ -364,14 +358,16 @@ class TrackingCameraClient {
   MultiCameraSync multi_camera_;
   CameraPipelineConfig config_;
   CameraPipelineCommand latest_command_;
-};  // namespace farm_ng
+};
+
+}  // namespace perception
 }  // namespace farm_ng
 
-void Cleanup(farm_ng::EventBus& bus) {}
+void Cleanup(farm_ng::core::EventBus& bus) {}
 
-int Main(farm_ng::EventBus& bus) {
+int Main(farm_ng::core::EventBus& bus) {
   try {
-    farm_ng::TrackingCameraClient client(bus);
+    farm_ng::perception::TrackingCameraClient client(bus);
     bus.get_io_service().run();
   } catch (...) {
   }
@@ -380,5 +376,5 @@ int Main(farm_ng::EventBus& bus) {
 
 int main(int argc, char* argv[]) {
   std::cerr << "And here." << std::endl;
-  return farm_ng::Main(argc, argv, &Main, &Cleanup);
+  return farm_ng::core::Main(argc, argv, &Main, &Cleanup);
 }

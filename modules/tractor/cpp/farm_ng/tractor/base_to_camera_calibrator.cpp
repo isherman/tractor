@@ -4,33 +4,46 @@
 
 #include <google/protobuf/util/time_util.h>
 
-#include "farm_ng/core/blobstore.h"
-
-#include "farm_ng/core/event_log_reader.h"
-#include "farm_ng/core/ipc.h"
-#include "farm_ng/perception/sophus_protobuf.h"
-
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/calibration/kinematics.h"
 #include "farm_ng/calibration/local_parameterization.h"
+#include "farm_ng/core/blobstore.h"
+#include "farm_ng/core/event_log_reader.h"
+#include "farm_ng/core/ipc.h"
 #include "farm_ng/perception/pose_utils.h"
+#include "farm_ng/perception/sophus_protobuf.h"
 #include "farm_ng/perception/time_series.h"
 
 #include "farm_ng/tractor/tractor.pb.h"
 
-namespace farm_ng {
-
 typedef farm_ng::core::Event EventPb;
-using farm_ng::perception::ApriltagDetections;
+using farm_ng::calibration::AddSE3ParameterBlockSubsetTranslation;
+using farm_ng::calibration::BaseToCameraInitialization;
 using farm_ng::calibration::BaseToCameraModel;
+using farm_ng::calibration::EstimateCameraPoseRig;
+using farm_ng::calibration::LocalParameterizationAbs;
 using farm_ng::calibration::MonocularApriltagRigModel;
-using farm_ng::perception::NamedSE3Pose;
 using farm_ng::calibration::SolverStatus;
-using farm_ng::tractor::TractorState;
+using farm_ng::calibration::TractorStartPoseTractorEnd;
 using farm_ng::calibration::ViewDirection;
+using farm_ng::calibration::ViewDirection_Name;
 using farm_ng::calibration::ViewInitialization;
-
+using farm_ng::core::EventBus;
+using farm_ng::core::EventLogReader;
+using farm_ng::core::MakeEvent;
+using farm_ng::core::ReadProtobufFromResource;
+using farm_ng::core::Resource;
+using farm_ng::perception::ApriltagDetections;
+using farm_ng::perception::NamedSE3Pose;
+using farm_ng::perception::SE3Pose;
+using farm_ng::perception::SophusToProto;
+using farm_ng::perception::StartsWith;
+using farm_ng::perception::TimeSeries;
+using farm_ng::tractor::CopyTractorStateToWheelState;
 using Sophus::SE3d;
+
+namespace farm_ng {
+namespace tractor {
 
 std::vector<int> ViewInitializationToConstSubset(
     const ViewInitialization& view_initialization) {
@@ -64,8 +77,7 @@ void ViewInitializationToNamedSE3Pose(
                          Sophus::SE3d::rotY(M_PI);
       break;
     default:
-      LOG(FATAL) << farm_ng::calibration::ViewDirection_Name(
-                        view_initialization.view_direction())
+      LOG(FATAL) << ViewDirection_Name(view_initialization.view_direction())
                  << "Not handled.";
   }
   base_pose_camera.translation().x() = view_initialization.x().value();
@@ -317,12 +329,10 @@ BaseToCameraModel InitialBaseToCameraModelFromEventLog(
       TractorState tractor_state;
       if (event.data().UnpackTo(&tractor_state)) {
         BaseToCameraModel::WheelMeasurement wheel_measurement;
-        farm_ng::CopyTractorStateToWheelState(tractor_state,
-                                              &wheel_measurement);
+        CopyTractorStateToWheelState(tractor_state, &wheel_measurement);
         wheel_measurement_series.insert(wheel_measurement);
       } else {
-        bool calibration_sample =
-            farm_ng::StartsWith(event.name(), "calibrator");
+        bool calibration_sample = StartsWith(event.name(), "calibrator");
         if (!calibration_sample && !full_apriltag_trajectory) {
           continue;
         }
@@ -335,7 +345,7 @@ BaseToCameraModel InitialBaseToCameraModelFromEventLog(
         }
         // LOG(INFO) << event.ShortDebugString();
         Sophus::optional<NamedSE3Pose> o_camera_pose_rig =
-            farm_ng::EstimateCameraPoseRig(rig_model.rig(), detections);
+            EstimateCameraPoseRig(rig_model.rig(), detections);
         if (!o_camera_pose_rig) {
           continue;
         }
@@ -408,4 +418,5 @@ BaseToCameraModel InitialBaseToCameraModelFromEventLog(
   return model;
 }
 
+}  // namespace tractor
 }  // namespace farm_ng

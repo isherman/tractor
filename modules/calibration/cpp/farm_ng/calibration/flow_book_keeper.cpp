@@ -10,7 +10,14 @@
 #include "farm_ng/perception/camera_model.h"
 #include "farm_ng/perception/eigen_cv.h"
 
+using farm_ng::core::Bucket;
+using farm_ng::perception::CameraModel;
+using farm_ng::perception::EigenToCvPoint;
+using farm_ng::perception::EigenToCvPoint2f;
+using farm_ng::perception::ReprojectPixelToPoint;
+
 namespace farm_ng {
+namespace calibration {
 
 FlowBookKeeper::FlowBookKeeper(CameraModel camera_model, size_t max_history)
     : max_history_(max_history),
@@ -364,4 +371,5 @@ cv::Scalar FlowBookKeeper::Color(uint64_t id) const {
   return colors_[id % colors_.size()];
 }
 
+}  // namespace calibration
 }  // namespace farm_ng

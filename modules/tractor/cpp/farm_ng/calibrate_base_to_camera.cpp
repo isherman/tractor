@@ -9,20 +9,16 @@
 #include "farm_ng/core/event_log_reader.h"
 #include "farm_ng/core/init.h"
 #include "farm_ng/core/ipc.h"
-
 #include "farm_ng/tractor/base_to_camera_calibrator.h"
 
-#include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/calibration/calibrate_apriltag_rig.pb.h"
 #include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
 #include "farm_ng/calibration/calibrator.pb.h"
+#include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/perception/capture_video_dataset.pb.h"
 
 typedef farm_ng::core::Event EventPb;
-using farm_ng::core::Subscription;
-using farm_ng::core::BUCKET_BASE_TO_CAMERA_MODELS;
-using farm_ng::perception::ApriltagDetections;
-using farm_ng::perception::CaptureVideoDatasetResult;
+using farm_ng::calibration::BaseToCameraInitialization;
 using farm_ng::calibration::BaseToCameraModel;
 using farm_ng::calibration::CalibrateApriltagRigResult;
 using farm_ng::calibration::CalibrateBaseToCameraConfiguration;
@@ -34,6 +30,18 @@ using farm_ng::calibration::SolverStatus_Name;
 using farm_ng::calibration::ViewDirection;
 using farm_ng::calibration::ViewDirection_Name;
 using farm_ng::calibration::ViewDirection_Parse;
+using farm_ng::core::ArchiveProtobufAsBinaryResource;
+using farm_ng::core::ArchiveProtobufAsJsonResource;
+using farm_ng::core::BUCKET_BASE_TO_CAMERA_MODELS;
+using farm_ng::core::ContentTypeProtobufJson;
+using farm_ng::core::EventBus;
+using farm_ng::core::MakeEvent;
+using farm_ng::core::MakeTimestampNow;
+using farm_ng::core::ReadProtobufFromResource;
+using farm_ng::core::SetArchivePath;
+using farm_ng::core::Subscription;
+using farm_ng::perception::ApriltagDetections;
+using farm_ng::perception::CaptureVideoDatasetResult;
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 
@@ -69,6 +77,8 @@ DEFINE_string(
 DEFINE_string(name, "base_to_camera", "Name of the calibration.");
 
 namespace farm_ng {
+namespace tractor {
+
 class CalibrateBaseToCameraProgram {
  public:
   CalibrateBaseToCameraProgram(EventBus& bus,
@@ -91,9 +101,8 @@ class CalibrateBaseToCameraProgram {
       bus_.get_io_service().run_one();
     }
 
-    auto dataset_result =
-        ReadProtobufFromResource<CaptureVideoDatasetResult>(
-            configuration_.calibration_dataset());
+    auto dataset_result = ReadProtobufFromResource<CaptureVideoDatasetResult>(
+        configuration_.calibration_dataset());
 
     auto rig_result = ReadProtobufFromResource<CalibrateApriltagRigResult>(
         configuration_.apriltag_rig_result());
@@ -205,19 +214,20 @@ class CalibrateBaseToCameraProgram {
   CalibrateBaseToCameraResult result_;
 };
 
+}  // namespace tractor
 }  // namespace farm_ng
 
-void Cleanup(farm_ng::EventBus& bus) { LOG(INFO) << "Cleanup."; }
+void Cleanup(farm_ng::core::EventBus& bus) { LOG(INFO) << "Cleanup."; }
 
-int Main(farm_ng::EventBus& bus) {
+int Main(farm_ng::core::EventBus& bus) {
   CalibrateBaseToCameraConfiguration config;
   config.mutable_calibration_dataset()->set_path(FLAGS_calibration_dataset);
   config.mutable_calibration_dataset()->set_content_type(
-      farm_ng::ContentTypeProtobufJson<CaptureVideoDatasetResult>());
+      ContentTypeProtobufJson<CaptureVideoDatasetResult>());
 
   config.mutable_apriltag_rig_result()->set_path(FLAGS_apriltag_rig_result);
   config.mutable_apriltag_rig_result()->set_content_type(
-      farm_ng::ContentTypeProtobufJson<CalibrateApriltagRigResult>());
+      ContentTypeProtobufJson<CalibrateApriltagRigResult>());
   auto initialization = config.mutable_initialization();
   initialization->mutable_wheel_baseline()->set_value(FLAGS_wheel_baseline *
                                                       0.0254);
@@ -246,9 +256,10 @@ int Main(farm_ng::EventBus& bus) {
       camera_direction);
   config.set_name(FLAGS_name);
 
-  farm_ng::CalibrateBaseToCameraProgram program(bus, config, FLAGS_interactive);
+  farm_ng::tractor::CalibrateBaseToCameraProgram program(bus, config,
+                                                         FLAGS_interactive);
   return program.run();
 }
 int main(int argc, char* argv[]) {
-  return farm_ng::Main(argc, argv, &Main, &Cleanup);
+  return farm_ng::core::Main(argc, argv, &Main, &Cleanup);
 }

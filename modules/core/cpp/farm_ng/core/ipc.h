@@ -11,15 +11,14 @@
 #include <boost/signals2.hpp>
 
 #include "farm_ng/core/blobstore.h"
+
 #include "farm_ng/core/io.pb.h"
 #include "farm_ng/core/resource.pb.h"
 
 namespace farm_ng {
-using farm_ng::core::LoggingStatus;
-using farm_ng::core::Subscription;
+namespace core {
 
-typedef boost::signals2::signal<void(const farm_ng::core::Event&)>
-    EventSignal;
+typedef boost::signals2::signal<void(const farm_ng::core::Event&)> EventSignal;
 typedef std::shared_ptr<EventSignal> EventSignalPtr;
 
 class EventBusImpl;
@@ -36,11 +35,9 @@ class EventBus : public boost::asio::io_service::service {
 
   EventSignalPtr GetEventSignal() const;
 
-  const std::map<std::string, farm_ng::core::Event>& GetState()
-      const;
+  const std::map<std::string, farm_ng::core::Event>& GetState() const;
 
-  const std::map<boost::asio::ip::udp::endpoint,
-                 farm_ng::core::Announce>&
+  const std::map<boost::asio::ip::udp::endpoint, farm_ng::core::Announce>&
   GetAnnouncements() const;
 
   void AddSubscriptions(const std::vector<Subscription>& subscriptions);
@@ -98,9 +95,8 @@ farm_ng::core::Resource ArchiveProtobufAsBinaryResource(
 google::protobuf::Timestamp MakeTimestampNow();
 
 template <typename T>
-farm_ng::core::Event MakeEvent(
-    std::string name, const T& message,
-    const google::protobuf::Timestamp& stamp) {
+farm_ng::core::Event MakeEvent(std::string name, const T& message,
+                               const google::protobuf::Timestamp& stamp) {
   farm_ng::core::Event event;
   *event.mutable_stamp() = stamp;
   *event.mutable_name() = name;
@@ -109,8 +105,7 @@ farm_ng::core::Event MakeEvent(
 }
 
 template <typename T>
-farm_ng::core::Event MakeEvent(std::string name,
-                                            const T& message) {
+farm_ng::core::Event MakeEvent(std::string name, const T& message) {
   return MakeEvent(name, message, MakeTimestampNow());
 }
 
@@ -124,6 +119,8 @@ void WaitForServices(EventBus& bus,
 LoggingStatus StartLogging(EventBus& bus, const std::string& archive_path);
 LoggingStatus StopLogging(EventBus& bus);
 void RequestStopLogging(EventBus& bus);
+
+}  // namespace core
 }  // namespace farm_ng
 
 #endif

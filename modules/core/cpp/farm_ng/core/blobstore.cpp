@@ -1,6 +1,7 @@
 #include "farm_ng/core/blobstore.h"
 
 namespace farm_ng {
+namespace core {
 
 boost::filesystem::path GetBlobstoreRoot() {
   boost::filesystem::path root;
@@ -66,4 +67,5 @@ boost::filesystem::path MakePathUnique(boost::filesystem::path root,
   return out_path;
 }
 
+}  // namespace core
 }  // namespace farm_ng

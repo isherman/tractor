@@ -10,13 +10,11 @@
 
 namespace farm_ng {
 
-using farm_ng::perception::ApriltagConfig;
-using farm_ng::perception::ApriltagDetection;
-using farm_ng::perception::ApriltagDetections;
-using farm_ng::perception::CameraModel;
-using farm_ng::perception::TagLibrary;
-
+namespace core {
 class EventBus;
+}
+
+namespace perception {
 
 std::array<Eigen::Vector3d, 4> PointsTag(const ApriltagDetection& detection);
 
@@ -55,10 +53,11 @@ class ApriltagsFilter {
   cv::Mat mask_;
   bool once_;
 };
+
 class ApriltagDetector {
  public:
   ApriltagDetector(const CameraModel& camera_model,
-                   EventBus* event_bus = nullptr);
+                   farm_ng::core::EventBus* event_bus = nullptr);
 
   ~ApriltagDetector();
 
@@ -72,5 +71,6 @@ class ApriltagDetector {
   std::shared_ptr<Impl> impl_;
 };
 
+}  // namespace perception
 }  // namespace farm_ng
 #endif

@@ -6,7 +6,12 @@
 
 #include "farm_ng/core/blobstore.h"
 
+using farm_ng::core::GetBlobstoreRoot;
+using farm_ng::core::Resource;
+
 namespace farm_ng {
+namespace perception {
+
 void ImageLoader::OpenVideo(const Resource& resource) {
   CHECK_EQ(resource.content_type(), "video/mp4");
 
@@ -57,4 +62,6 @@ cv::Mat ImageLoader::LoadImage(const Image& image) {
   CHECK_EQ(frame.size().height, image.camera_model().image_height());
   return frame;
 }
+
+}  // namespace perception
 }  // namespace farm_ng

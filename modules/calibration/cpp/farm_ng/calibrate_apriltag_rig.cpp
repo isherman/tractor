@@ -6,15 +6,14 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include "farm_ng/perception/apriltag.h"
-#include "farm_ng/core/blobstore.h"
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
+#include "farm_ng/calibration/calibrate_apriltag_rig.pb.h"
+#include "farm_ng/calibration/calibrator.pb.h"
+#include "farm_ng/core/blobstore.h"
 #include "farm_ng/core/event_log_reader.h"
 #include "farm_ng/core/init.h"
 #include "farm_ng/core/ipc.h"
-
-#include "farm_ng/calibration/calibrate_apriltag_rig.pb.h"
-#include "farm_ng/calibration/calibrator.pb.h"
+#include "farm_ng/perception/apriltag.h"
 #include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/perception/capture_video_dataset.pb.h"
 
@@ -34,17 +33,23 @@ DEFINE_string(camera_name, "tracking_camera/front/left",
               "Which camera to run on.");
 
 typedef farm_ng::core::Event EventPb;
-using farm_ng::perception::ApriltagDetections;
+using farm_ng::core::ArchiveProtobufAsBinaryResource;
+using farm_ng::core::ArchiveProtobufAsJsonResource;
 using farm_ng::core::BUCKET_APRILTAG_RIG_MODELS;
-using farm_ng::calibration::CalibrateApriltagRigConfiguration;
-using farm_ng::calibration::CalibrateApriltagRigResult;
-using farm_ng::calibration::CalibrateApriltagRigStatus;
+using farm_ng::core::ContentTypeProtobufJson;
+using farm_ng::core::EventBus;
+using farm_ng::core::EventLogReader;
+using farm_ng::core::MakeEvent;
+using farm_ng::core::MakeTimestampNow;
+using farm_ng::core::ReadProtobufFromResource;
+using farm_ng::core::SetArchivePath;
+using farm_ng::core::Subscription;
+using farm_ng::perception::ApriltagDetections;
+using farm_ng::perception::ApriltagsFilter;
 using farm_ng::perception::CaptureVideoDatasetResult;
 
-using farm_ng::calibration::MonocularApriltagRigModel;
-using farm_ng::core::Subscription;
-
 namespace farm_ng {
+namespace calibration {
 
 class CalibrateApriltagRigProgram {
  public:
@@ -140,7 +145,7 @@ class CalibrateApriltagRigProgram {
         ArchiveProtobufAsJsonResource("initial_result", result));
     send_status();
 
-    farm_ng::Solve(&model);
+    Solve(&model);
     MonocularApriltagRigModel final_model_pb;
     model.ToMonocularApriltagRigModel(&final_model_pb);
     result.mutable_monocular_apriltag_rig_solved()->CopyFrom(
@@ -213,12 +218,13 @@ class CalibrateApriltagRigProgram {
   ApriltagsFilter tag_filter_;
 };
 
+}  // namespace calibration
 }  // namespace farm_ng
 
-void Cleanup(farm_ng::EventBus& bus) { LOG(INFO) << "Cleanup."; }
+void Cleanup(farm_ng::core::EventBus& bus) { LOG(INFO) << "Cleanup."; }
 
-int Main(farm_ng::EventBus& bus) {
-  CalibrateApriltagRigConfiguration config;
+int Main(farm_ng::core::EventBus& bus) {
+  farm_ng::calibration::CalibrateApriltagRigConfiguration config;
   std::stringstream ss(FLAGS_tag_ids);
   std::string token;
   while (std::getline(ss, token, ',')) {
@@ -226,15 +232,16 @@ int Main(farm_ng::EventBus& bus) {
   }
   config.mutable_calibration_dataset()->set_path(FLAGS_calibration_dataset);
   config.mutable_calibration_dataset()->set_content_type(
-      farm_ng::ContentTypeProtobufJson<CaptureVideoDatasetResult>());
+      ContentTypeProtobufJson<CaptureVideoDatasetResult>());
   config.set_root_tag_id(FLAGS_root_tag_id);
   config.set_name(FLAGS_name);
   config.set_filter_stable_tags(FLAGS_filter_stable_tags);
   config.set_camera_name(FLAGS_camera_name);
 
-  farm_ng::CalibrateApriltagRigProgram program(bus, config, FLAGS_interactive);
+  farm_ng::calibration::CalibrateApriltagRigProgram program(bus, config,
+                                                            FLAGS_interactive);
   return program.run();
 }
 int main(int argc, char* argv[]) {
-  return farm_ng::Main(argc, argv, &Main, &Cleanup);
+  return farm_ng::core::Main(argc, argv, &Main, &Cleanup);
 }

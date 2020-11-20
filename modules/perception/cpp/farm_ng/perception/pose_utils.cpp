@@ -1,7 +1,10 @@
 #include "farm_ng/perception/pose_utils.h"
 
 #include <glog/logging.h>
+
 namespace farm_ng {
+namespace perception {
+
 std::string FrameNameNumber(const std::string& name, int number) {
   char buffer[1024];
   CHECK_LT(
@@ -19,4 +22,6 @@ std::string FrameRigTag(const std::string& rig_name, int tag_id) {
 bool StartsWith(const std::string& x, const std::string& prefix) {
   return x.rfind(prefix, 0) == 0;
 }
+
+}  // namespace perception
 }  // namespace farm_ng

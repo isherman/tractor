@@ -8,6 +8,8 @@
 #include <google/protobuf/util/time_util.h>
 
 namespace farm_ng {
+namespace perception {
+
 template <typename ValueT>
 class TimeSeries {
  public:
@@ -98,6 +100,8 @@ class TimeSeries {
 
  private:
   ContainerT series_;
-};  // namespace farm_ng
+};
+
+}  // namespace perception
 }  // namespace farm_ng
 #endif

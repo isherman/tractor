@@ -5,14 +5,10 @@
 #include <glog/logging.h>
 #include <iostream>
 
-namespace farm_ng {
-
-using farm_ng::core::Announce;
 typedef farm_ng::core::Event EventPb;
-using farm_ng::core::LoggingCommand;
-using farm_ng::core::LoggingStatus;
-using farm_ng::core::Resource;
-using farm_ng::core::Subscription;
+
+namespace farm_ng {
+namespace core {
 
 class IpcLogger {
  public:
@@ -123,18 +119,19 @@ class IpcLogger {
   Resource log_resource_;
   LoggingCommand last_command_;
   LoggingStatus logging_status_;
-};  // namespace farm_ng
+};
 
+}  // namespace core
 }  // namespace farm_ng
 
-void Cleanup(farm_ng::EventBus& bus) {}
+void Cleanup(farm_ng::core::EventBus& bus) {}
 
-int Main(farm_ng::EventBus& bus) {
-  farm_ng::IpcLogger logger(bus);
+int Main(farm_ng::core::EventBus& bus) {
+  farm_ng::core::IpcLogger logger(bus);
   bus.get_io_service().run();
   return 0;
 }
 
 int main(int argc, char* argv[]) {
-  return farm_ng::Main(argc, argv, &Main, &Cleanup);
+  return farm_ng::core::Main(argc, argv, &Main, &Cleanup);
 }

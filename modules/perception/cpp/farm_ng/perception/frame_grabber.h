@@ -7,12 +7,13 @@
 #include <opencv2/core.hpp>
 
 #include "farm_ng/core/ipc.h"
+
 #include "farm_ng/perception/camera_model.pb.h"
 #include "farm_ng/perception/camera_pipeline.pb.h"
 
 namespace farm_ng {
-using farm_ng::perception::CameraConfig;
-using farm_ng::perception::CameraModel;
+namespace perception {
+
 struct FrameData {
   CameraConfig config;
   CameraModel camera_model;
@@ -25,11 +26,11 @@ struct FrameData {
 
 class FrameGrabber {
  public:
-  typedef std::function<std::unique_ptr<FrameGrabber>(EventBus& event_bus,
-                                                      CameraConfig config)>
+  typedef std::function<std::unique_ptr<FrameGrabber>(
+      farm_ng::core::EventBus& event_bus, CameraConfig config)>
       FrameGrabberFactory;
-  static std::unique_ptr<FrameGrabber> MakeFrameGrabber(EventBus& event_bus,
-                                                        CameraConfig config);
+  static std::unique_ptr<FrameGrabber> MakeFrameGrabber(
+      farm_ng::core::EventBus& event_bus, CameraConfig config);
   static int AddFrameGrabberFactory(const std::string& frame_grabber_name,
                                     FrameGrabberFactory);
 
@@ -40,5 +41,6 @@ class FrameGrabber {
   virtual Signal& VisualFrameSignal() = 0;
 };
 
+}  // namespace perception
 }  // namespace farm_ng
 #endif

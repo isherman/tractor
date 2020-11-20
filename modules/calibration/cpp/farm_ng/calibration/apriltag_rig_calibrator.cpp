@@ -6,18 +6,29 @@
 #include <opencv2/imgproc.hpp>
 #include <sophus/average.hpp>
 
-#include "farm_ng/perception/apriltag.h"
 #include "farm_ng/calibration/local_parameterization.h"
-#include "farm_ng/perception/camera_model.h"
-#include "farm_ng/perception/pose_utils.h"
-
-#include "farm_ng/perception/image_loader.h"
 #include "farm_ng/core/ipc.h"
-
+#include "farm_ng/perception/apriltag.h"
+#include "farm_ng/perception/camera_model.h"
+#include "farm_ng/perception/image_loader.h"
+#include "farm_ng/perception/pose_utils.h"
 #include "farm_ng/perception/sophus_protobuf.h"
 
-namespace farm_ng {
+using farm_ng::core::GetUniqueArchiveResource;
+using farm_ng::perception::ApriltagDetections;
 using farm_ng::perception::ApriltagRig;
+using farm_ng::perception::CameraModel;
+using farm_ng::perception::FrameNameNumber;
+using farm_ng::perception::FrameRigTag;
+using farm_ng::perception::Image;
+using farm_ng::perception::ImageLoader;
+using farm_ng::perception::NamedSE3Pose;
+using farm_ng::perception::ProtoToSophus;
+using farm_ng::perception::StartsWith;
+using Sophus::SE3d;
+
+namespace farm_ng {
+namespace calibration {
 
 Sophus::optional<SE3d> CameraPoseRigRootInit(
     const std::unordered_map<int, SE3d>& tag_poses_root,
@@ -197,9 +208,8 @@ void ModelError(ApriltagRigModel& model) {
     Image reprojection_image;
     reprojection_image.CopyFrom(detections.image());
     auto resource_path = GetUniqueArchiveResource(
-        FrameNameNumber(
-            "reprojection-" + farm_ng::calibration::SolverStatus_Name(model.status),
-            frame_n),
+        FrameNameNumber("reprojection-" + SolverStatus_Name(model.status),
+                        frame_n),
         "png", "image/png");
     reprojection_image.mutable_resource()->CopyFrom(resource_path.first);
 
@@ -543,5 +553,5 @@ Sophus::optional<NamedSE3Pose> EstimateCameraPoseRig(
     return Sophus::optional<NamedSE3Pose>();
   }
 }
-
+}  // namespace calibration
 }  // namespace farm_ng

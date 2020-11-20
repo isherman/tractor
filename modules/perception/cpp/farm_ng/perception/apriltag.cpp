@@ -11,9 +11,14 @@
 #include "farm_ng/perception/camera_model.h"
 #include "farm_ng/perception/sophus_protobuf.h"
 
+using farm_ng::core::Bucket;
+using farm_ng::core::EventBus;
+using farm_ng::core::GetBucketAbsolutePath;
+using farm_ng::core::MakeEvent;
+using farm_ng::core::ReadProtobufFromJsonFile;
+
 namespace farm_ng {
-using farm_ng::perception::TagConfig;
-using farm_ng::perception::Vec2;
+namespace perception {
 
 std::array<Eigen::Vector3d, 4> PointsTag(const ApriltagDetection& detection) {
   CHECK(detection.tag_size() > 0.0);
@@ -425,4 +430,5 @@ bool ApriltagsFilter::AddApriltags(const ApriltagDetections& detections) {
   return false;
 }
 
+}  // namespace perception
 }  // namespace farm_ng

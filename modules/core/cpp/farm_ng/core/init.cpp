@@ -17,6 +17,7 @@ typedef boost::error_info<struct tag_stacktrace, boost::stacktrace::stacktrace>
     traced;
 
 namespace farm_ng {
+namespace core {
 
 namespace {
 boost::asio::io_service& _get_io_service() {
@@ -88,4 +89,6 @@ int Main(int argc, char** argv, int (*main_func)(EventBus&),
     return 1;
   }
 }
+
+}  // namespace core
 }  // namespace farm_ng

@@ -7,6 +7,7 @@
 #include <ceres/problem.h>
 
 namespace farm_ng {
+namespace calibration {
 
 class LocalParameterizationAbs : public ceres::LocalParameterization {
  public:
@@ -82,6 +83,7 @@ void AddSE3ParameterBlockSubsetTranslation(
     ceres::Problem* problem, double* parameter_block,
     const std::vector<int>& translation_subset);
 
+}  // namespace calibration
 }  // namespace farm_ng
 
 #endif  // FARM_NG_CALIBRATION_LOCAL_PARAMETERIZATION_SE3_H_

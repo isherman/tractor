@@ -6,15 +6,15 @@
 #include "farm_ng/perception/camera_pipeline.pb.h"
 
 namespace farm_ng {
+namespace perception {
 
-using farm_ng::perception::CameraPipelineCommand;
-using farm_ng::perception::CameraPipelineCommand_RecordStart_Mode;
-
-void RequestStartCapturing(EventBus& bus,
+void RequestStartCapturing(farm_ng::core::EventBus& bus,
                            CameraPipelineCommand_RecordStart_Mode mode);
-void RequestStartCapturing(EventBus& bus, CameraPipelineCommand command);
-void RequestStopCapturing(EventBus& bus);
+void RequestStartCapturing(farm_ng::core::EventBus& bus,
+                           CameraPipelineCommand command);
+void RequestStopCapturing(farm_ng::core::EventBus& bus);
 
+}  // namespace perception
 }  // namespace farm_ng
 
 #endif

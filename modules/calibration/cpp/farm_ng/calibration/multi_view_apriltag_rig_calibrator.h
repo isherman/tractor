@@ -5,8 +5,7 @@
 #include "farm_ng/calibration/calibrator.pb.h"
 
 namespace farm_ng {
-using farm_ng::calibration::CalibrateMultiViewApriltagRigConfiguration;
-using farm_ng::calibration::MultiViewApriltagRigModel;
+namespace calibration {
 
 MultiViewApriltagRigModel SolveMultiViewApriltagModel(
     MultiViewApriltagRigModel model);
@@ -14,5 +13,6 @@ MultiViewApriltagRigModel SolveMultiViewApriltagModel(
 MultiViewApriltagRigModel InitialMultiViewApriltagModelFromConfig(
     const CalibrateMultiViewApriltagRigConfiguration& config);
 
+}  // namespace calibration
 }  // namespace farm_ng
 #endif

@@ -4,9 +4,13 @@
 #include <string>
 
 #include <boost/filesystem.hpp>
+
 #include "farm_ng/core/io.pb.h"
 #include "farm_ng/core/resource.pb.h"
+
 namespace farm_ng {
+namespace core {
+
 class EventLogWriterImpl;
 class EventLogWriter {
  public:
@@ -18,6 +22,7 @@ class EventLogWriter {
   std::unique_ptr<EventLogWriterImpl> impl_;
 };
 
+}  // namespace core
 }  // namespace farm_ng
 
 #endif

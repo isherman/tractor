@@ -10,25 +10,22 @@
 #include <opencv2/videoio.hpp>
 #include <sophus/se3.hpp>
 
+#include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
 #include "farm_ng/calibration/flow_book_keeper.h"
+#include "farm_ng/perception/camera_model.pb.h"
 #include "farm_ng/perception/time_series.h"
 
-#include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
-#include "farm_ng/perception/camera_model.pb.h"
-
 namespace farm_ng {
-using farm_ng::calibration::BaseToCameraModel;
-using farm_ng::perception::CameraModel;
-using farm_ng::perception::NamedSE3Pose;
+namespace calibration {
 
 struct VisualOdometerResult {
-  NamedSE3Pose odometry_vo_pose_base;
-  NamedSE3Pose base_pose_goal;
+  farm_ng::perception::NamedSE3Pose odometry_vo_pose_base;
+  farm_ng::perception::NamedSE3Pose base_pose_goal;
 };
 
 class VisualOdometer {
  public:
-  VisualOdometer(const CameraModel& camera_model,
+  VisualOdometer(const farm_ng::perception::CameraModel& camera_model,
                  const BaseToCameraModel& base_to_camera_model,
                  size_t max_history);
 
@@ -54,7 +51,7 @@ class VisualOdometer {
 
   void AddFlowImageToProblem(FlowImage* flow_image, ceres::Problem* problem,
                              FlowBlocks* flow_blocks);
-  CameraModel camera_model_;
+  farm_ng::perception::CameraModel camera_model_;
   FlowBookKeeper flow_;
   BaseToCameraModel base_to_camera_model_;
 
@@ -63,10 +60,12 @@ class VisualOdometer {
 
   std::optional<uint64_t> goal_image_id_;
   Sophus::SE3d camera_pose_base_goal_;
-  TimeSeries<BaseToCameraModel::WheelMeasurement> wheel_measurements_;
+  farm_ng::perception::TimeSeries<BaseToCameraModel::WheelMeasurement>
+      wheel_measurements_;
 
   cv::Mat debug_image_;
 };
 
+}  // namespace calibration
 }  // namespace farm_ng
 #endif

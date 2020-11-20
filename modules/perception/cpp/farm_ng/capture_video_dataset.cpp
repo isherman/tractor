@@ -11,9 +11,9 @@
 #include "farm_ng/perception/tracking_camera_utils.h"
 
 #include "farm_ng/perception/apriltag.pb.h"
+#include "farm_ng/perception/camera_pipeline.pb.h"
 #include "farm_ng/perception/capture_video_dataset.pb.h"
 #include "farm_ng/perception/image.pb.h"
-#include "farm_ng/perception/camera_pipeline.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(name, "default",
@@ -21,32 +21,26 @@ DEFINE_string(name, "default",
 DEFINE_bool(detect_apriltags, false, "Detect apriltags.");
 
 typedef farm_ng::core::Event EventPb;
+using farm_ng::core::ArchiveProtobufAsJsonResource;
 using farm_ng::core::BUCKET_VIDEO_DATASETS;
+using farm_ng::core::EventBus;
+using farm_ng::core::LoggingStatus;
+using farm_ng::core::MakeEvent;
+using farm_ng::core::MakeTimestampNow;
 using farm_ng::core::Subscription;
-using farm_ng::perception::ApriltagDetection;
-using farm_ng::perception::CaptureVideoDatasetConfiguration;
-using farm_ng::perception::CaptureVideoDatasetResult;
-using farm_ng::perception::CaptureVideoDatasetStatus;
-using farm_ng::perception::Image;
-using farm_ng::perception::CameraPipelineCommand;
-
-void Cleanup(farm_ng::EventBus& bus) {
-  farm_ng::RequestStopCapturing(bus);
-  LOG(INFO) << "Requested Stop capture";
-  farm_ng::RequestStopLogging(bus);
-  LOG(INFO) << "Requested Stop logging";
-}
 
 namespace farm_ng {
+namespace perception {
 
 namespace {
-  bool ends_with(const std::string& s, const std::string& suffix) {
-    if (s.length() < suffix.length()) {
-      return false;
-    }
-    return (0 == s.compare(s.length() - suffix.length(), suffix.length(), suffix));
+bool ends_with(const std::string& s, const std::string& suffix) {
+  if (s.length() < suffix.length()) {
+    return false;
   }
-} // namespace
+  return (0 ==
+          s.compare(s.length() - suffix.length(), suffix.length(), suffix));
+}
+}  // namespace
 
 class CaptureVideoDatasetProgram {
  public:
@@ -136,9 +130,9 @@ class CaptureVideoDatasetProgram {
       }
     }
     if (first_frame_for_camera) {
-        auto per_camera_num_frames = status_.add_per_camera_num_frames();
-        per_camera_num_frames->set_camera_name(image.camera_model().frame_name());
-        per_camera_num_frames->set_num_frames(1);
+      auto per_camera_num_frames = status_.add_per_camera_num_frames();
+      per_camera_num_frames->set_camera_name(image.camera_model().frame_name());
+      per_camera_num_frames->set_num_frames(1);
     }
 
     // TODO(ethanrublee | isherman): Remove (deprecated)
@@ -161,9 +155,9 @@ class CaptureVideoDatasetProgram {
       }
     }
     if (first_time_seen) {
-        auto per_tag_id_num_frames = status_.add_per_tag_id_num_frames();
-        per_tag_id_num_frames->set_tag_id(detection.id());
-        per_tag_id_num_frames->set_num_frames(1);
+      auto per_tag_id_num_frames = status_.add_per_tag_id_num_frames();
+      per_tag_id_num_frames->set_tag_id(detection.id());
+      per_tag_id_num_frames->set_num_frames(1);
     }
 
     return true;
@@ -204,16 +198,25 @@ class CaptureVideoDatasetProgram {
   CaptureVideoDatasetStatus status_;
 };
 
+}  // namespace perception
 }  // namespace farm_ng
 
-int Main(farm_ng::EventBus& bus) {
-  CaptureVideoDatasetConfiguration config;
+int Main(farm_ng::core::EventBus& bus) {
+  farm_ng::perception::CaptureVideoDatasetConfiguration config;
   config.set_name(FLAGS_name);
   config.set_detect_apriltags(FLAGS_detect_apriltags);
-  farm_ng::CaptureVideoDatasetProgram program(bus, config, FLAGS_interactive);
+  farm_ng::perception::CaptureVideoDatasetProgram program(bus, config,
+                                                          FLAGS_interactive);
   return program.run();
 }
 
+void Cleanup(farm_ng::core::EventBus& bus) {
+  farm_ng::perception::RequestStopCapturing(bus);
+  LOG(INFO) << "Requested Stop capture";
+  farm_ng::core::RequestStopLogging(bus);
+  LOG(INFO) << "Requested Stop logging";
+}
+
 int main(int argc, char* argv[]) {
-  return farm_ng::Main(argc, argv, &Main, &Cleanup);
+  return farm_ng::core::Main(argc, argv, &Main, &Cleanup);
 }

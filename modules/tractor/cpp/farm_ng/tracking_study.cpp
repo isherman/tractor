@@ -15,21 +15,16 @@ tractor/build/cpp/farm_ng/tracking_study \
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "farm_ng/calibration/visual_odometer.h"
 #include "farm_ng/core/blobstore.h"
 #include "farm_ng/core/event_log_reader.h"
-#include "farm_ng/perception/image_loader.h"
 #include "farm_ng/core/init.h"
 #include "farm_ng/core/ipc.h"
-
+#include "farm_ng/perception/image_loader.h"
 #include "farm_ng/tractor/base_to_camera_calibrator.h"
-#include "farm_ng/calibration/visual_odometer.h"
 
 #include "farm_ng/calibration/calibrate_base_to_camera.pb.h"
 #include "farm_ng/perception/capture_video_dataset.pb.h"
-
-using farm_ng::calibration::CalibrateBaseToCameraResult;
-using farm_ng::perception::CaptureVideoDatasetResult;
-using farm_ng::tractor::TractorState;
 
 DEFINE_string(video_dataset_result, "",
               "The path to a serialized CaptureVideoDatasetResult");
@@ -39,7 +34,20 @@ DEFINE_string(base_to_camera_result, "",
 DEFINE_bool(zero_indexed, true,
             "Data recorded with zero indexed video frame numbers?  This is a "
             "hack that should be removed once data format is stable.");
+
+using farm_ng::calibration::BaseToCameraModel;
+using farm_ng::calibration::CalibrateBaseToCameraResult;
+using farm_ng::calibration::VisualOdometer;
+using farm_ng::core::EventBus;
+using farm_ng::core::EventLogReader;
+using farm_ng::core::ReadProtobufFromJsonFile;
+using farm_ng::core::ReadProtobufFromResource;
+using farm_ng::perception::CaptureVideoDatasetResult;
+using farm_ng::perception::Image;
+using farm_ng::perception::ImageLoader;
+
 namespace farm_ng {
+namespace tractor {
 
 class TrackingStudyProgram {
  public:
@@ -138,16 +146,17 @@ class TrackingStudyProgram {
  private:
   EventBus& bus_;
   boost::asio::deadline_timer timer_;
-};  // namespace farm_ng
+};
 
+}  // namespace tractor
 }  // namespace farm_ng
 
-void Cleanup(farm_ng::EventBus& bus) { LOG(INFO) << "Cleanup."; }
+void Cleanup(farm_ng::core::EventBus& bus) { LOG(INFO) << "Cleanup."; }
 
-int Main(farm_ng::EventBus& bus) {
-  farm_ng::TrackingStudyProgram program(bus);
+int Main(farm_ng::core::EventBus& bus) {
+  farm_ng::tractor::TrackingStudyProgram program(bus);
   return program.run();
 }
 int main(int argc, char* argv[]) {
-  return farm_ng::Main(argc, argv, &Main, &Cleanup);
+  return farm_ng::core::Main(argc, argv, &Main, &Cleanup);
 }

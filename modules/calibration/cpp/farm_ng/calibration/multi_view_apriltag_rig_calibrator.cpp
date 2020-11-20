@@ -1,39 +1,52 @@
 #include "farm_ng/calibration/multi_view_apriltag_rig_calibrator.h"
 
 #include <ceres/ceres.h>
+#include <google/protobuf/util/time_util.h>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/graph/graph_traits.hpp>
 #include <opencv2/highgui.hpp>  // TODO remove.
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
-
-#include <google/protobuf/util/time_util.h>
 #include <sophus/average.hpp>
-
-#include "farm_ng/core/blobstore.h"
-
-#include "farm_ng/core/event_log_reader.h"
-#include "farm_ng/perception/image_utils.h"
-#include "farm_ng/core/ipc.h"
-#include "farm_ng/perception/sophus_protobuf.h"
-
-#include "farm_ng/perception/apriltag.h"
-#include "farm_ng/perception/camera_model.h"
 
 #include "farm_ng/calibration/apriltag_rig_calibrator.h"
 #include "farm_ng/calibration/kinematics.h"
 #include "farm_ng/calibration/local_parameterization.h"
+#include "farm_ng/core/blobstore.h"
+#include "farm_ng/core/event_log_reader.h"
+#include "farm_ng/core/ipc.h"
+#include "farm_ng/perception/apriltag.h"
+#include "farm_ng/perception/apriltag.pb.h"
+#include "farm_ng/perception/camera_model.h"
+#include "farm_ng/perception/capture_video_dataset.pb.h"
+#include "farm_ng/perception/image_loader.h"
+#include "farm_ng/perception/image_utils.h"
 #include "farm_ng/perception/pose_utils.h"
+#include "farm_ng/perception/sophus_protobuf.h"
 #include "farm_ng/perception/time_series.h"
 
-#include "farm_ng/perception/apriltag.pb.h"
-#include "farm_ng/perception/capture_video_dataset.pb.h"
-
-#include "farm_ng/perception/image_loader.h"
-
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/dijkstra_shortest_paths.hpp>
-#include <boost/graph/graph_traits.hpp>
+typedef farm_ng::core::Event EventPb;
+using farm_ng::core::EventLogReader;
+using farm_ng::core::GetUniqueArchiveResource;
+using farm_ng::core::ReadProtobufFromResource;
+using farm_ng::core::Resource;
+using farm_ng::perception::ApriltagDetections;
+using farm_ng::perception::ApriltagRig;
+using farm_ng::perception::ApriltagsFilter;
+using farm_ng::perception::CameraModel;
+using farm_ng::perception::ConstructGridImage;
+using farm_ng::perception::FrameNameNumber;
+using farm_ng::perception::FrameRigTag;
+using farm_ng::perception::Image;
+using farm_ng::perception::ImageLoader;
+using farm_ng::perception::NamedSE3Pose;
+using farm_ng::perception::SophusToProto;
+using farm_ng::perception::TimeSeries;
+using Sophus::SE3d;
 
 namespace farm_ng {
+namespace calibration {
 
 struct pose_edge_t {
   typedef boost::edge_property_tag kind;
@@ -378,10 +391,9 @@ class PoseGraph {
   GraphT graph_;
 };
 
-using farm_ng::perception::CaptureVideoDatasetResult;
 using farm_ng::core::Event;
+using farm_ng::perception::CaptureVideoDatasetResult;
 using farm_ng::perception::MultiViewApriltagDetections;
-using farm_ng::calibration::PerImageRmse;
 using Sophus::SE3d;
 
 struct CameraRigApriltagRigCostFunctor {
@@ -605,9 +617,9 @@ void ModelError(MultiViewApriltagRigModel* model) {
     reprojection_image.mutable_camera_model()->set_image_width(image_width);
     reprojection_image.mutable_camera_model()->set_image_height(image_height);
     auto resource_path = GetUniqueArchiveResource(
-        FrameNameNumber("reprojection-" + farm_ng::calibration::SolverStatus_Name(
-                                              model->solver_status()),
-                        frame_num),
+        FrameNameNumber(
+            "reprojection-" + SolverStatus_Name(model->solver_status()),
+            frame_num),
         "png", "image/png");
     reprojection_image.mutable_resource()->CopyFrom(resource_path.first);
     LOG(INFO) << resource_path.second.string();
@@ -970,4 +982,6 @@ MultiViewApriltagRigModel SolveMultiViewApriltagModel(
   ModelError(&model);
   return model;
 }
+
+}  // namespace calibration
 }  // namespace farm_ng

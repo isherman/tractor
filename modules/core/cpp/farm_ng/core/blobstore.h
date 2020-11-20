@@ -12,9 +12,7 @@
 #include "farm_ng/core/resource.pb.h"
 
 namespace farm_ng {
-
-using farm_ng::core::Bucket;
-using farm_ng::core::Resource;
+namespace core {
 
 boost::filesystem::path GetBlobstoreRoot();
 boost::filesystem::path GetBucketRelativePath(Bucket id);
@@ -49,8 +47,9 @@ const std::string& ContentTypeProtobufJson() {
 boost::filesystem::path MakePathUnique(boost::filesystem::path root,
                                        boost::filesystem::path path);
 template <typename ProtobufT>
-farm_ng::core::Resource WriteProtobufAsJsonResource(
-    Bucket id, const std::string& path, const ProtobufT& message) {
+farm_ng::core::Resource WriteProtobufAsJsonResource(Bucket id,
+                                                    const std::string& path,
+                                                    const ProtobufT& message) {
   farm_ng::core::Resource resource;
   resource.set_content_type(ContentTypeProtobufJson<ProtobufT>());
 
@@ -111,8 +110,7 @@ ProtobufT ReadProtobufFromBinaryFile(const boost::filesystem::path& path) {
 }
 
 template <typename ProtobufT>
-ProtobufT ReadProtobufFromResource(
-    const farm_ng::core::Resource& resource) {
+ProtobufT ReadProtobufFromResource(const farm_ng::core::Resource& resource) {
   if (ContentTypeProtobufJson<ProtobufT>() == resource.content_type()) {
     return ReadProtobufFromJsonFile<ProtobufT>(GetBlobstoreRoot() /
                                                resource.path());
@@ -127,6 +125,8 @@ ProtobufT ReadProtobufFromResource(
       ContentTypeProtobufBinary<ProtobufT>() +
       " instead : " + resource.content_type());
 }
+
+}  // namespace core
 }  // namespace farm_ng
 
 #endif
