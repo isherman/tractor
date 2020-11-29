@@ -15,12 +15,8 @@ message CalibrateIntrinsicsConfiguration {
 
   farm_ng.perception.CameraModel.DistortionModel distortion_model = 2;
 
-  // A list of Apriltag board names to use in calibration.
-  string calibration_board_name = 3;
-
-  string camera_name = 4;
-
-  bool filter_stable_tags = 5;
+  string camera_name = 3;
+  bool filter_stable_tags = 4;
 }
 
 message CalibrateIntrinsicsStatus {

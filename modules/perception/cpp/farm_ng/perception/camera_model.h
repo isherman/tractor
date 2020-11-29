@@ -15,6 +15,8 @@ namespace perception {
 template <typename T>
 class CameraModelJetMap {
  public:
+  static int constexpr num_parameters = 9;
+
   explicit CameraModelJetMap(const CameraModel& camera_model)
       : storage_({0.}),
         camera_model_(camera_model),
@@ -28,6 +30,9 @@ class CameraModelJetMap {
       storage_[4 + i] = camera_model_.distortion_coefficients(i);
     }
   }
+  explicit CameraModelJetMap(const T* raw_model,
+                             const CameraModel& camera_model)
+      : camera_model_(camera_model), raw_model_(raw_model) {}
 
   CameraModel GetCameraModel() const {
     CameraModel model;
@@ -42,9 +47,6 @@ class CameraModelJetMap {
     return model;
   }
 
-  explicit CameraModelJetMap(T* raw_model, const CameraModel& camera_model)
-      : camera_model_(camera_model), raw_model_(raw_model) {}
-
   const T& fx() const { return raw_model_[0]; }
   const T& fy() const { return raw_model_[1]; }
   const T& cx() const { return raw_model_[2]; }
@@ -55,14 +57,18 @@ class CameraModelJetMap {
   CameraModel::DistortionModel distortion_model() const {
     return camera_model_.distortion_model();
   }
-  T* data() { return raw_model_; }
+
+  T* data() { return const_cast<T*>(raw_model_); }
   size_t data_size() const { return storage_.size(); }
 
- private:
-  std::array<T, 9> storage_;
-  CameraModel camera_model_;
+  std::string ShortDebugString() const {
+    return camera_model_.ShortDebugString();
+  }
 
-  T* raw_model_;  // fx, fy, cx, cy, d0, d1, d2,d3,d4
+ private:
+  std::array<T, num_parameters> storage_;
+  CameraModel camera_model_;
+  const T* raw_model_;  // fx, fy, cx, cy, d0, d1, d2,d3,d4
 };
 
 inline cv::Size GetCvSize(const CameraModel& model) {
