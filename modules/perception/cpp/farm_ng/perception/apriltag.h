@@ -47,7 +47,8 @@ class ApriltagsFilter {
  public:
   ApriltagsFilter();
   void Reset();
-  bool AddApriltags(const ApriltagDetections& detections);
+  bool AddApriltags(const ApriltagDetections& detections, int steady_count = 5,
+                    int window_size = 7);
 
  private:
   cv::Mat mask_;
@@ -57,7 +58,8 @@ class ApriltagsFilter {
 class ApriltagDetector {
  public:
   ApriltagDetector(const CameraModel& camera_model,
-                   farm_ng::core::EventBus* event_bus = nullptr);
+                   farm_ng::core::EventBus* event_bus = nullptr,
+                   const ApriltagConfig* config = nullptr);
 
   ~ApriltagDetector();
 

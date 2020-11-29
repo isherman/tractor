@@ -53,13 +53,13 @@ void GlogFailureFunction() {
 
 int Main(int argc, char** argv, int (*main_func)(EventBus&),
          void (*cleanup_func)(EventBus&)) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
   FLAGS_logtostderr = 1;
-
   std::string filename = boost::filesystem::path(argv[0]).filename().string();
   google::InitGoogleLogging(filename.c_str());
   google::InstallFailureFunction(&GlogFailureFunction);
   google::InstallFailureSignalHandler();
+
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   _get_signal_set().async_wait(&_signal_handler);
 

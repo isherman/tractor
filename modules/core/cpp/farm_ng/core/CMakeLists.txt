@@ -1,5 +1,5 @@
 find_package(Boost REQUIRED system filesystem)
-find_package(gflags REQUIRED)
+find_package(gflags REQUIRED COMPONENTS shared)
 find_package(Glog REQUIRED)
 
 add_library(farm_ng_core SHARED
@@ -21,6 +21,7 @@ target_link_libraries(
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   dl
+  pthread
   gflags
   ${GLOG_LIBRARIES}
 )

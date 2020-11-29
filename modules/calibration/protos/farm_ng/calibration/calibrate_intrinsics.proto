@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "farm_ng/core/resource.proto";
+import "farm_ng/calibration/calibrator.proto";
+import "farm_ng/calibration/intrinsic_model.proto";
+import "farm_ng/perception/camera_model.proto";
+
+package farm_ng.calibration;
+option go_package = "github.com/farm-ng/genproto/calibration";
+
+message CalibrateIntrinsicsConfiguration {
+  // Serialized CaptureVideoDatasetResult
+  farm_ng.core.Resource video_dataset = 1;
+
+  farm_ng.perception.CameraModel.DistortionModel distortion_model = 2;
+
+  // A list of Apriltag board names to use in calibration.
+  string calibration_board_name = 3;
+
+  string camera_name = 4;
+
+  bool filter_stable_tags = 5;
+}
+
+message CalibrateIntrinsicsStatus {
+  oneof input_required {
+    CalibrateIntrinsicsConfiguration input_required_configuration = 1;
+  }
+  // Serialized CalibrateIntrinsicsResult
+  farm_ng.core.Resource result = 2;
+
+  SolverIterationSummary iteration_summary = 3;
+}
+
+message CalibrateIntrinsicsResult {
+  // Configuration which initiated the computation of this result.
+  CalibrateIntrinsicsConfiguration configuration = 1;
+  farm_ng.core.Resource intrinsics_solved = 2;
+  SolverStatus solver_status = 3;
+  double rmse = 4;
+  google.protobuf.Timestamp stamp_end = 5;
+  // Debug event log.
+  farm_ng.core.Resource event_log = 6;
+}
