@@ -17,10 +17,10 @@ message IntrinsicModel {
   // The solved for camera model.
   farm_ng.perception.CameraModel camera_model = 1;
 
-  // Calibration board rig used for solving camera model
+  // Apriltag rigs used for solving camera model
   repeated farm_ng.perception.ApriltagRig apriltag_rigs = 2;
 
-  // Is this the initial rig, or did the solver converge, fail...
+  // Is this the initialization or did the solver converge, fail...
   // For diagnosis of failures or unexpected results its useful to look at the
   // initialization first.
   SolverStatus solver_status = 3;
@@ -31,13 +31,13 @@ message IntrinsicModel {
   repeated ApriltagRigTagStats tag_stats = 5;
 
   // The ApriltagDetections that are used to initialize and solve the
-  // rig. For debugging purposes, these typically have the image resources
+  // camera model. For debugging purposes, these typically have the image resources
   // associated with them.  The tag_stats.per_image_rmse keys refer to the
   // elements of this collection.
   repeated farm_ng.perception.ApriltagDetections detections = 6;
 
-  // The solver also estimates the pose of each of the camera views in
-  // detections to the the rig.  This is may not be the same length of
+  // The solver also estimates the pose of each of the camera views w.r.t to the apriltag rigs.
+  //  This is may not be the same length of
   // detections, for example if the detections had outliers or not enough
   // detections to estimate the pose, but the frame names
   // <camera_frame_name>/<detections_index %05d> encode
