@@ -263,10 +263,18 @@ IntrinsicModel SolveIntrinsicsModel(IntrinsicModel model) {
   problem.AddParameterBlock(camera_model_param.data(),
                             camera_model_param.data_size(), nullptr);
   for (PoseEdge* pose_edge : pose_graph.MutablePoseEdges()) {
-    LOG(INFO) << *pose_edge;
+    // LOG(INFO) << *pose_edge;
     problem.AddParameterBlock(pose_edge->GetAPoseB().data(),
                               SE3d::num_parameters,
                               new LocalParameterizationSE3);
+
+    if (pose_edge->frame_a.find(model.camera_model().frame_name()) ==
+            std::string::npos &&
+        pose_edge->frame_b.find(model.camera_model().frame_name()) ==
+            std::string::npos) {
+      LOG(INFO) << "Setting constant: " << *pose_edge;
+      problem.SetParameterBlockConstant(pose_edge->GetAPoseB().data());
+    }
   }
 
   for (int i = 0; i < model.detections_size(); ++i) {
@@ -299,7 +307,6 @@ IntrinsicModel SolveIntrinsicsModel(IntrinsicModel model) {
                                camera_model_param.data(),
                                camera_to_tag_rig->GetAPoseB().data(),
                                tag_to_tag_rig->GetAPoseB().data());
-      problem.SetParameterBlockConstant(tag_to_tag_rig->GetAPoseB().data());
     }
   }
 
@@ -374,8 +381,14 @@ IntrinsicModel InitialIntrinsicModelFromConfig(
                   << detections.image().camera_model().ShortDebugString();
         intrinsic_model.mutable_camera_model()->CopyFrom(
             detections.image().camera_model());
-        // intrinsic_model.mutable_camera_model()->set_distortion_model(
-        //     CameraModel::DISTORTION_MODEL_INVERSE_BROWN_CONRADY);
+        if (config.distortion_model() !=
+            CameraModel::DISTORTION_MODEL_UNSPECIFIED) {
+          LOG(INFO) << "Solving for distortion model: "
+                    << CameraModel::DistortionModel_Name(
+                           config.distortion_model());
+          intrinsic_model.mutable_camera_model()->set_distortion_model(
+              config.distortion_model());
+        }
       } else {
         CHECK_EQ(intrinsic_model.camera_model().image_height(),
                  detections.image().camera_model().image_height());
