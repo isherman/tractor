@@ -78,8 +78,8 @@ class CalibrateIntrinsicsProgram {
     // Output under the same directory as the dataset.
     SetArchivePath((output_dir / "intrinsic_model").string());
 
-    IntrinsicModel solved_model_pb =
-        SolveIntrinsicsModel(InitialIntrinsicModelFromConfig(configuration_));
+    IntrinsicModel solved_model_pb = SolveIntrinsicsModel(
+        bus_, InitialIntrinsicModelFromConfig(configuration_));
 
     LOG(INFO) << "Initial model computed.";
 

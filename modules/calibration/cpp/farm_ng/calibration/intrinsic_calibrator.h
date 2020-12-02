@@ -2,11 +2,12 @@
 #define FARM_NG_CALIBRATION_INTRINSIC_CALIBRATOR_H_
 #include "farm_ng/calibration/calibrate_intrinsics.pb.h"
 #include "farm_ng/calibration/intrinsic_model.pb.h"
+#include "farm_ng/core/ipc.h"
 
 namespace farm_ng {
 namespace calibration {
 
-IntrinsicModel SolveIntrinsicsModel(IntrinsicModel model);
+IntrinsicModel SolveIntrinsicsModel(core::EventBus& bus, IntrinsicModel model);
 
 IntrinsicModel InitialIntrinsicModelFromConfig(
     const CalibrateIntrinsicsConfiguration& config);

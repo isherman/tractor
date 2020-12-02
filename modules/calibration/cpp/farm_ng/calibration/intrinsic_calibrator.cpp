@@ -13,6 +13,7 @@
 #include "farm_ng/perception/image_loader.h"
 #include "farm_ng/perception/pose_graph.h"
 #include "farm_ng/perception/pose_utils.h"
+#include "farm_ng/perception/video_streamer.h"
 
 #include "farm_ng/calibration/local_parameterization.h"
 
@@ -173,7 +174,7 @@ std::tuple<PoseGraph, ApriltagRigIdMap> PoseGraphFromModel(
   return {pose_graph, id_map};
 }
 
-void ModelError(IntrinsicModel* model) {
+void ModelError(core::EventBus& bus, IntrinsicModel* model) {
   model->set_rmse(0.0);
   model->clear_reprojection_images();
   model->clear_tag_stats();
@@ -190,6 +191,9 @@ void ModelError(IntrinsicModel* model) {
 
   cv::namedWindow("image", 0);
   cv::resizeWindow("image", cv::Size(1920 / 2, 1080 / 2));
+
+  perception::VideoStreamer streamer(bus, model->camera_model(),
+                                     perception::VideoStreamer::MODE_MP4_FILE);
 
   for (int i = 0; i < model->detections_size(); ++i) {
     std::string camera_frame =
@@ -247,12 +251,13 @@ void ModelError(IntrinsicModel* model) {
       cv::putText(image, id_str, dc, cv::FONT_HERSHEY_PLAIN, 1.0,
                   cv::Scalar(125, 255, 125));
     }
+    streamer.AddFrame(image, core::MakeTimestampNow());
     cv::imshow("image", image);
-    cv::waitKey(0);
+    cv::waitKey(10);
   }
 }
 
-IntrinsicModel SolveIntrinsicsModel(IntrinsicModel model) {
+IntrinsicModel SolveIntrinsicsModel(core::EventBus& bus, IntrinsicModel model) {
   perception::CameraModelJetMap<double> camera_model_param(
       model.camera_model());
   PoseGraph pose_graph;
@@ -331,7 +336,7 @@ IntrinsicModel SolveIntrinsicsModel(IntrinsicModel model) {
     model.mutable_camera_model()->CopyFrom(camera_model_param.GetCameraModel());
     pose_graph.UpdateNamedSE3Poses(model.mutable_camera_poses_rig());
     model.set_solver_status(SolverStatus::SOLVER_STATUS_CONVERGED);
-    ModelError(&model);
+    ModelError(bus, &model);
   } else {
     model.set_solver_status(SolverStatus::SOLVER_STATUS_FAILED);
   }
