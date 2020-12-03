@@ -1,5 +1,7 @@
 #include "farm_ng/perception/frame_grabber.h"
+
 #include <iostream>
+
 namespace farm_ng {
 namespace perception {
 
