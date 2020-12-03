@@ -13,6 +13,7 @@ find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
 set(_GRPC_GRPCPP gRPC::grpc++)
 set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
+set(_GRPC_PYTHON_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_python_plugin>)
 
 macro(farm_ng_add_protobufs target)
   set(multi_value_args PROTO_FILES DEPENDENCIES)
@@ -41,13 +42,13 @@ macro(farm_ng_add_protobufs target)
     set("_protoc_args_cpp"
       "--cpp_out=${_proto_output_dir_cpp}"
       "--grpc_out=${_proto_output_dir_cpp}"
-      "--plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-      )
+      "--plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN_EXECUTABLE}")
     SET(_cpp_out_src ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.pb.cc)
     SET(_cpp_out_hdr ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.pb.h)
     SET(_cpp_grpc_out_src ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.grpc.pb.cc)
     SET(_cpp_grpc_out_hdr ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.grpc.pb.h)
     list(APPEND _cpp_out_all ${_cpp_out_src} ${_cpp_out_hdr})
+    list(APPEND _cpp_grpc_out_all ${_cpp_grpc_out_src} ${_cpp_grpc_out_hdr})
     add_custom_command(
       OUTPUT ${_cpp_out_src} ${_cpp_out_hdr} ${_cpp_grpc_out_src} ${_cpp_grpc_out_hdr}
       COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
@@ -57,11 +58,15 @@ macro(farm_ng_add_protobufs target)
       VERBATIM)
 
     # python
-    set("_protoc_args_python" "--python_out=${_proto_output_dir_python}")
+    set("_protoc_args_python"
+      "--python_out=${_proto_output_dir_python}"
+      "--grpc_python_out=${_proto_output_dir_python}"
+      "--plugin=protoc-gen-grpc_python=${_GRPC_PYTHON_PLUGIN_EXECUTABLE}")
     SET(_python_out ${_proto_output_dir_python}/${_file_dir}/${_file_we}_pb2.py)
-    list(APPEND _python_out_all ${_python_out})
+    SET(_python_grpc_out ${_proto_output_dir_python}/${_file_dir}/${_file_we}_pb2_grpc.py)
+    list(APPEND _python_out_all ${_python_out} ${_python_grpc_out})
     add_custom_command(
-      OUTPUT ${_python_out}
+      OUTPUT ${_python_out} ${_python_grpc_out}
       COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
       ARGS ${_protoc_args_python} -I ${CMAKE_CURRENT_SOURCE_DIR} ${DEP_PROTO_INCLUDES} ${_full_proto_path}
       DEPENDS ${_full_proto_path} ${PROTOBUF_PROTOC_EXECUTABLE}
