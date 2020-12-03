@@ -3,13 +3,13 @@ from concurrent import futures
 
 import grpc
 
-from farm_ng.calibration.hal_pb2 import CalibrationResultResponse
-from farm_ng.calibration.hal_pb2 import CapturePoseResponse
-from farm_ng.calibration.hal_pb2_grpc import RobotBaseToCameraHALServiceServicer
-from farm_ng.calibration.hal_pb2_grpc import add_RobotBaseToCameraHALServiceServicer_to_server
+from farm_ng.calibration.robot_hal_pb2 import CalibrationResultResponse
+from farm_ng.calibration.robot_hal_pb2 import CapturePoseResponse
+from farm_ng.calibration.robot_hal_pb2_grpc import RobotHALServiceServicer
+from farm_ng.calibration.robot_hal_pb2_grpc import add_RobotHALServiceServicer_to_server
 
 
-class BaseToCameraCalibrationServer(RobotBaseToCameraHALServiceServicer):
+class RobotHALServer(RobotHALServiceServicer):
 
     def CapturePose(self, request_iterator, context):
         for request in request_iterator:
@@ -22,7 +22,7 @@ class BaseToCameraCalibrationServer(RobotBaseToCameraHALServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    add_RobotBaseToCameraHALServiceServicer_to_server(BaseToCameraCalibrationServer(), server)
+    add_RobotHALServiceServicer_to_server(RobotHALServer(), server)
     server.add_insecure_port('[::]:50051')
     server.start()
     server.wait_for_termination()

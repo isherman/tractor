@@ -51,7 +51,6 @@ sudo apt-get install -y \
      libgstreamer-plugins-base1.0-dev \
      libgstreamer1.0-dev \
      libprotobuf-dev \
-     libprotoc-dev \
      librealsense2-dev \
      librealsense2-utils \
      libsuitesparse-dev \
