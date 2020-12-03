@@ -1,4 +1,18 @@
+# Find Protobuf installation
+# Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.
+set(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(Protobuf REQUIRED)
+message(STATUS "Using protobuf ${Protobuf_VERSION}")
+set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
+set(_REFLECTION gRPC::grpc++_reflection)
+set(_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
+
+# Find gRPC installation
+# Looks for gRPCConfig.cmake file installed by gRPC's cmake installation.
+find_package(gRPC CONFIG REQUIRED)
+message(STATUS "Using gRPC ${gRPC_VERSION}")
+set(_GRPC_GRPCPP gRPC::grpc++)
+set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 
 macro(farm_ng_add_protobufs target)
   set(multi_value_args PROTO_FILES DEPENDENCIES)
@@ -24,12 +38,18 @@ macro(farm_ng_add_protobufs target)
     get_filename_component(_file_dir ${_proto_path} DIRECTORY)
 
     # cpp
-    set("_protoc_args_cpp" "--cpp_out=${_proto_output_dir_cpp}")
+    set("_protoc_args_cpp"
+      "--cpp_out=${_proto_output_dir_cpp}"
+      "--grpc_out=${_proto_output_dir_cpp}"
+      "--plugin=protoc-gen-grpc=${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+      )
     SET(_cpp_out_src ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.pb.cc)
     SET(_cpp_out_hdr ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.pb.h)
+    SET(_cpp_grpc_out_src ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.grpc.pb.cc)
+    SET(_cpp_grpc_out_hdr ${_proto_output_dir_cpp}/${_file_dir}/${_file_we}.grpc.pb.h)
     list(APPEND _cpp_out_all ${_cpp_out_src} ${_cpp_out_hdr})
     add_custom_command(
-      OUTPUT ${_cpp_out_src} ${_cpp_out_hdr}
+      OUTPUT ${_cpp_out_src} ${_cpp_out_hdr} ${_cpp_grpc_out_src} ${_cpp_grpc_out_hdr}
       COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
       ARGS ${_protoc_args_cpp} -I ${CMAKE_CURRENT_SOURCE_DIR} ${DEP_PROTO_INCLUDES} ${_full_proto_path}
       DEPENDS ${_full_proto_path} ${PROTOBUF_PROTOC_EXECUTABLE}
@@ -83,7 +103,7 @@ macro(farm_ng_add_protobufs target)
   if(NOT DISABLE_PROTOC_cpp)
     add_library(${target} SHARED ${_cpp_out_all})
     target_include_directories(${target} PUBLIC ${_proto_output_dir_cpp})
-    target_link_libraries(${target} ${Protobuf_LIBRARIES} ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
+    target_link_libraries(${target} ${Protobuf_LIBRARIES} ${_GRPC_GRPCPP} ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
   endif()
 
   if(NOT DISABLE_PROTOC_python)

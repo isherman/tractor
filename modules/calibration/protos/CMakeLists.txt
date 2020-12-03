@@ -4,6 +4,7 @@ farm_ng_add_protobufs(farm_ng_calibration_protobuf
   ./farm_ng/calibration/calibrate_base_to_camera.proto
   ./farm_ng/calibration/calibrate_multi_view_apriltag_rig.proto
   ./farm_ng/calibration/calibrator.proto
+  ./farm_ng/calibration/hal.proto
   DEPENDENCIES
   farm_ng_core_protobuf
   farm_ng_perception_protobuf

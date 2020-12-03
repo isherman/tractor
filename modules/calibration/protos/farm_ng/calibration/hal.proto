@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+import "farm_ng/calibration/calibrator.proto";
+import "farm_ng/perception/geometry.proto";
+import "farm_ng/perception/image.proto";
+
+package farm_ng.calibration;
+option go_package = "github.com/farm-ng/genproto/calibration";
+
+message CapturePoseRequest {
+  farm_ng.perception.NamedSE3Pose base_pose_tool_flange = 1;
+}
+
+message CapturePoseResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_SUCCESS = 1;
+    STATUS_ERROR_STOPPED = 2;
+    STATUS_ERROR_NOT_READY = 3;
+    STATUS_ERROR_BAD_POSE = 4;
+  }
+
+  Status status = 1;
+  farm_ng.perception.NamedSE3Pose base_pose_tool_flange = 2;
+
+  // Image here contains the RGBD data and the factory calibration camera model
+  // (intrinsics and extrinsics).
+  farm_ng.perception.ImageRGBD image_rgbd = 3;
+}
+
+message RobotBaseToCameraModel {
+  SolverStatus status = 1;
+  double rmse = 2;
+  repeated farm_ng.perception.NamedSE3Pose base_poses_camera = 3;
+  repeated farm_ng.perception.NamedSE3Pose tool_flange_poses_marker = 4;
+  // repeated PerMeasurementStats stats = 5;
+}
+
+message CalibrationResultRequest {
+  RobotBaseToCameraModel model = 1;
+  // A name for the model, such as a date, workcell number, entered by operator.
+  string model_name = 2;
+  // Who performed the calibration?
+  string operator_name = 3;
+  // Any notes associated with the calibration, like why it was performed.
+  string notes = 4;
+}
+
+message CalibrationResultResponse {
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_ACCEPTED = 1;
+  }
+  Status status = 1;
+}
+
+// This service API is implemented by the robot workcell, and allows the
+// calibration tool UI to interactively drive a calibration motion and capture
+// dance. The implementation of the service has access to camera frame grabbers,
+// robot controller, the kinematics, and the application specific safety and
+// system state variables.
+service RobotBaseToCameraHALService {
+  // The calibration tool calls CapturePose when initiated from the UI, with a
+  // sequence of robot pose goals, and expects the robot to move to each goal,
+  // pause for some amount of time, and returns an image and the achieved pose.
+  // It is the server's responsibility to ensure it is safe to move the the
+  // goal.
+  rpc CapturePose(stream CapturePoseRequest)
+    returns (stream CapturePoseResponse) {
+  }
+  // When the calibration result has been accepted by an operator in the
+  // calibration UI, the calibration tool calls this function to report the
+  // calibration to the workcell.
+  rpc CalibrationResult(CalibrationResultRequest)
+    returns (CalibrationResultResponse) {
+  }
+}
