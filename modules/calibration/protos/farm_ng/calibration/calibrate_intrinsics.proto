@@ -10,7 +10,8 @@ package farm_ng.calibration;
 option go_package = "github.com/farm-ng/genproto/calibration";
 
 message CalibrateIntrinsicsConfiguration {
-  // Serialized CaptureVideoDatasetResult
+  // Serialized CreateVideoDatasetResult
+  // TODO support CreateVideoDatasetResult and CaptureVideoDatasetResult
   farm_ng.core.Resource video_dataset = 1;
 
   farm_ng.perception.CameraModel.DistortionModel distortion_model = 2;

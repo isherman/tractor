@@ -1,12 +1,10 @@
 syntax = "proto3";
 
-import "farm_ng/core/resource.proto";
 import "farm_ng/perception/apriltag.proto";
 import "farm_ng/perception/camera_model.proto";
 import "farm_ng/perception/geometry.proto";
 import "farm_ng/perception/image.proto";
 import "farm_ng/calibration/calibrator.proto";
-import "google/protobuf/timestamp.proto";
 
 package farm_ng.calibration;
 option go_package = "github.com/farm-ng/genproto/calibration";

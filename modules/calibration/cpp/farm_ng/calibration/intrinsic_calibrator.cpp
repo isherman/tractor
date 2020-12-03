@@ -9,7 +9,7 @@
 
 #include "farm_ng/perception/apriltag.h"
 #include "farm_ng/perception/camera_model.h"
-#include "farm_ng/perception/capture_video_dataset.pb.h"
+#include "farm_ng/perception/create_video_dataset.pb.h"
 #include "farm_ng/perception/image_loader.h"
 #include "farm_ng/perception/pose_graph.h"
 #include "farm_ng/perception/pose_utils.h"
@@ -373,8 +373,9 @@ IntrinsicModel SolveIntrinsicsModel(IntrinsicModel model) {
 
 IntrinsicModel InitialIntrinsicModelFromConfig(
     const CalibrateIntrinsicsConfiguration& config) {
+  // TODO add support for
   auto dataset_result =
-      core::ReadProtobufFromResource<perception::CaptureVideoDatasetResult>(
+      core::ReadProtobufFromResource<perception::CreateVideoDatasetResult>(
           config.video_dataset());
 
   IntrinsicModel intrinsic_model;

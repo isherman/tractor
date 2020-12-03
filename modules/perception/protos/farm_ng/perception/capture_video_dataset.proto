@@ -6,16 +6,9 @@ import "google/protobuf/timestamp.proto";
 package farm_ng.perception;
 option go_package = "github.com/farm-ng/genproto/perception";
 
-message VideoFileCamera {
-  string camera_frame_name = 1;
-  farm_ng.core.Resource video_file_resource = 2;
-}
-
 message CaptureVideoDatasetConfiguration {
   string name = 1;
   bool detect_apriltags = 2;
-  repeated VideoFileCamera video_file_cameras = 3;
-  repeated farm_ng.core.Resource apriltag_rigs = 4;
 }
 
 message PerCameraNumFrames {

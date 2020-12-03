@@ -20,7 +20,7 @@
 #include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/perception/camera_model.h"
 #include "farm_ng/perception/camera_pipeline.pb.h"
-#include "farm_ng/perception/capture_video_dataset.pb.h"
+#include "farm_ng/perception/create_video_dataset.pb.h"
 #include "farm_ng/perception/image.pb.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
@@ -53,7 +53,7 @@ namespace perception {
 class CreateVideoDatasetProgram {
  public:
   CreateVideoDatasetProgram(EventBus& bus,
-                            CaptureVideoDatasetConfiguration configuration,
+                            CreateVideoDatasetConfiguration configuration,
                             bool interactive)
       : bus_(bus), timer_(bus_.get_io_service()) {
     if (interactive) {
@@ -74,6 +74,10 @@ class CreateVideoDatasetProgram {
     }
 
     WaitForServices(bus_, {"ipc_logger"});
+
+    CreateVideoDatasetResult result;
+
+    result.mutable_stamp_begin()->CopyFrom(MakeTimestampNow());
 
     std::vector<ApriltagRig> rigs;
     ApriltagConfig apriltag_config;
@@ -136,7 +140,6 @@ class CreateVideoDatasetProgram {
       bus_.Send(
           MakeEvent(camera_model->frame_name() + "/image", image_pb, stamp));
 
-      status_.set_num_frames(image_pb.frame_number().value() + 1);
       bool first_frame_for_camera = true;
       for (auto& entry : *status_.mutable_per_camera_num_frames()) {
         if (entry.camera_name() == image_pb.camera_model().frame_name()) {
@@ -181,9 +184,7 @@ class CreateVideoDatasetProgram {
 
     bus_.get_io_service().poll();
 
-    CaptureVideoDatasetResult result;
     result.mutable_configuration()->CopyFrom(configuration_);
-    result.set_num_frames(status_.num_frames());
     result.mutable_per_camera_num_frames()->CopyFrom(
         status_.per_camera_num_frames());
     result.mutable_per_tag_id_num_frames()->CopyFrom(
@@ -201,28 +202,6 @@ class CreateVideoDatasetProgram {
     LOG(INFO) << "Complete:\n" << status_.DebugString();
     send_status();
     return 0;
-
-    // try {
-    //   bus_.get_io_service().run();
-    // } catch (std::exception& e) {
-    //   CaptureVideoDatasetResult result;
-    //   result.mutable_configuration()->CopyFrom(configuration_);
-    //   result.set_num_frames(status_.num_frames());
-    //   result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
-    //   result.mutable_dataset()->set_path(log.recording().archive_path());
-
-    //   // TODO some how save the result in the archive directory as well, so
-    //   its
-    //   // self contained.
-    //   ArchiveProtobufAsJsonResource(configuration_.name(), result);
-
-    //   status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
-    //       BUCKET_VIDEO_DATASETS, configuration_.name(), result));
-    //   LOG(INFO) << "Complete:\n" << status_.DebugString();
-    //   send_status();
-    //   return 0;
-    // }
-    // return 1;
   }
 
   void send_status() {
@@ -243,7 +222,7 @@ class CreateVideoDatasetProgram {
   }
 
   bool on_configuration(const EventPb& event) {
-    CaptureVideoDatasetConfiguration configuration;
+    CreateVideoDatasetConfiguration configuration;
     if (!event.data().UnpackTo(&configuration)) {
       return false;
     }
@@ -252,7 +231,7 @@ class CreateVideoDatasetProgram {
     return true;
   }
 
-  void set_configuration(CaptureVideoDatasetConfiguration configuration) {
+  void set_configuration(CreateVideoDatasetConfiguration configuration) {
     configuration_ = configuration;
     status_.clear_input_required_configuration();
     send_status();
@@ -267,15 +246,15 @@ class CreateVideoDatasetProgram {
  private:
   EventBus& bus_;
   boost::asio::deadline_timer timer_;
-  CaptureVideoDatasetConfiguration configuration_;
-  CaptureVideoDatasetStatus status_;
+  CreateVideoDatasetConfiguration configuration_;
+  CreateVideoDatasetStatus status_;
 };
 
 }  // namespace perception
 }  // namespace farm_ng
 
 int Main(farm_ng::core::EventBus& bus) {
-  farm_ng::perception::CaptureVideoDatasetConfiguration config;
+  farm_ng::perception::CreateVideoDatasetConfiguration config;
   config.set_name(FLAGS_name);
   config.set_detect_apriltags(FLAGS_detect_apriltags);
   auto* video_file_camera = config.add_video_file_cameras();
