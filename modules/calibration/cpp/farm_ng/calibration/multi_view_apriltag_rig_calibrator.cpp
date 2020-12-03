@@ -261,8 +261,6 @@ void ModelError(MultiViewApriltagRigModel* model) {
         stats.set_n_frames(stats.n_frames() + 1);
         stats.set_tag_rig_rmse(stats.tag_rig_rmse() +
                                residuals.squaredNorm() / 8);
-        tag_stats[detection.id()].set_n_frames(
-            tag_stats[detection.id()].n_frames() + 1);
         PerImageRmse* image_rmse = stats.add_per_image_rmse();
         image_rmse->set_rmse(std::sqrt(residuals.squaredNorm() / 8));
         image_rmse->set_frame_number(frame_num);

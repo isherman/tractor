@@ -15,7 +15,7 @@
 #include "farm_ng/core/ipc.h"
 
 #include "farm_ng/perception/apriltag.h"
-#include "farm_ng/perception/tracking_camera_utils.h"
+#include "farm_ng/perception/camera_pipeline_utils.h"
 
 #include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/perception/camera_model.h"

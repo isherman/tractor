@@ -7,7 +7,7 @@
 namespace farm_ng {
 namespace calibration {
 
-IntrinsicModel SolveIntrinsicsModel(core::EventBus& bus, IntrinsicModel model);
+IntrinsicModel SolveIntrinsicsModel(IntrinsicModel model);
 
 IntrinsicModel InitialIntrinsicModelFromConfig(
     const CalibrateIntrinsicsConfiguration& config);

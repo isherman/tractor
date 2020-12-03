@@ -24,6 +24,7 @@ using perception::ApriltagRig;
 using perception::ApriltagRigIdMap;
 using perception::CameraModel;
 using perception::FrameNameNumber;
+using perception::Image;
 using perception::ImageLoader;
 using perception::NamedSE3Pose;
 using perception::PointsImage;
@@ -31,7 +32,6 @@ using perception::PointsTag;
 using perception::PoseEdge;
 using perception::PoseGraph;
 using perception::SE3Map;
-
 using Sophus::SE3d;
 
 struct IntrinsicCostFunctor {
@@ -174,7 +174,7 @@ std::tuple<PoseGraph, ApriltagRigIdMap> PoseGraphFromModel(
   return {pose_graph, id_map};
 }
 
-void ModelError(core::EventBus& bus, IntrinsicModel* model) {
+void ModelError(IntrinsicModel* model) {
   model->set_rmse(0.0);
   model->clear_reprojection_images();
   model->clear_tag_stats();
@@ -188,12 +188,6 @@ void ModelError(core::EventBus& bus, IntrinsicModel* model) {
   std::map<int, ApriltagRigTagStats> tag_stats;
 
   ImageLoader image_loader;
-
-  cv::namedWindow("image", 0);
-  cv::resizeWindow("image", cv::Size(1920 / 2, 1080 / 2));
-
-  perception::VideoStreamer streamer(bus, model->camera_model(),
-                                     perception::VideoStreamer::MODE_MP4_FILE);
 
   for (int i = 0; i < model->detections_size(); ++i) {
     std::string camera_frame =
@@ -225,14 +219,30 @@ void ModelError(core::EventBus& bus, IntrinsicModel* model) {
       SE3d camera_pose_tag = (*camera_pose_rig) * (*rig_pose_tag);
       auto points_image = PointsImage(detection);
       auto points_tag = PointsTag(detection);
+      double tag_rmse = 0;
       for (int i = 0; i < 4; ++i) {
         cv::circle(image, cv::Point(points_image[i].x(), points_image[i].y()),
                    5, cv::Scalar(255, 0, 0));
-        Eigen::Vector2d proj_image = perception::ProjectPointToPixel(
+        Eigen::Vector2d point_image_proj = perception::ProjectPointToPixel(
             model->camera_model(), camera_pose_tag * points_tag[i]);
-        cv::circle(image, cv::Point(proj_image.x(), proj_image.y()), 3,
-                   cv::Scalar(0, 0, 255), -1);
+
+        double rmse = (point_image_proj - points_image[i]).squaredNorm();
+        tag_rmse += rmse;
+
+        cv::circle(image, cv::Point(point_image_proj.x(), point_image_proj.y()),
+                   3, cv::Scalar(0, 0, 255), -1);
       }
+      total_rmse += tag_rmse;
+      total_count += 8;  // 4*2 residuals
+
+      ApriltagRigTagStats& stats = tag_stats[detection.id()];
+      stats.set_tag_id(detection.id());
+      stats.set_n_frames(stats.n_frames() + 1);
+      stats.set_tag_rig_rmse(stats.tag_rig_rmse() + tag_rmse / 8);
+      PerImageRmse* image_rmse = stats.add_per_image_rmse();
+      image_rmse->set_rmse(std::sqrt(tag_rmse / 8));
+      image_rmse->set_frame_number(i);
+      image_rmse->set_camera_name(model->camera_model().frame_name());
 
       cv::Point dc(detection.c().x(), detection.c().y());
       std::string id_str = std::to_string(detection.id());
@@ -251,13 +261,30 @@ void ModelError(core::EventBus& bus, IntrinsicModel* model) {
       cv::putText(image, id_str, dc, cv::FONT_HERSHEY_PLAIN, 1.0,
                   cv::Scalar(125, 255, 125));
     }
-    streamer.AddFrame(image, core::MakeTimestampNow());
-    cv::imshow("image", image);
-    cv::waitKey(10);
+    Image& reprojection_image = *model->add_reprojection_images();
+    reprojection_image.mutable_camera_model()->CopyFrom(model->camera_model());
+    auto resource_path = core::GetUniqueArchiveResource(
+        FrameNameNumber(
+            "reprojection-" + SolverStatus_Name(model->solver_status()), i),
+        "jpg", "image/jpg");
+    reprojection_image.mutable_resource()->CopyFrom(resource_path.first);
+    LOG(INFO) << resource_path.second.string();
+    CHECK(cv::imwrite(resource_path.second.string(), image))
+        << "Could not write: " << resource_path.second;
   }
+  for (auto& stats : tag_stats) {
+    stats.second.set_tag_rig_rmse(
+        std::sqrt(stats.second.tag_rig_rmse() / stats.second.n_frames()));
+    auto debug_stats = stats.second;
+    debug_stats.clear_per_image_rmse();
+    LOG(INFO) << debug_stats.DebugString();
+    model->add_tag_stats()->CopyFrom(stats.second);
+  }
+  model->set_rmse(std::sqrt(total_rmse / total_count));
+  LOG(INFO) << "model rmse (pixels): " << model->rmse();
 }
 
-IntrinsicModel SolveIntrinsicsModel(core::EventBus& bus, IntrinsicModel model) {
+IntrinsicModel SolveIntrinsicsModel(IntrinsicModel model) {
   perception::CameraModelJetMap<double> camera_model_param(
       model.camera_model());
   PoseGraph pose_graph;
@@ -336,7 +363,7 @@ IntrinsicModel SolveIntrinsicsModel(core::EventBus& bus, IntrinsicModel model) {
     model.mutable_camera_model()->CopyFrom(camera_model_param.GetCameraModel());
     pose_graph.UpdateNamedSE3Poses(model.mutable_camera_poses_rig());
     model.set_solver_status(SolverStatus::SOLVER_STATUS_CONVERGED);
-    ModelError(bus, &model);
+    ModelError(&model);
   } else {
     model.set_solver_status(SolverStatus::SOLVER_STATUS_FAILED);
   }

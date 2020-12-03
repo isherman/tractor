@@ -32,10 +32,14 @@ message CalibrateIntrinsicsStatus {
 message CalibrateIntrinsicsResult {
   // Configuration which initiated the computation of this result.
   CalibrateIntrinsicsConfiguration configuration = 1;
+  // binary protobuf of the intrinsic model used by calibration
   farm_ng.core.Resource intrinsics_solved = 2;
-  SolverStatus solver_status = 3;
-  double rmse = 4;
-  google.protobuf.Timestamp stamp_end = 5;
-  // Debug event log.
-  farm_ng.core.Resource event_log = 6;
+  // json file of CameraModel, for downstream ease of consumption.
+  farm_ng.core.Resource camera_model = 3;
+
+  SolverStatus solver_status = 4;
+  double rmse = 5;
+
+  google.protobuf.Timestamp stamp_begin = 6;
+  google.protobuf.Timestamp stamp_end = 7;
 }

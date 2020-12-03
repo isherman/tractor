@@ -67,6 +67,9 @@ class CalibrateIntrinsicsProgram {
       bus_.get_io_service().run_one();
     }
     LOG(INFO) << "config:\n" << configuration_.DebugString();
+    CalibrateIntrinsicsResult result;
+
+    result.mutable_stamp_begin()->CopyFrom(MakeTimestampNow());
 
     auto dataset_result = ReadProtobufFromResource<CaptureVideoDatasetResult>(
         configuration_.video_dataset());
@@ -78,15 +81,16 @@ class CalibrateIntrinsicsProgram {
     // Output under the same directory as the dataset.
     SetArchivePath((output_dir / "intrinsic_model").string());
 
-    IntrinsicModel solved_model_pb = SolveIntrinsicsModel(
-        bus_, InitialIntrinsicModelFromConfig(configuration_));
+    IntrinsicModel solved_model_pb =
+        SolveIntrinsicsModel(InitialIntrinsicModelFromConfig(configuration_));
 
     LOG(INFO) << "Initial model computed.";
 
-    CalibrateIntrinsicsResult result;
     result.mutable_configuration()->CopyFrom(configuration_);
     result.mutable_intrinsics_solved()->CopyFrom(
         ArchiveProtobufAsBinaryResource("solved", solved_model_pb));
+    result.mutable_camera_model()->CopyFrom(ArchiveProtobufAsJsonResource(
+        "camera_model", solved_model_pb.camera_model()));
     result.set_rmse(solved_model_pb.rmse());
     result.set_solver_status(solved_model_pb.solver_status());
     result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
