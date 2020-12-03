@@ -17,12 +17,12 @@
 #include "farm_ng/core/ipc.h"
 #include "farm_ng/perception/apriltag.h"
 #include "farm_ng/perception/apriltag.pb.h"
-#include "farm_ng/perception/capture_video_dataset.pb.h"
+#include "farm_ng/perception/create_video_dataset.pb.h"
 #include "farm_ng/perception/time_series.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(video_dataset, "",
-              "The path to a serialized CaptureVideoDatasetResult");
+              "The path to a serialized CreateVideoDatasetResult");
 
 DEFINE_string(camera_name, "", "Camera frame name.");
 
@@ -40,7 +40,7 @@ using farm_ng::core::ReadProtobufFromResource;
 using farm_ng::core::SetArchivePath;
 using farm_ng::core::Subscription;
 using farm_ng::perception::ApriltagDetections;
-using farm_ng::perception::CaptureVideoDatasetResult;
+using farm_ng::perception::CreateVideoDatasetResult;
 
 namespace farm_ng {
 namespace calibration {
@@ -71,7 +71,7 @@ class CalibrateIntrinsicsProgram {
 
     result.mutable_stamp_begin()->CopyFrom(MakeTimestampNow());
 
-    auto dataset_result = ReadProtobufFromResource<CaptureVideoDatasetResult>(
+    auto dataset_result = ReadProtobufFromResource<CreateVideoDatasetResult>(
         configuration_.video_dataset());
     LOG(INFO) << "dataset_result:\n" << dataset_result.DebugString();
 
@@ -163,7 +163,7 @@ int Main(farm_ng::core::EventBus& bus) {
 
   config.mutable_video_dataset()->set_path(FLAGS_video_dataset);
   config.mutable_video_dataset()->set_content_type(
-      ContentTypeProtobufJson<CaptureVideoDatasetResult>());
+      ContentTypeProtobufJson<CreateVideoDatasetResult>());
   config.set_camera_name(FLAGS_camera_name);
   config.set_filter_stable_tags(FLAGS_filter_stable_tags);
 
