@@ -9,10 +9,5 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 export FARM_NG_ROOT=$( cd "$( dirname "${SOURCE}" )" >/dev/null 2>&1 && pwd )
 
-FARM_NG_GOPATH=$FARM_NG_ROOT/env/go
-export GOPATH=$FARM_NG_GOPATH:$GOPATH
-export PATH=$FARM_NG_GOPATH/bin:/usr/local/go/bin:$PATH
-
-
 $FARM_NG_ROOT/bootstrap-apt.sh
 $FARM_NG_ROOT/bootstrap-venv.sh

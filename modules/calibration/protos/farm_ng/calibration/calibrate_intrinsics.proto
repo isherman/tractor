@@ -33,7 +33,7 @@ message CalibrateIntrinsicsStatus {
 message CalibrateIntrinsicsResult {
   // Configuration which initiated the computation of this result.
   CalibrateIntrinsicsConfiguration configuration = 1;
-  // binary protobuf of the intrinsic model used by calibration
+  // binary protobuf of the IntrinsicModel used by calibration
   farm_ng.core.Resource intrinsics_solved = 2;
   // json file of CameraModel, for downstream ease of consumption.
   farm_ng.core.Resource camera_model = 3;
