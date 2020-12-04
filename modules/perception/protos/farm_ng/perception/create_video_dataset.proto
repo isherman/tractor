@@ -22,18 +22,18 @@ message CreateVideoDatasetConfiguration {
 
 
 message CreateVideoDatasetStatus {
-  // Number of frames captured per camera
-  repeated PerCameraNumFrames per_camera_num_frames = 4;
-
-  // Number of frames captured per tag id
-  repeated PerTagIdNumFrames per_tag_id_num_frames = 5;
-
   // Serialized CreateVideoDatasetResult
-  farm_ng.core.Resource result = 2;
+  farm_ng.core.Resource result = 1;
 
   oneof input_required {
-    CreateVideoDatasetConfiguration input_required_configuration = 3;
+    CreateVideoDatasetConfiguration input_required_configuration = 2;
   }
+
+  // Number of frames captured per camera
+  repeated PerCameraNumFrames per_camera_num_frames = 3;
+
+  // Number of frames captured per tag id
+  repeated PerTagIdNumFrames per_tag_id_num_frames = 4;
 }
 
 message CreateVideoDatasetResult {
