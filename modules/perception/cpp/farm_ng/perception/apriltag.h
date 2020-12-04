@@ -99,7 +99,7 @@ class ApriltagRigIdMap {
     if (it_name != id_frame_map_.end()) {
       return it_name->second;
     }
-    return std::optional<FrameNames>();
+    return std::nullopt;
   }
 
  private:
