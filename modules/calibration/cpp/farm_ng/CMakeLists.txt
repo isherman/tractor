@@ -5,3 +5,6 @@ target_link_libraries(calibrate_apriltag_rig farm_ng_calibration)
 
 add_executable(calibrate_multi_view_apriltag_rig calibrate_multi_view_apriltag_rig.cpp)
 target_link_libraries(calibrate_multi_view_apriltag_rig farm_ng_calibration)
+
+add_executable(robot_hal_client robot_hal_client.cpp)
+target_link_libraries(robot_hal_client farm_ng_calibration)

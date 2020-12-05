@@ -106,7 +106,7 @@ macro(farm_ng_add_protobufs target)
   endforeach()
 
   if(NOT DISABLE_PROTOC_cpp)
-    add_library(${target} SHARED ${_cpp_out_all})
+    add_library(${target} SHARED ${_cpp_out_all} ${_cpp_grpc_out_all})
     target_include_directories(${target} PUBLIC ${_proto_output_dir_cpp})
     target_link_libraries(${target} ${Protobuf_LIBRARIES} ${_GRPC_GRPCPP} ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
   endif()
