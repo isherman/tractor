@@ -1,17 +1,8 @@
-# Find Protobuf installation
-# Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.
-set(protobuf_MODULE_COMPATIBLE TRUE)
 find_package(Protobuf REQUIRED)
 message(STATUS "Using protobuf ${Protobuf_VERSION}")
-set(_PROTOBUF_LIBPROTOBUF protobuf::libprotobuf)
-set(_REFLECTION gRPC::grpc++_reflection)
-set(_PROTOBUF_PROTOC $<TARGET_FILE:protobuf::protoc>)
 
-# Find gRPC installation
-# Looks for gRPCConfig.cmake file installed by gRPC's cmake installation.
 find_package(gRPC CONFIG REQUIRED)
 message(STATUS "Using gRPC ${gRPC_VERSION}")
-set(_GRPC_GRPCPP gRPC::grpc++)
 set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
 set(_GRPC_PYTHON_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_python_plugin>)
 
@@ -64,7 +55,8 @@ macro(farm_ng_add_protobufs target)
       "--plugin=protoc-gen-grpc_python=${_GRPC_PYTHON_PLUGIN_EXECUTABLE}")
     SET(_python_out ${_proto_output_dir_python}/${_file_dir}/${_file_we}_pb2.py)
     SET(_python_grpc_out ${_proto_output_dir_python}/${_file_dir}/${_file_we}_pb2_grpc.py)
-    list(APPEND _python_out_all ${_python_out} ${_python_grpc_out})
+    list(APPEND _python_out_all ${_python_out})
+    list(APPEND _python_grpc_out_all  ${_python_grpc_out})
     add_custom_command(
       OUTPUT ${_python_out} ${_python_grpc_out}
       COMMAND ${PROTOBUF_PROTOC_EXECUTABLE}
@@ -105,14 +97,22 @@ macro(farm_ng_add_protobufs target)
       VERBATIM)
   endforeach()
 
+  # Build grpc libraries in separate targets
+  string(REGEX REPLACE "protobuf" "grpc" _grpc_target ${target})
+
   if(NOT DISABLE_PROTOC_cpp)
-    add_library(${target} SHARED ${_cpp_out_all} ${_cpp_grpc_out_all})
+    add_library(${target} SHARED ${_cpp_out_all})
+    target_include_directories(${target} PUBLIC ${_proto_output_dir_cpp} ${Protobuf_INCLUDE_DIRS})
+    target_link_libraries(${target} ${Protobuf_LIBRARIES} ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
+
+    add_library(${_grpc_target} SHARED ${_cpp_grpc_out_all})
     target_include_directories(${target} PUBLIC ${_proto_output_dir_cpp})
-    target_link_libraries(${target} ${Protobuf_LIBRARIES} ${_GRPC_GRPCPP} ${FARM_NG_ADD_PROTOBUFS_DEPENDENCIES})
-  endif()
+    target_link_libraries(${_grpc_target} ${target} gRPC::grpc++)
+endif()
 
   if(NOT DISABLE_PROTOC_python)
     add_custom_target(${target}_py ALL DEPENDS ${_python_out_all})
+    add_custom_target(${_grpc_target}_py ALL DEPENDS ${_python_grpc_out_all})
   endif()
 
   if(NOT DISABLE_PROTOC_go)
