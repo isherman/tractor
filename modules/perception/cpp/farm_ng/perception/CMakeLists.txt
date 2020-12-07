@@ -26,6 +26,7 @@ add_library(farm_ng_perception SHARED
   video_streamer.h
   video_streamer.cpp
   eigen_cv.h
+  pose_graph.h
   ${h_files}
   ${cpp_files}
   )
