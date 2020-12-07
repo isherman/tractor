@@ -53,8 +53,8 @@ class CaptureVideoDatasetProgram {
     } else {
       set_configuration(configuration);
     }
-    bus_.AddSubscriptions(
-        {bus_.GetName(), "/image$", "/apriltags$", "logger/status"});
+    bus_.AddSubscriptions({bus_.GetName(), "/image$", "/apriltags$",
+                           "logger/command", "logger/status"});
 
     bus_.GetEventSignal()->connect(std::bind(
         &CaptureVideoDatasetProgram::on_event, this, std::placeholders::_1));
@@ -142,24 +142,25 @@ class CaptureVideoDatasetProgram {
   }
 
   bool on_apriltag_detection(const EventPb& event) {
-    ApriltagDetection detection;
-    if (!event.data().UnpackTo(&detection)) {
+    ApriltagDetections detections;
+    if (!event.data().UnpackTo(&detections)) {
       return false;
     }
 
-    bool first_time_seen = true;
-    for (auto& entry : *status_.mutable_per_tag_id_num_frames()) {
-      if (entry.tag_id() == detection.id()) {
-        entry.set_num_frames(entry.num_frames() + 1);
-        first_time_seen = false;
+    for (const auto& detection : detections.detections()) {
+      bool first_time_seen = true;
+      for (auto& entry : *status_.mutable_per_tag_id_num_frames()) {
+        if (entry.tag_id() == detection.id()) {
+          entry.set_num_frames(entry.num_frames() + 1);
+          first_time_seen = false;
+        }
+      }
+      if (first_time_seen) {
+        auto per_tag_id_num_frames = status_.add_per_tag_id_num_frames();
+        per_tag_id_num_frames->set_tag_id(detection.id());
+        per_tag_id_num_frames->set_num_frames(1);
       }
     }
-    if (first_time_seen) {
-      auto per_tag_id_num_frames = status_.add_per_tag_id_num_frames();
-      per_tag_id_num_frames->set_tag_id(detection.id());
-      per_tag_id_num_frames->set_num_frames(1);
-    }
-
     return true;
   }
 
