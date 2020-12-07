@@ -14,11 +14,17 @@ import { CalibrateApriltagRigConfigurationVisualizer } from "../components/scope
 import { CalibrateApriltagRigResultVisualizer } from "../components/scope/visualizers/CalibrateApriltagRigResult";
 import { CalibrateBaseToCameraConfigurationVisualizer } from "../components/scope/visualizers/CalibrateBaseToCameraConfiguration";
 import { CalibrateBaseToCameraResultVisualizer } from "../components/scope/visualizers/CalibrateBaseToCameraResult";
+import { CalibrateIntrinsicsConfigurationVisualizer } from "../components/scope/visualizers/CalibrateIntrinsicsConfiguration";
+import { CalibrateIntrinsicsStatusVisualizer } from "../components/scope/visualizers/CalibrateIntrinsicsStatus";
+import { CalibrateIntrinsicsResultVisualizer } from "../components/scope/visualizers/CalibrateIntrinsicsResult";
 import { MonocularApriltagRigModelVisualizer } from "../components/scope/visualizers/MonocularApriltagRigModel";
 import { TractorConfigVisualizer } from "../components/scope/visualizers/TractorConfig";
 import { CaptureVideoDatasetConfigurationVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetConfiguration";
 import { CaptureVideoDatasetStatusVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetStatus";
 import { CaptureVideoDatasetResultVisualizer } from "../components/scope/visualizers/CaptureVideoDatasetResult";
+import { CreateVideoDatasetConfigurationVisualizer } from "../components/scope/visualizers/CreateVideoDatasetConfiguration";
+import { CreateVideoDatasetStatusVisualizer } from "../components/scope/visualizers/CreateVideoDatasetStatus";
+import { CreateVideoDatasetResultVisualizer } from "../components/scope/visualizers/CreateVideoDatasetResult";
 import { ApriltagConfigVisualizer } from "../components/scope/visualizers/ApriltagConfig";
 import { CameraConfigVisualizer } from "../components/scope/visualizers/CameraConfig";
 import { CameraPipelineConfigVisualizer } from "../components/scope/visualizers/CameraPipelineConfig";
@@ -74,9 +80,15 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   CalibrateMultiViewApriltagRigResultVisualizer,
   CalibrateMultiViewApriltagRigStatusVisualizer,
   CameraConfigVisualizer,
+  CalibrateIntrinsicsConfigurationVisualizer,
+  CalibrateIntrinsicsResultVisualizer,
+  CalibrateIntrinsicsStatusVisualizer,
   CaptureVideoDatasetConfigurationVisualizer,
   CaptureVideoDatasetResultVisualizer,
   CaptureVideoDatasetStatusVisualizer,
+  CreateVideoDatasetConfigurationVisualizer,
+  CreateVideoDatasetResultVisualizer,
+  CreateVideoDatasetStatusVisualizer,
   ImageVisualizer,
   MonocularApriltagRigModelVisualizer,
   MultiViewApriltagRigModelVisualizer,
