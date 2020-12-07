@@ -57,6 +57,7 @@ import {
   CreateVideoDatasetConfiguration,
   CreateVideoDatasetResult,
   CreateVideoDatasetStatus,
+  VideoFileCamera,
 } from "@farm-ng/genproto-perception/farm_ng/perception/create_video_dataset";
 import {
   CalibrateApriltagRigConfiguration,
@@ -124,6 +125,7 @@ export type EventType =
   | TractorConfig
   | TractorState
   | Vec2
+  | VideoFileCamera
   | ViewInitialization;
 
 // Infer the keys, but restrict values to Message<EventType>
@@ -178,6 +180,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.perception.CameraPipelineCommand": CameraPipelineCommand,
   "type.googleapis.com/farm_ng.perception.CameraPipelineConfig": CameraPipelineConfig,
   "type.googleapis.com/farm_ng.perception.Vec2": Vec2,
+  "type.googleapis.com/farm_ng.perception.VideoFileCamera": VideoFileCamera,
   "type.googleapis.com/farm_ng.tractor.MotorControllerState": MotorControllerState,
   "type.googleapis.com/farm_ng.tractor.SteeringCommand": SteeringCommand,
   "type.googleapis.com/farm_ng.tractor.TractorConfig": TractorConfig,

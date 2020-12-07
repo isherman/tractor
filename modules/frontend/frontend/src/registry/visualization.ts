@@ -32,6 +32,7 @@ import { CalibrateMultiViewApriltagRigConfigurationVisualizer } from "../compone
 import { CalibrateMultiViewApriltagRigResultVisualizer } from "../components/scope/visualizers/CalibrateMultiViewApriltagRigResult";
 import { CalibrateMultiViewApriltagRigStatusVisualizer } from "../components/scope/visualizers/CalibrateMultiViewApriltagRigStatus";
 import { MultiViewApriltagRigModelVisualizer } from "../components/scope/visualizers/MultiViewApriltagRigModel";
+import { VideoFileCameraVisualizer } from "../components/scope/visualizers/VideoFileCamera";
 
 export interface VisualizerOptionConfig {
   label: string;
@@ -89,6 +90,7 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   CreateVideoDatasetConfigurationVisualizer,
   CreateVideoDatasetResultVisualizer,
   CreateVideoDatasetStatusVisualizer,
+  VideoFileCameraVisualizer,
   ImageVisualizer,
   MonocularApriltagRigModelVisualizer,
   MultiViewApriltagRigModelVisualizer,

@@ -11,6 +11,7 @@ import {
 } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_intrinsics";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { Card } from "./Card";
+import { CalibrateIntrinsicsResultVisualizer } from "./CalibrateIntrinsicsResult";
 
 const CalibrateIntrinsicsStatusElement: React.FC<SingleElementVisualizerProps<
   CalibrateIntrinsicsStatus
@@ -31,7 +32,10 @@ const CalibrateIntrinsicsStatusElement: React.FC<SingleElementVisualizerProps<
 
   return (
     <Card timestamp={timestamp} json={value}>
-      TODO
+      <CalibrateIntrinsicsResultVisualizer.Element
+        {...props}
+        value={[0, result]}
+      />
     </Card>
   );
 };

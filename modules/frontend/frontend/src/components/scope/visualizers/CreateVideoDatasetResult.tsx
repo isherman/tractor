@@ -22,6 +22,7 @@ const CreateVideoDatasetResultElement: React.FC<SingleElementVisualizerProps<
     configuration,
     perCameraNumFrames,
     perTagIdNumFrames,
+    stampBegin,
     stampEnd,
     dataset,
   } = value;
@@ -31,6 +32,7 @@ const CreateVideoDatasetResultElement: React.FC<SingleElementVisualizerProps<
       <Card title="Summary">
         <KeyValueTable
           records={[
+            ["Stamp Begin", stampBegin],
             ["Stamp End", stampEnd],
             ["Dataset URL", dataset?.path],
           ]}

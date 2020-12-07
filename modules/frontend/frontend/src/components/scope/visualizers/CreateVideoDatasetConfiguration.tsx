@@ -6,18 +6,25 @@ import {
 } from "../../../registry/visualization";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import { CreateVideoDatasetConfiguration } from "@farm-ng/genproto-perception/farm_ng/perception/create_video_dataset";
+import {
+  CreateVideoDatasetConfiguration,
+  VideoFileCamera,
+} from "@farm-ng/genproto-perception/farm_ng/perception/create_video_dataset";
 import {
   StandardComponent,
   StandardComponentOptions,
 } from "./StandardComponent";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
+import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
+import { VideoFileCameraVisualizer } from "./VideoFileCamera";
 
 const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
   CreateVideoDatasetConfiguration
 >> = (props) => {
   const [value, setValue] = useFormState(props);
+
+  const { videoFileCameras, apriltagRigs } = value;
 
   return (
     <>
@@ -39,6 +46,99 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
           const detectApriltags = Boolean(e.target.checked);
           setValue((v) => ({ ...v, detectApriltags }));
         }}
+      />
+
+      {videoFileCameras?.map((videoFileCamera, index) => (
+        <div
+          // className={styles.row}
+          key={videoFileCamera.cameraFrameName}
+        >
+          <VideoFileCameraVisualizer.Form
+            initialValue={videoFileCamera}
+            onChange={(updated) =>
+              setValue((v) => ({
+                ...v,
+                videoFileCameras: Object.assign([...v.videoFileCameras], {
+                  [index]: updated,
+                }),
+              }))
+            }
+          />
+          <Form.ButtonGroup
+            buttonText="X"
+            onClick={() =>
+              setValue((v) => ({
+                ...v,
+                videoFileCameras: [
+                  ...(v.videoFileCameras || []).slice(0, index),
+                  ...(v.videoFileCameras || []).slice(index + 1),
+                ],
+              }))
+            }
+          />
+        </div>
+      ))}
+
+      <Form.ButtonGroup
+        buttonText="+"
+        onClick={() =>
+          setValue((v) => ({
+            ...v,
+            cameraConfigs: [
+              ...(v.videoFileCameras || []),
+              VideoFileCamera.fromPartial({}),
+            ],
+          }))
+        }
+      />
+
+      {apriltagRigs?.map((apriltagRig, index) => (
+        <div
+          // className={styles.row}
+          key={apriltagRig.path}
+        >
+          <Form.Group
+            // TODO: Replace with resource browser
+            label="Resource Path"
+            value={apriltagRig.path}
+            type="text"
+            onChange={(e) => {
+              const path = e.target.value;
+              setValue((v) => ({
+                ...v,
+                apriltagRigs: Object.assign([...v.apriltagRigs], {
+                  [index]: Resource.fromPartial({
+                    path,
+                    contentType:
+                      "application/json; type=type.googleapis.com/farm_ng.calibration.CalibrateMultiViewApriltagRigResult",
+                  }),
+                }),
+              }));
+            }}
+          />
+          <Form.ButtonGroup
+            buttonText="X"
+            onClick={() =>
+              setValue((v) => ({
+                ...v,
+                apriltagRigs: [
+                  ...(v.apriltagRigs || []).slice(0, index),
+                  ...(v.apriltagRigs || []).slice(index + 1),
+                ],
+              }))
+            }
+          />
+        </div>
+      ))}
+
+      <Form.ButtonGroup
+        buttonText="+"
+        onClick={() =>
+          setValue((v) => ({
+            ...v,
+            apriltagRigs: [...(v.apriltagRigs || []), Resource.fromPartial({})],
+          }))
+        }
       />
     </>
   );
