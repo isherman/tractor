@@ -12,13 +12,58 @@ import { CalibrateIntrinsicsConfiguration } from "@farm-ng/genproto-calibration/
 import { Card } from "./Card";
 import { KeyValueTable } from "./KeyValueTable";
 import { cameraModel_DistortionModelToJSON } from "@farm-ng/genproto-perception/farm_ng/perception/camera_model";
+import { useFormState } from "../../../hooks/useFormState";
+import Form from "./Form";
+import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 
 const CalibrateIntrinsicsConfigurationForm: React.FC<FormProps<
   CalibrateIntrinsicsConfiguration
->> = () => {
-  // const [value, setValue] = useFormState(props);
+>> = (props) => {
+  const [value, setValue] = useFormState(props);
 
-  return <>TODO</>;
+  const { videoDataset, cameraName, filterStableTags } = value;
+
+  return (
+    <>
+      <Form.Group
+        // TODO: Replace with resource browser
+        label="Video Dataset"
+        value={videoDataset?.path}
+        type="text"
+        onChange={(e) => {
+          const path = e.target.value;
+          setValue((v) => ({
+            ...v,
+            videoDataset: Resource.fromPartial({
+              path,
+              contentType:
+                "application/json; type=type.googleapis.com/farm_ng.perception.CreateVideoDatasetResult",
+            }),
+          }));
+        }}
+      />
+
+      <Form.Group
+        label="Camera Name"
+        value={cameraName}
+        type="text"
+        onChange={(e) => {
+          const cameraName = e.target.value;
+          setValue((v) => ({ ...v, cameraName }));
+        }}
+      />
+
+      <Form.Group
+        label="Filter Stable Tags?"
+        checked={filterStableTags}
+        type="checkbox"
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+          const filterStableTags = Boolean(e.target.checked);
+          setValue((v) => ({ ...v, filterStableTags }));
+        }}
+      />
+    </>
+  );
 };
 
 const CalibrateIntrinsicsConfigurationElement: React.FC<SingleElementVisualizerProps<
@@ -32,19 +77,17 @@ const CalibrateIntrinsicsConfigurationElement: React.FC<SingleElementVisualizerP
 
   return (
     <Card timestamp={timestamp} json={value}>
-      <Card title="Summary">
-        <KeyValueTable
-          records={[
-            ["Video Dataset", videoDataset?.path],
-            [
-              "Distortion Model",
-              cameraModel_DistortionModelToJSON(distortionModel),
-            ],
-            ["Camera Name", cameraName],
-            ["Filter Stable Tags?", filterStableTags],
-          ]}
-        />
-      </Card>
+      <KeyValueTable
+        records={[
+          ["Video Dataset", videoDataset?.path],
+          [
+            "Distortion Model",
+            cameraModel_DistortionModelToJSON(distortionModel),
+          ],
+          ["Camera Name", cameraName],
+          ["Filter Stable Tags?", filterStableTags],
+        ]}
+      />
     </Card>
   );
 };

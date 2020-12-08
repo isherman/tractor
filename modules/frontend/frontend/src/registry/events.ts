@@ -75,6 +75,7 @@ import {
   CalibrateMultiViewApriltagRigResult,
   CalibrateMultiViewApriltagRigStatus,
 } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_multi_view_apriltag_rig";
+import { CameraModel } from "@farm-ng/genproto-perception/farm_ng/perception/camera_model";
 
 export type EventType =
   | Announce
@@ -120,6 +121,7 @@ export type EventType =
   | SteeringCommand
   | StopProgramRequest
   | TagConfig
+  | CameraModel
   | CameraPipelineCommand
   | CameraPipelineConfig
   | TractorConfig
@@ -137,7 +139,8 @@ const inferKeys = <T>(
 export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.calibration.BaseToCameraInitialization": BaseToCameraInitialization,
   "type.googleapis.com/farm_ng.calibration.BaseToCameraModel": BaseToCameraModel,
-  "type.googleapis.com/farm_ng.calibration.IntrinsicsModel": IntrinsicModel,
+  "type.googleapis.com/farm_ng.perception.CameraModel": CameraModel,
+  "type.googleapis.com/farm_ng.calibration.IntrinsicModel": IntrinsicModel,
   "type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigConfiguration": CalibrateApriltagRigConfiguration,
   "type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigResult": CalibrateApriltagRigResult,
   "type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigStatus": CalibrateApriltagRigStatus,

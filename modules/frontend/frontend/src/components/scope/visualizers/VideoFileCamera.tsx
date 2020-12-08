@@ -22,8 +22,8 @@ const VideoFileCameraForm: React.FC<FormProps<VideoFileCamera>> = (props) => {
         value={value.cameraFrameName}
         type="text"
         onChange={(e) => {
-          const name = e.target.value;
-          setValue((v) => ({ ...v, name }));
+          const cameraFrameName = e.target.value;
+          setValue((v) => ({ ...v, cameraFrameName }));
         }}
       />
 

@@ -33,6 +33,7 @@ import { CalibrateMultiViewApriltagRigResultVisualizer } from "../components/sco
 import { CalibrateMultiViewApriltagRigStatusVisualizer } from "../components/scope/visualizers/CalibrateMultiViewApriltagRigStatus";
 import { MultiViewApriltagRigModelVisualizer } from "../components/scope/visualizers/MultiViewApriltagRigModel";
 import { VideoFileCameraVisualizer } from "../components/scope/visualizers/VideoFileCamera";
+import { CameraModelVisualizer } from "../components/scope/visualizers/CameraModel";
 
 export interface VisualizerOptionConfig {
   label: string;
@@ -81,6 +82,7 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   CalibrateMultiViewApriltagRigResultVisualizer,
   CalibrateMultiViewApriltagRigStatusVisualizer,
   CameraConfigVisualizer,
+  CameraModelVisualizer,
   CalibrateIntrinsicsConfigurationVisualizer,
   CalibrateIntrinsicsResultVisualizer,
   CalibrateIntrinsicsStatusVisualizer,

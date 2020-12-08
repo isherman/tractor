@@ -84,7 +84,7 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
         onClick={() =>
           setValue((v) => ({
             ...v,
-            cameraConfigs: [
+            videoFileCameras: [
               ...(v.videoFileCameras || []),
               VideoFileCamera.fromPartial({}),
             ],

@@ -13,6 +13,7 @@ import { IntrinsicModel } from "@farm-ng/genproto-calibration/farm_ng/calibratio
 import { KeyValueTable } from "./KeyValueTable";
 import { solverStatusToJSON } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrator";
 import { IntrinsicModelVisualizer } from "./IntrinsicModel";
+import { useStores } from "../../../hooks/useStores";
 
 const CalibrateIntrinsicsResultElement: React.FC<SingleElementVisualizerProps<
   CalibrateIntrinsicsResult
@@ -22,12 +23,22 @@ const CalibrateIntrinsicsResultElement: React.FC<SingleElementVisualizerProps<
     resources,
   } = props;
 
+  const { baseUrl } = useStores();
+  const blobstoreUrl = `${baseUrl}/blobstore`;
+
   const intrinsicsSolved = useFetchResource<IntrinsicModel>(
     value.intrinsicsSolved,
     resources
   );
 
-  const { configuration, solverStatus, rmse, stampBegin, stampEnd } = value;
+  const {
+    configuration,
+    solverStatus,
+    cameraModel,
+    rmse,
+    stampBegin,
+    stampEnd,
+  } = value;
 
   return (
     <Card timestamp={timestamp} json={value}>
@@ -41,6 +52,13 @@ const CalibrateIntrinsicsResultElement: React.FC<SingleElementVisualizerProps<
           ]}
         />
       </Card>
+      {cameraModel && (
+        <Card title="Output">
+          <a target="_blank" href={`${blobstoreUrl}/${cameraModel.path}`}>
+            {cameraModel.path}
+          </a>
+        </Card>
+      )}
       {configuration && (
         <Card title="Configuration">
           {
@@ -52,7 +70,7 @@ const CalibrateIntrinsicsResultElement: React.FC<SingleElementVisualizerProps<
         </Card>
       )}
       {intrinsicsSolved && (
-        <Card title="Intrinsics Solved">
+        <Card title="Details">
           <IntrinsicModelVisualizer.Element
             {...props}
             value={[0, intrinsicsSolved]}
