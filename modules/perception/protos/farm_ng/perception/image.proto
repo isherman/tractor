@@ -19,7 +19,3 @@ message Image {
   // If resource is a video, the frame rate of the video
   google.protobuf.DoubleValue fps = 4;
 }
-
-message ImageRGBD {
-  CameraModel camera_model = 1;
-}

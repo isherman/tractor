@@ -1,11 +1,3 @@
-find_package(Protobuf REQUIRED)
-message(STATUS "Using protobuf ${Protobuf_VERSION}")
-
-find_package(gRPC CONFIG REQUIRED)
-message(STATUS "Using gRPC ${gRPC_VERSION}")
-set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_cpp_plugin>)
-set(_GRPC_PYTHON_PLUGIN_EXECUTABLE $<TARGET_FILE:gRPC::grpc_python_plugin>)
-
 macro(farm_ng_add_protobufs target)
   set(multi_value_args PROTO_FILES DEPENDENCIES)
   cmake_parse_arguments(FARM_NG_ADD_PROTOBUFS "" "" "${multi_value_args}" ${ARGN})

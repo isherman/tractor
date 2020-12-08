@@ -30,7 +30,7 @@ message CapturePoseResponse {
   repeated farm_ng.perception.NamedSE3Pose poses = 2;
 
   // The captured image.
-  farm_ng.perception.ImageRGBD image_rgbd = 3;
+  farm_ng.perception.Image image_rgb = 3;
 }
 
 // A named collection of poses.

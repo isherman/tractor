@@ -12,6 +12,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(cmake/farm_ng_modules.cmake)
+include(cmake/farm_ng_find_base_packages.cmake)
 
 list(APPEND _modules core perception calibration tractor frontend)
 
@@ -25,6 +26,8 @@ endif()
 
 add_subdirectory(third_party)
 add_subdirectory(third_party/googletest)
+
+farm_ng_find_base_packages()
 
 foreach(_module ${_modules})
   add_subdirectory("modules/${_module}")

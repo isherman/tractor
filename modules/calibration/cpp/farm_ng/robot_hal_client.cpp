@@ -24,6 +24,8 @@ class RobotHalClient {
     std::thread writer([stream]() {
       std::vector<CapturePoseRequest> requests;
       CapturePoseRequest request;
+      // TODO(isherman): Add pose targets - sample a workspace (trans, rotation)
+      // volume defined in the configuration protobuf
       requests.push_back(request);
       for (const CapturePoseRequest& request : requests) {
         std::cout << "Sending capture pose request "
@@ -35,6 +37,8 @@ class RobotHalClient {
 
     CapturePoseResponse response;
     while (stream->Read(&response)) {
+      // TODO read image? for testing moc, we can check that the image is non
+      // empty, and the size we expect in return?
       std::cout << "Got message " << response.ShortDebugString() << std::endl;
     }
     writer.join();
