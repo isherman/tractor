@@ -3,5 +3,8 @@ add_subdirectory(perception)
 add_executable(capture_video_dataset capture_video_dataset.cpp)
 target_link_libraries(capture_video_dataset farm_ng_perception)
 
+add_executable(create_video_dataset create_video_dataset.cpp)
+target_link_libraries(create_video_dataset farm_ng_perception)
+
 add_executable(camera_pipeline camera_pipeline.cpp)
 target_link_libraries(camera_pipeline farm_ng_perception)
