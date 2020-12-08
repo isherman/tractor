@@ -39,7 +39,7 @@ message PoseSet {
   repeated farm_ng.perception.NamedSE3Pose poses = 2;
 }
 
-message RobotModel {
+message RobotExtrinsicModel {
   SolverStatus status = 1;
 
   // Total RMSE for the calibration result.
@@ -55,9 +55,9 @@ message RobotModel {
   // repeated PerMeasurementStats stats = 4;
 }
 
-message CalibrationResultRequest {
-  // The calibrated robot model.
-  RobotModel model = 1;
+message RobotExtrinsicCalibrationResultRequest {
+  // The calibrated robot extrinsics.
+  RobotExtrinsicModel model = 1;
 
   // A name for the model, such as a date and workcell number.
   string model_name = 2;
@@ -69,7 +69,7 @@ message CalibrationResultRequest {
   string notes = 4;
 }
 
-message CalibrationResultResponse {
+message RobotExtrinsicCalibrationResultResponse {
   enum Status {
     STATUS_UNSPECIFIED = 0;
     STATUS_ACCEPTED = 1;
@@ -94,7 +94,7 @@ service RobotHALService {
   // When the calibration result has been accepted by an operator in the
   // calibration UI, the calibration tool calls this function to report the
   // calibration to the workcell.
-  rpc CalibrationResult(CalibrationResultRequest)
-    returns (CalibrationResultResponse) {
+  rpc RobotExtrinsicCalibrationResult(RobotExtrinsicCalibrationResultRequest)
+    returns (RobotExtrinsicCalibrationResultResponse) {
   }
 }

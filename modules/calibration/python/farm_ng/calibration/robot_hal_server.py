@@ -3,8 +3,8 @@ from concurrent import futures
 
 import grpc
 
-from farm_ng.calibration.robot_hal_pb2 import CalibrationResultResponse
 from farm_ng.calibration.robot_hal_pb2 import CapturePoseResponse
+from farm_ng.calibration.robot_hal_pb2 import RobotExtrinsicCalibrationResultResponse
 from farm_ng.calibration.robot_hal_pb2_grpc import RobotHALServiceServicer
 from farm_ng.calibration.robot_hal_pb2_grpc import add_RobotHALServiceServicer_to_server
 
@@ -15,9 +15,9 @@ class RobotHALServer(RobotHALServiceServicer):
         for request in request_iterator:
             yield CapturePoseResponse(status=CapturePoseResponse.Status.STATUS_SUCCESS)
 
-    def CalibrationResult(self, request_iterator, context):
+    def RobotExtrinsicCalibrationResult(self, request_iterator, context):
         for request in request_iterator:
-            yield CalibrationResultResponse(status=CalibrationResultResponse.Status.STATUS_ACCEPTED)
+            yield RobotExtrinsicCalibrationResultResponse(status=RobotExtrinsicCalibrationResultResponse.Status.STATUS_ACCEPTED)
 
 
 def serve():
