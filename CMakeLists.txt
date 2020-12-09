@@ -18,6 +18,7 @@ list(APPEND _modules core perception calibration tractor frontend)
 
 if(BUILD_ONLY_PROTO)
   message(STATUS "Build only proto.")
+  farm_ng_find_base_packages()
   foreach(_module ${_modules})
     add_subdirectory("modules/${_module}/protos")
   endforeach()
