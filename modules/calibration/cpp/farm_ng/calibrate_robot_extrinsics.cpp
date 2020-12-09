@@ -76,7 +76,6 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
                               sample_count_y),
             target_coordinate(iz, sampled_workspace.workspace().size().z(),
                               sample_count_z));
-        // TODO(isherman): Support rotation
 
         CapturePoseRequest pose_request;
         NamedSE3Pose* pose = pose_request.add_poses();
