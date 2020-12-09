@@ -38,7 +38,8 @@ message CameraModel {
   string frame_name = 9;
 };
 
-
+// TODO(ethanrublee): Evaluate how this can express a camera rig with a root other than a camera
+// e.g. how root_camera_name is used in other calibration contexts.
 message MultiViewCameraRig {
   repeated CameraModel cameras = 1;
   repeated NamedSE3Pose camera_pose_rig = 2;
