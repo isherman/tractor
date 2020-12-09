@@ -20,7 +20,7 @@ message Resource {
     string path = 1;
 
     // The serialized payload
-    bytes bytes = 2;
+    bytes data = 2;
   }
 
   // The content-type (aka MIME-type) of the payload.

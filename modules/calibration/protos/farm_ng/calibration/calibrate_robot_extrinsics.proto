@@ -18,14 +18,17 @@ message SampledCartesianWorkspace {
   CartesianWorkspace workspace = 1;
 
   // The number of evenly-spaced samples to take along the X,Y, and Z dimensions, respectively.
-  // A value less than or equal to zero will default to 1.
   // The first sample along each dimension is taken at its origin.
+  // The second sample along each dimension is taken at the extent of the workspace.
+  // Additional samples continue to evenly divide the workspace.
   //
   // For example, on the unit cube,
   // {sample_count_x: 1, sample_count_y: 2, sample_count_z: 3} would sample:
   // {{0, 0, 0.0}, {0, 1, 0.0},
   //  {0, 0, 0.5}, {0, 1, 0.5},
   //  {0, 0, 1.0}, {0, 1, 1.0}},
+  //
+  // Values than or equal to zero default to 1.
   int32 sample_count_x = 2;
   int32 sample_count_y = 3;
   int32 sample_count_z = 4;
@@ -42,4 +45,9 @@ message SampledCartesianWorkspace {
 
   // All samples share the same axis-alignment
   Orientation orientation = 5;
+}
+
+
+message CalibrateRobotExtrinsicsConfiguration {
+  SampledCartesianWorkspace sampled_workspace = 1;
 }
