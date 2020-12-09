@@ -15,6 +15,8 @@
 
 using farm_ng::core::ReadProtobufFromJsonFile;
 using farm_ng::perception::NamedSE3Pose;
+using farm_ng::perception::Image;
+
 
 namespace farm_ng::calibration {
 class RobotHalClient {
@@ -67,7 +69,7 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
     for (double iy = 0; iy < sample_count_y; iy++) {
       for (double iz = 0; iz < sample_count_z; iz++) {
         Sophus::SE3d base_pose_workspace;
-        ProtoToSophus(sampled_workspace.workspace().base_pose_workspace(),
+        ProtoToSophus(sampled_workspace.workspace().base_pose_workspace().a_pose_b(),
                       &base_pose_workspace);
         Sophus::SE3d workspace_pose_target = Sophus::SE3d::trans(
             target_coordinate(ix, sampled_workspace.workspace().size().x(),
@@ -105,8 +107,11 @@ class CaptureRobotExtrinsicsDatasetProgram {
       // TODO(isherman): Pipe this into calibration
       CHECK(status.ok());
       CHECK_EQ(response.status(), CapturePoseResponse::STATUS_SUCCESS);
-      CHECK_GT(response.image_rgb().resource().data().length(), 0);
-      CHECK_GT(response.image_rgb().camera_model().image_width(), 0);
+      for(const Image& image: response.images()) {
+        CHECK_GT(image.resource().data().length(), 0);
+        CHECK_GT(image.camera_model().image_width(), 0);
+      }
+
     }
   }
 

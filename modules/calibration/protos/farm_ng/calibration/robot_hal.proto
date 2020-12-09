@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-import "farm_ng/calibration/calibrator.proto";
 import "farm_ng/perception/geometry.proto";
 import "farm_ng/perception/image.proto";
 
@@ -47,7 +46,7 @@ message CapturePoseResponse {
 
   // The captured image(s).
   // Image metadata identifies the camera that captured it.
-  repeated farm_ng.perception.Image image_rgb = 3;
+  repeated farm_ng.perception.Image images = 3;
 }
 
 // This service API is implemented by a robot (or robot workcell), and allows the
