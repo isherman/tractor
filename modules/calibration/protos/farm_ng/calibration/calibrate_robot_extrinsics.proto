@@ -6,8 +6,8 @@ package farm_ng.calibration;
 option go_package = "github.com/farm-ng/genproto/calibration";
 
 message CartesianWorkspace {
-  // The origin of the workspace, relative to some known parent frame.
-  farm_ng.perception.SE3Pose origin = 1;
+  // The origin of the workspace, relative to some (application-specific) root frame.
+  farm_ng.perception.SE3Pose root_pose_origin = 1;
 
   // The size of the workspace, in meters, along its X, Y, and Z dimensions.
   farm_ng.perception.Vec3 size = 2;
@@ -33,18 +33,7 @@ message SampledCartesianWorkspace {
   int32 sample_count_y = 3;
   int32 sample_count_z = 4;
 
-  enum Orientation {
-    ORIENTATION_UNSPECIFIED = 0;
-    ORIENTATION_X_NEG = 1;
-    ORIENTATION_X_POS = 2;
-    ORIENTATION_Y_NEG = 3;
-    ORIENTATION_Y_POS = 4;
-    ORIENTATION_Z_NEG = 5;
-    ORIENTATION_Z_POS = 6;
-  }
-
-  // All samples share the same axis-alignment
-  Orientation orientation = 5;
+  // TODO(isherman): Support rotation
 }
 
 

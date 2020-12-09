@@ -1,7 +1,7 @@
 {
   "sampled_workspace": {
     "workspace": {
-      "origin": {
+      "root_pose_origin": {
         "position": {
           "x": 0,
           "y": 0,
@@ -20,9 +20,8 @@
         "z": 1
       }
     },
-    "sample_count_x": 1,
+    "sample_count_x": 2,
     "sample_count_y": 2,
-    "sample_count_z": 4,
-    "orientation": "ORIENTATION_X_POS"
+    "sample_count_z": 3
   }
 }

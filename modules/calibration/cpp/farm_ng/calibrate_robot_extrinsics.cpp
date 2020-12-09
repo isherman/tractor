@@ -1,16 +1,17 @@
 #include <thread>
 
 #include <glog/logging.h>
-
 #include <grpc/grpc.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
+#include <sophus/se3.hpp>
 
 #include "farm_ng/calibration/calibrate_robot_extrinsics.pb.h"
 #include "farm_ng/calibration/robot_hal.grpc.pb.h"
 #include "farm_ng/core/blobstore.h"
+#include "farm_ng/perception/sophus_protobuf.h"
 
 using farm_ng::core::ReadProtobufFromJsonFile;
 using farm_ng::perception::NamedSE3Pose;
@@ -52,7 +53,7 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
   int sample_count_y = std::max(sampled_workspace.sample_count_y(), 1);
   int sample_count_z = std::max(sampled_workspace.sample_count_z(), 1);
 
-  auto coordinate = [=](int i, double size, int sample_count) -> double {
+  auto target_coordinate = [=](int i, double size, int sample_count) -> double {
     if (i == 0) {
       return 0;
     }
@@ -65,17 +66,22 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
   for (double ix = 0; ix < sample_count_x; ix++) {
     for (double iy = 0; iy < sample_count_y; iy++) {
       for (double iz = 0; iz < sample_count_z; iz++) {
+        Sophus::SE3d root_pose_workspace;
+        ProtoToSophus(sampled_workspace.workspace().root_pose_origin(),
+                      &root_pose_workspace);
+        Sophus::SE3d workspace_pose_target = Sophus::SE3d::trans(
+            target_coordinate(ix, sampled_workspace.workspace().size().x(),
+                              sample_count_x),
+            target_coordinate(iy, sampled_workspace.workspace().size().y(),
+                              sample_count_y),
+            target_coordinate(iz, sampled_workspace.workspace().size().z(),
+                              sample_count_z));
+        // TODO(isherman): Support rotation
+
         CapturePoseRequest pose_request;
         NamedSE3Pose* pose = pose_request.add_poses();
-        pose->mutable_a_pose_b()->mutable_position()->set_x(coordinate(
-            ix, sampled_workspace.workspace().size().x(), sample_count_x));
-        pose->mutable_a_pose_b()->mutable_position()->set_y(coordinate(
-            iy, sampled_workspace.workspace().size().y(), sample_count_y));
-        pose->mutable_a_pose_b()->mutable_position()->set_z(coordinate(
-            iz, sampled_workspace.workspace().size().z(), sample_count_z));
-        // TODO: add to workspace.origin
-        // TODO: rotation
-        // SophusToProto(se3, "workspace_origin", "target", pose)
+        SophusToProto(root_pose_workspace * workspace_pose_target, "root",
+                      "target", pose);
         pose_requests.push_back(pose_request);
       }
     }
