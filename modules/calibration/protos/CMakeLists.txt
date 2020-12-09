@@ -7,6 +7,7 @@ farm_ng_add_protobufs(farm_ng_calibration_protobuf
   ./farm_ng/calibration/calibrator.proto
   ./farm_ng/calibration/intrinsic_model.proto
   ./farm_ng/calibration/robot_hal.proto
+  ./farm_ng/calibration/workspace.proto
   DEPENDENCIES
   farm_ng_core_protobuf
   farm_ng_perception_protobuf

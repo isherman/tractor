@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+import "farm_ng/perception/geometry.proto";
+
+package farm_ng.calibration;
+option go_package = "github.com/farm-ng/genproto/calibration";
+
+message CartesianWorkspace {
+  // The origin of the workspace, relative to some known parent frame.
+  farm_ng.perception.SE3Pose origin = 1;
+
+  // The size of the workspace, in meters, along its X, Y, and Z dimensions.
+  farm_ng.perception.Vec3 size = 2;
+}
+
+// Evenly subdivides a cartesian workspace into a set of axis-aligned poses.
+message SampledCartesianWorkspace {
+  CartesianWorkspace workspace = 1;
+
+  // The number of evenly-spaced samples to take along the X,Y, and Z dimensions, respectively.
+  // A value less than or equal to zero will default to 1.
+  // The first sample along each dimension is taken at its origin.
+  //
+  // For example, on the unit cube,
+  // {sample_count_x: 1, sample_count_y: 2, sample_count_z: 3} would sample:
+  // {{0, 0, 0.0}, {0, 1, 0.0},
+  //  {0, 0, 0.5}, {0, 1, 0.5},
+  //  {0, 0, 1.0}, {0, 1, 1.0}},
+  int32 sample_count_x = 2;
+  int32 sample_count_y = 3;
+  int32 sample_count_z = 4;
+
+  enum Orientation {
+    ORIENTATION_UNSPECIFIED = 0;
+    ORIENTATION_X_NEG = 1;
+    ORIENTATION_X_POS = 2;
+    ORIENTATION_Y_NEG = 3;
+    ORIENTATION_Y_POS = 4;
+    ORIENTATION_Z_NEG = 5;
+    ORIENTATION_Z_POS = 6;
+  }
+
+  // All samples share the same axis-alignment
+  Orientation orientation = 5;
+}
