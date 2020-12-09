@@ -8,7 +8,7 @@
 #include <grpcpp/security/credentials.h>
 #include <sophus/se3.hpp>
 
-#include "farm_ng/calibration/calibrate_robot_extrinsics.pb.h"
+#include "farm_ng/calibration/capture_robot_extrinsics_dataset.pb.h"
 #include "farm_ng/calibration/robot_hal.grpc.pb.h"
 #include "farm_ng/core/blobstore.h"
 #include "farm_ng/perception/sophus_protobuf.h"
@@ -66,9 +66,9 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
   for (double ix = 0; ix < sample_count_x; ix++) {
     for (double iy = 0; iy < sample_count_y; iy++) {
       for (double iz = 0; iz < sample_count_z; iz++) {
-        Sophus::SE3d root_pose_workspace;
-        ProtoToSophus(sampled_workspace.workspace().root_pose_origin(),
-                      &root_pose_workspace);
+        Sophus::SE3d base_pose_workspace;
+        ProtoToSophus(sampled_workspace.workspace().base_pose_workspace(),
+                      &base_pose_workspace);
         Sophus::SE3d workspace_pose_target = Sophus::SE3d::trans(
             target_coordinate(ix, sampled_workspace.workspace().size().x(),
                               sample_count_x),
@@ -79,7 +79,7 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
 
         CapturePoseRequest pose_request;
         NamedSE3Pose* pose = pose_request.add_poses();
-        SophusToProto(root_pose_workspace * workspace_pose_target, "root",
+        SophusToProto(base_pose_workspace * workspace_pose_target, "root",
                       "target", pose);
         pose_requests.push_back(pose_request);
       }
@@ -88,11 +88,11 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
   return pose_requests;
 }
 
-class CalibrateRobotExtrinsicsProgram {
+class CaptureRobotExtrinsicsDatasetProgram {
  public:
-  CalibrateRobotExtrinsicsProgram(
+  CaptureRobotExtrinsicsDatasetProgram(
       std::shared_ptr<RobotHalClient> client,
-      const CalibrateRobotExtrinsicsConfiguration& configuration)
+      const CaptureRobotExtrinsicsDatasetConfiguration& configuration)
       : client_(client), configuration_(configuration) {}
 
   void Run() {
@@ -112,7 +112,7 @@ class CalibrateRobotExtrinsicsProgram {
 
  private:
   std::shared_ptr<RobotHalClient> client_;
-  CalibrateRobotExtrinsicsConfiguration configuration_;
+  CaptureRobotExtrinsicsDatasetConfiguration configuration_;
 };
 
 }  // namespace farm_ng::calibration
@@ -128,9 +128,9 @@ int main(int argc, char* argv[]) {
   auto channel = grpc::CreateChannel(server_address, credentials);
   auto client = std::make_shared<farm_ng::calibration::RobotHalClient>(channel);
   auto configuration = ReadProtobufFromJsonFile<
-      farm_ng::calibration::CalibrateRobotExtrinsicsConfiguration>(
+      farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
       configuration_path);
-  auto program = farm_ng::calibration::CalibrateRobotExtrinsicsProgram(
+  auto program = farm_ng::calibration::CaptureRobotExtrinsicsDatasetProgram(
       client, configuration);
   program.Run();
 
