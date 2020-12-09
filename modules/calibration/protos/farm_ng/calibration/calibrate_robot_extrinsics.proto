@@ -32,9 +32,13 @@ message SampledCartesianWorkspace {
   int32 sample_count_x = 2;
   int32 sample_count_y = 3;
   int32 sample_count_z = 4;
+
 }
 
 
 message CalibrateRobotExtrinsicsConfiguration {
   SampledCartesianWorkspace sampled_workspace = 1;
+  // name, intrinsics (intialization)
+  repeated CameraModel cameras=2;
+  repeated NamedSE3Pose pose_initialization=3;
 }
