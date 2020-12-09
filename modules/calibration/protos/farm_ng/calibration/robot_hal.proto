@@ -18,19 +18,35 @@ message CapturePoseRequest {
 message CapturePoseResponse {
   enum Status {
     STATUS_UNSPECIFIED = 0;
+
+    // The requested pose was achieved and images successfully captured.
     STATUS_SUCCESS = 1;
-    STATUS_ERROR_STOPPED = 2;
-    STATUS_ERROR_NOT_READY = 3;
-    STATUS_ERROR_BAD_POSE = 4;
+
+    // The requested pose was unreachable, but the server may have commanded the robot to a nearby pose (see below)
+    STATUS_WARNING_POSE_UNREACHABLE = 2;
+
+    // The robot is in an error state.
+    // The client should probably exit.
+    STATUS_ERROR_STOPPED = 3;
+
+    // The robot is not ready to move.
+    // The client may choose to retry at some point in the future.
+    STATUS_ERROR_NOT_READY = 4;
   }
   Status status = 1;
 
   // The achieved pose(s).
   // The interpretation of this set of poses is application-specific (see CapturePoseRequest).
+  //
+  // If a requested pose is unreachable, and the server chooses to approximate the requested pose,
+  // it should return the achieved pose here, along with the status STATUS_WARNING_POSE_UNREACHABLE.
+  //
+  // If a requested pose is unreachable, and the server chooses not to approximate the requested pose,
+  // the server should not populate this field, and return STATUS_WARNING_POSE_UNREACHABLE.
   repeated farm_ng.perception.NamedSE3Pose poses = 2;
 
-  // The captured image.
-  // support multiple images?
+  // The captured image(s).
+  // Image metadata identifies the camera that captured it.
   repeated farm_ng.perception.Image image_rgb = 3;
 }
 
