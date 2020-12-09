@@ -50,50 +50,6 @@ message CapturePoseResponse {
   repeated farm_ng.perception.Image image_rgb = 3;
 }
 
-// A named collection of poses.
-message PoseSet {
-  string name = 1;
-  repeated farm_ng.perception.NamedSE3Pose poses = 2;
-}
-
-message RobotExtrinsicModel {
-  SolverStatus status = 1;
-
-  // Total RMSE for the calibration result.
-  double rmse = 2;
-
-  // A collection of poses, estimated by the calibration program.
-  // The interpretation of this set of poses is application-specific.
-  // The number of poses in each PoseSet is the same.
-  repeated PoseSet poses = 3;
-
-  // Detailed statistics (e.g. RMSE) for each measurement.
-  // The number of stats is the same as the number of poses in each PoseSet in this result.
-  // repeated PerMeasurementStats stats = 4;
-}
-
-message RobotExtrinsicCalibrationResultRequest {
-  // The calibrated robot extrinsics.
-  RobotExtrinsicModel model = 1;
-
-  // A name for the model, such as a date and workcell number.
-  string model_name = 2;
-
-  // Who performed the calibration?
-  string operator_name = 3;
-
-  // Any notes associated with the calibration, like why it was performed.
-  string notes = 4;
-}
-
-message RobotExtrinsicCalibrationResultResponse {
-  enum Status {
-    STATUS_UNSPECIFIED = 0;
-    STATUS_ACCEPTED = 1;
-  }
-  Status status = 1;
-}
-
 // This service API is implemented by a robot (or robot workcell), and allows the
 // calibration tool UI to interactively drive a calibration motion and capture
 // dance. The implementation of the service has access to camera frame grabbers,
@@ -107,11 +63,5 @@ service RobotHALService {
   // goal.
   rpc CapturePose(stream CapturePoseRequest)
     returns (stream CapturePoseResponse) {
-  }
-  // When the calibration result has been accepted by an operator in the
-  // calibration UI, the calibration tool calls this function to report the
-  // calibration to the workcell.
-  rpc RobotExtrinsicCalibrationResult(RobotExtrinsicCalibrationResultRequest)
-    returns (RobotExtrinsicCalibrationResultResponse) {
   }
 }
