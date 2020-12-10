@@ -267,7 +267,7 @@ class CaptureRobotExtrinsicsDatasetProgram {
 int Main(farm_ng::core::EventBus& bus) {
   auto configuration = ReadProtobufFromJsonFile<
       farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
-      core::GetBlobstoreRoot() / FLAGS_configuration_path);
+      farm_ng::core::GetBlobstoreRoot() / FLAGS_configuration_path);
 
   farm_ng::calibration::CaptureRobotExtrinsicsDatasetProgram program(
       bus, configuration);
