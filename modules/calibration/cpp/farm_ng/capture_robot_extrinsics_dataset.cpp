@@ -248,9 +248,8 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
     core::ArchiveProtobufAsJsonResource(configuration_.name(), result);
 
-    // TODO(isherman) different bucket?
     status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
-        core::BUCKET_BASE_TO_CAMERA_MODELS, configuration_.name(), result));
+        core::BUCKET_ROBOT_EXTRINSICS_DATASETS, configuration_.name(), result));
 
     return 0;
   }
