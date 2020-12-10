@@ -3,7 +3,6 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "farm_ng/core/resource.proto";
 import "farm_ng/calibration/calibrator.proto";
-import "farm_ng/calibration/intrinsic_model.proto";
 import "farm_ng/perception/camera_model.proto";
 
 package farm_ng.calibration;
