@@ -38,12 +38,17 @@ message SampledCartesianWorkspace {
   int32 sample_count_z = 4;
 }
 
-// Sampling algorithm:
+// Describes a workcell that may be driven (via the Robot HAL) to capture a robot extrinsics dataset.
+//
+// The workcell contains a workspace volume. The capture program captures robot pose and images
+// at multiple poses within this workspace volume, according to the following sampling algorithm:
+//
+// Sampling algorithm
 // - For each translation workspace_T_link in the workspace volume:
 //   - Find a set of link orientations workspace_R_link that meet the visibility requirements
 //   - Emit base_pose_link = base_pose_workspace * compose(workspace_T_link, workspace_R_link)
 //
-// Visibility algorithm:
+// Visibility algorithm
 // - Set of orientations where the link_tag_rig is visible in each camera in the
 //   the base_camera_rig, and also where base_tag_rig is visible from link_camera_rig.
 //
@@ -78,32 +83,40 @@ message CaptureRobotExtrinsicsDatasetConfiguration {
   farm_ng.perception.ApriltagRig link_tag_rig = 9;
 
   // the hostname and port of the RobotHALService server. e.g. "localhost:50051"
-  string hal_service_address =10;
+  string hal_service_address = 10;
 }
 
+// TODO(isherman): visualization
+//   - all frames in the configuration
+//   - workspace volume
+//   - all poses in the request queue
+//   - the last request and response pose
+//   - the last response image
+//   - latest_request_index / request_queue.length
 message CaptureRobotExtrinsicsDatasetStatus {
   oneof input_required {
-    CaptureRobotExtrinsicsDatasetConfiguration  input_required_configuration = 1;
+    CaptureRobotExtrinsicsDatasetConfiguration input_required_configuration = 1;
   }
-  // Serialized CaptureRobotExtrinsicsDatasetResult
+  // Serialized CaptureRobotExtrinsicsDatasetResult.
   farm_ng.core.Resource result = 2;
 
-  // TODO(isherman): document
-  // TODO(isherman): visualization
-  //   - all frames in the configuration
-  //   - workspace volume
-  //   - all poses in the request queue
-  //   - the last request and response pose
-  //   - the last response image
-  //   - latest_request_index / request_queue.length
+  // Configuration which initiated this program.
   CaptureRobotExtrinsicsDatasetConfiguration configuration = 3;
+
+  // The pending queue of requests, as determined by the sampling algorithm described above.
   repeated CapturePoseRequest request_queue = 4;
+
+  // The index of the request that was most recently issued.
   int32 latest_request_index = 5;
+
+  // The value of the response that was most recently returned.
   CapturePoseResponse latest_response = 6;
 }
 
 message CaptureRobotExtrinsicsDatasetResult {
   // Configuration which initiated the computation of this result.
   CaptureRobotExtrinsicsDatasetConfiguration configuration=1;
+
+  // The dataset result.
   farm_ng.core.Resource dataset = 2;
 }
