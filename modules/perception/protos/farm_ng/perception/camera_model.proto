@@ -27,6 +27,8 @@ message CameraModel {
     // Intel Realsense T265 - Four parameter Kannala Brandt distortion model
     DISTORTION_MODEL_KANNALA_BRANDT4 = 1;
     DISTORTION_MODEL_INVERSE_BROWN_CONRADY = 2;
+    // Azure Kinect uses BROWN_CONRADY, compatible with opencv
+    DISTORTION_MODEL_BROWN_CONRADY = 3;
   };
 
   // Specifies the distortion model.
