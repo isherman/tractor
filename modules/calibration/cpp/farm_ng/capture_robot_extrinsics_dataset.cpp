@@ -7,6 +7,7 @@
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
 #include <grpcpp/security/credentials.h>
+#include <opencv2/imgcodecs.hpp>
 #include <sophus/se3.hpp>
 
 #include "farm_ng/calibration/capture_robot_extrinsics_dataset.pb.h"
@@ -16,6 +17,7 @@
 #include "farm_ng/core/init.h"
 #include "farm_ng/core/ipc.h"
 
+#include "farm_ng/perception/pose_utils.h"
 #include "farm_ng/perception/sophus_protobuf.h"
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
@@ -51,9 +53,6 @@ class RobotHalClient {
     // Block waiting for response
     CapturePoseResponse response;
     stream->Read(&response);
-    std::cout << "Got response " << response.ShortDebugString() << "\n"
-              << std::endl;
-
     return {stream->Finish(), response};
   }
 
@@ -102,6 +101,25 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
     }
   }
   return pose_requests;
+}
+
+void ImageDataToResource(Image* image, int frame_number) {
+  core::Resource* resource = image->mutable_resource();
+  CHECK(resource->payload_case() == core::Resource::kData);
+  cv::Mat mat =
+      cv::imdecode(cv::Mat(1, resource->data().size(), CV_8UC1,
+                           const_cast<char*>(resource->data().data())),
+                   cv::IMREAD_UNCHANGED);
+
+  auto resource_path = core::GetUniqueArchiveResource(
+      perception::FrameNameNumber(image->camera_model().frame_name(),
+                                  frame_number),
+      "png", "image/png");
+  resource->CopyFrom(resource_path.first);
+  CHECK(resource->payload_case() == core::Resource::kPath);
+  LOG(INFO) << resource_path.second.string();
+  CHECK(cv::imwrite(resource_path.second.string(), mat))
+      << "Could not write: " << resource_path.second;
 }
 
 class CaptureRobotExtrinsicsDatasetProgram {
@@ -154,6 +172,7 @@ class CaptureRobotExtrinsicsDatasetProgram {
       const CaptureRobotExtrinsicsDatasetConfiguration& configuration) {
     configuration_ = configuration;
     status_.clear_input_required_configuration();
+    status_.mutable_configuration()->CopyFrom(configuration_);
     send_status();
   }
 
@@ -170,9 +189,13 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
     WaitForServices(bus_, {});
 
+    grpc::ChannelArguments ch_args;
+    ch_args.SetMaxReceiveMessageSize(100000000);
+    ch_args.SetMaxSendMessageSize(100000000);
     auto credentials = grpc::InsecureChannelCredentials();
-    auto channel =
-        grpc::CreateChannel(configuration_.hal_service_address(), credentials);
+    auto channel = grpc::CreateCustomChannel(
+        configuration_.hal_service_address(), credentials, ch_args);
+
     farm_ng::calibration::RobotHalClient client(channel);
 
     std::string log_path = (core::GetBucketRelativePath(core::BUCKET_LOGS) /
@@ -183,29 +206,54 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
     // TODO(isherman): Replace "bi" with an appropriate content-type for farm-ng
     // binary logs
-    auto resource_path =
-        farm_ng::core::GetUniqueArchiveResource("events", "log", "bi");
+    auto resource_path = farm_ng::core::GetUniqueArchiveResource(
+        "events", "log", "application/farm-ng-eventlog-v1");
 
     core::EventLogWriter log_writer(resource_path.second);
 
     auto requests = CapturePoseRequestsFromSampledWorkspace(
-        configuration_.sampled_workspace());
 
+        configuration_.sampled_workspace());
+    status_.clear_request_queue();
+    for (auto& request : requests) {
+      status_.add_request_queue()->CopyFrom(request);
+    }
+    int frame_number = 0;
     for (auto& request : requests) {
       bus_.get_io_service().poll();
 
       log_writer.Write(core::MakeEvent("capture/request", request));
+
       auto [status, response] = client.CapturePoseSync(request);
-      log_writer.Write(core::MakeEvent("capture/response", response));
 
       // TODO(isherman): Pipe this into calibration
-      CHECK(status.ok());
+
+      CHECK(status.ok()) << status.error_message();
       CHECK_EQ(response.status(), CapturePoseResponse::STATUS_SUCCESS);
       for (const Image& image : response.images()) {
         CHECK_GT(image.resource().data().length(), 0);
         CHECK_GT(image.camera_model().image_width(), 0);
       }
+      for (Image& image : *response.mutable_images()) {
+        ImageDataToResource(&image, frame_number);
+      }
+      log_writer.Write(core::MakeEvent("capture/response", response));
+      status_.set_latest_request_index(frame_number);
+      status_.mutable_latest_response()->CopyFrom(response);
+      send_status();
+
+      frame_number++;
     }
+    CaptureRobotExtrinsicsDatasetResult result;
+    result.mutable_configuration()->CopyFrom(configuration_);
+    result.mutable_dataset()->CopyFrom(resource_path.first);
+
+    core::ArchiveProtobufAsJsonResource(configuration_.name(), result);
+
+    // TODO different bucket?
+    status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
+        core::BUCKET_BASE_TO_CAMERA_MODELS, configuration_.name(), result));
+
     return 0;
   }
 
