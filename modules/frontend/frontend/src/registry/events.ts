@@ -80,6 +80,7 @@ import {
   CalibrateMultiViewApriltagRigStatus,
 } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_multi_view_apriltag_rig";
 import { CameraModel } from "@farm-ng/genproto-perception/farm_ng/perception/camera_model";
+import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 
 export type EventType =
   | Announce
@@ -95,16 +96,19 @@ export type EventType =
   | CalibrateBaseToCameraConfiguration
   | CalibrateBaseToCameraResult
   | CalibrateBaseToCameraStatus
-  | CalibrateMultiViewApriltagRigConfiguration
-  | CalibrateMultiViewApriltagRigResult
-  | CalibrateMultiViewApriltagRigStatus
   | CalibrateIntrinsicsConfiguration
   | CalibrateIntrinsicsResult
   | CalibrateIntrinsicsStatus
+  | CalibrateMultiViewApriltagRigConfiguration
+  | CalibrateMultiViewApriltagRigResult
+  | CalibrateMultiViewApriltagRigStatus
   | CalibrationParameter
   | CalibratorCommand
   | CalibratorStatus
   | CameraConfig
+  | CameraModel
+  | CameraPipelineCommand
+  | CameraPipelineConfig
   | CaptureVideoDatasetConfiguration
   | CaptureVideoDatasetResult
   | CaptureVideoDatasetStatus
@@ -122,14 +126,12 @@ export type EventType =
   | MultiViewApriltagRigModel
   | NamedSE3Pose
   | ProgramSupervisorStatus
+  | Resource
   | SE3Pose
   | StartProgramRequest
   | SteeringCommand
   | StopProgramRequest
   | TagConfig
-  | CameraModel
-  | CameraPipelineCommand
-  | CameraPipelineConfig
   | TractorConfig
   | TractorState
   | Vec2
@@ -169,6 +171,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.core.Event": BusEvent,
   "type.googleapis.com/farm_ng.core.LoggingCommand": LoggingCommand,
   "type.googleapis.com/farm_ng.core.LoggingStatus": LoggingStatus,
+  "type.googleapis.com/farm_ng.core.Resource": Resource,
   "type.googleapis.com/farm_ng.frontend.ProgramSupervisorStatus": ProgramSupervisorStatus,
   "type.googleapis.com/farm_ng.frontend.StartProgramRequest": StartProgramRequest,
   "type.googleapis.com/farm_ng.frontend.StopProgramRequest": StopProgramRequest,

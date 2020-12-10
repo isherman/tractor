@@ -18,6 +18,7 @@ import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 import { RepeatedIntForm } from "./RepeatedIntForm";
 import { CaptureVideoDatasetResult } from "@farm-ng/genproto-perception/farm_ng/perception/capture_video_dataset";
 import { CaptureVideoDatasetResultVisualizer } from "./CaptureVideoDatasetResult";
+import { ResourceVisualizer } from "./Resource";
 
 const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
   CalibrateApriltagRigConfiguration
@@ -26,22 +27,18 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
 
   return (
     <>
-      <Form.Group
-        // TODO: Replace with resource browser
-        label="Resource Path"
-        value={value.calibrationDataset?.path}
-        type="text"
-        onChange={(e) => {
-          const path = e.target.value;
+      <ResourceVisualizer.Form
+        initialValue={Resource.fromPartial({
+          path: value.calibrationDataset?.path,
+          contentType:
+            "application/json; type=type.googleapis.com/farm_ng.perception.CaptureVideoDatasetResult",
+        })}
+        onChange={(updated) =>
           setValue((v) => ({
             ...v,
-            calibrationDataset: Resource.fromPartial({
-              path,
-              contentType:
-                "application/json; type=type.googleapis.com/farm_ng.perception.CaptureVideoDatasetResult",
-            }),
-          }));
-        }}
+            calibrationDataset: updated,
+          }))
+        }
       />
 
       <h6>Tag IDs</h6>
