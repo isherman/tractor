@@ -226,14 +226,14 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
       auto [status, response] = client.CapturePoseSync(request);
 
-      // TODO(isherman): Pipe this into calibration
-
       CHECK(status.ok()) << status.error_message();
+
       CHECK_EQ(response.status(), CapturePoseResponse::STATUS_SUCCESS);
       for (const Image& image : response.images()) {
         CHECK_GT(image.resource().data().length(), 0);
         CHECK_GT(image.camera_model().image_width(), 0);
       }
+
       for (Image& image : *response.mutable_images()) {
         ImageDataToResource(&image, frame_number);
       }
