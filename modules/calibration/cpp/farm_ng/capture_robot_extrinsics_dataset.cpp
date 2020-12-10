@@ -93,8 +93,9 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
 
         CapturePoseRequest pose_request;
         NamedSE3Pose* pose = pose_request.add_poses();
-        SophusToProto(base_pose_workspace * workspace_pose_target, "root",
-                      "target", pose);
+        SophusToProto(base_pose_workspace * workspace_pose_target,
+                      configuration_.base_frame_name(),
+                      configuration_.link_frame_name(), pose);
         pose_requests.push_back(pose_request);
       }
     }
