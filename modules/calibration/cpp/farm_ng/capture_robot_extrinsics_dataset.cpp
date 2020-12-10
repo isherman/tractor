@@ -22,10 +22,9 @@
 
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 
-// TODO should this be a resource path, relative to blobstore?
-// TODO(isherman): Make this relative to the blobstore, update dockerfile
-DEFINE_string(configuration_path, "/host/config.json",
-              "Path to the configuration file.");
+DEFINE_string(configuration_path,
+              "configurations/capture_robot_extrinsics_dataset.json",
+              "Blobstore-relative path to the configuration file.");
 
 using farm_ng::core::MakeEvent;
 using farm_ng::core::ReadProtobufFromJsonFile;
@@ -204,10 +203,8 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
     core::SetArchivePath(log_path);
 
-    // TODO(isherman): Replace "bi" with an appropriate content-type for farm-ng
-    // binary logs
     auto resource_path = farm_ng::core::GetUniqueArchiveResource(
-        "events", "log", "application/farm-ng-eventlog-v1");
+        "events", "log", "application/farm_ng.eventlog.v1");
 
     core::EventLogWriter log_writer(resource_path.second);
 
@@ -270,7 +267,7 @@ class CaptureRobotExtrinsicsDatasetProgram {
 int Main(farm_ng::core::EventBus& bus) {
   auto configuration = ReadProtobufFromJsonFile<
       farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
-      FLAGS_configuration_path);
+      core::GetBlobstoreRoot() / FLAGS_configuration_path);
 
   farm_ng::calibration::CaptureRobotExtrinsicsDatasetProgram program(
       bus, configuration);
