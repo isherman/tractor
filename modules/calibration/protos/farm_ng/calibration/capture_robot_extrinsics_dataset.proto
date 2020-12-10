@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "farm_ng/calibration/robot_hal.proto";
 import "farm_ng/core/resource.proto";
 import "farm_ng/perception/apriltag.proto";
 import "farm_ng/perception/camera_model.proto";
@@ -37,8 +38,6 @@ message SampledCartesianWorkspace {
   int32 sample_count_z = 4;
 }
 
-
-
 // Sampling algorithm:
 // - For each translation workspace_T_link in the workspace volume:
 //   - Find a set of link orientations workspace_R_link that meet the visibility requirements
@@ -53,6 +52,7 @@ message SampledCartesianWorkspace {
 message CaptureRobotExtrinsicsDatasetConfiguration {
   // The dataset name.
   string name = 1;
+
   // A cartesian volume, sampled in its translation components
   SampledCartesianWorkspace sampled_workspace = 2;
 
@@ -87,6 +87,19 @@ message CaptureRobotExtrinsicsDatasetStatus {
   }
   // Serialized CaptureRobotExtrinsicsDatasetResult
   farm_ng.core.Resource result = 2;
+
+  // TODO(isherman): document
+  // TODO(isherman): visualization
+  //   - all frames in the configuration
+  //   - workspace volume
+  //   - all poses in the request queue
+  //   - the last request and response pose
+  //   - the last response image
+  //   - latest_request_index / request_queue.length
+  CaptureRobotExtrinsicsDatasetConfiguration configuration = 3;
+  repeated CapturePoseRequest request_queue = 4;
+  int32 latest_request_index = 5;
+  CapturePoseResponse latest_response = 6;
 }
 
 message CaptureRobotExtrinsicsDatasetResult {

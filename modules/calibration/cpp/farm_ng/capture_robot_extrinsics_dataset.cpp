@@ -21,6 +21,7 @@
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 
 // TODO should this be a resource path, relative to blobstore?
+// TODO(isherman): Make this relative to the blobstore, update dockerfile
 DEFINE_string(configuration_path, "/host/config.json",
               "Path to the configuration file.");
 
@@ -180,6 +181,8 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
     core::SetArchivePath(log_path);
 
+    // TODO(isherman): Replace "bi" with an appropriate content-type for farm-ng
+    // binary logs
     auto resource_path =
         farm_ng::core::GetUniqueArchiveResource("events", "log", "bi");
 
