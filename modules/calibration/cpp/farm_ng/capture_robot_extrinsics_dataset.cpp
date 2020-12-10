@@ -59,9 +59,11 @@ class RobotHalClient {
   std::unique_ptr<RobotHALService::Stub> stub_;
 };
 
-std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
-    SampledCartesianWorkspace sampled_workspace) {
+std::vector<CapturePoseRequest> GenerateCapturePoseRequests(
+    const CaptureRobotExtrinsicsDatasetConfiguration& configuration) {
   std::vector<CapturePoseRequest> pose_requests;
+
+  auto sampled_workspace = configuration.sampled_workspace();
   int sample_count_x = std::max(sampled_workspace.sample_count_x(), 1);
   int sample_count_y = std::max(sampled_workspace.sample_count_y(), 1);
   int sample_count_z = std::max(sampled_workspace.sample_count_z(), 1);
@@ -94,8 +96,8 @@ std::vector<CapturePoseRequest> CapturePoseRequestsFromSampledWorkspace(
         CapturePoseRequest pose_request;
         NamedSE3Pose* pose = pose_request.add_poses();
         SophusToProto(base_pose_workspace * workspace_pose_target,
-                      configuration_.base_frame_name(),
-                      configuration_.link_frame_name(), pose);
+                      configuration.base_frame_name(),
+                      configuration.link_frame_name(), pose);
         pose_requests.push_back(pose_request);
       }
     }
@@ -209,9 +211,7 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
     core::EventLogWriter log_writer(resource_path.second);
 
-    auto requests = CapturePoseRequestsFromSampledWorkspace(
-
-        configuration_.sampled_workspace());
+    auto requests = GenerateCapturePoseRequests(configuration_);
     status_.clear_request_queue();
     for (auto& request : requests) {
       status_.add_request_queue()->CopyFrom(request);
