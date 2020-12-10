@@ -11,12 +11,16 @@ all:
 	make systemd
 	echo "\nSuccessful full system build.\n"
 
+clean:
+	rm -rf build env third_party/build-*
+
 bootstrap:
 	./bootstrap.sh
 
+
 cpp:
 	mkdir -p build
-	cd build && rm -rf ./* && cmake -DCMAKE_PREFIX_PATH=`pwd`/../env -DCMAKE_BUILD_TYPE=Release .. && make -j`nproc --ignore=1`
+	cd build && cmake -DCMAKE_PREFIX_PATH=`pwd`/../env -DCMAKE_BUILD_TYPE=Release .. && make -j`nproc --ignore=1`
 
 frontend:
 	cd modules/frontend/frontend && yarn && yarn build
@@ -24,7 +28,7 @@ frontend:
 
 protos:
 	mkdir -p build
-	cd build && cmake .. && make -j`nproc --ignore=1` farm_ng_all_protobuf_go farm_ng_all_protobuf_ts
+	cd build && cmake -DCMAKE_PREFIX_PATH=`pwd`/../env -DCMAKE_BUILD_TYPE=Release .. && make -j`nproc --ignore=1` farm_ng_all_protobuf_py farm_ng_all_protobuf_go farm_ng_all_protobuf_ts
 
 systemd:
 	cd jetson && sudo ./install.sh
@@ -44,4 +48,4 @@ webservices:
 	make frontend
 	make webserver
 
-.PHONY: bootstrap cpp frontend protos systemd third_party test webserver webservices all
+.PHONY: clean bootstrap cpp frontend protos systemd third_party test webserver webservices all
