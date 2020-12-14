@@ -25,6 +25,8 @@ import { CaptureVideoDatasetResultVisualizer } from "../components/scope/visuali
 import { CreateVideoDatasetConfigurationVisualizer } from "../components/scope/visualizers/CreateVideoDatasetConfiguration";
 import { CreateVideoDatasetStatusVisualizer } from "../components/scope/visualizers/CreateVideoDatasetStatus";
 import { CreateVideoDatasetResultVisualizer } from "../components/scope/visualizers/CreateVideoDatasetResult";
+import { DetectApriltagsConfigurationVisualizer } from "../components/scope/visualizers/DetectApriltagsConfiguration";
+import { DetectApriltagsStatusVisualizer } from "../components/scope/visualizers/DetectApriltagsStatus";
 import { ApriltagConfigVisualizer } from "../components/scope/visualizers/ApriltagConfig";
 import { CameraConfigVisualizer } from "../components/scope/visualizers/CameraConfig";
 import { CameraPipelineConfigVisualizer } from "../components/scope/visualizers/CameraPipelineConfig";
@@ -93,6 +95,8 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   CreateVideoDatasetResultVisualizer,
   CreateVideoDatasetStatusVisualizer,
   VideoFileCameraVisualizer,
+  DetectApriltagsConfigurationVisualizer,
+  DetectApriltagsStatusVisualizer,
   ImageVisualizer,
   MonocularApriltagRigModelVisualizer,
   MultiViewApriltagRigModelVisualizer,

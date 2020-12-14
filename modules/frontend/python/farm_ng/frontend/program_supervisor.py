@@ -60,6 +60,12 @@ library = {
         name='Intrinsics Calibration',
         description='Calibrates camera intrinsics from data collected with create_video_dataset',
     ),
+    'detect_apriltags': ProgramInfo(
+        path=f'{farm_ng_root}/build/modules/perception/cpp/farm_ng/detect_apriltags',
+        args=['-interactive'],
+        name='Detect Apriltags',
+        description='Given a video dataset, this runs apriltag detection on each image. Discards existing apriltag detections.',
+    ),
     'calibrate_multi_view_apriltag_rig': ProgramInfo(
         path=f'{farm_ng_root}/build/modules/calibration/cpp/farm_ng/calibrate_multi_view_apriltag_rig',
         args=['-interactive'],
