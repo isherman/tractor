@@ -18,6 +18,7 @@ import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 import { VideoFileCameraVisualizer } from "./VideoFileCamera";
+import { ResourceVisualizer } from "./Resource";
 
 const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
   CreateVideoDatasetConfiguration
@@ -31,7 +32,6 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
       <Form.Group
         label="Name"
         value={value.name}
-        description="A name for the dataset, used to name the output archive."
         type="text"
         onChange={(e) => {
           const name = e.target.value;
@@ -91,7 +91,24 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
 
       {apriltagRigs?.map((apriltagRig, index) => (
         <div key={apriltagRig.path}>
-          <Form.Group
+          <ResourceVisualizer.Form
+            label="Apriltag Rig"
+            initialValue={Resource.fromPartial({
+              path: apriltagRig.path,
+              contentType:
+                "application/json; type=type.googleapis.com/farm_ng.perception.ApriltagRig",
+            })}
+            onChange={(updated) =>
+              setValue((v) => ({
+                ...v,
+                apriltagRigs: Object.assign([...v.apriltagRigs], {
+                  [index]: updated,
+                }),
+              }))
+            }
+          />
+
+          {/* <Form.Group
             // TODO: Replace with resource browser
             label="Resource Path"
             value={apriltagRig.path}
@@ -109,7 +126,7 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
                 }),
               }));
             }}
-          />
+          /> */}
           <Form.ButtonGroup
             buttonText="X"
             onClick={() =>

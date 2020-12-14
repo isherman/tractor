@@ -15,43 +15,61 @@ import { cameraModel_DistortionModelToJSON } from "@farm-ng/genproto-perception/
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
+import { ResourceVisualizer } from "./Resource";
+import { useFetchResource } from "../../../hooks/useFetchResource";
+import { CreateVideoDatasetResult } from "@farm-ng/genproto-perception/farm_ng/perception/create_video_dataset";
+import { useStores } from "../../../hooks/useStores";
 
 const CalibrateIntrinsicsConfigurationForm: React.FC<FormProps<
   CalibrateIntrinsicsConfiguration
 >> = (props) => {
   const [value, setValue] = useFormState(props);
 
-  const { videoDataset, cameraName, filterStableTags } = value;
+  const { cameraName, filterStableTags } = value;
+  const { httpResourceArchive } = useStores();
+
+  const loadedVideoDataset = useFetchResource<CreateVideoDatasetResult>(
+    value.videoDataset,
+    httpResourceArchive
+  );
 
   return (
     <>
-      <Form.Group
-        // TODO: Replace with resource browser
-        label="Video Dataset"
-        value={videoDataset?.path}
-        type="text"
-        onChange={(e) => {
-          const path = e.target.value;
+      <ResourceVisualizer.Form
+        initialValue={Resource.fromPartial({
+          path: value.videoDataset?.path,
+          contentType:
+            "application/json; type=type.googleapis.com/farm_ng.perception.CreateVideoDatasetResult",
+        })}
+        onChange={(updated) =>
           setValue((v) => ({
             ...v,
-            videoDataset: Resource.fromPartial({
-              path,
-              contentType:
-                "application/json; type=type.googleapis.com/farm_ng.perception.CreateVideoDatasetResult",
-            }),
-          }));
-        }}
+            videoDataset: updated,
+          }))
+        }
       />
 
-      <Form.Group
-        label="Camera Name"
-        value={cameraName}
-        type="text"
-        onChange={(e) => {
-          const cameraName = e.target.value;
-          setValue((v) => ({ ...v, cameraName }));
-        }}
-      />
+      {loadedVideoDataset && (
+        <Form.Group
+          label="Camera Name"
+          value={cameraName}
+          as="select"
+          onChange={(e) => {
+            const cameraName = e.target.value;
+            setValue((v) => ({ ...v, cameraName }));
+          }}
+        >
+          {loadedVideoDataset.perCameraNumFrames
+            .map((entry) => entry.cameraName)
+            .map((cameraName) => {
+              return (
+                <option key={cameraName} value={cameraName}>
+                  {cameraName}
+                </option>
+              );
+            })}
+        </Form.Group>
+      )}
 
       <Form.Group
         label="Filter Stable Tags?"

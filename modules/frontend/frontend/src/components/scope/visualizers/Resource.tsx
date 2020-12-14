@@ -21,7 +21,11 @@ import { Icon } from "../../Icon";
 import { useState } from "react";
 import { BlobstoreBrowser } from "../../BlobstoreBrowser";
 
-const ResourceForm: React.FC<FormProps<Resource>> = (props) => {
+interface ResourceFormProps extends FormProps<Resource> {
+  label?: string;
+}
+
+const ResourceForm: React.FC<ResourceFormProps> = (props) => {
   const [value, setValue] = useFormState(props);
   const [showModal, setShowModal] = useState(false);
 
@@ -33,6 +37,11 @@ const ResourceForm: React.FC<FormProps<Resource>> = (props) => {
       path,
     }));
 
+  const shortContentType = value.contentType.replace(
+    /type=type\.googleapis\.com\/farm_ng\.\w+\./,
+    ""
+  );
+
   // A form,
   // with two text fields for path and content_type (eventually support data too)
   // and a button next to path that launches a modal, allowing for selecting of a path
@@ -40,10 +49,10 @@ const ResourceForm: React.FC<FormProps<Resource>> = (props) => {
   return (
     <>
       <Form.Group
-        label="Resource Path"
+        label={props.label || "Resource Path"}
         value={value.path}
         type="text"
-        description={value.contentType}
+        description={shortContentType}
         append={
           <Button variant="outline-secondary" onClick={handleShowModal}>
             <Icon id="folder2-open" />

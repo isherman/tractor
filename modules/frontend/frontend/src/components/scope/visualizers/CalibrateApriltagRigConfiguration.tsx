@@ -19,15 +19,33 @@ import { RepeatedIntForm } from "./RepeatedIntForm";
 import { CaptureVideoDatasetResult } from "@farm-ng/genproto-perception/farm_ng/perception/capture_video_dataset";
 import { CaptureVideoDatasetResultVisualizer } from "./CaptureVideoDatasetResult";
 import { ResourceVisualizer } from "./Resource";
+import { useStores } from "../../../hooks/useStores";
 
 const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
   CalibrateApriltagRigConfiguration
 >> = (props) => {
   const [value, setValue] = useFormState(props);
+  const { httpResourceArchive } = useStores();
+
+  const loadedCalibrationDataset = useFetchResource<CaptureVideoDatasetResult>(
+    value.calibrationDataset,
+    httpResourceArchive
+  );
 
   return (
     <>
+      <Form.Group
+        label="Name"
+        value={value.name}
+        type="text"
+        onChange={(e) => {
+          const name = e.target.value;
+          setValue((v) => ({ ...v, name }));
+        }}
+      />
+
       <ResourceVisualizer.Form
+        label="Video Dataset"
         initialValue={Resource.fromPartial({
           path: value.calibrationDataset?.path,
           contentType:
@@ -41,56 +59,72 @@ const CalibrateApriltagRigConfigurationForm: React.FC<FormProps<
         }
       />
 
-      <h6>Tag IDs</h6>
-      <RepeatedIntForm
-        initialValue={value.tagIds}
-        onChange={(updated) =>
-          setValue((v) => ({
-            ...v,
-            tagIds: updated,
-          }))
-        }
-      />
+      {loadedCalibrationDataset && (
+        <>
+          <Form.Group
+            label="Camera Name"
+            value={value.cameraName}
+            as="select"
+            onChange={(e) => {
+              const cameraName = e.target.value;
+              setValue((v) => ({ ...v, cameraName }));
+            }}
+          >
+            {loadedCalibrationDataset.perCameraNumFrames
+              .map((entry) => entry.cameraName)
+              .map((cameraName) => {
+                return (
+                  <option key={cameraName} value={cameraName}>
+                    {cameraName}
+                  </option>
+                );
+              })}
+          </Form.Group>
 
-      <Form.Group
-        label="Name"
-        value={value.name}
-        type="text"
-        onChange={(e) => {
-          const name = e.target.value;
-          setValue((v) => ({ ...v, name }));
-        }}
-      />
+          <h6>Tag IDs</h6>
+          <RepeatedIntForm
+            initialValue={loadedCalibrationDataset.perTagIdNumFrames.map(
+              (_) => _.tagId
+            )}
+            onChange={(updated) =>
+              setValue((v) => ({
+                ...v,
+                tagIds: updated,
+              }))
+            }
+          />
 
-      <Form.Group
-        label="Root Tag ID"
-        value={value.rootTagId}
-        type="number"
-        onChange={(e) => {
-          const rootTagId = parseInt(e.target.value);
-          setValue((v) => ({ ...v, rootTagId }));
-        }}
-      />
+          <Form.Group
+            label="Root Tag ID"
+            value={value.rootTagId}
+            as="select"
+            onChange={(e) => {
+              const rootTagId = parseInt(e.target.value);
+              setValue((v) => ({ ...v, rootTagId }));
+            }}
+          >
+            {loadedCalibrationDataset.perTagIdNumFrames
+              .map((entry) => entry.tagId)
+              .map((tagId) => {
+                return (
+                  <option key={tagId} value={tagId}>
+                    {tagId}
+                  </option>
+                );
+              })}
+          </Form.Group>
 
-      <Form.Group
-        label="Filter stable tags?"
-        checked={value.filterStableTags}
-        type="checkbox"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          const filterStableTags = Boolean(e.target.checked);
-          setValue((v) => ({ ...v, filterStableTags }));
-        }}
-      />
-
-      <Form.Group
-        label="Camera Name"
-        value={value.cameraName}
-        type="text"
-        onChange={(e) => {
-          const cameraName = e.target.value;
-          setValue((v) => ({ ...v, cameraName }));
-        }}
-      />
+          <Form.Group
+            label="Filter stable tags?"
+            checked={value.filterStableTags}
+            type="checkbox"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const filterStableTags = Boolean(e.target.checked);
+              setValue((v) => ({ ...v, filterStableTags }));
+            }}
+          />
+        </>
+      )}
     </>
   );
 };

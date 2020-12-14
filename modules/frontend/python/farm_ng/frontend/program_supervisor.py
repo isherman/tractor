@@ -21,12 +21,6 @@ farm_ng_root = os.environ['FARM_NG_ROOT']
 ProgramInfo = namedtuple('ProgramInfo', 'path args name description')
 
 library = {
-    'calibrate_apriltag_rig_playback': ProgramInfo(
-        path=f'{farm_ng_root}/build/modules/core/cpp/farm_ng/log_playback',
-        args=['-send', '-log', f'{farm_ng_root}/../tractor-data/cal01/events-02498-00000.log'],
-        name='Apriltag Rig Calibration Playback',
-        description='Log playback',
-    ),
     'calibrate_apriltag_rig': ProgramInfo(
         path=f'{farm_ng_root}/build/modules/calibration/cpp/farm_ng/calibrate_apriltag_rig',
         args=['-interactive'],
