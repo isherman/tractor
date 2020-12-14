@@ -59,15 +59,20 @@ const CalibrateIntrinsicsConfigurationForm: React.FC<FormProps<
             setValue((v) => ({ ...v, cameraName }));
           }}
         >
-          {loadedVideoDataset.perCameraNumFrames
-            .map((entry) => entry.cameraName)
-            .map((cameraName) => {
-              return (
-                <option key={cameraName} value={cameraName}>
-                  {cameraName}
-                </option>
-              );
-            })}
+          {[
+            <option key={"SELECT"} value={""}>
+              {"SELECT"}
+            </option>,
+            ...loadedVideoDataset.perCameraNumFrames
+              .map((entry) => entry.cameraName)
+              .map((cameraName) => {
+                return (
+                  <option key={cameraName} value={cameraName}>
+                    {cameraName}
+                  </option>
+                );
+              }),
+          ]}
         </Form.Group>
       )}
 
