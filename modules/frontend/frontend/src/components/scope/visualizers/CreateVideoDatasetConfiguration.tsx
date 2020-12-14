@@ -19,13 +19,15 @@ import Form from "./Form";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 import { VideoFileCameraVisualizer } from "./VideoFileCamera";
 import { ResourceVisualizer } from "./Resource";
+import { useStableKey } from "../../../hooks/useStableKey";
 
 const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
   CreateVideoDatasetConfiguration
 >> = (props) => {
   const [value, setValue] = useFormState(props);
 
-  const { videoFileCameras, apriltagRigs } = value;
+  const { apriltagRigs } = value;
+  const keyedVideoFileCameras = useStableKey(value.videoFileCameras);
 
   return (
     <>
@@ -48,8 +50,8 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
         }}
       />
 
-      {videoFileCameras?.map((videoFileCamera, index) => (
-        <div key={videoFileCamera.cameraFrameName}>
+      {keyedVideoFileCameras?.map(([key, videoFileCamera], index) => (
+        <div key={key}>
           <VideoFileCameraVisualizer.Form
             initialValue={videoFileCamera}
             onChange={(updated) =>
@@ -108,25 +110,6 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
             }
           />
 
-          {/* <Form.Group
-            // TODO: Replace with resource browser
-            label="Resource Path"
-            value={apriltagRig.path}
-            type="text"
-            onChange={(e) => {
-              const path = e.target.value;
-              setValue((v) => ({
-                ...v,
-                apriltagRigs: Object.assign([...v.apriltagRigs], {
-                  [index]: Resource.fromPartial({
-                    path,
-                    contentType:
-                      "application/json; type=type.googleapis.com/farm_ng.calibration.CalibrateMultiViewApriltagRigResult",
-                  }),
-                }),
-              }));
-            }}
-          /> */}
           <Form.ButtonGroup
             buttonText="X"
             onClick={() =>
