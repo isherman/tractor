@@ -6,10 +6,7 @@ import {
 } from "../../../registry/visualization";
 import { KeyValueTable } from "./KeyValueTable";
 import { Card } from "./Card";
-import {
-  CreateVideoDatasetConfiguration,
-  VideoFileCamera,
-} from "@farm-ng/genproto-perception/farm_ng/perception/create_video_dataset";
+import { CreateVideoDatasetConfiguration } from "@farm-ng/genproto-perception/farm_ng/perception/create_video_dataset";
 import {
   StandardComponent,
   StandardComponentOptions,
@@ -63,6 +60,8 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
               }))
             }
           />
+          {/* Disabled until multiple video file inputs are supported
+
           <Form.ButtonGroup
             buttonText="X"
             onClick={() =>
@@ -74,10 +73,11 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
                 ],
               }))
             }
-          />
+          /> */}
         </div>
       ))}
 
+      {/* Disabled until multiple video file inputs are supported
       <Form.ButtonGroup
         buttonText="+"
         onClick={() =>
@@ -89,7 +89,7 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
             ],
           }))
         }
-      />
+      /> */}
 
       {apriltagRigs?.map((apriltagRig, index) => (
         <div key={apriltagRig.path}>

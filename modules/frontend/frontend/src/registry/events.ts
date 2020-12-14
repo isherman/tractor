@@ -102,6 +102,9 @@ export type EventType =
   | CalibrateMultiViewApriltagRigConfiguration
   | CalibrateMultiViewApriltagRigResult
   | CalibrateMultiViewApriltagRigStatus
+  | CalibrateIntrinsicsConfiguration
+  | CalibrateIntrinsicsResult
+  | CalibrateIntrinsicsStatus
   | CalibrationParameter
   | CalibratorCommand
   | CalibratorStatus
@@ -132,6 +135,9 @@ export type EventType =
   | SteeringCommand
   | StopProgramRequest
   | TagConfig
+  | CameraModel
+  | CameraPipelineCommand
+  | CameraPipelineConfig
   | TractorConfig
   | TractorState
   | Vec2
