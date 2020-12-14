@@ -16,21 +16,6 @@ import { useState } from "react";
 import RangeSlider from "react-bootstrap-range-slider";
 import { ImageVisualizer } from "./Image";
 import { ApriltagDetectionsVisualizer } from "./ApriltagDetections";
-// import { ApriltagRigVisualizer } from "./ApriltagRig";
-// import { Scene } from "./Scene";
-// import { PerspectiveCamera } from "./Camera";
-// import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
-// import {
-//   cameraModelToThreeJSFOV,
-//   matrix4ToSE3Pose,
-//   openCVPoseToThreeJSPose,
-//   toQuaternion,
-//   toVector3,
-// } from "../../../utils/protoConversions";
-// import { Matrix4 } from "three";
-
-// repeated farm_ng.perception.ApriltagRig apriltag_rigs = 2;
-// repeated farm_ng.perception.NamedSE3Pose camera_poses_rig = 7;
 
 const IntrinsicModelElement: React.FC<SingleElementVisualizerProps<
   IntrinsicModel
@@ -54,29 +39,6 @@ const IntrinsicModelElement: React.FC<SingleElementVisualizerProps<
 
   const reprojectionImage = value.reprojectionImages[index];
   const apriltagDetections = detections[index];
-
-  // TODO: Support multiple apriltag rigs
-  // const apriltagRig = apriltagRigs[0] && (
-  //   <ApriltagRigVisualizer.Marker3D value={[0, apriltagRigs[0]]} />
-  // );
-
-  // const cameraRig = (
-  //   <NamedSE3PoseVisualizer.Marker3D
-  //     value={[0, openCVPoseToThreeJSPose(cameraPosesRig[0])]}
-  //   >
-  //     <PerspectiveCamera
-  //       showHelper
-  //       fov={cameraModel ? cameraModelToThreeJSFOV(cameraModel) : 80}
-  //       far={0.5}
-  //       aspect={
-  //         cameraModel ? cameraModel.imageWidth / cameraModel.imageHeight : 1
-  //       }
-  //     />
-  //   </NamedSE3PoseVisualizer.Marker3D>
-  // );
-
-  // const cameraRigPoseApriltagRig =
-  //   cameraPosesRig[index].aPoseB || matrix4ToSE3Pose(new Matrix4());
 
   return (
     <Card json={value} timestamp={timestamp}>

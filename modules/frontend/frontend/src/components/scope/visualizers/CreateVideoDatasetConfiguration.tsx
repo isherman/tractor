@@ -49,10 +49,7 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
       />
 
       {videoFileCameras?.map((videoFileCamera, index) => (
-        <div
-          // className={styles.row}
-          key={videoFileCamera.cameraFrameName}
-        >
+        <div key={videoFileCamera.cameraFrameName}>
           <VideoFileCameraVisualizer.Form
             initialValue={videoFileCamera}
             onChange={(updated) =>
@@ -93,10 +90,7 @@ const CreateVideoDatasetConfigurationForm: React.FC<FormProps<
       />
 
       {apriltagRigs?.map((apriltagRig, index) => (
-        <div
-          // className={styles.row}
-          key={apriltagRig.path}
-        >
+        <div key={apriltagRig.path}>
           <Form.Group
             // TODO: Replace with resource browser
             label="Resource Path"
