@@ -5,6 +5,8 @@ import { DetectApriltagsProgram } from "../components/programs/DetectApriltags";
 import { EventType } from "./events";
 import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import { CalibrateMultiViewApriltagRigProgram } from "../components/programs/CalibrateMultiViewApriltagRig";
+import { CreateVideoDatasetProgram } from "../components/programs/CreateVideoDataset";
+import { CalibrateIntrinsicsProgram } from "../components/programs/CalibrateIntrinsics";
 
 export interface Program<T extends EventType = EventType> {
   programIds: readonly string[];
@@ -21,7 +23,9 @@ export const programRegistry: Program[] = [
   CaptureVideoDatasetProgram as Program,
   CalibrateApriltagRigProgram as Program,
   CalibrateBaseToCameraProgram as Program,
+  CalibrateIntrinsicsProgram as Program,
   CalibrateMultiViewApriltagRigProgram as Program,
+  CreateVideoDatasetProgram as Program,
   DetectApriltagsProgram as Program,
 ];
 
