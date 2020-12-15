@@ -71,7 +71,7 @@ const CalibrateMultiViewApriltagRigConfigurationForm: React.FC<FormProps<
       {loadedVideoDataset && (
         <>
           <Form.Group
-            label="Camera Name"
+            label="Root Camera Name"
             value={value.rootCameraName}
             as="select"
             onChange={(e) => {
