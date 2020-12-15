@@ -79,15 +79,20 @@ const CalibrateMultiViewApriltagRigConfigurationForm: React.FC<FormProps<
               setValue((v) => ({ ...v, rootCameraName }));
             }}
           >
-            {loadedVideoDataset.perCameraNumFrames
-              .map((entry) => entry.cameraName)
-              .map((cameraName) => {
-                return (
-                  <option key={cameraName} value={cameraName}>
-                    {cameraName}
-                  </option>
-                );
-              })}
+            {[
+              <option key={"SELECT"} value={""}>
+                {"SELECT"}
+              </option>,
+              ...loadedVideoDataset.perCameraNumFrames
+                .map((entry) => entry.cameraName)
+                .map((cameraName) => {
+                  return (
+                    <option key={cameraName} value={cameraName}>
+                      {cameraName}
+                    </option>
+                  );
+                }),
+            ]}
           </Form.Group>
 
           <h6>Tag IDs</h6>
@@ -112,15 +117,20 @@ const CalibrateMultiViewApriltagRigConfigurationForm: React.FC<FormProps<
               setValue((v) => ({ ...v, rootTagId }));
             }}
           >
-            {loadedVideoDataset.perTagIdNumFrames
-              .map((entry) => entry.tagId)
-              .map((tagId) => {
-                return (
-                  <option key={tagId} value={tagId}>
-                    {tagId}
-                  </option>
-                );
-              })}
+            {[
+              <option key={"SELECT"} value={""}>
+                {"SELECT"}
+              </option>,
+              ...loadedVideoDataset.perTagIdNumFrames
+                .map((entry) => entry.tagId)
+                .map((tagId) => {
+                  return (
+                    <option key={tagId} value={tagId}>
+                      {tagId}
+                    </option>
+                  );
+                }),
+            ]}
           </Form.Group>
 
           <Form.Group
