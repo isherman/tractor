@@ -144,7 +144,7 @@ export const BlobstoreBrowser: React.FC<IProps> = ({
     const fetchRootDir = async (): Promise<void> => {
       const response = await fetch(`${blobstoreUrl}/`, {
         method: "GET",
-        cache: "no-cache", // always revalidate with the server
+        cache: "no-store",
         headers: {
           "Content-Type": "application/protobuf",
         },
@@ -161,7 +161,7 @@ export const BlobstoreBrowser: React.FC<IProps> = ({
       const path = dirsToPath(parentDirs);
       const response = await fetch(`${blobstoreUrl}/${path}`, {
         method: "GET",
-        cache: "no-cache", // always revalidate with the server
+        cache: "no-store",
         headers: {
           "Content-Type": "application/protobuf",
         },
