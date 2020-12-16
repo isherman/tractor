@@ -79,7 +79,10 @@ import {
   CalibrateMultiViewApriltagRigResult,
   CalibrateMultiViewApriltagRigStatus,
 } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_multi_view_apriltag_rig";
-import { CameraModel } from "@farm-ng/genproto-perception/farm_ng/perception/camera_model";
+import {
+  CameraModel,
+  MultiViewCameraRig,
+} from "@farm-ng/genproto-perception/farm_ng/perception/camera_model";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
 
 export type EventType =
@@ -127,6 +130,7 @@ export type EventType =
   | MonocularApriltagRigModel
   | MotorControllerState
   | MultiViewApriltagRigModel
+  | MultiViewCameraRig
   | NamedSE3Pose
   | ProgramSupervisorStatus
   | Resource
@@ -194,6 +198,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.perception.DetectApriltagsConfiguration": DetectApriltagsConfiguration,
   "type.googleapis.com/farm_ng.perception.DetectApriltagsStatus": DetectApriltagsStatus,
   "type.googleapis.com/farm_ng.perception.Image": Image,
+  "type.googleapis.com/farm_ng.perception.MultiViewCameraRig": MultiViewCameraRig,
   "type.googleapis.com/farm_ng.perception.NamedSE3Pose": NamedSE3Pose,
   "type.googleapis.com/farm_ng.perception.SE3Pose": SE3Pose,
   "type.googleapis.com/farm_ng.perception.TagConfig": TagConfig,
