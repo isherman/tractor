@@ -18,7 +18,7 @@ import { parseResourceContentType } from "../../../utils/protoConversions";
 import styles from "./Resource.module.scss";
 import { Button, Modal } from "react-bootstrap";
 import { Icon } from "../../Icon";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { BlobstoreBrowser } from "../../BlobstoreBrowser";
 
 interface ResourceFormProps extends FormProps<Resource> {
@@ -28,14 +28,29 @@ interface ResourceFormProps extends FormProps<Resource> {
 const ResourceForm: React.FC<ResourceFormProps> = (props) => {
   const [value, setValue] = useFormState(props);
   const [showModal, setShowModal] = useState(false);
+  const fileSelected = useRef<string | null>(null);
 
-  const handleCloseModal = () => setShowModal(false);
   const handleShowModal = () => setShowModal(true);
-  const handleFileSelected = (path: string) =>
-    setValue((v) => ({
-      ...v,
-      path,
-    }));
+  const handleFileSelected = (path: string) => {
+    console.log("handleFileSelected");
+    fileSelected.current = path;
+  };
+  const handleCancelModal = () => {
+    console.log("handleCancelModal");
+    fileSelected.current = null;
+    setShowModal(false);
+  };
+  const handleSubmitModal = () => {
+    console.log("handleSubmitModal");
+    const fileSelectedCurrent = fileSelected.current;
+    if (fileSelectedCurrent) {
+      setValue((v) => ({
+        ...v,
+        path: fileSelectedCurrent,
+      }));
+    }
+    setShowModal(false);
+  };
 
   const shortContentType = value.contentType.replace(
     /type=type\.googleapis\.com\/farm_ng\.\w+\./,
@@ -69,7 +84,7 @@ const ResourceForm: React.FC<ResourceFormProps> = (props) => {
 
       <Modal
         show={showModal}
-        onHide={handleCloseModal}
+        onHide={handleCancelModal}
         dialogClassName={styles.modal}
       >
         <Modal.Header closeButton>
@@ -84,10 +99,10 @@ const ResourceForm: React.FC<ResourceFormProps> = (props) => {
           ></BlobstoreBrowser>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
+          <Button variant="secondary" onClick={handleCancelModal}>
             Close
           </Button>
-          <Button variant="primary" onClick={handleCloseModal}>
+          <Button variant="primary" onClick={handleSubmitModal}>
             Select
           </Button>
         </Modal.Footer>
