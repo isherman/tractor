@@ -11,7 +11,10 @@ import {
 import { CalibrateIntrinsicsConfiguration } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_intrinsics";
 import { Card } from "./Card";
 import { KeyValueTable } from "./KeyValueTable";
-import { cameraModel_DistortionModelToJSON } from "@farm-ng/genproto-perception/farm_ng/perception/camera_model";
+import {
+  CameraModel_DistortionModel,
+  cameraModel_DistortionModelToJSON,
+} from "@farm-ng/genproto-perception/farm_ng/perception/camera_model";
 import { useFormState } from "../../../hooks/useFormState";
 import Form from "./Form";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
@@ -19,6 +22,7 @@ import { ResourceVisualizer } from "./Resource";
 import { useFetchResource } from "../../../hooks/useFetchResource";
 import { CreateVideoDatasetResult } from "@farm-ng/genproto-perception/farm_ng/perception/create_video_dataset";
 import { useStores } from "../../../hooks/useStores";
+import { enumNumericKeys } from "../../../utils/enum";
 
 const CalibrateIntrinsicsConfigurationForm: React.FC<FormProps<
   CalibrateIntrinsicsConfiguration
@@ -48,6 +52,26 @@ const CalibrateIntrinsicsConfigurationForm: React.FC<FormProps<
           }))
         }
       />
+
+      <Form.Group
+        label="Distortion Model"
+        value={value.distortionModel}
+        as="select"
+        onChange={(e) => {
+          const distortionModel = parseInt(e.target.value);
+          setValue((v) => ({ ...v, distortionModel }));
+        }}
+      >
+        {enumNumericKeys(CameraModel_DistortionModel)
+          .filter((k) => k >= 0)
+          .map((k) => {
+            return (
+              <option key={k} value={k}>
+                {cameraModel_DistortionModelToJSON(k)}
+              </option>
+            );
+          })}
+      </Form.Group>
 
       {loadedVideoDataset && (
         <Form.Group
