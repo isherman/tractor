@@ -193,21 +193,21 @@ const MultiViewApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
         <div className={styles.boxWhisker}>
           <BoxWhiskerPlot
             data={tagRmsesByImage}
-            title="Tag RMSEs by image"
+            title="Tag RMSE by image"
             xAxisLabel="Image Index"
           />
         </div>
         <div className={styles.boxWhisker}>
           <BoxWhiskerPlot
             data={tagRmsesByTag}
-            title="Tag RMSEs by tag"
+            title="Tag RMSE by tag"
             xAxisLabel="Tag ID"
           />
         </div>
         <div className={styles.boxWhisker}>
           <BoxWhiskerPlot
             data={tagRmsesByCamera}
-            title="Tag RMSEs by camera"
+            title="Tag RMSE by camera"
             xAxisLabel="Camera Name"
           />
         </div>
