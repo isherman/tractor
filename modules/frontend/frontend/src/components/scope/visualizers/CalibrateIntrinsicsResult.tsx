@@ -74,7 +74,6 @@ const CalibrateIntrinsicsResultElement: React.FC<SingleElementVisualizerProps<
                   <td>
                     <Button
                       download
-                      target="_blank"
                       href={`${blobstoreUrl}/${cameraModel.path}`}
                     >
                       <Icon id="download" />

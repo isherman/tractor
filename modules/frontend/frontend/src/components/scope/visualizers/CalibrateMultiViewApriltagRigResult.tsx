@@ -89,7 +89,6 @@ const CalibrateMultiViewApriltagRigResultElement: React.FC<SingleElementVisualiz
                   <td>
                     <Button
                       download
-                      target="_blank"
                       href={`${blobstoreUrl}/${apriltagRigSolved.path}`}
                     >
                       <Icon id="download" />
@@ -112,7 +111,6 @@ const CalibrateMultiViewApriltagRigResultElement: React.FC<SingleElementVisualiz
                   <td>
                     <Button
                       download
-                      target="_blank"
                       href={`${blobstoreUrl}/${cameraRigSolved.path}`}
                     >
                       <Icon id="download" />
@@ -128,7 +126,7 @@ const CalibrateMultiViewApriltagRigResultElement: React.FC<SingleElementVisualiz
         </Table>
       </Card>
       {configuration && (
-        <Card title="Configuration">
+        <Card title="Configuration" collapsed>
           <CalibrateMultiViewApriltagRigConfigurationVisualizer.Element
             {...props}
             value={[0, configuration]}
@@ -136,7 +134,7 @@ const CalibrateMultiViewApriltagRigResultElement: React.FC<SingleElementVisualiz
         </Card>
       )}
       {loadedInitial && (
-        <Card title="Initial">
+        <Card title="Initial" collapsed>
           <MultiViewApriltagRigModelVisualizer.Element
             {...props}
             value={[0, loadedInitial]}
@@ -144,7 +142,7 @@ const CalibrateMultiViewApriltagRigResultElement: React.FC<SingleElementVisualiz
         </Card>
       )}
       {loadedSolved && (
-        <Card title="Solved">
+        <Card title="Solved" collapsed>
           <MultiViewApriltagRigModelVisualizer.Element
             {...props}
             value={[0, loadedSolved]}
