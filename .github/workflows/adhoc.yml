@@ -1,0 +1,21 @@
+name: Ad Hoc (Actions Development)
+
+# For tags beginning with 'adhoc-', run integration tests.
+
+on:
+  push:
+    tags:
+      - "adhoc-*"
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, sensor-box]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Build
+        run: docker-compose -f docker/docker-compose.yml build
+      - name: Test
+        run: bash
