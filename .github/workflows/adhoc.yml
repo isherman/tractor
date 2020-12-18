@@ -8,14 +8,39 @@ on:
       - "adhoc-*"
 
 jobs:
-  deploy:
-    runs-on: [self-hosted, sensor-box]
+  onsite-tests:
+    strategy:
+      matrix:
+        module: ["core", "perception", "calibration", "tractor"]
+    runs-on: [self-hosted]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           submodules: "recursive"
-      - name: Build
-        run: docker-compose -f docker/docker-compose.yml build
       - name: Test
-        run: bash
+        run: ./env.sh python -m unittest modules/${{ matrix.module }}/tests/integration_test.py
+  onsensorbox-tests:
+    strategy:
+      matrix:
+        module: ["perception", "calibration", "tractor"]
+    runs-on: [self-hosted, sensorbox]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Test
+        run: ./env.sh python -m unittest modules/${{ matrix.module }}/tests/sensorbox_integration_test.py
+  ontractor-tests:
+    strategy:
+      matrix:
+        module: ["tractor"]
+    runs-on: [self-hosted, tractor]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Test
+        run: ./env.sh python -m unittest modules/${{ matrix.module }}/tests/tractor_integration_test.py
