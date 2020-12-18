@@ -21,6 +21,7 @@ jobs:
       - name: Test
         run: ./env.sh python -m unittest modules/${{ matrix.module }}/tests/integration_test.py
   onsensorbox-tests:
+    if: false
     strategy:
       matrix:
         module: ["perception"]
@@ -33,6 +34,7 @@ jobs:
       - name: Test
         run: ./env.sh python -m unittest modules/${{ matrix.module }}/tests/sensorbox_integration_test.py
   ontractor-tests:
+    if: false
     strategy:
       matrix:
         module: ["tractor"]
