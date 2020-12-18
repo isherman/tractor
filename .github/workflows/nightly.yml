@@ -1,0 +1,36 @@
+name: Nightly
+
+# Run integration tests nightly
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # 9 AM UTC
+  push:
+    # For testing
+    # TODO(isherman): remove
+    tags:
+      - "nightly-*"
+
+jobs:
+  onsite-tests:
+    strategy:
+      matrix:
+        module: ["core", "perception", "calibration", "tractor"]
+    runs-on: [self-hosted]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Test
+        run: ./env.sh python -m unittest modules/${{ matrix.module }}/tests/integration_test.py
+  # onsensorbox-tests:
+  #   strategy:
+  #     matrix:
+  #       module: ["perception"]
+  #   runs-on: [self-hosted, sensorbox]
+  # ontractor-tests:
+  #   strategy:
+  #     matrix:
+  #       module: ["tractor"]
+  #   runs-on: [self-hosted, tractor]
