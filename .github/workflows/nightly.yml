@@ -23,10 +23,10 @@ jobs:
         with:
           submodules: "recursive"
       - name: Build
-        run:
-          - ./bootstrap-venv.sh
-          - ./env.sh make third_party
-          - ./env.sh make protos
+        run: |
+          ./bootstrap-venv.sh
+          ./env.sh make third_party
+          ./env.sh make protos
       - name: Test
         run: ./env.sh python -m unittest modules/${{ matrix.module }}/tests/integration_test.py
   # Something like the following could be used to run specific tests on specific hardware
