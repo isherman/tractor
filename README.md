@@ -1,6 +1,6 @@
 ![CI](https://github.com/farm-ng/tractor/workflows/CI/badge.svg)
 
-[![Nightly](https://github.com/isherman/tractor/workflows/adhoc/badge.svg)](https://github.com/isherman/tractor/workflows/adhoc)
+[![Nightly](https://github.com/isherman/tractor/workflows/adhoc/badge.svg)](<https://github.com/isherman/tractor/workflows/Ad%20Hoc%20(Actions%20Development)/badge.svg>)
 
 ## Welcome to farm-ng/tractor documentation
 
