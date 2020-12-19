@@ -61,7 +61,7 @@ def event_counts_by_name(log_path):
 
 class Test(unittest.TestCase):
     def test(self):
-        logs_path = os.path.join(BLOBSTORE.bucket_relative_path(BUCKET_LOGS), ARCHIVE_NAME)
+        logs_path = os.path.join(BLOBSTORE.root, BLOBSTORE.bucket_relative_path(BUCKET_LOGS), ARCHIVE_NAME)
         self.assertTrue(os.path.isdir(logs_path))
         logs = os.listdir(logs_path)
         self.assertEqual(len(logs), 1)
