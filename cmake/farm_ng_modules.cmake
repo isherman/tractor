@@ -46,7 +46,7 @@ macro(farm_ng_add_protobufs target)
     if (NOT BUILD_ONLY_PROTO)
       list(APPEND _protoc_args_python
       "--grpc_python_out=${_proto_output_dir_python}"
-      "--plugin=protoc-gen-grpc_python=${_GRPC_PYTHON_PLUGIN_EXECUTABLE}"
+      "--plugin=protoc-gen-grpc_python=${_GRPC_PYTHON_PLUGIN_EXECUTABLE}")
     endif()
     SET(_python_out ${_proto_output_dir_python}/${_file_dir}/${_file_we}_pb2.py)
     SET(_python_grpc_out ${_proto_output_dir_python}/${_file_dir}/${_file_we}_pb2_grpc.py)
