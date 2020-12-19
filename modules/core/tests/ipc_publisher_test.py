@@ -40,7 +40,8 @@ async def run():
 
 class Test(unittest.TestCase):
     def test(self):
-        logs_path = os.path.join(os.getenv('BLOBSTORE_ROOT'), 'logs', 'default')
+        logs_path = os.path.join('/blobstore', 'logs', 'default')
+        print('LOGS_PATH: ', logs_path)
         self.assertTrue(os.path.isdir(logs_path))
         logs = os.listdir(logs_path)
         self.assertEqual(len(logs), 1)

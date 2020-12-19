@@ -20,3 +20,5 @@ services:
       dockerfile: docker/base.Dockerfile
     network_mode: host
     entrypoint: ./env.sh python modules/core/tests/ipc_publisher_test.py
+    volumes:
+      - "${BLOBSTORE_ROOT:?err}:/blobstore"
