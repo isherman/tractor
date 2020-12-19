@@ -7,16 +7,19 @@ services:
       context: ../../..
       dockerfile: docker/base.Dockerfile
     entrypoint: build/modules/core/cpp/farm_ng/ipc_logger
-    user: "${UID}:${GID}"
+    user: "${_UID}:${_GID}"
     network_mode: host
     environment:
       - BLOBSTORE_ROOT=/blobstore
     volumes:
       - "${BLOBSTORE_ROOT:?err}:/blobstore"
-  ipc_publisher:
+  test_runner:
     image: "farmng/base:${TAG:?err}"
     build:
       context: ../../..
       dockerfile: docker/base.Dockerfile
     network_mode: host
-    entrypoint: ./env.sh python modules/core/tests/ipc_publisher.py
+    environment:
+      - BLOBSTORE_ROOT=/blobstore
+    volumes:
+      - "${BLOBSTORE_ROOT:?err}:/blobstore"
