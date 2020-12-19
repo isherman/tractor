@@ -13,10 +13,10 @@ services:
       - BLOBSTORE_ROOT=/blobstore
     volumes:
       - "${BLOBSTORE_ROOT:?err}:/blobstore"
-  ipc_publisher:
+  ipc_publisher_test:
     image: "farmng/base:${TAG:?err}"
     build:
       context: ../../..
       dockerfile: docker/base.Dockerfile
     network_mode: host
-    entrypoint: ./env.sh python modules/core/tests/ipc_publisher.py
+    entrypoint: ./env.sh python modules/core/tests/ipc_publisher_test.py
