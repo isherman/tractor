@@ -19,5 +19,7 @@ services:
       context: ../../..
       dockerfile: docker/base.Dockerfile
     network_mode: host
+    environment:
+      - BLOBSTORE_ROOT=/blobstore
     volumes:
       - "${BLOBSTORE_ROOT:?err}:/blobstore"
