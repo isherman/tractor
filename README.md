@@ -1,6 +1,6 @@
 ![CI](https://github.com/farm-ng/tractor/workflows/CI/badge.svg)
 
-![Nightly](https://github.com/isherman/tractor/workflows/Nightly/badge.svg)
+![Nightly](https://github.com/farm-ng/tractor/workflows/Nightly/badge.svg)
 
 ## Welcome to farm-ng/tractor documentation
 
