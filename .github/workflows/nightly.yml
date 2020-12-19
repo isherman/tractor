@@ -25,10 +25,14 @@ jobs:
       - name: Build
         run: |
           ./bootstrap-venv.sh
-          ./env.sh make third_party
-          ./env.sh make protos
+          mkdir -p build
+          cd build
+          cmake -DBUILD_ONLY_PROTO=TRUE -DDISABLE_PROTOC_cpp=TRUE -DDISABLE_PROTOC_ts=true -DDISABLE_PROTOC_go=true -DCMAKE_PREFIX_PATH=`pwd`/../env -DCMAKE_BUILD_TYPE=Release ..
+          make -j`nproc --ignore=1`
       - name: Test
-        run: ./env.sh python -m unittest modules/${{ matrix.module }}/tests/integration_test.py
+        env:
+          TAG:
+        run: TAG=${GITHUB_SHA::7} ./env.sh python -m unittest modules/${{ matrix.module }}/tests/integration_test.py
   # Something like the following could be used to run specific tests on specific hardware
   # onsensorbox-tests:
   #   strategy:
