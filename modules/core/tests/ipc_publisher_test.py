@@ -16,49 +16,58 @@ from farm_ng.core.resource_pb2 import BUCKET_LOGS
 event_bus = get_event_bus('ipc-publisher')
 event_bus.add_subscriptions(['.*'])
 
+N_MESSAGES = 5
+MESSAGE_NAME_PREFIX = 'ipc-publisher/status'
+ARCHIVE_NAME = 'default'
+BLOBSTORE = Blobstore()
 
-async def run():
-    await asyncio.sleep(3)
-    blobstore = Blobstore()
-    event = make_event(
-        'logger/command', LoggingCommand(
-            record_start=LoggingCommand.RecordStart(
-                archive_path=os.path.join(blobstore.bucket_relative_path(BUCKET_LOGS), 'default'),
+
+def start_logging():
+    event_bus.send(
+        make_event(
+            'logger/command', LoggingCommand(
+                record_start=LoggingCommand.RecordStart(
+                    archive_path=os.path.join(BLOBSTORE.bucket_relative_path(BUCKET_LOGS), ARCHIVE_NAME),
+                ),
             ),
         ),
     )
-    event_bus.send(event)
 
-    for n in range(5):
-        t = Timestamp()
-        t.FromSeconds(n)
-        event = make_event(f'ipc_publisher/status/{n}', t, stamp=t)
-        event_bus.send(event)
-        print(f'Sending {n}')
-        await asyncio.sleep(1)
+
+async def run():
+    # TODO(isherman): WaitForServices instead
+    await asyncio.sleep(3)
+
+    start_logging()
+
+    for i in range(N_MESSAGES):
+        event_bus.send(make_event(f'{MESSAGE_NAME_PREFIX}/{i}', Timestamp()))
+
+
+def event_counts_by_name(log_path):
+    counter = collections.Counter()
+    with open(log_path, 'rb') as f:
+        while True:
+            header = f.read(2)
+            if header == b'':
+                break
+            size, = struct.unpack('<H', header)
+            message = f.read(size)
+            event = Event()
+            event.ParseFromString(message)
+            counter[event.name] += 1
+    return counter
 
 
 class Test(unittest.TestCase):
     def test(self):
-        logs_path = os.path.join('/blobstore', 'logs', 'default')
-        print('LOGS_PATH: ', logs_path)
+        logs_path = os.path.join(BLOBSTORE.bucket_relative_path(BUCKET_LOGS), ARCHIVE_NAME)
         self.assertTrue(os.path.isdir(logs_path))
         logs = os.listdir(logs_path)
         self.assertEqual(len(logs), 1)
-        log_path = os.path.join(logs_path, logs[0])
+        counter = event_counts_by_name(os.path.join(logs_path, logs[0]))
 
-        counter = collections.Counter()
-        with open(log_path, 'rb') as f:
-            while True:
-                header = f.read(2)
-                if header == b'':
-                    break
-                size, = struct.unpack('<H', header)
-                message = f.read(size)
-                event = Event()
-                event.ParseFromString(message)
-                counter[event.name] += 1
-        for i in range(5):
+        for i in range(N_MESSAGES):
             self.assertEqual(counter[f'ipc_publisher/status/{i}'], 1)
 
 
