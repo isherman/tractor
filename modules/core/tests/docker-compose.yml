@@ -2,6 +2,7 @@ version: "3.3"
 
 services:
   ipc_logger:
+    image: "farmng/base:${TAG:?err}"
     build:
       context: ../../..
       dockerfile: docker/base.Dockerfile
@@ -13,6 +14,7 @@ services:
     volumes:
       - "${BLOBSTORE_ROOT:?err}:/blobstore"
   ipc_publisher:
+    image: "farmng/base:${TAG:?err}"
     build:
       context: ../../..
       dockerfile: docker/base.Dockerfile

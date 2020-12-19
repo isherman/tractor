@@ -10,13 +10,23 @@ from farm_ng.core.io_pb2 import Event
 
 
 class TestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        subprocess.run(
+            '/usr/local/bin/docker-compose pull',
+            shell=True,
+            check=True,
+            cwd=pathlib.Path(__file__).parent.absolute(),
+            env={'BLOBSTORE_ROOT': '/tmp', 'TAG': os.getenv('TAG')},
+        )
+
     def test_ipclogger(self):
         with tempfile.TemporaryDirectory() as blobstore:
             process = subprocess.run(
-                '/usr/local/bin/docker-compose up --build --abort-on-container-exit ipc_logger ipc_publisher',
+                '/usr/local/bin/docker-compose up --abort-on-container-exit ipc_logger ipc_publisher',
                 shell=True,
                 cwd=pathlib.Path(__file__).parent.absolute(),
-                env={'BLOBSTORE_ROOT': blobstore, 'UID': str(os.getuid()), 'GID': str(os.getgid())},
+                env={'BLOBSTORE_ROOT': blobstore, 'TAG': os.getenv('TAG'), 'UID': str(os.getuid()), 'GID': str(os.getgid())},
             )
             self.assertEqual(process.returncode, 0)
             logs_path = os.path.join(blobstore, 'logs', 'default')

@@ -42,9 +42,12 @@ macro(farm_ng_add_protobufs target)
 
     # python
     set("_protoc_args_python"
-      "--python_out=${_proto_output_dir_python}"
+      "--python_out=${_proto_output_dir_python}")
+    if (NOT BUILD_ONLY_PROTO)
+      list(APPEND _protoc_args_python
       "--grpc_python_out=${_proto_output_dir_python}"
-      "--plugin=protoc-gen-grpc_python=${_GRPC_PYTHON_PLUGIN_EXECUTABLE}")
+      "--plugin=protoc-gen-grpc_python=${_GRPC_PYTHON_PLUGIN_EXECUTABLE}"
+    endif()
     SET(_python_out ${_proto_output_dir_python}/${_file_dir}/${_file_we}_pb2.py)
     SET(_python_grpc_out ${_proto_output_dir_python}/${_file_dir}/${_file_we}_pb2_grpc.py)
     list(APPEND _python_out_all ${_python_out})
@@ -104,7 +107,9 @@ endif()
 
   if(NOT DISABLE_PROTOC_python)
     add_custom_target(${target}_py ALL DEPENDS ${_python_out_all})
-    add_custom_target(${_grpc_target}_py ALL DEPENDS ${_python_grpc_out_all})
+    if (NOT BUILD_ONLY_PROTO)
+      add_custom_target(${_grpc_target}_py ALL DEPENDS ${_python_grpc_out_all})
+    endif()
   endif()
 
   if(NOT DISABLE_PROTOC_go)
