@@ -42,6 +42,7 @@ async def run():
 
     for i in range(N_MESSAGES):
         event_bus.send(make_event(f'{MESSAGE_NAME_PREFIX}/{i}', Timestamp()))
+        await asyncio.sleep(1)
 
 
 def event_counts_by_name(log_path):
