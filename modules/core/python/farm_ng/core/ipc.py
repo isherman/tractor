@@ -28,7 +28,9 @@ logger.setLevel(logging.INFO)
 
 # https://en.wikipedia.org/wiki/Multicast_address
 # adminstratively scoped: 239.0.0.0 to 239.255.255.255
-_g_multicast_group = ('239.20.20.21', 10000)
+_g_multicast_address = '239.20.20.21'
+_g_multicast_port = 10000
+_g_subnet_broadcast_port = 10001
 
 _g_datagram_size = 65507
 
@@ -111,11 +113,11 @@ class EventBus:
 
         subnet_broadcast_address = os.getenv('SUBNET_BROADCAST_ADDRESS', None)
         if subnet_broadcast_address:
-            self._subnet_broadcast_address = _parse_address(subnet_broadcast_address)
+            self._subnet_broadcast_address = (subnet_broadcast_address, _g_subnet_broadcast_port)
             self._multicast_group = None
         else:
             self._subnet_broadcast_address = None
-            self._multicast_group = _g_multicast_group
+            self._multicast_group = (_g_multicast_address, _g_multicast_port)
 
         self._name = name
         self._quiet_count = 0
