@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+import "farm_ng/core/resource.proto";
+import "google/protobuf/timestamp.proto";
+
+package farm_ng.core;
+option go_package = "github.com/farm-ng/genproto/core";
+
+message LogPlaybackConfiguration {
+  // Resource pointing to the log file.
+  Resource log = 1;
+  // Loop playback?
+  bool loop = 2;
+  // Should messages be sent on the bus
+  bool send = 3;
+  // How fast to play log, multiple of realtime
+  double speed = 4;
+}
+message MessageStats {
+  // event name
+  string name = 1;
+  // protobuf typename
+  string type_url = 2;
+  // Total message count
+  uint64 count = 3;
+  // Last timestamp
+  google.protobuf.Timestamp last_stamp = 4;
+  // average frequency in HZ
+  double frequency = 5;
+}
+
+message LogPlaybackStatus {
+  oneof input_required {
+    LogPlaybackConfiguration input_required_configuration = 1;
+  }
+  LogPlaybackConfiguration configuration = 2;
+  google.protobuf.Timestamp last_message_stamp = 3;
+  // sum of all messages played back
+  uint64 message_count = 4;
+  repeated MessageStats message_stats = 5;
+}
