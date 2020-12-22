@@ -57,7 +57,8 @@ const ApriltagRig3DElement: React.FC<SingleElementVisualizerProps<
     value: [, value],
   } = props;
 
-  const { nodes, rootTagId } = value;
+  const { nodes } = value;
+  const rootTagId = value.rootTagId || nodes[0].id;
   const rigRootName = nodes?.find((_) => _.id === rootTagId)?.frameName;
   const nodePoses = (nodes || [])
     .sort((a, b) => (a.id === rootTagId ? -1 : b.id === rootTagId ? 1 : 0))

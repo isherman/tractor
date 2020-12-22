@@ -27,6 +27,7 @@ DEFINE_string(configuration_path,
               "Blobstore-relative path to the configuration file.");
 
 using farm_ng::core::MakeEvent;
+using farm_ng::core::MakeTimestampNow;
 using farm_ng::core::ReadProtobufFromJsonFile;
 using farm_ng::perception::Image;
 using farm_ng::perception::NamedSE3Pose;
@@ -180,6 +181,9 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
     WaitForServices(bus_, {});
 
+    CaptureRobotExtrinsicsDatasetResult result;
+    result.mutable_stamp_begin()->CopyFrom(MakeTimestampNow());
+
     grpc::ChannelArguments ch_args;
     ch_args.SetMaxReceiveMessageSize(100000000);
     ch_args.SetMaxSendMessageSize(100000000);
@@ -228,14 +232,17 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
       frame_number++;
     }
-    CaptureRobotExtrinsicsDatasetResult result;
+
     result.mutable_configuration()->CopyFrom(configuration_);
     result.mutable_dataset()->CopyFrom(resource_path.first);
+    result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
 
     core::ArchiveProtobufAsJsonResource(configuration_.name(), result);
 
     status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
         core::BUCKET_ROBOT_EXTRINSICS_DATASETS, configuration_.name(), result));
+
+    send_status();
 
     return 0;
   }

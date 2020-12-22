@@ -28,6 +28,8 @@ const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementV
     halServiceAddress,
   } = value;
 
+  console.log(value);
+
   const baseCameraRig = value.baseCameraRig && (
     <MultiViewCameraRigVisualizer.Marker3D value={[0, value.baseCameraRig]} />
   );
@@ -44,10 +46,14 @@ const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementV
     <ApriltagRigVisualizer.Marker3D value={[0, value.linkTagRig]} />
   );
 
-  const basePosesLink = value.basePosesLink.map((pose) => {
+  console.log(value.requestQueue);
+  const requestPoses = value.requestQueue.map((req, index) => {
+    // TODO: Support chains of poses
+    const pose = req.poses[0];
+    console.log(pose);
     return (
       <NamedSE3PoseVisualizer.Marker3D
-        key={`${pose.frameA}:${pose.frameB}`}
+        key={`${pose.frameA}:${pose.frameB}:${index}`}
         value={[0, pose]}
       />
     );
@@ -66,20 +72,20 @@ const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementV
           ]}
         />
       </Card>
-      <Card title="Base_Poses_Link">
-        <Scene>{basePosesLink}</Scene>
+      <Card title="Request Poses">
+        <Scene groundTransparency>{requestPoses}</Scene>
       </Card>
       <Card title="Base Camera Rig">
-        <Scene>{baseCameraRig}</Scene>
+        <Scene groundTransparency>{baseCameraRig}</Scene>
       </Card>
       <Card title="Base Tag Rig">
-        <Scene>{baseTagRig}</Scene>
+        <Scene groundTransparency>{baseTagRig}</Scene>
       </Card>
       <Card title="Link Camera Rig">
-        <Scene>{linkCameraRig}</Scene>
+        <Scene groundTransparency>{linkCameraRig}</Scene>
       </Card>
       <Card title="Link Tag Rig">
-        <Scene>{linkTagRig}</Scene>
+        <Scene groundTransparency>{linkTagRig}</Scene>
       </Card>
     </Card>
   );
@@ -95,6 +101,4 @@ export const CaptureRobotExtrinsicsDatasetConfigurationVisualizer = {
     CaptureRobotExtrinsicsDatasetConfigurationElement
   ),
   Element: CaptureRobotExtrinsicsDatasetConfigurationElement,
-  // TODO: Form
-  // Form: CaptureRobotExtrinsicsDatasetConfigurationForm,
 };

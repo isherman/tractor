@@ -49,6 +49,9 @@ const bestGuessEventType = (
     if (selectedPath.endsWith("camera.json")) {
       return "type.googleapis.com/farm_ng.perception.CameraPipelineConfig";
     }
+    if (selectedPath.endsWith("capture_robot_extrinsics_dataset.json")) {
+      return "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetConfiguration";
+    }
   }
   if (folderChain.map((_) => _.name).includes("base_to_camera_models")) {
     return "type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraResult";
@@ -58,6 +61,9 @@ const bestGuessEventType = (
   }
   if (folderChain.map((_) => _.name).includes("calibration-datasets")) {
     return "type.googleapis.com/farm_ng.perception.CaptureVideoDatasetResult";
+  }
+  if (folderChain.map((_) => _.name).includes("robot_extrinsics_datasets")) {
+    return "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetResult";
   }
   if (folderChain.map((_) => _.name).includes("video_datasets")) {
     return "type.googleapis.com/farm_ng.perception.CreateVideoDatasetResult";

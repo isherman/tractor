@@ -45,7 +45,7 @@ const CaptureRobotExtrinsicsDatasetStatusElement: React.FC<SingleElementVisualiz
         <KeyValueTable
           records={[
             ["Completed Requests", latestRequestIndex],
-            ["Total Requests", configuration?.basePosesLink.length],
+            ["Total Requests", configuration?.requestQueue.length],
           ]}
         />
       </Card>
