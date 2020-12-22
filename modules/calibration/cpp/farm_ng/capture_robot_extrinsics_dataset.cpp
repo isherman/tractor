@@ -151,11 +151,16 @@ class CaptureRobotExtrinsicsDatasetProgram {
   }
 
   bool on_configuration(const EventPb& event) {
-    CaptureRobotExtrinsicsDatasetConfiguration configuration;
-    if (!event.data().UnpackTo(&configuration)) {
+    core::Resource configuration_resource;
+    if (!event.data().UnpackTo(&configuration_resource)) {
       return false;
     }
-    LOG(INFO) << configuration.ShortDebugString();
+    LOG(INFO) << configuration_resource.ShortDebugString();
+
+    auto configuration = ReadProtobufFromJsonFile<
+        farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
+        farm_ng::core::GetBlobstoreRoot() / configuration_resource.path());
+
     set_configuration(configuration);
     return true;
   }
