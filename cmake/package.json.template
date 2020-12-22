@@ -7,6 +7,7 @@
   "private": true,
   "dependencies": {
     "long": "^4.0.0",
-    "protobufjs": "^6.10.1"
+    "protobufjs": "^6.10.1",
+    "rxjs": "^6.6.3"
   }
 }
