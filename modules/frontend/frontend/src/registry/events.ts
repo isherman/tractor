@@ -93,6 +93,10 @@ import {
   CapturePoseRequest,
   CapturePoseResponse,
 } from "@farm-ng/genproto-calibration/farm_ng/calibration/robot_hal";
+import {
+  LogPlaybackConfiguration,
+  LogPlaybackStatus,
+} from "@farm-ng/genproto-core/farm_ng/core/log_playback";
 
 export type EventType =
   | Announce
@@ -141,6 +145,8 @@ export type EventType =
   | IntrinsicModel
   | LoggingCommand
   | LoggingStatus
+  | LogPlaybackConfiguration
+  | LogPlaybackStatus
   | MonocularApriltagRigModel
   | MotorControllerState
   | MultiViewApriltagRigModel
@@ -200,6 +206,8 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.core.Event": BusEvent,
   "type.googleapis.com/farm_ng.core.LoggingCommand": LoggingCommand,
   "type.googleapis.com/farm_ng.core.LoggingStatus": LoggingStatus,
+  "type.googleapis.com/farm_ng.core.LogPlaybackConfiguration": LogPlaybackConfiguration,
+  "type.googleapis.com/farm_ng.core.LogPlaybackStatus": LogPlaybackStatus,
   "type.googleapis.com/farm_ng.core.Resource": Resource,
   "type.googleapis.com/farm_ng.core.ProgramSupervisorStatus": ProgramSupervisorStatus,
   "type.googleapis.com/farm_ng.core.StartProgramRequest": StartProgramRequest,

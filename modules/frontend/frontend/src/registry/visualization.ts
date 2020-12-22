@@ -42,6 +42,8 @@ import { CaptureRobotExtrinsicsDatasetConfigurationVisualizer } from "../compone
 import { CaptureRobotExtrinsicsDatasetResultVisualizer } from "../components/scope/visualizers/CaptureRobotExtrinsicsDatasetResult";
 import { CaptureRobotExtrinsicsDatasetStatusVisualizer } from "../components/scope/visualizers/CaptureRobotExtrinsicsDatasetStatus";
 import { MultiViewCameraRigVisualizer } from "../components/scope/visualizers/MultiViewCameraRig";
+import { LogPlaybackConfigurationVisualizer } from "../components/scope/visualizers/LogPlaybackConfiguration";
+import { LogPlaybackStatusVisualizer } from "../components/scope/visualizers/LogPlaybackStatus";
 
 export interface VisualizerOptionConfig {
   label: string;
@@ -109,6 +111,8 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   DetectApriltagsConfigurationVisualizer,
   DetectApriltagsStatusVisualizer,
   ImageVisualizer,
+  LogPlaybackConfigurationVisualizer,
+  LogPlaybackStatusVisualizer,
   MonocularApriltagRigModelVisualizer,
   MultiViewApriltagRigModelVisualizer,
   MultiViewCameraRigVisualizer,
