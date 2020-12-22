@@ -13,6 +13,7 @@ import {
   StandardComponentOptions,
 } from "./StandardComponent";
 import { CaptureRobotExtrinsicsDatasetResultVisualizer } from "./CaptureRobotExtrinsicsDatasetResult";
+import { CapturePoseResponseVisualizer } from "./CapturePoseResponse";
 
 const CaptureRobotExtrinsicsDatasetStatusElement: React.FC<SingleElementVisualizerProps<
   CaptureRobotExtrinsicsDatasetStatus
@@ -26,18 +27,12 @@ const CaptureRobotExtrinsicsDatasetStatusElement: React.FC<SingleElementVisualiz
     value.result,
     resources
   );
-  const {
-    configuration,
-    latestRequestIndex,
-    // latestResponse
-  } = value;
+  const { configuration, latestRequestIndex, latestResponse } = value;
 
   // TODO:
   //   - all frames in the configuration
   //   - all poses in the request queue
   //   - the last request and response pose
-  //   - the last response image
-  //   - latest_request_index / request_queue.length
 
   return (
     <Card timestamp={timestamp} json={value}>
@@ -49,12 +44,22 @@ const CaptureRobotExtrinsicsDatasetStatusElement: React.FC<SingleElementVisualiz
           ]}
         />
       </Card>
+      {latestResponse && (
+        <Card title="LatestResponse">
+          {
+            <CapturePoseResponseVisualizer.Element
+              {...props}
+              value={[timestamp, latestResponse]}
+            />
+          }
+        </Card>
+      )}
       {result && (
         <Card title="Result">
           {
             <CaptureRobotExtrinsicsDatasetResultVisualizer.Element
               {...props}
-              value={[0, result]}
+              value={[timestamp, result]}
             />
           }
         </Card>
