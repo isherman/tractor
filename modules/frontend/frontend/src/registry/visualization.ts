@@ -36,6 +36,10 @@ import { CalibrateMultiViewApriltagRigStatusVisualizer } from "../components/sco
 import { MultiViewApriltagRigModelVisualizer } from "../components/scope/visualizers/MultiViewApriltagRigModel";
 import { VideoFileCameraVisualizer } from "../components/scope/visualizers/VideoFileCamera";
 import { CameraModelVisualizer } from "../components/scope/visualizers/CameraModel";
+import { CaptureRobotExtrinsicsDatasetConfigurationVisualizer } from "../components/scope/visualizers/CaptureRobotExtrinsicsDatasetConfiguration";
+import { CaptureRobotExtrinsicsDatasetResultVisualizer } from "../components/scope/visualizers/CaptureRobotExtrinsicsDatasetResult";
+import { CaptureRobotExtrinsicsDatasetStatusVisualizer } from "../components/scope/visualizers/CaptureRobotExtrinsicsDatasetStatus";
+import { MultiViewCameraRigVisualizer } from "../components/scope/visualizers/MultiViewCameraRig";
 
 export interface VisualizerOptionConfig {
   label: string;
@@ -88,6 +92,9 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   CalibrateIntrinsicsConfigurationVisualizer,
   CalibrateIntrinsicsResultVisualizer,
   CalibrateIntrinsicsStatusVisualizer,
+  CaptureRobotExtrinsicsDatasetConfigurationVisualizer,
+  CaptureRobotExtrinsicsDatasetResultVisualizer,
+  CaptureRobotExtrinsicsDatasetStatusVisualizer,
   CaptureVideoDatasetConfigurationVisualizer,
   CaptureVideoDatasetResultVisualizer,
   CaptureVideoDatasetStatusVisualizer,
@@ -100,6 +107,7 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   ImageVisualizer,
   MonocularApriltagRigModelVisualizer,
   MultiViewApriltagRigModelVisualizer,
+  MultiViewCameraRigVisualizer,
   NamedSE3PoseVisualizer,
   SteeringCommandVisualizer,
   CameraPipelineConfigVisualizer,

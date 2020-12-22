@@ -49,6 +49,11 @@ import {
   CalibrateIntrinsicsStatus,
 } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_intrinsics";
 import {
+  CaptureRobotExtrinsicsDatasetConfiguration,
+  CaptureRobotExtrinsicsDatasetResult,
+  CaptureRobotExtrinsicsDatasetStatus,
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/capture_robot_extrinsics_dataset";
+import {
   CaptureVideoDatasetConfiguration,
   CaptureVideoDatasetResult,
   CaptureVideoDatasetStatus,
@@ -115,6 +120,9 @@ export type EventType =
   | CameraModel
   | CameraPipelineCommand
   | CameraPipelineConfig
+  | CaptureRobotExtrinsicsDatasetConfiguration
+  | CaptureRobotExtrinsicsDatasetResult
+  | CaptureRobotExtrinsicsDatasetStatus
   | CaptureVideoDatasetConfiguration
   | CaptureVideoDatasetResult
   | CaptureVideoDatasetStatus
@@ -174,6 +182,9 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.calibration.CalibrationParameter": CalibrationParameter,
   "type.googleapis.com/farm_ng.calibration.CalibratorCommand": CalibratorCommand,
   "type.googleapis.com/farm_ng.calibration.CalibratorStatus": CalibratorStatus,
+  "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetConfiguration": CaptureRobotExtrinsicsDatasetConfiguration,
+  "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetStatus": CaptureRobotExtrinsicsDatasetStatus,
+  "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetResult": CaptureRobotExtrinsicsDatasetResult,
   "type.googleapis.com/farm_ng.calibration.MonocularApriltagRigModel": MonocularApriltagRigModel,
   "type.googleapis.com/farm_ng.calibration.MultiViewApriltagRigModel": MultiViewApriltagRigModel,
   "type.googleapis.com/farm_ng.calibration.ViewInitialization": ViewInitialization,

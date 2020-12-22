@@ -77,7 +77,7 @@ macro(farm_ng_add_protobufs target)
       VERBATIM)
 
     # ts
-    set("_protoc_args_ts" "--ts_proto_out=forceLong=long:${_proto_output_dir_ts}")
+    set("_protoc_args_ts" "--ts_proto_out=forceLong=long,outputClientImpl=false:${_proto_output_dir_ts}")
     SET(_ts_out ${_proto_output_dir_ts}/${_file_dir}/${_file_we}.ts)
     list(APPEND _ts_out_all ${_ts_out})
     add_custom_command(
