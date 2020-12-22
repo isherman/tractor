@@ -89,6 +89,10 @@ import {
   MultiViewCameraRig,
 } from "@farm-ng/genproto-perception/farm_ng/perception/camera_model";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
+import {
+  CapturePoseRequest,
+  CapturePoseResponse,
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/robot_hal";
 
 export type EventType =
   | Announce
@@ -120,6 +124,8 @@ export type EventType =
   | CameraModel
   | CameraPipelineCommand
   | CameraPipelineConfig
+  | CapturePoseRequest
+  | CapturePoseResponse
   | CaptureRobotExtrinsicsDatasetConfiguration
   | CaptureRobotExtrinsicsDatasetResult
   | CaptureRobotExtrinsicsDatasetStatus
@@ -182,6 +188,8 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.calibration.CalibrationParameter": CalibrationParameter,
   "type.googleapis.com/farm_ng.calibration.CalibratorCommand": CalibratorCommand,
   "type.googleapis.com/farm_ng.calibration.CalibratorStatus": CalibratorStatus,
+  "type.googleapis.com/farm_ng.calibration.CapturePoseRequest": CapturePoseRequest,
+  "type.googleapis.com/farm_ng.calibration.CapturePoseResponse": CapturePoseResponse,
   "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetConfiguration": CaptureRobotExtrinsicsDatasetConfiguration,
   "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetStatus": CaptureRobotExtrinsicsDatasetStatus,
   "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetResult": CaptureRobotExtrinsicsDatasetResult,
