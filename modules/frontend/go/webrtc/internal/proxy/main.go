@@ -311,7 +311,7 @@ func (p *Proxy) AddPeer(offer webrtc.SessionDescription) (*webrtc.SessionDescrip
 			}
 
 			// Service received data channel events, forwarding them to the event bus
-			const messageSize = 1024
+			const messageSize = 4 * 1024
 			go func() {
 				log.Printf("[%s] Starting datachannel->eventbus forwarding\n", peerID)
 				for {

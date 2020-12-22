@@ -85,6 +85,18 @@
       ]
     },
     {
+      "id": "capture_robot_extrinsics_dataset",
+      "name": "Capture Robot Extrinsics Dataset",
+      "description": "Captures a robot extrinsics dataset, for use in other programs",
+      "launchPath": {
+        "path": "build/modules/calibration/cpp/farm_ng/capture_robot_extrinsics_dataset",
+        "rootEnvVar": "FARM_NG_ROOT"
+      },
+      "launchArgs": [
+        "-interactive"
+      ]
+    },
+    {
       "id": "sleep-5",
       "name": "Sleep 5",
       "description": "Take a nap",

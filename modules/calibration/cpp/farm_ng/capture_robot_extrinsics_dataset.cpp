@@ -62,11 +62,11 @@ class RobotHalClient {
 std::vector<CapturePoseRequest> GenerateCapturePoseRequests(
     const CaptureRobotExtrinsicsDatasetConfiguration& configuration) {
   std::vector<CapturePoseRequest> pose_requests;
-  for(auto base_pose_link: configuration.base_poses_link()) {
-      CapturePoseRequest pose_request;
-        NamedSE3Pose* pose = pose_request.add_poses();
-        pose->CopyFrom(base_pose_link);
-        pose_requests.push_back(pose_request);
+  for (auto base_pose_link : configuration.base_poses_link()) {
+    CapturePoseRequest pose_request;
+    NamedSE3Pose* pose = pose_request.add_poses();
+    pose->CopyFrom(base_pose_link);
+    pose_requests.push_back(pose_request);
   }
   return pose_requests;
 }
@@ -92,15 +92,21 @@ void ImageDataToResource(Image* image, int frame_number) {
 
 class CaptureRobotExtrinsicsDatasetProgram {
  public:
-  CaptureRobotExtrinsicsDatasetProgram(
-      core::EventBus& bus,
-      const CaptureRobotExtrinsicsDatasetConfiguration& configuration)
-      : bus_(bus),
-        timer_(bus_.get_io_service()),
-        configuration_(configuration) {
-    if (FLAGS_interactive) {
-      status_.mutable_input_required_configuration()->CopyFrom(configuration);
+  CaptureRobotExtrinsicsDatasetProgram(core::EventBus& bus,
+                                       const std::string& configuration_path,
+                                       bool interactive)
+      : bus_(bus), timer_(bus_.get_io_service()) {
+    if (interactive) {
+      status_.mutable_input_required_configuration()->set_path(
+          configuration_path);
+      status_.mutable_input_required_configuration()->set_content_type(
+          "application/json; "
+          "type=type.googleapis.com/"
+          "farm_ng.calibration.CaptureRobotExtrinsicsDatasetConfiguration");
     } else {
+      auto configuration = ReadProtobufFromJsonFile<
+          farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
+          farm_ng::core::GetBlobstoreRoot() / configuration_path);
       set_configuration(configuration);
     }
     bus_.AddSubscriptions({bus_.GetName()});
@@ -231,12 +237,8 @@ class CaptureRobotExtrinsicsDatasetProgram {
 }  // namespace farm_ng::calibration
 
 int Main(farm_ng::core::EventBus& bus) {
-  auto configuration = ReadProtobufFromJsonFile<
-      farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
-      farm_ng::core::GetBlobstoreRoot() / FLAGS_configuration_path);
-
   farm_ng::calibration::CaptureRobotExtrinsicsDatasetProgram program(
-      bus, configuration);
+      bus, FLAGS_configuration_path, FLAGS_interactive);
   return program.run();
 }
 
