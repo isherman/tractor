@@ -15,6 +15,7 @@ import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
 import { Scene } from "./Scene";
 import { ImageVisualizer } from "./Image";
 import { useStores } from "../../../hooks/useStores";
+import styles from "./CapturePoseResponse.module.scss";
 
 const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
   CapturePoseResponse
@@ -48,11 +49,15 @@ const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
         <Scene groundTransparency>{poses}</Scene>
       </Card>
       <Card title="Images">
-        <ImageVisualizer.Component
-          values={images.map((image, index) => [index, image])}
-          options={[{ label: "", options: [], value: "overlay" }]}
-          resources={httpResourceArchive}
-        />
+        <div className={styles.imageRow}>
+          {images.map((image, index) => (
+            <ImageVisualizer.Element
+              key={index}
+              value={[timestamp, image]}
+              resources={httpResourceArchive}
+            />
+          ))}
+        </div>
       </Card>
     </Card>
   );
