@@ -48,12 +48,24 @@ const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
       <Card title="Poses">
         <Scene groundTransparency>{poses}</Scene>
       </Card>
-      <Card title="Images">
+      <Card title="RGB Images">
         <div className={styles.imageRow}>
           {images.map((image, index) => (
             <ImageVisualizer.Element
               key={index}
               value={[timestamp, image]}
+              resources={httpResourceArchive}
+            />
+          ))}
+        </div>
+      </Card>
+      <Card title="Depth Images">
+        <div className={[styles.imageRow, styles.depthImages].join(" ")}>
+          {images.map((image, index) => (
+            <ImageVisualizer.Element
+              key={index}
+              value={[timestamp, image]}
+              depth
               resources={httpResourceArchive}
             />
           ))}
