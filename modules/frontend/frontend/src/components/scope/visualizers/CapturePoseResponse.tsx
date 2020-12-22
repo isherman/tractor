@@ -1,13 +1,20 @@
 /* eslint-disable no-console */
 import * as React from "react";
 import { SingleElementVisualizerProps } from "../../../registry/visualization";
-import { CapturePoseResponse } from "@farm-ng/genproto-calibration/farm_ng/calibration/robot_hal";
+import {
+  CapturePoseResponse,
+  capturePoseResponse_StatusToJSON,
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/robot_hal";
 import {
   StandardComponentOptions,
   StandardComponent,
 } from "./StandardComponent";
 import { Card } from "./Card";
 import { KeyValueTable } from "./KeyValueTable";
+import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
+import { Scene } from "./Scene";
+import { ImageVisualizer } from "./Image";
+import { useStores } from "../../../hooks/useStores";
 
 const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
   CapturePoseResponse
@@ -16,12 +23,36 @@ const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
     value: [timestamp, value],
   } = props;
 
-  const {} = value;
+  const { status, images } = value;
+  const { httpResourceArchive } = useStores();
+
+  const poses = value.poses.map((pose, index) => {
+    return (
+      <NamedSE3PoseVisualizer.Marker3D
+        key={`${pose.frameA}:${pose.frameB}:${index}`}
+        value={[0, pose]}
+      />
+    );
+  });
+
+  // TODO: Joint States
 
   return (
     <Card timestamp={timestamp} json={value}>
       <Card title="Summary">
-        <KeyValueTable records={[]} />
+        <KeyValueTable
+          records={[["Status", capturePoseResponse_StatusToJSON(status)]]}
+        />
+      </Card>
+      <Card title="Poses">
+        <Scene groundTransparency>{poses}</Scene>
+      </Card>
+      <Card title="Images">
+        <ImageVisualizer.Component
+          values={images.map((image, index) => [index, image])}
+          options={[{ label: "", options: [], value: "overlay" }]}
+          resources={httpResourceArchive}
+        />
       </Card>
     </Card>
   );
