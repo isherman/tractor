@@ -33,7 +33,7 @@ export const PanelSidebar: React.FC<IProps> = ({ panel }) => {
       selectedVisualizer,
       visualizers,
       optionConfigs,
-      selectedOptions
+      selectedOptions,
     } = panel;
     const { bufferEmpty } = store;
 
@@ -51,11 +51,23 @@ export const PanelSidebar: React.FC<IProps> = ({ panel }) => {
               }
             }}
           >
-            {[...eventTypeIds].map((_) => (
-              <option disabled={!(_ in store.buffer)} value={_} key={_}>
-                {_.split(".").slice(-1)}
-              </option>
-            ))}
+            {[...eventTypeIds]
+              .sort((a, b) => {
+                if (a in store.buffer && !(b in store.buffer)) {
+                  return -1;
+                }
+                if (b in store.buffer && !(a in store.buffer)) {
+                  return 1;
+                }
+                const aStr = a.split(".").slice(-1)[0];
+                const bStr = b.split(".").slice(-1)[0];
+                return aStr.localeCompare(bStr);
+              })
+              .map((_) => (
+                <option disabled={!(_ in store.buffer)} value={_} key={_}>
+                  {_.split(".").slice(-1)}
+                </option>
+              ))}
           </Form.Control>
         </Form.Group>
 
