@@ -28,8 +28,6 @@ const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementV
     halServiceAddress,
   } = value;
 
-  console.log(value);
-
   const baseCameraRig = value.baseCameraRig && (
     <MultiViewCameraRigVisualizer.Marker3D value={[0, value.baseCameraRig]} />
   );
@@ -46,11 +44,9 @@ const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementV
     <ApriltagRigVisualizer.Marker3D value={[0, value.linkTagRig]} />
   );
 
-  console.log(value.requestQueue);
   const requestPoses = value.requestQueue.map((req, index) => {
     // TODO: Support chains of poses
     const pose = req.poses[0];
-    console.log(pose);
     return (
       <NamedSE3PoseVisualizer.Marker3D
         key={`${pose.frameA}:${pose.frameB}:${index}`}
