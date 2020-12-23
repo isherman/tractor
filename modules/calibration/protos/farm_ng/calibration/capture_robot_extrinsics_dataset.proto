@@ -49,8 +49,11 @@ message CaptureRobotExtrinsicsDatasetConfiguration {
 
 message CaptureRobotExtrinsicsDatasetStatus {
   oneof input_required {
-    farm_ng.core.Resource input_required_configuration = 1;
-    // CaptureRobotExtrinsicsDatasetConfiguration input_required_configuration = 1;
+    // DEPRECATED
+    farm_ng.core.Resource input_required_configuration = 1 [deprecated = true];
+
+    // Serialized CaptureRobotExtrinsicsDatasetConfiguration
+    farm_ng.core.Resource input_required_resource = 7;
   }
   // Serialized CaptureRobotExtrinsicsDatasetResult.
   farm_ng.core.Resource result = 2;

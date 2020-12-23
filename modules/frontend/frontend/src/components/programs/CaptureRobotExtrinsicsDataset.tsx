@@ -14,7 +14,7 @@ const programId = "capture_robot_extrinsics_dataset";
 
 const Component: React.FC<ProgramProps<Resource>> = ({ inputRequired }) => {
   const { busClient } = useStores();
-  const [configuration, setConfiguration] = useState<Resource>();
+  const [resource, setResource] = useState<Resource>();
 
   const handleConfigurationSubmit = (
     e: React.FormEvent<HTMLFormElement>
@@ -23,19 +23,19 @@ const Component: React.FC<ProgramProps<Resource>> = ({ inputRequired }) => {
     busClient.send(
       "type.googleapis.com/farm_ng.core.Resource",
       `${programId}/configure`,
-      Resource.encode(Resource.fromJSON(configuration)).finish()
+      Resource.encode(Resource.fromJSON(resource)).finish()
     );
   };
 
-  if (inputRequired && !configuration) {
-    setConfiguration(inputRequired);
+  if (inputRequired && !resource) {
+    setResource(inputRequired);
   }
 
   return (
     <Form onSubmit={handleConfigurationSubmit}>
       <ResourceVisualizer.Form
-        initialValue={configuration || Resource.fromPartial({})}
-        onChange={(updated) => setConfiguration(updated)}
+        initialValue={resource || Resource.fromPartial({})}
+        onChange={(updated) => setResource(updated)}
       />
       <Form.ButtonGroup type="submit" buttonText="Submit" />
     </Form>
@@ -54,7 +54,7 @@ export const CaptureRobotExtrinsicsDatasetProgram = {
       console.error(`Could not decode bus event`, e);
       return null;
     }
-    return (data as Status).inputRequiredConfiguration || null;
+    return (data as Status).inputRequiredResource || null;
   },
   Component,
 };
