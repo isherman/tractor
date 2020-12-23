@@ -26,7 +26,7 @@ export const JointStatePlot: React.FC<{ values: JointState[][] }> = ({
   const plotData = [
     range(
       0,
-      Math.max(...Object.values(jointValuesByName).map((_) => _.length)) + 1
+      Math.max(...Object.values(jointValuesByName).map((_) => _.length))
     ),
     ...jointNames.map((key) => jointValuesByName[key]),
   ];
@@ -35,6 +35,16 @@ export const JointStatePlot: React.FC<{ values: JointState[][] }> = ({
   const plotOptions = {
     width: 800,
     height: 600,
+    scales: {
+      x: {
+        time: false,
+      },
+    },
+    axes: [
+      {
+        incrs: [1],
+      },
+    ],
     series: [
       {
         show: false,

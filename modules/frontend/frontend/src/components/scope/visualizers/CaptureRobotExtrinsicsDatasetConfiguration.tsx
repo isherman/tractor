@@ -13,6 +13,7 @@ import { Scene } from "./Scene";
 import { MultiViewCameraRigVisualizer } from "./MultiViewCameraRig";
 import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
 import { JointStatePlot } from "./JointStatePlot";
+import { NamedSE3Pose } from "@farm-ng/genproto-perception/farm_ng/perception/geometry";
 
 const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementVisualizerProps<
   CaptureRobotExtrinsicsDatasetConfiguration
@@ -45,16 +46,19 @@ const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementV
     <ApriltagRigVisualizer.Marker3D value={[0, value.linkTagRig]} />
   );
 
-  const requestPoses = value.requestQueue.map((req, index) => {
-    // TODO: Support chains of poses
-    const pose = req.poses[0];
-    return (
-      <NamedSE3PoseVisualizer.Marker3D
-        key={`${pose.frameA}:${pose.frameB}:${index}`}
-        value={[0, pose]}
-      />
-    );
-  });
+  const requestPoses = value.requestQueue.reduce<
+    ReturnType<React.FC<SingleElementVisualizerProps<NamedSE3Pose>>>[]
+  >((acc, req, index) => {
+    req.poses.forEach((pose) => {
+      acc.push(
+        <NamedSE3PoseVisualizer.Marker3D
+          key={`${pose.frameA}:${pose.frameB}:${index}`}
+          value={[0, { ...pose, frameB: `${pose.frameB} (${index})` }]}
+        />
+      );
+    });
+    return acc;
+  }, []);
 
   return (
     <Card timestamp={timestamp} json={value}>
