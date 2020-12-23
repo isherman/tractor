@@ -9,6 +9,8 @@ import {
 import { Card } from "./Card";
 import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
 import { Scene } from "./Scene";
+import { jointState_UnitsToJSON } from "@farm-ng/genproto-perception/farm_ng/perception/kinematics";
+import { KeyValueTable } from "./KeyValueTable";
 
 const CapturePoseRequestElement: React.FC<SingleElementVisualizerProps<
   CapturePoseRequest
@@ -30,6 +32,16 @@ const CapturePoseRequestElement: React.FC<SingleElementVisualizerProps<
     <Card timestamp={timestamp} json={value}>
       <Card title="Summary">
         <Scene groundTransparency>{poses}</Scene>
+      </Card>
+      <Card title="Joint States">
+        <KeyValueTable
+          headers={["Name", "Value", "Units"]}
+          records={value.jointStates.map((_) => [
+            _.name,
+            _.value,
+            jointState_UnitsToJSON(_.units),
+          ])}
+        />
       </Card>
     </Card>
   );

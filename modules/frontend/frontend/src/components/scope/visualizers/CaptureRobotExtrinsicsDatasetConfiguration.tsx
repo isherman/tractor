@@ -12,6 +12,7 @@ import { ApriltagRigVisualizer } from "./ApriltagRig";
 import { Scene } from "./Scene";
 import { MultiViewCameraRigVisualizer } from "./MultiViewCameraRig";
 import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
+import { JointStatePlot } from "./JointStatePlot";
 
 const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementVisualizerProps<
   CaptureRobotExtrinsicsDatasetConfiguration
@@ -70,6 +71,7 @@ const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementV
       </Card>
       <Card title="Request Poses">
         <Scene groundTransparency>{requestPoses}</Scene>
+        <JointStatePlot values={value.requestQueue.map((_) => _.jointStates)} />
       </Card>
       <Card title="Base Camera Rig">
         <Scene groundTransparency>{baseCameraRig}</Scene>
