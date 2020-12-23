@@ -97,6 +97,7 @@ import {
   LogPlaybackConfiguration,
   LogPlaybackStatus,
 } from "@farm-ng/genproto-core/farm_ng/core/log_playback";
+import { JointState } from "@farm-ng/genproto-calibration/farm_ng/perception/kinematics";
 
 export type EventType =
   | Announce
@@ -143,6 +144,7 @@ export type EventType =
   | DetectApriltagsStatus
   | Image
   | IntrinsicModel
+  | JointState
   | LoggingCommand
   | LoggingStatus
   | LogPlaybackConfiguration
@@ -227,6 +229,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.perception.DetectApriltagsConfiguration": DetectApriltagsConfiguration,
   "type.googleapis.com/farm_ng.perception.DetectApriltagsStatus": DetectApriltagsStatus,
   "type.googleapis.com/farm_ng.perception.Image": Image,
+  "type.googleapis.com/farm_ng.perception.JointState": JointState,
   "type.googleapis.com/farm_ng.perception.MultiViewCameraRig": MultiViewCameraRig,
   "type.googleapis.com/farm_ng.perception.NamedSE3Pose": NamedSE3Pose,
   "type.googleapis.com/farm_ng.perception.SE3Pose": SE3Pose,

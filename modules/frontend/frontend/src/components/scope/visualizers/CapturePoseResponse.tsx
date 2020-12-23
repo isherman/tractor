@@ -16,6 +16,7 @@ import { Scene } from "./Scene";
 import { ImageVisualizer } from "./Image";
 import { useStores } from "../../../hooks/useStores";
 import styles from "./CapturePoseResponse.module.scss";
+import { JointStateVisualizer } from "./JointState";
 
 const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
   CapturePoseResponse
@@ -36,8 +37,6 @@ const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
     );
   });
 
-  // TODO: Joint States
-
   return (
     <Card timestamp={timestamp} json={value}>
       <Card title="Summary">
@@ -47,6 +46,13 @@ const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
       </Card>
       <Card title="Poses">
         <Scene groundTransparency>{poses}</Scene>
+      </Card>
+      <Card title="Joint States">
+        <JointStateVisualizer.Component
+          values={value.jointStates.map((_) => [timestamp, _])}
+          options={[{ label: "", options: [], value: "overlay" }]}
+          resources={httpResourceArchive}
+        />
       </Card>
       <Card title="RGB Images">
         <div className={styles.imageRow}>
