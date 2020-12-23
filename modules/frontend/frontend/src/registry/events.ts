@@ -242,4 +242,13 @@ export const eventRegistry = inferKeys({
 export const eventTypeIds = Object.keys(
   eventRegistry
 ) as (keyof typeof eventRegistry)[];
+
 export type EventTypeId = typeof eventTypeIds[number];
+
+export function eventTypeIdFromMessage(
+  MessageT: Message<EventType>
+): EventTypeId | undefined {
+  return Object.keys(eventRegistry).find(
+    (key) => eventRegistry[key as EventTypeId] === MessageT
+  ) as EventTypeId;
+}

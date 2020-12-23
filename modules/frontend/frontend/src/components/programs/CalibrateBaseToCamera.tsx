@@ -25,13 +25,11 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
     e: React.FormEvent<HTMLFormElement>
   ): void => {
     e.preventDefault();
-    busClient.send(
-      "type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraConfiguration",
-      `${programId}/configure`,
-      Configuration.encode(
-        Configuration.fromPartial(configuration || {})
-      ).finish()
-    );
+    if (configuration === undefined) {
+      console.error("Could not submit undefined configuration.");
+      return;
+    }
+    busClient.send(configuration, `${programId}/configure`, Configuration);
   };
 
   if (inputRequired && !configuration) {

@@ -20,19 +20,11 @@ export const Programs: React.FC = () => {
   }, []);
 
   const handleStart = (id: string): void => {
-    busClient.send(
-      "type.googleapis.com/farm_ng.core.StartProgramRequest",
-      "programd/request",
-      StartProgramRequest.encode(StartProgramRequest.fromJSON({ id })).finish()
-    );
+    busClient.send({ id }, "programd/request", StartProgramRequest);
   };
 
   const handleStop = (id: string): void => {
-    busClient.send(
-      "type.googleapis.com/farm_ng.core.StopProgramRequest",
-      "programd/request",
-      StopProgramRequest.encode(StopProgramRequest.fromJSON({ id })).finish()
-    );
+    busClient.send({ id }, "programd/request", StopProgramRequest);
   };
 
   return useObserver(() => {

@@ -20,11 +20,11 @@ const Component: React.FC<ProgramProps<Resource>> = ({ inputRequired }) => {
     e: React.FormEvent<HTMLFormElement>
   ): void => {
     e.preventDefault();
-    busClient.send(
-      "type.googleapis.com/farm_ng.core.Resource",
-      `${programId}/configure`,
-      Resource.encode(Resource.fromJSON(resource)).finish()
-    );
+    if (resource === undefined) {
+      console.error("Could not submit undefined configuration.");
+      return;
+    }
+    busClient.send(resource, `${programId}/configure`, Resource);
   };
 
   if (inputRequired && !resource) {

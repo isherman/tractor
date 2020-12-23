@@ -19,19 +19,17 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
   inputRequired,
 }) => {
   const { busClient } = useStores();
-  const [configuration, setConfiguration] = useState<Configuration | null>(
-    null
-  );
+  const [configuration, setConfiguration] = useState<Configuration>();
 
   const handleConfigurationSubmit = (
     e: React.FormEvent<HTMLFormElement>
   ): void => {
     e.preventDefault();
-    busClient.send(
-      "type.googleapis.com/farm_ng.perception.DetectApriltagsConfiguration",
-      `${programId}/configure`,
-      Configuration.encode(Configuration.fromJSON(configuration)).finish()
-    );
+    if (configuration === undefined) {
+      console.error("Could not submit undefined configuration.");
+      return;
+    }
+    busClient.send(configuration, `${programId}/configure`, Configuration);
   };
 
   if (inputRequired && !configuration) {
