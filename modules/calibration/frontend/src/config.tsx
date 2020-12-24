@@ -1,0 +1,1 @@
+../../../frontend/frontend/src/config.tsx
