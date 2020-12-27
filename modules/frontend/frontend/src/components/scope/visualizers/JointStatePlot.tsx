@@ -41,7 +41,9 @@ export const JointStatePlot: React.FC<{
       scales: { x: { time: false } },
       axes: [
         {
-          incrs: maxNumSamples > 1 ? [1] : undefined,
+          // Don't allow x-axis steps less than 1
+          incrs: [1, 5, 10, 50, 100],
+          // If requested, show asterisks on x-axis for completed poses
           values: (_: uPlot, splits: number[]) =>
             splits.map((v, index) => {
               return `${v}${

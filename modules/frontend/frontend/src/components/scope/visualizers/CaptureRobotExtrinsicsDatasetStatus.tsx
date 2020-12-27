@@ -16,6 +16,7 @@ import { CaptureRobotExtrinsicsDatasetResultVisualizer } from "./CaptureRobotExt
 import { CapturePoseRequestList } from "./CapturePoseRequestList";
 import { formatValue } from "../../../utils/formatValue";
 import { SE3Pose } from "@farm-ng/genproto-calibration/farm_ng/perception/geometry";
+import { CapturePoseResponseVisualizer } from "./CapturePoseResponse";
 
 function se3PoseToString(p: SE3Pose | undefined) {
   return [
@@ -88,6 +89,14 @@ const CaptureRobotExtrinsicsDatasetStatusElement: React.FC<SingleElementVisualiz
               }
             />
           }
+        </Card>
+      )}
+      {latestResponse && (
+        <Card title="Latest Response">
+          <CapturePoseResponseVisualizer.Element
+            {...props}
+            value={[timestamp, latestResponse]}
+          />
         </Card>
       )}
       {result && (
