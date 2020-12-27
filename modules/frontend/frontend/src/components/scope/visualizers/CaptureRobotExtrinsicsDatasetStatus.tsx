@@ -13,7 +13,21 @@ import {
   StandardComponentOptions,
 } from "./StandardComponent";
 import { CaptureRobotExtrinsicsDatasetResultVisualizer } from "./CaptureRobotExtrinsicsDatasetResult";
-import { CapturePoseResponseVisualizer } from "./CapturePoseResponse";
+import { CapturePoseRequestList } from "./CapturePoseRequestList";
+import { formatValue } from "../../../utils/formatValue";
+import { SE3Pose } from "@farm-ng/genproto-calibration/farm_ng/perception/geometry";
+
+function se3PoseToString(p: SE3Pose | undefined) {
+  return [
+    `tx: ${formatValue(p?.position?.x)}`,
+    `ty: ${formatValue(p?.position?.y)}`,
+    `tz: ${formatValue(p?.position?.z)}`,
+    `rx: ${formatValue(p?.rotation?.x)}`,
+    `ry: ${formatValue(p?.rotation?.y)}`,
+    `rz: ${formatValue(p?.rotation?.z)}`,
+    `rw: ${formatValue(p?.rotation?.w)}`,
+  ].join(", ");
+}
 
 const CaptureRobotExtrinsicsDatasetStatusElement: React.FC<SingleElementVisualizerProps<
   CaptureRobotExtrinsicsDatasetStatus
@@ -28,28 +42,50 @@ const CaptureRobotExtrinsicsDatasetStatusElement: React.FC<SingleElementVisualiz
     resources
   );
   const { configuration, latestRequestIndex, latestResponse } = value;
-
-  // TODO:
-  //   - all frames in the configuration
-  //   - all poses in the request queue
-  //   - the last request and response pose
+  const completedRequests =
+    latestResponse === undefined ? 0 : latestRequestIndex + 1;
 
   return (
     <Card timestamp={timestamp} json={value}>
-      <Card title="Summary">
-        <KeyValueTable
-          records={[
-            ["Completed Requests", latestRequestIndex],
-            ["Total Requests", configuration?.requestQueue.length],
-          ]}
-        />
-      </Card>
-      {latestResponse && (
-        <Card title="LatestResponse">
+      {configuration && (
+        <Card title="Progress">
+          <KeyValueTable
+            records={[
+              ["Completed Requests", completedRequests],
+              ["Total Requests", configuration?.requestQueue.length],
+              ...(
+                (latestResponse &&
+                  configuration?.requestQueue[latestRequestIndex].poses) ||
+                []
+              ).map((_) => [
+                `Latest ${_.frameA}_T_${_.frameB} request`,
+                se3PoseToString(_.aPoseB),
+              ]),
+              ...(latestResponse?.poses || []).map((_) => [
+                `Latest ${_.frameA}_T_${_.frameB} response`,
+                se3PoseToString(_.aPoseB),
+              ]),
+              [
+                "Latest joint state request",
+                latestResponse &&
+                  configuration?.requestQueue[latestRequestIndex].jointStates
+                    .map((_) => `${_.name}: ${formatValue(_.value)}`)
+                    .join(", "),
+              ],
+              [
+                "Latest joint state response",
+                latestResponse?.jointStates
+                  .map((_) => `${_.name}: ${formatValue(_.value)}`)
+                  .join(", "),
+              ],
+            ]}
+          />
           {
-            <CapturePoseResponseVisualizer.Element
-              {...props}
-              value={[timestamp, latestResponse]}
+            <CapturePoseRequestList
+              requests={configuration.requestQueue}
+              latestRequestIndex={
+                latestResponse ? latestRequestIndex : undefined
+              }
             />
           }
         </Card>

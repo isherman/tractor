@@ -11,6 +11,7 @@ import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
 import { Scene } from "./Scene";
 import { jointState_UnitsToJSON } from "@farm-ng/genproto-perception/farm_ng/perception/kinematics";
 import { KeyValueTable } from "./KeyValueTable";
+import styles from "./CapturePoseRequest.module.scss";
 
 const CapturePoseRequestElement: React.FC<SingleElementVisualizerProps<
   CapturePoseRequest
@@ -23,6 +24,7 @@ const CapturePoseRequestElement: React.FC<SingleElementVisualizerProps<
     return (
       <NamedSE3PoseVisualizer.Marker3D
         key={`${pose.frameA}:${pose.frameB}:${index}`}
+        showFrameA={index === 0}
         value={[0, pose]}
       />
     );
@@ -30,19 +32,17 @@ const CapturePoseRequestElement: React.FC<SingleElementVisualizerProps<
 
   return (
     <Card timestamp={timestamp} json={value}>
-      <Card title="Summary">
+      <div className={styles.scenePair}>
         <Scene groundTransparency>{poses}</Scene>
-      </Card>
-      <Card title="Joint States">
         <KeyValueTable
-          headers={["Name", "Value", "Units"]}
+          headers={["Joint Name", "Value", "Units"]}
           records={value.jointStates.map((_) => [
             _.name,
             _.value,
             jointState_UnitsToJSON(_.units),
           ])}
         />
-      </Card>
+      </div>
     </Card>
   );
 };

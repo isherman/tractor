@@ -25,13 +25,14 @@ const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
     value: [timestamp, value],
   } = props;
 
-  const { status, images } = value;
+  const { status, images, jointStates } = value;
   const { httpResourceArchive } = useStores();
 
   const poses = value.poses.map((pose, index) => {
     return (
       <NamedSE3PoseVisualizer.Marker3D
         key={`${pose.frameA}:${pose.frameB}:${index}`}
+        showFrameA={index === 0}
         value={[0, pose]}
       />
     );
@@ -42,19 +43,6 @@ const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
       <Card title="Summary">
         <KeyValueTable
           records={[["Status", capturePoseResponse_StatusToJSON(status)]]}
-        />
-      </Card>
-      <Card title="Poses">
-        <Scene groundTransparency>{poses}</Scene>
-      </Card>
-      <Card title="Joint States">
-        <KeyValueTable
-          headers={["Name", "Value", "Units"]}
-          records={value.jointStates.map((_) => [
-            _.name,
-            _.value,
-            jointState_UnitsToJSON(_.units),
-          ])}
         />
       </Card>
       <Card title="RGB Images">
@@ -80,6 +68,21 @@ const CapturePoseResponseElement: React.FC<SingleElementVisualizerProps<
           ))}
         </div>
       </Card>
+      {(poses.length > 0 || jointStates.length > 0) && (
+        <Card title="Achieved Poses and Joint States">
+          <div className={styles.scenePair}>
+            <Scene groundTransparency>{poses}</Scene>
+            <KeyValueTable
+              headers={["Joint Name", "Value", "Units"]}
+              records={jointStates.map((_) => [
+                _.name,
+                _.value,
+                jointState_UnitsToJSON(_.units),
+              ])}
+            />
+          </div>
+        </Card>
+      )}
     </Card>
   );
 };

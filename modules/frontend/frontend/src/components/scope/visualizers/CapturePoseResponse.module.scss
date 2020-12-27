@@ -1,6 +1,16 @@
 .imageRow {
   display: flex;
-  flex-direction: horizontal;
+  flex-direction: row;
+}
+
+.scenePair {
+  display: flex;
+  flex-direction: row;
+  min-height: 400px;
+
+  div {
+    flex-basis: 50%;
+  }
 }
 
 .depthImages {

@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useMemo } from "react";
 import { median, min, max, quantile } from "simple-statistics";
 import uPlot from "uplot";
 import {
@@ -32,33 +33,40 @@ export const BoxWhiskerPlot: React.FC<IProps> = ({
   // Brittle, determined experimentally
   const xAxisHeight = 30 + max(keys.map((_) => _.length)) * 5;
 
-  const options = {
-    width: 800,
-    height: 600,
-    title: title,
-    plugins: [boxesPlugin(), legendAsTooltipPlugin(), columnHighlightPlugin()],
-    axes: [
-      {
-        rotate: -90,
-        space: 10,
-        size: xAxisHeight,
-        grid: { show: false },
-        values: (_: uPlot, vals: number[]) => vals.map((v) => keys[v]),
-      },
-    ],
-    scales: { x: { distr: 2, time: false } as uPlot.Scale },
-    series: [
-      {
-        label: xAxisLabel,
-        value: (_: uPlot, i: number) => keys[i],
-      },
-      { label: "Median" },
-      { label: "q1" },
-      { label: "q3" },
-      { label: "min" },
-      { label: "max" },
-    ],
-  };
+  const options = useMemo(
+    () => ({
+      width: 800,
+      height: 600,
+      title: title,
+      plugins: [
+        boxesPlugin(),
+        legendAsTooltipPlugin(),
+        columnHighlightPlugin(),
+      ],
+      axes: [
+        {
+          rotate: -90,
+          space: 10,
+          size: xAxisHeight,
+          grid: { show: false },
+          values: (_: uPlot, vals: number[]) => vals.map((v) => keys[v]),
+        },
+      ],
+      scales: { x: { distr: 2, time: false } as uPlot.Scale },
+      series: [
+        {
+          label: xAxisLabel,
+          value: (_: uPlot, i: number) => keys[i],
+        },
+        { label: "Median" },
+        { label: "q1" },
+        { label: "q3" },
+        { label: "min" },
+        { label: "max" },
+      ],
+    }),
+    [title, keys, xAxisLabel]
+  );
 
   return <Plot data={data} options={options} />;
 };

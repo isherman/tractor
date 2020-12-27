@@ -11,9 +11,8 @@ import {
 import { ApriltagRigVisualizer } from "./ApriltagRig";
 import { Scene } from "./Scene";
 import { MultiViewCameraRigVisualizer } from "./MultiViewCameraRig";
-import { NamedSE3PoseVisualizer } from "./NamedSE3Pose";
-import { JointStatePlot } from "./JointStatePlot";
-import { NamedSE3Pose } from "@farm-ng/genproto-perception/farm_ng/perception/geometry";
+import { CapturePoseRequestList } from "./CapturePoseRequestList";
+import styles from "./CaptureRobotExtrinsicsDatasetConfiguration.module.scss";
 
 const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementVisualizerProps<
   CaptureRobotExtrinsicsDatasetConfiguration
@@ -46,20 +45,6 @@ const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementV
     <ApriltagRigVisualizer.Marker3D value={[0, value.linkTagRig]} />
   );
 
-  const requestPoses = value.requestQueue.reduce<
-    ReturnType<React.FC<SingleElementVisualizerProps<NamedSE3Pose>>>[]
-  >((acc, req, index) => {
-    req.poses.forEach((pose) => {
-      acc.push(
-        <NamedSE3PoseVisualizer.Marker3D
-          key={`${pose.frameA}:${pose.frameB}:${index}`}
-          value={[0, { ...pose, frameB: `${pose.frameB} (${index})` }]}
-        />
-      );
-    });
-    return acc;
-  }, []);
-
   return (
     <Card timestamp={timestamp} json={value}>
       <Card title="Summary">
@@ -73,21 +58,32 @@ const CaptureRobotExtrinsicsDatasetConfigurationElement: React.FC<SingleElementV
           ]}
         />
       </Card>
-      <Card title="Request Poses">
-        <Scene groundTransparency>{requestPoses}</Scene>
-        <JointStatePlot values={value.requestQueue.map((_) => _.jointStates)} />
+      <Card title="Request Queue">
+        {value.requestQueue && (
+          <CapturePoseRequestList requests={value.requestQueue} />
+        )}
       </Card>
-      <Card title="Base Camera Rig">
-        <Scene groundTransparency>{baseCameraRig}</Scene>
-      </Card>
-      <Card title="Base Tag Rig">
-        <Scene groundTransparency>{baseTagRig}</Scene>
-      </Card>
-      <Card title="Link Camera Rig">
-        <Scene groundTransparency>{linkCameraRig}</Scene>
-      </Card>
-      <Card title="Link Tag Rig">
-        <Scene groundTransparency>{linkTagRig}</Scene>
+      <Card title="Rigs">
+        <div className={styles.scenePair}>
+          <div>
+            <h6>Base Camera Rig</h6>
+            <Scene groundTransparency>{baseCameraRig}</Scene>
+          </div>
+          <div>
+            <h6>Base Tag Rig</h6>
+            <Scene groundTransparency>{baseTagRig}</Scene>
+          </div>
+        </div>
+        <div className={styles.scenePair}>
+          <div>
+            <h6>Link Camera Rig</h6>
+            <Scene groundTransparency>{linkCameraRig}</Scene>
+          </div>
+          <div>
+            <h6>Link Tag Rig</h6>
+            <Scene groundTransparency>{linkTagRig}</Scene>
+          </div>
+        </div>
       </Card>
     </Card>
   );
