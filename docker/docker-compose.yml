@@ -6,53 +6,36 @@ version: "3.3"
 
 services:
   ipc_logger:
-    image: farmng/base:n_cameras
+    image: farmng/base:edge
     build:
       context: ..
       dockerfile: docker/base.Dockerfile
     entrypoint: build/modules/core/cpp/farm_ng/ipc_logger
-    restart: always
     environment:
-      - BLOBSTORE_ROOT=/farm_ng_data
+      - BLOBSTORE_ROOT=/blobstore
     volumes:
-      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
-    network_mode: host
-  camera_pipeline:
-    image: farmng/base:n_cameras
-    build:
-      context: ..
-      dockerfile: docker/base.Dockerfile
-    entrypoint: build/modules/perception/cpp/farm_ng/camera_pipeline
-    restart: always
-    environment:
-      - BLOBSTORE_ROOT=/farm_ng_data
-    volumes:
-      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
-      - /dev:/dev
-    privileged: true
+      - "${BLOBSTORE_ROOT:?err}:/blobstore"
     network_mode: host
   programd:
     entrypoint: ./env.sh python -m farm_ng.core.programd
-    image: farmng/base:n_cameras
+    image: farmng/base:edge
     build:
       context: ..
       dockerfile: docker/base.Dockerfile
-    restart: always
     environment:
-      - BLOBSTORE_ROOT=/farm_ng_data
+      - BLOBSTORE_ROOT=/blobstore
     volumes:
-      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
+      - "${BLOBSTORE_ROOT:?err}:/blobstore"
     network_mode: host
   webservices:
-    image: farmng/webservices:n_cameras
+    image: farmng/webservices:edge
     build:
       context: ..
       dockerfile: docker/webservices.Dockerfile
     environment:
       - FARM_NG_ROOT=/farm_ng
-      - BLOBSTORE_ROOT=/farm_ng_data
+      - BLOBSTORE_ROOT=/blobstore
       - PORT=8989
-    restart: always
     volumes:
-      - "${BLOBSTORE_ROOT:?err}:/farm_ng_data"
+      - "${BLOBSTORE_ROOT:?err}:/blobstore"
     network_mode: host

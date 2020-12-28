@@ -25,12 +25,11 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
     e: React.FormEvent<HTMLFormElement>
   ): void => {
     e.preventDefault();
-    // TODO: Provide a better API to busClient.send
-    busClient.send(
-      "type.googleapis.com/farm_ng.calibration.CalibrateApriltagRigConfiguration",
-      `${programId}/configure`,
-      Configuration.encode(Configuration.fromJSON(configuration)).finish()
-    );
+    if (configuration === undefined) {
+      console.error("Could not submit undefined configuration.");
+      return;
+    }
+    busClient.send(configuration, `${programId}/configure`, Configuration);
   };
 
   if (inputRequired && !configuration) {

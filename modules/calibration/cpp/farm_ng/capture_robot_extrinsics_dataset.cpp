@@ -27,6 +27,7 @@ DEFINE_string(configuration_path,
               "Blobstore-relative path to the configuration file.");
 
 using farm_ng::core::MakeEvent;
+using farm_ng::core::MakeTimestampNow;
 using farm_ng::core::ReadProtobufFromJsonFile;
 using farm_ng::perception::Image;
 using farm_ng::perception::NamedSE3Pose;
@@ -59,49 +60,64 @@ class RobotHalClient {
   std::unique_ptr<RobotHALService::Stub> stub_;
 };
 
-std::vector<CapturePoseRequest> GenerateCapturePoseRequests(
-    const CaptureRobotExtrinsicsDatasetConfiguration& configuration) {
-  std::vector<CapturePoseRequest> pose_requests;
-  for(auto base_pose_link: configuration.base_poses_link()) {
-      CapturePoseRequest pose_request;
-        NamedSE3Pose* pose = pose_request.add_poses();
-        pose->CopyFrom(base_pose_link);
-        pose_requests.push_back(pose_request);
+void ImageResourcePayloadToPath(core::Resource* resource,
+                                const std::string& name) {
+  if (resource->payload_case() != core::Resource::kData) {
+    CHECK_EQ(resource->payload_case(), core::Resource::kPath)
+        << resource->ShortDebugString();
+    return;
   }
-  return pose_requests;
+
+  std::string ext;
+  if (resource->content_type() == "image/png") {
+    ext = "png";
+  } else if (resource->content_type() == "image/jpeg") {
+    ext = "jpg";
+  }
+  CHECK(!ext.empty())
+      << "Could not determine image extension (jpg, png supported): "
+      << resource->content_type();
+
+  auto resource_path =
+      core::GetUniqueArchiveResource(name, ext, resource->content_type());
+  {
+    LOG(INFO) << "Writing to: " << resource_path.second.string();
+    std::ofstream outf(resource_path.second.string(), std::ofstream::binary);
+    CHECK(outf) << "Could not open : " << resource_path.second.string() << "\n"
+                << resource_path.first.ShortDebugString();
+    outf << resource->data();
+  }
+  CHECK(boost::filesystem::exists(resource_path.second.string()))
+      << "Did not write to: " << resource_path.second.string();
+  resource->CopyFrom(resource_path.first);
+  CHECK_EQ(resource->payload_case(), core::Resource::kPath)
+      << resource->ShortDebugString();
 }
 
 void ImageDataToResource(Image* image, int frame_number) {
-  core::Resource* resource = image->mutable_resource();
-  CHECK(resource->payload_case() == core::Resource::kData);
-  cv::Mat mat =
-      cv::imdecode(cv::Mat(1, resource->data().size(), CV_8UC1,
-                           const_cast<char*>(resource->data().data())),
-                   cv::IMREAD_UNCHANGED);
-
-  auto resource_path = core::GetUniqueArchiveResource(
+  ImageResourcePayloadToPath(
+      image->mutable_resource(),
       perception::FrameNameNumber(image->camera_model().frame_name(),
-                                  frame_number),
-      "png", "image/png");
-  resource->CopyFrom(resource_path.first);
-  CHECK(resource->payload_case() == core::Resource::kPath);
-  LOG(INFO) << resource_path.second.string();
-  CHECK(cv::imwrite(resource_path.second.string(), mat))
-      << "Could not write: " << resource_path.second;
+                                  frame_number));
+
+  if (image->has_depthmap()) {
+    ImageResourcePayloadToPath(
+        image->mutable_depthmap()->mutable_resource(),
+        perception::FrameNameNumber(image->camera_model().frame_name(),
+                                    frame_number, "_depthmap"));
+  }
 }
 
 class CaptureRobotExtrinsicsDatasetProgram {
  public:
-  CaptureRobotExtrinsicsDatasetProgram(
-      core::EventBus& bus,
-      const CaptureRobotExtrinsicsDatasetConfiguration& configuration)
-      : bus_(bus),
-        timer_(bus_.get_io_service()),
-        configuration_(configuration) {
-    if (FLAGS_interactive) {
-      status_.mutable_input_required_configuration()->CopyFrom(configuration);
+  CaptureRobotExtrinsicsDatasetProgram(core::EventBus& bus,
+                                       core::Resource& resource,
+                                       bool interactive)
+      : bus_(bus), timer_(bus_.get_io_service()) {
+    if (interactive) {
+      status_.mutable_input_required_resource()->CopyFrom(resource);
     } else {
-      set_configuration(configuration);
+      set_configuration(resource);
     }
     bus_.AddSubscriptions({bus_.GetName()});
 
@@ -127,19 +143,20 @@ class CaptureRobotExtrinsicsDatasetProgram {
   }
 
   bool on_configuration(const EventPb& event) {
-    CaptureRobotExtrinsicsDatasetConfiguration configuration;
-    if (!event.data().UnpackTo(&configuration)) {
+    core::Resource configuration_resource;
+    if (!event.data().UnpackTo(&configuration_resource)) {
       return false;
     }
-    LOG(INFO) << configuration.ShortDebugString();
-    set_configuration(configuration);
+    LOG(INFO) << configuration_resource.ShortDebugString();
+    set_configuration(configuration_resource);
     return true;
   }
 
-  void set_configuration(
-      const CaptureRobotExtrinsicsDatasetConfiguration& configuration) {
-    configuration_ = configuration;
-    status_.clear_input_required_configuration();
+  void set_configuration(const core::Resource& resource) {
+    configuration_ = ReadProtobufFromJsonFile<
+        farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
+        farm_ng::core::GetBlobstoreRoot() / resource.path());
+    status_.clear_input_required_resource();
     status_.mutable_configuration()->CopyFrom(configuration_);
     send_status();
   }
@@ -151,11 +168,14 @@ class CaptureRobotExtrinsicsDatasetProgram {
   }
 
   int run() {
-    while (status_.has_input_required_configuration()) {
+    while (status_.has_input_required_resource()) {
       bus_.get_io_service().run_one();
     }
 
     WaitForServices(bus_, {});
+
+    CaptureRobotExtrinsicsDatasetResult result;
+    result.mutable_stamp_begin()->CopyFrom(MakeTimestampNow());
 
     grpc::ChannelArguments ch_args;
     ch_args.SetMaxReceiveMessageSize(100000000);
@@ -177,13 +197,8 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
     core::EventLogWriter log_writer(resource_path.second);
 
-    auto requests = GenerateCapturePoseRequests(configuration_);
-    status_.clear_request_queue();
-    for (auto& request : requests) {
-      status_.add_request_queue()->CopyFrom(request);
-    }
     int frame_number = 0;
-    for (auto& request : requests) {
+    for (auto& request : configuration_.request_queue()) {
       bus_.get_io_service().poll();
 
       log_writer.Write(core::MakeEvent("capture/request", request));
@@ -208,14 +223,17 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
       frame_number++;
     }
-    CaptureRobotExtrinsicsDatasetResult result;
+
     result.mutable_configuration()->CopyFrom(configuration_);
     result.mutable_dataset()->CopyFrom(resource_path.first);
+    result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
 
     core::ArchiveProtobufAsJsonResource(configuration_.name(), result);
 
     status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
         core::BUCKET_ROBOT_EXTRINSICS_DATASETS, configuration_.name(), result));
+
+    send_status();
 
     return 0;
   }
@@ -231,12 +249,15 @@ class CaptureRobotExtrinsicsDatasetProgram {
 }  // namespace farm_ng::calibration
 
 int Main(farm_ng::core::EventBus& bus) {
-  auto configuration = ReadProtobufFromJsonFile<
-      farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
-      farm_ng::core::GetBlobstoreRoot() / FLAGS_configuration_path);
+  farm_ng::core::Resource resource;
+  resource.set_path(FLAGS_configuration_path);
+  resource.set_content_type(
+      "application/json; "
+      "type=type.googleapis.com/"
+      "farm_ng.calibration.CaptureRobotExtrinsicsDatasetConfiguration");
 
   farm_ng::calibration::CaptureRobotExtrinsicsDatasetProgram program(
-      bus, configuration);
+      bus, resource, FLAGS_interactive);
   return program.run();
 }
 

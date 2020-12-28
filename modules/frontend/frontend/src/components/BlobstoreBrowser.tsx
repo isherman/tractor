@@ -20,6 +20,7 @@ import { Button } from "react-bootstrap";
 import { useStores } from "../hooks/useStores";
 import { useHistory, useParams } from "react-router-dom";
 import Form from "./scope/visualizers/Form";
+import { Icon } from "./Icon";
 
 const fileToFileData = (f: File): FileData => ({
   id: f.name,
@@ -49,6 +50,9 @@ const bestGuessEventType = (
     if (selectedPath.endsWith("camera.json")) {
       return "type.googleapis.com/farm_ng.perception.CameraPipelineConfig";
     }
+    if (selectedPath.endsWith("capture_robot_extrinsics_dataset.json")) {
+      return "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetConfiguration";
+    }
   }
   if (folderChain.map((_) => _.name).includes("base_to_camera_models")) {
     return "type.googleapis.com/farm_ng.calibration.CalibrateBaseToCameraResult";
@@ -58,6 +62,9 @@ const bestGuessEventType = (
   }
   if (folderChain.map((_) => _.name).includes("calibration-datasets")) {
     return "type.googleapis.com/farm_ng.perception.CaptureVideoDatasetResult";
+  }
+  if (folderChain.map((_) => _.name).includes("robot_extrinsics_datasets")) {
+    return "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetResult";
   }
   if (folderChain.map((_) => _.name).includes("video_datasets")) {
     return "type.googleapis.com/farm_ng.perception.CreateVideoDatasetResult";
@@ -89,6 +96,7 @@ export const BlobstoreBrowser: React.FC<IProps> = ({
   const [selectedResource, setSelectedResource] = useState<EventType>();
   const [modifiedResource, setModifiedResource] = useState<EventType>();
   const [modificationInFlight, setModificationInFlight] = useState(false);
+  const [fullWidthDetail, setFullWidthDetail] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   const { baseUrl, httpResourceArchive } = useStores();
@@ -205,6 +213,10 @@ export const BlobstoreBrowser: React.FC<IProps> = ({
     setIsEditing(false);
   };
 
+  const toggleFullWidthDetail = (): void => {
+    setFullWidthDetail((prev) => !prev);
+  };
+
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
@@ -245,7 +257,11 @@ export const BlobstoreBrowser: React.FC<IProps> = ({
 
   return (
     <div className={styles.container}>
-      <div className={styles.browser}>
+      <div
+        className={[styles.browser, fullWidthDetail ? styles.hidden : ""].join(
+          " "
+        )}
+      >
         <FileBrowser
           files={files || []}
           folderChain={[rootDir, ...parentDirs].filter((_) => _)}
@@ -258,7 +274,22 @@ export const BlobstoreBrowser: React.FC<IProps> = ({
           <FileList />
         </FileBrowser>
       </div>
-      <div className={styles.detail}>
+      <div
+        className={[
+          styles.detail,
+          fullWidthDetail ? styles.fullWidth : "",
+        ].join(" ")}
+      >
+        {selectedResource && (
+          <Button
+            className={styles.fullWidthDetailButton}
+            onClick={toggleFullWidthDetail}
+          >
+            <Icon
+              id={fullWidthDetail ? "arrowsAngleContract" : "arrowsAngleExpand"}
+            />
+          </Button>
+        )}
         {selectedResource &&
           editingEnabled &&
           !isEditing &&

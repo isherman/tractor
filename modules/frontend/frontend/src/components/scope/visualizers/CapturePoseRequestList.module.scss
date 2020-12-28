@@ -1,0 +1,12 @@
+.scenePair {
+  display: flex;
+  flex-direction: row;
+  min-height: 400px;
+  padding-top: 1rem;
+
+  > div {
+    flex-basis: 50%;
+    min-width: 0;
+    padding: 1rem;
+  }
+}

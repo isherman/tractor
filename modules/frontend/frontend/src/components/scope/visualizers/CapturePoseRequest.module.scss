@@ -1,0 +1,9 @@
+.scenePair {
+  display: flex;
+  flex-direction: row;
+  min-height: 400px;
+
+  div {
+    flex-basis: 50%;
+  }
+}
