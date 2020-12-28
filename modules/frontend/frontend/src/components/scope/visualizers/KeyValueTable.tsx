@@ -4,7 +4,7 @@ import { formatValue } from "../../../utils/formatValue";
 
 interface IProps {
   headers?: string[];
-  records: [string, unknown][];
+  records: unknown[][];
 }
 
 export const KeyValueTable: React.FC<IProps> = ({ records, headers }) => {
@@ -20,10 +20,11 @@ export const KeyValueTable: React.FC<IProps> = ({ records, headers }) => {
         </thead>
       )}
       <tbody>
-        {records.map(([key, value]) => (
-          <tr key={key}>
-            <td>{key}</td>
-            <td>{formatValue(value)}</td>
+        {records.map((record) => (
+          <tr key={formatValue(record[0])}>
+            {record.map((v, i) => (
+              <td key={i}>{formatValue(v)}</td>
+            ))}
           </tr>
         ))}
       </tbody>

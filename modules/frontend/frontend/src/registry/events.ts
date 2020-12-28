@@ -49,6 +49,11 @@ import {
   CalibrateIntrinsicsStatus,
 } from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_intrinsics";
 import {
+  CaptureRobotExtrinsicsDatasetConfiguration,
+  CaptureRobotExtrinsicsDatasetResult,
+  CaptureRobotExtrinsicsDatasetStatus,
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/capture_robot_extrinsics_dataset";
+import {
   CaptureVideoDatasetConfiguration,
   CaptureVideoDatasetResult,
   CaptureVideoDatasetStatus,
@@ -84,6 +89,15 @@ import {
   MultiViewCameraRig,
 } from "@farm-ng/genproto-perception/farm_ng/perception/camera_model";
 import { Resource } from "@farm-ng/genproto-core/farm_ng/core/resource";
+import {
+  CapturePoseRequest,
+  CapturePoseResponse,
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/robot_hal";
+import {
+  LogPlaybackConfiguration,
+  LogPlaybackStatus,
+} from "@farm-ng/genproto-core/farm_ng/core/log_playback";
+import { JointState } from "@farm-ng/genproto-calibration/farm_ng/perception/kinematics";
 
 export type EventType =
   | Announce
@@ -115,6 +129,11 @@ export type EventType =
   | CameraModel
   | CameraPipelineCommand
   | CameraPipelineConfig
+  | CapturePoseRequest
+  | CapturePoseResponse
+  | CaptureRobotExtrinsicsDatasetConfiguration
+  | CaptureRobotExtrinsicsDatasetResult
+  | CaptureRobotExtrinsicsDatasetStatus
   | CaptureVideoDatasetConfiguration
   | CaptureVideoDatasetResult
   | CaptureVideoDatasetStatus
@@ -125,8 +144,11 @@ export type EventType =
   | DetectApriltagsStatus
   | Image
   | IntrinsicModel
+  | JointState
   | LoggingCommand
   | LoggingStatus
+  | LogPlaybackConfiguration
+  | LogPlaybackStatus
   | MonocularApriltagRigModel
   | MotorControllerState
   | MultiViewApriltagRigModel
@@ -174,6 +196,11 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.calibration.CalibrationParameter": CalibrationParameter,
   "type.googleapis.com/farm_ng.calibration.CalibratorCommand": CalibratorCommand,
   "type.googleapis.com/farm_ng.calibration.CalibratorStatus": CalibratorStatus,
+  "type.googleapis.com/farm_ng.calibration.CapturePoseRequest": CapturePoseRequest,
+  "type.googleapis.com/farm_ng.calibration.CapturePoseResponse": CapturePoseResponse,
+  "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetConfiguration": CaptureRobotExtrinsicsDatasetConfiguration,
+  "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetStatus": CaptureRobotExtrinsicsDatasetStatus,
+  "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetResult": CaptureRobotExtrinsicsDatasetResult,
   "type.googleapis.com/farm_ng.calibration.MonocularApriltagRigModel": MonocularApriltagRigModel,
   "type.googleapis.com/farm_ng.calibration.MultiViewApriltagRigModel": MultiViewApriltagRigModel,
   "type.googleapis.com/farm_ng.calibration.ViewInitialization": ViewInitialization,
@@ -181,6 +208,8 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.core.Event": BusEvent,
   "type.googleapis.com/farm_ng.core.LoggingCommand": LoggingCommand,
   "type.googleapis.com/farm_ng.core.LoggingStatus": LoggingStatus,
+  "type.googleapis.com/farm_ng.core.LogPlaybackConfiguration": LogPlaybackConfiguration,
+  "type.googleapis.com/farm_ng.core.LogPlaybackStatus": LogPlaybackStatus,
   "type.googleapis.com/farm_ng.core.Resource": Resource,
   "type.googleapis.com/farm_ng.core.ProgramSupervisorStatus": ProgramSupervisorStatus,
   "type.googleapis.com/farm_ng.core.StartProgramRequest": StartProgramRequest,
@@ -200,6 +229,7 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.perception.DetectApriltagsConfiguration": DetectApriltagsConfiguration,
   "type.googleapis.com/farm_ng.perception.DetectApriltagsStatus": DetectApriltagsStatus,
   "type.googleapis.com/farm_ng.perception.Image": Image,
+  "type.googleapis.com/farm_ng.perception.JointState": JointState,
   "type.googleapis.com/farm_ng.perception.MultiViewCameraRig": MultiViewCameraRig,
   "type.googleapis.com/farm_ng.perception.NamedSE3Pose": NamedSE3Pose,
   "type.googleapis.com/farm_ng.perception.SE3Pose": SE3Pose,
@@ -215,4 +245,13 @@ export const eventRegistry = inferKeys({
 export const eventTypeIds = Object.keys(
   eventRegistry
 ) as (keyof typeof eventRegistry)[];
+
 export type EventTypeId = typeof eventTypeIds[number];
+
+export function eventTypeIdFromMessage(
+  MessageT: Message<EventType>
+): EventTypeId | undefined {
+  return Object.keys(eventRegistry).find(
+    (key) => eventRegistry[key as EventTypeId] === MessageT
+  ) as EventTypeId;
+}

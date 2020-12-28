@@ -4,16 +4,15 @@ import { useState } from "react";
 import { useStores } from "../../hooks/useStores";
 import { Event as BusEvent } from "@farm-ng/genproto-core/farm_ng/core/io";
 import {
-  CalibrateBaseToCameraConfiguration,
-  CalibrateBaseToCameraConfiguration as Configuration,
-  CalibrateBaseToCameraStatus as Status,
-} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_base_to_camera";
-import { CalibrateBaseToCameraConfigurationVisualizer } from "../scope/visualizers/CalibrateBaseToCameraConfiguration";
+  LogPlaybackConfiguration as Configuration,
+  LogPlaybackStatus as Status,
+} from "@farm-ng/genproto-core/farm_ng/core/log_playback";
+import { LogPlaybackConfigurationVisualizer } from "../scope/visualizers/LogPlaybackConfiguration";
 import { ProgramProps } from "../../registry/programs";
 import { decodeAnyEvent } from "../../models/decodeAnyEvent";
 import Form from "../scope/visualizers/Form";
 
-const programId = "calibrate_base_to_camera";
+const programId = "log_playback";
 
 const Component: React.FC<ProgramProps<Configuration>> = ({
   inputRequired,
@@ -38,10 +37,8 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
 
   return (
     <Form onSubmit={handleConfigurationSubmit}>
-      <CalibrateBaseToCameraConfigurationVisualizer.Form
-        initialValue={
-          configuration || CalibrateBaseToCameraConfiguration.fromPartial({})
-        }
+      <LogPlaybackConfigurationVisualizer.Form
+        initialValue={configuration || Configuration.fromPartial({})}
         onChange={(updated) => setConfiguration(updated)}
       />
       <Form.ButtonGroup type="submit" buttonText="Submit" />
@@ -49,7 +46,7 @@ const Component: React.FC<ProgramProps<Configuration>> = ({
   );
 };
 
-export const CalibrateBaseToCameraProgram = {
+export const LogPlaybackProgram = {
   programIds: [programId] as const,
   eventLogPredicate: (e: BusEvent) => e.name.startsWith(`${programId}/`),
   inputRequired: (e: BusEvent) => {

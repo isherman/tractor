@@ -1,4 +1,4 @@
-.detailRow {
+.imageRow {
   display: flex;
   flex-direction: row;
 }
@@ -10,5 +10,11 @@
 
   div {
     flex-basis: 50%;
+  }
+}
+
+.depthImages {
+  img {
+    filter: brightness(15);
   }
 }

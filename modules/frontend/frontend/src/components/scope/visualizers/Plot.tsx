@@ -7,6 +7,9 @@ import "uplot/dist/uPlot.min.css";
 
 interface IProps {
   data: uPlot.AlignedData;
+
+  // Parent components should memoize `options`, as changes will
+  // destroy and reinstantiate the underlying uPlot instance.
   options: uPlot.Options;
 }
 
@@ -19,7 +22,7 @@ export const Plot: React.FC<IProps> = ({ data, options }) => {
     if (resizeObservation && uPlotInstance) {
       uPlotInstance.setSize({
         width: Math.floor(resizeObservation.contentRect.width),
-        height: Math.floor(resizeObservation.contentRect.height) - 25
+        height: Math.floor(resizeObservation.contentRect.height) - 25,
       });
     }
   }, [resizeObservation, uPlotInstance]);
@@ -29,9 +32,12 @@ export const Plot: React.FC<IProps> = ({ data, options }) => {
     if (!container) {
       return;
     }
-    setUPlotInstance(
-      (existing) => existing || new uPlot(options, data, container)
-    );
+    setUPlotInstance((existing) => {
+      if (existing) {
+        existing.destroy();
+      }
+      return new uPlot(options, data, container);
+    });
   }, [container, options]);
 
   // On data change, just update the data

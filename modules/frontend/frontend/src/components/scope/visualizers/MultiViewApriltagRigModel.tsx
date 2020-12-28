@@ -76,6 +76,7 @@ const MultiViewApriltagRigModelElement: React.FC<SingleElementVisualizerProps<
 
   // Camera Rig Visualization
   // TODO: Don't assume pose.frameA is the root of the camera rig
+  // TODO: Replace with MultiViewCameraRigVisualizer
   const cameras = value.cameraRig?.cameraPoseRig.map((pose) => {
     const camera = value.cameraRig?.cameras.find(
       (c) => c.frameName === pose.frameB

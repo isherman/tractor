@@ -15,7 +15,7 @@ export type Buffer = {
 
 type Builtin = Date | Function | Uint8Array | string | number | undefined;
 
-type DeepPartial<T> = T extends Builtin
+export type DeepPartial<T> = T extends Builtin
   ? T
   : T extends Array<infer U>
   ? Array<DeepPartial<U>>
@@ -26,7 +26,7 @@ type DeepPartial<T> = T extends Builtin
   : Partial<T>;
 
 export type Message<T> = {
-  encode(message: T, writer: Writer): Writer;
+  encode(message: T, writer?: Writer): Writer;
   decode(input: Uint8Array | Reader, length?: number): T;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fromJSON(object: any): T;

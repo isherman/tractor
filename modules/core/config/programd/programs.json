@@ -8,9 +8,7 @@
         "path": "build/modules/calibration/cpp/farm_ng/calibrate_apriltag_rig",
         "rootEnvVar": "FARM_NG_ROOT"
       },
-      "launchArgs": [
-        "-interactive"
-      ]
+      "launchArgs": ["-interactive"]
     },
     {
       "id": "calibrate_base_to_camera",
@@ -20,9 +18,7 @@
         "path": "build/modules/tractor/cpp/farm_ng/calibrate_base_to_camera",
         "rootEnvVar": "FARM_NG_ROOT"
       },
-      "launchArgs": [
-        "-interactive"
-      ]
+      "launchArgs": ["-interactive"]
     },
     {
       "id": "capture_video_dataset",
@@ -32,9 +28,7 @@
         "path": "build/modules/perception/cpp/farm_ng/capture_video_dataset",
         "rootEnvVar": "FARM_NG_ROOT"
       },
-      "launchArgs": [
-        "-interactive"
-      ]
+      "launchArgs": ["-interactive"]
     },
     {
       "id": "create_video_dataset",
@@ -44,9 +38,7 @@
         "path": "build/modules/perception/cpp/farm_ng/create_video_dataset",
         "rootEnvVar": "FARM_NG_ROOT"
       },
-      "launchArgs": [
-        "-interactive"
-      ]
+      "launchArgs": ["-interactive"]
     },
     {
       "id": "calibrate_intrinsics",
@@ -56,9 +48,7 @@
         "path": "build/modules/calibration/cpp/farm_ng/calibrate_intrinsics",
         "rootEnvVar": "FARM_NG_ROOT"
       },
-      "launchArgs": [
-        "-interactive"
-      ]
+      "launchArgs": ["-interactive"]
     },
     {
       "id": "detect_apriltags",
@@ -68,9 +58,7 @@
         "path": "build/modules/perception/cpp/farm_ng/detect_apriltags",
         "rootEnvVar": "FARM_NG_ROOT"
       },
-      "launchArgs": [
-        "-interactive"
-      ]
+      "launchArgs": ["-interactive"]
     },
     {
       "id": "calibrate_multi_view_apriltag_rig",
@@ -80,9 +68,27 @@
         "path": "build/modules/calibration/cpp/farm_ng/calibrate_multi_view_apriltag_rig",
         "rootEnvVar": "FARM_NG_ROOT"
       },
-      "launchArgs": [
-        "-interactive"
-      ]
+      "launchArgs": ["-interactive"]
+    },
+    {
+      "id": "capture_robot_extrinsics_dataset",
+      "name": "Capture Robot Extrinsics Dataset",
+      "description": "Captures a robot extrinsics dataset, for use in other programs",
+      "launchPath": {
+        "path": "build/modules/calibration/cpp/farm_ng/capture_robot_extrinsics_dataset",
+        "rootEnvVar": "FARM_NG_ROOT"
+      },
+      "launchArgs": ["-interactive"]
+    },
+    {
+      "id": "log_playback",
+      "name": "Log Playback",
+      "description": "Plays back farm-ng event log on the eventbus",
+      "launchPath": {
+        "path": "build/modules/core/cpp/farm_ng/log_playback",
+        "rootEnvVar": "FARM_NG_ROOT"
+      },
+      "launchArgs": ["-interactive"]
     },
     {
       "id": "sleep-5",
@@ -92,9 +98,7 @@
         "path": "sleep",
         "rootEnvVar": ""
       },
-      "launchArgs": [
-        "5"
-      ]
+      "launchArgs": ["5"]
     }
   ]
 }

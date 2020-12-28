@@ -7,10 +7,26 @@
 .browser {
   flex-grow: 1;
   min-width: 50%;
+
+  &.hidden {
+    display: none;
+  }
 }
 
 .detail {
   min-width: 50%;
   display: flex;
   flex-direction: column;
+  position: relative;
+
+  &.fullWidth {
+    flex-grow: 1;
+  }
+}
+
+.fullWidthDetailButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
 }

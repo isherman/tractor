@@ -3,6 +3,7 @@ import { SteeringCommand } from "@farm-ng/genproto-tractor/farm_ng/tractor/steer
 import { VisualizerProps } from "../../../registry/visualization";
 import { colorGenerator } from "../../../utils/colorGenerator";
 import { Plot } from "./Plot";
+import { useMemo } from "react";
 
 const SteeringCommandComponent: React.FC<VisualizerProps<SteeringCommand>> = ({
   values,
@@ -18,20 +19,23 @@ const SteeringCommandComponent: React.FC<VisualizerProps<SteeringCommand>> = ({
 
   const strokeWidth = parseInt(options[0].value);
   const colors = colorGenerator();
-  const plotOptions = {
-    width: 800,
-    height: 600,
-    series: [
-      {
-        show: false,
-      },
-      ...["brake", "deadman", "v", "ω"].map((label) => ({
-        label,
-        stroke: colors.next().value,
-        width: strokeWidth,
-      })),
-    ],
-  };
+  const plotOptions = useMemo(
+    () => ({
+      width: 800,
+      height: 600,
+      series: [
+        {
+          show: false,
+        },
+        ...["brake", "deadman", "v", "ω"].map((label) => ({
+          label,
+          stroke: colors.next().value,
+          width: strokeWidth,
+        })),
+      ],
+    }),
+    [strokeWidth]
+  );
 
   return <Plot data={plotData} options={plotOptions} />;
 };

@@ -77,7 +77,11 @@ macro(farm_ng_add_protobufs target)
       VERBATIM)
 
     # ts
-    set("_protoc_args_ts" "--ts_proto_out=forceLong=long:${_proto_output_dir_ts}")
+    # - forceLong=long provides support for (u)int64s, parsing them as Longs
+    # - outputClientImpl=false disables gRPC/twirp client stub generation, which
+    #   appears to be broken (generates non-compiling code for bidi streaming services),
+    #   and we don't use anyways.
+    set("_protoc_args_ts" "--ts_proto_out=forceLong=long,outputClientImpl=false:${_proto_output_dir_ts}")
     SET(_ts_out ${_proto_output_dir_ts}/${_file_dir}/${_file_we}.ts)
     list(APPEND _ts_out_all ${_ts_out})
     add_custom_command(

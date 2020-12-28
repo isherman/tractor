@@ -19,15 +19,28 @@ import {
   Standard3DElement,
 } from "./StandardComponent";
 
-const NamedSE3Pose3DElement: React.FC<SingleElementVisualizerProps<
-  NamedSE3Pose
->> = ({ children, ...props }) => {
+interface IProps extends SingleElementVisualizerProps<NamedSE3Pose> {
+  showFrameA?: boolean;
+}
+
+const NamedSE3Pose3DElement: React.FC<IProps> = ({
+  children,
+  showFrameA,
+  ...props
+}) => {
   const {
     value: [, value],
   } = props;
 
   return (
     <group>
+      {showFrameA && (
+        <axesHelper scale={[0.2, 0.2, 0.2]}>
+          <Html>
+            <div>{value.frameA}</div>
+          </Html>
+        </axesHelper>
+      )}
       <line>
         <geometry
           attach="geometry"

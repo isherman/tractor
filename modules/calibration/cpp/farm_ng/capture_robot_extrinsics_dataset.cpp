@@ -27,6 +27,7 @@ DEFINE_string(configuration_path,
               "Blobstore-relative path to the configuration file.");
 
 using farm_ng::core::MakeEvent;
+using farm_ng::core::MakeTimestampNow;
 using farm_ng::core::ReadProtobufFromJsonFile;
 using farm_ng::perception::Image;
 using farm_ng::perception::NamedSE3Pose;
@@ -109,16 +110,14 @@ void ImageDataToResource(Image* image, int frame_number) {
 
 class CaptureRobotExtrinsicsDatasetProgram {
  public:
-  CaptureRobotExtrinsicsDatasetProgram(
-      core::EventBus& bus,
-      const CaptureRobotExtrinsicsDatasetConfiguration& configuration)
-      : bus_(bus),
-        timer_(bus_.get_io_service()),
-        configuration_(configuration) {
-    if (FLAGS_interactive) {
-      status_.mutable_input_required_configuration()->CopyFrom(configuration);
+  CaptureRobotExtrinsicsDatasetProgram(core::EventBus& bus,
+                                       core::Resource& resource,
+                                       bool interactive)
+      : bus_(bus), timer_(bus_.get_io_service()) {
+    if (interactive) {
+      status_.mutable_input_required_resource()->CopyFrom(resource);
     } else {
-      set_configuration(configuration);
+      set_configuration(resource);
     }
     bus_.AddSubscriptions({bus_.GetName()});
 
@@ -144,19 +143,20 @@ class CaptureRobotExtrinsicsDatasetProgram {
   }
 
   bool on_configuration(const EventPb& event) {
-    CaptureRobotExtrinsicsDatasetConfiguration configuration;
-    if (!event.data().UnpackTo(&configuration)) {
+    core::Resource configuration_resource;
+    if (!event.data().UnpackTo(&configuration_resource)) {
       return false;
     }
-    LOG(INFO) << configuration.ShortDebugString();
-    set_configuration(configuration);
+    LOG(INFO) << configuration_resource.ShortDebugString();
+    set_configuration(configuration_resource);
     return true;
   }
 
-  void set_configuration(
-      const CaptureRobotExtrinsicsDatasetConfiguration& configuration) {
-    configuration_ = configuration;
-    status_.clear_input_required_configuration();
+  void set_configuration(const core::Resource& resource) {
+    configuration_ = ReadProtobufFromJsonFile<
+        farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
+        farm_ng::core::GetBlobstoreRoot() / resource.path());
+    status_.clear_input_required_resource();
     status_.mutable_configuration()->CopyFrom(configuration_);
     send_status();
   }
@@ -168,11 +168,14 @@ class CaptureRobotExtrinsicsDatasetProgram {
   }
 
   int run() {
-    while (status_.has_input_required_configuration()) {
+    while (status_.has_input_required_resource()) {
       bus_.get_io_service().run_one();
     }
 
     WaitForServices(bus_, {});
+
+    CaptureRobotExtrinsicsDatasetResult result;
+    result.mutable_stamp_begin()->CopyFrom(MakeTimestampNow());
 
     grpc::ChannelArguments ch_args;
     ch_args.SetMaxReceiveMessageSize(100000000);
@@ -194,8 +197,6 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
     core::EventLogWriter log_writer(resource_path.second);
 
-    status_.clear_request_queue();
-    status_.mutable_request_queue()->CopyFrom(configuration_.request_queue());
     int frame_number = 0;
     for (auto& request : configuration_.request_queue()) {
       bus_.get_io_service().poll();
@@ -222,14 +223,17 @@ class CaptureRobotExtrinsicsDatasetProgram {
 
       frame_number++;
     }
-    CaptureRobotExtrinsicsDatasetResult result;
+
     result.mutable_configuration()->CopyFrom(configuration_);
     result.mutable_dataset()->CopyFrom(resource_path.first);
+    result.mutable_stamp_end()->CopyFrom(MakeTimestampNow());
 
     core::ArchiveProtobufAsJsonResource(configuration_.name(), result);
 
     status_.mutable_result()->CopyFrom(WriteProtobufAsJsonResource(
         core::BUCKET_ROBOT_EXTRINSICS_DATASETS, configuration_.name(), result));
+
+    send_status();
 
     return 0;
   }
@@ -245,12 +249,15 @@ class CaptureRobotExtrinsicsDatasetProgram {
 }  // namespace farm_ng::calibration
 
 int Main(farm_ng::core::EventBus& bus) {
-  auto configuration = ReadProtobufFromJsonFile<
-      farm_ng::calibration::CaptureRobotExtrinsicsDatasetConfiguration>(
-      farm_ng::core::GetBlobstoreRoot() / FLAGS_configuration_path);
+  farm_ng::core::Resource resource;
+  resource.set_path(FLAGS_configuration_path);
+  resource.set_content_type(
+      "application/json; "
+      "type=type.googleapis.com/"
+      "farm_ng.calibration.CaptureRobotExtrinsicsDatasetConfiguration");
 
   farm_ng::calibration::CaptureRobotExtrinsicsDatasetProgram program(
-      bus, configuration);
+      bus, resource, FLAGS_interactive);
   return program.run();
 }
 

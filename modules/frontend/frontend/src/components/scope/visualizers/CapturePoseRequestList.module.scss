@@ -1,14 +1,12 @@
-.detailRow {
-  display: flex;
-  flex-direction: row;
-}
-
 .scenePair {
   display: flex;
   flex-direction: row;
   min-height: 400px;
+  padding-top: 1rem;
 
-  div {
+  > div {
     flex-basis: 50%;
+    min-width: 0;
+    padding: 1rem;
   }
 }

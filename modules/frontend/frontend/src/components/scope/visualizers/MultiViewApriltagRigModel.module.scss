@@ -1,6 +1,6 @@
 .sceneTablePair {
   display: flex;
-  flex-direction: horizontal;
+  flex-direction: row;
   min-height: 400px;
 
   > div:first-child {
@@ -14,7 +14,7 @@
 
 .scenePair {
   display: flex;
-  flex-direction: horizontal;
+  flex-direction: row;
   min-height: 400px;
 
   > div {
