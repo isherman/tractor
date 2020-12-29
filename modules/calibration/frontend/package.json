@@ -34,6 +34,6 @@
   "scripts": {
     "dev-start": "webpack-dev-server --progress",
     "dev-start-remote": "webpack-dev-server --progress --host 0.0.0.0 --disable-host-check",
-    "build": "webpack --mode production --progress"
+    "build": "./build-deps.sh && webpack --mode production --progress"
   }
 }

@@ -4,9 +4,9 @@ import { Switch, Route, Link } from "react-router-dom";
 import { State } from "@farm-ng/frontend/src/components/State";
 import { Video } from "@farm-ng/frontend/src/components/Video";
 import { Root as Scope } from "@farm-ng/frontend/src/components/scope/Root";
-import styles from "./App.module.scss";
 import { Programs } from "@farm-ng/frontend/src/components/Programs";
 import { Blobstore } from "@farm-ng/frontend/src/components/Blobstore";
+import styles from "./App.module.scss";
 
 export const App: React.FC = () => {
   return (
