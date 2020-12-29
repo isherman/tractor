@@ -49,17 +49,7 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "@farm-ng/frontend": "link:../../frontend/frontend",
-    "@farm-ng/genproto-calibration": "link:../../../build/modules/calibration/protos/ts",
-    "@farm-ng/genproto-core": "link:../../../build/modules/core/protos/ts",
-    "@farm-ng/genproto-frontend": "link:../../../build/modules/frontend/protos/ts",
-    "@farm-ng/genproto-perception": "link:../../../build/modules/perception/protos/ts",
-    "@farm-ng/genproto-tractor": "link:../../../build/modules/tractor/protos/ts",
-    "bootstrap": "^4.5.2",
-    "react": "^16.13.1",
-    "react-bootstrap": "^1.3.0",
-    "react-dom": "^16.13.1",
-    "react-router-dom": "^5.2.0"
+    "@farm-ng/frontend": "link:../../frontend/frontend"
   },
   "scripts": {
     "dev-start": "webpack-dev-server --progress",
