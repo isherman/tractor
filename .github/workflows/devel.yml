@@ -2,8 +2,11 @@ name: Devel docker images CI
 
 # For all pushes to the devel branch push devel related images to registry tagged as `edge`
 on:
-  push:
-    branches: devel
+  pull_request:
+    branches: master
+    paths:
+      - 'docker/devel/**'
+      - '.github/workflows/devel.yml'
 
 jobs:
   third_party_build:
@@ -63,6 +66,22 @@ jobs:
           tags: ${{ steps.prep.outputs.tags }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+      -
+        name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }} > docker/devel/${{ matrix.image }}-digest.txt
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.image }}-digest
+          path: docker/devel/${{ matrix.image }}-digest.txt
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v6
+        with:
+          author_name: Devel Build Action
+          author_email: devel_build@noreply
+          message: 'Update ${{ matrix.image }} digest: farmng/build-${{ matrix.image }}@${{ steps.docker_build.outputs.digest }}'
+          add: docker/devel/${{ matrix.image }}-digest.txt
+
   devel_build:
     needs: third_party_build
     runs-on: ubuntu-latest
@@ -106,6 +125,14 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Get digest
+        id: vars
+        run: |
+          echo ::set-output name=apriltag::$(cat docker/devel/apriltag-digest.txt)
+          echo ::set-output name=ceres::$(cat docker/devel/ceres-digest.txt)
+          echo ::set-output name=grpc::$(cat docker/devel/grpc-digest.txt)
+          echo ::set-output name=opencv::$(cat docker/devel/opencv-digest.txt)
+          echo ::set-output name=sophus::$(cat docker/devel/sophus-digest.txt)
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
@@ -113,7 +140,88 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./docker/devel
           file: ./docker/devel/devel.Dockerfile
+          build-args: |
+            apriltag_tag=farmng/build-apriltag@${{steps.vars.outputs.apriltag}}
+            ceres_tag=farmng/build-ceres@${{steps.vars.outputs.ceres}}
+            grpc_tag=farmng/build-grpc@${{steps.vars.outputs.grpc}}
+            opencv_tag=farmng/build-opencv@${{steps.vars.outputs.opencv}}
+            sophus_tag=farmng/build-sophus@${{steps.vars.outputs.sophus}}
           push: true
           tags: ${{ steps.prep.outputs.tags }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
+      -
+        name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }} > docker/devel/devel-digest.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          name: devel_digest
+          path: docker/devel/devel-digest.txt
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v6
+        with:
+          author_name: Devel Build Action
+          author_email: devel_build@noreply
+          message: 'Update devel digest: farmng/devel@${{ steps.docker_build.outputs.digest }}'
+          add: docker/devel/devel-digest.txt
+  docs:
+    needs: devel_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Build Docs
+        run: ./devel.sh make docs
+      - uses: actions/upload-artifact@v2
+        with:
+          name: sphinx
+          path: build/doc/sphinx/
+  build:
+    needs: devel_build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      # Use the Github Actions cache to cache our container image layers.
+      # The tradeoffs relative to using the container registry as a cache are not yet clear.
+      # For example:
+      # - Using Dockerhub as a cache would allow local builds and CI builds to share the same cache.
+      # - Dockerhub has announced a rate-limit of 200 pulls/6 hrs for unpaid accounts.
+      # - The Github cache evicts when it grows above 5GB.
+      # - The Github cache has nice built-in support for "fallback" cache keys
+      # To use Dockerhub as a cache instead, replace the cache-from/cache-to lines below with:
+      #   cache-from: type=registry,ref=farmng/base:latest
+      #   cache-to: type=inline,mode=max
+      # (taking care to choose appropriate cache keys)
+      # see https://github.com/docker/buildx#--cache-fromnametypetypekeyvalue)
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-base-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-base-
+            ${{ runner.os }}-buildx-
+      - name: Get digest
+        id: vars
+        run: |
+          echo ::set-output name=devel::$(cat docker/devel/devel-digest.txt)
+      - name: Build Base
+        uses: docker/build-push-action@v2
+        with:
+          builder: ${{ steps.buildx.outputs.name }}
+          context: .
+          file: ./docker/base.Dockerfile
+          build-args: |
+            FARM_NG_DEVEL_IMAGE=farmng/devel@${{steps.vars.outputs.devel}}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache,mode=max
