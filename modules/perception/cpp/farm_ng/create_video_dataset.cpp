@@ -143,7 +143,7 @@ class CreateVideoDatasetProgram {
         gray = image.clone();
       }
       auto stamp = core::MakeTimestampNow();
-      bus_.Send(
+      log_writer.Write(
           MakeEvent(camera_model->frame_name() + "/image", image_pb, stamp));
 
       bool first_frame_for_camera = true;
@@ -163,8 +163,8 @@ class CreateVideoDatasetProgram {
       if (configuration_.detect_apriltags()) {
         auto detections = detector->Detect(gray, stamp);
         detections.mutable_image()->CopyFrom(image_pb);
-        bus_.Send(MakeEvent(camera_model->frame_name() + "/apriltags",
-                            detections, stamp));
+        log_writer.Write(MakeEvent(camera_model->frame_name() + "/apriltags",
+                                   detections, stamp));
 
         for (auto const& detection : detections.detections()) {
           bool first_time_seen = true;
