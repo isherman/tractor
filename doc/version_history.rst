@@ -4,6 +4,15 @@
 Version History
 ===============
 
+0.9.0
+=====
+
+New Features
+------------
+
+- Robot arm extrinsic calibration
+- Adding point clouds, imu and tensor protobuf definitions
+
 0.8.0
 =====
 
