@@ -9,8 +9,7 @@
 #include "farm_ng/core/resource.pb.h"
 #include "farm_ng/perception/image.pb.h"
 
-namespace farm_ng {
-namespace perception {
+namespace farm_ng::perception {
 
 class ImageLoader {
  public:
@@ -26,7 +25,14 @@ class ImageLoader {
   bool zero_indexed_;
 };
 
-}  // namespace perception
-}  // namespace farm_ng
+// If the image resource has a data payload rather than a path, this saves
+// it to disk, and replaces the resource payload with the path on disk.
+void ImageResourceDataToPath(Image* image);
+
+// If the image resource has a path payload rather than data, this reads
+// the playload form the path on disk, and replaces the resource payload with
+// data.
+void ImageResourcePathToData(Image* image);
+}  // namespace farm_ng::perception
 
 #endif
