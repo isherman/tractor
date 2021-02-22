@@ -78,6 +78,20 @@ inline Sophus::SE3d ProtoToSophus(const SE3Pose& ppose) {
   return pose;
 }
 
+inline Sophus::SE3d ProtoToSophus(const NamedSE3Pose& ppose,
+                                  const std::string& frame_a,
+                                  const std::string& frame_b) {
+  if (ppose.frame_a() == frame_a && ppose.frame_b() == frame_b) {
+    return ProtoToSophus(ppose.a_pose_b());
+  }
+  if (ppose.frame_b() == frame_a && ppose.frame_b() == frame_a) {
+    return ProtoToSophus(ppose.a_pose_b()).inverse();
+  }
+  LOG(FATAL) << "Pose doesn't contain: " << frame_a << " or " << frame_b
+             << ppose.ShortDebugString();
+  return Sophus::SE3d();
+}
+
 inline SE3Pose SophusToProto(const Sophus::SE3d& pose) {
   SE3Pose ppose;
   SophusToProto(pose, &ppose);

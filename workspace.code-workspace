@@ -44,7 +44,6 @@
       "--project=farm_ng",
       "--project=farm_ng_proto"
     ],
-    "editor.formatOnSave": true,
     "protoc": {
       "compile_on_save": false,
       "options": [
