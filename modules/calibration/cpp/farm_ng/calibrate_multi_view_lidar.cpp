@@ -29,9 +29,9 @@
 #include <Eigen/Dense>
 DEFINE_bool(interactive, false, "receive program args via eventbus");
 DEFINE_string(output_config, "", "Output the config to a file.");
-DEFINE_string(config,
-              "",
-              "Load config from a file rather than args.");
+DEFINE_string(
+    config, "/blobstore/logs/calibration_capture/multi_view_lidar_config.json",
+    "Load config from a file rather than args.");
 
 DEFINE_string(name, "", "Name of calibration output.");
 DEFINE_string(event_log, "", "Path to event log containing input data.");
@@ -295,8 +295,8 @@ class CalibrateMultiViewLidarProgram {
 
     CHECK(configuration_.has_event_log()) << "Please specify an event log.";
 
-
-  fs::path output_dir= fs::path(configuration_.event_log().path()).parent_path();
+    fs::path output_dir =
+        fs::path(configuration_.event_log().path()).parent_path();
 
     // Output under the same directory as the dataset.
     core::SetArchivePath((output_dir / "multi_view_lidar_model").string());
@@ -344,14 +344,14 @@ class CalibrateMultiViewLidarProgram {
     CHECK_GT(lidar_names.size(), 0);
 
     auto time_window =
-        google::protobuf::util::TimeUtil::MillisecondsToDuration(200);
+        google::protobuf::util::TimeUtil::MillisecondsToDuration(1000);
 
     perception::ApriltagsFilter tag_filter;
     std::string root_camera_name = camera_rig.root_camera_name();
 
     int steady_count = 2;
 
-    for (auto event : event_series[root_camera_name + "/apritags"]) {
+    for (auto event : event_series[root_camera_name + "/apriltags"]) {
       perception::ApriltagDetections detections;
       CHECK(event.data().UnpackTo(&detections));
       if (!tag_filter.AddApriltags(detections, steady_count, 7)) {
@@ -362,12 +362,12 @@ class CalibrateMultiViewLidarProgram {
       for (auto lidar_name : lidar_names) {
         auto closest_event =
             event_series[lidar_name].FindNearest(event.stamp(), time_window);
-
-        CHECK(closest_event && closest_event->stamp() == event.stamp())
-            << closest_event->name() << " "
-            << closest_event->stamp().ShortDebugString()
-            << " != " << event.name() << " "
-            << event.stamp().ShortDebugString();
+        if (!closest_event) {
+          LOG(WARNING) << "No closest event for: " << lidar_name
+                       << " within time_window: "
+                       << time_window.ShortDebugString();
+          continue;
+        }
         auto* cloud = measurement.mutable_multi_view_pointclouds()
                           ->add_point_clouds_per_view();
         CHECK(closest_event->data().UnpackTo(cloud))
@@ -375,18 +375,9 @@ class CalibrateMultiViewLidarProgram {
       }
       auto* mv_detections = measurement.mutable_multi_view_detections();
       for (auto camera : camera_rig.cameras()) {
-        // HACK
-        std::string apriltags_topic = camera.frame_name() + "/apritags";
-        CHECK(event_series.count(apriltags_topic) > 0)
-            << apriltags_topic << " not in event log";
+        std::string apriltags_topic = camera.frame_name() + "/apriltags";
         auto closest_event = event_series[apriltags_topic].FindNearest(
             event.stamp(), time_window);
-        // HACK we only have 3 images in current dataset per point cloud.
-        CHECK(closest_event && closest_event->stamp() == event.stamp())
-            << closest_event->name() << " "
-            << closest_event->stamp().ShortDebugString()
-            << " != " << event.name() << " "
-            << event.stamp().ShortDebugString();
         CHECK(closest_event->data().UnpackTo(
             mv_detections->add_detections_per_view()))
             << closest_event->name() << " is not an ApriltagDetections.";
@@ -408,10 +399,12 @@ class CalibrateMultiViewLidarProgram {
     model = Solve(model);
     SavePlyFilesInTagRig(model, "/blobstore/scratch/solved_");
 
-    auto temp_model= model;
+    auto temp_model = model;
     temp_model.clear_measurements();
 
-    auto model_json = core::GetUniqueArchiveResource("multi_view_lidar_model", "json", core::ContentTypeProtobufJson<MultiViewLidarModel>());
+    auto model_json = core::GetUniqueArchiveResource(
+        "multi_view_lidar_model", "json",
+        core::ContentTypeProtobufJson<MultiViewLidarModel>());
     LOG(INFO) << "writing: " << model_json.second.string();
     core::WriteProtobufToJsonFile(model_json.second, temp_model);
 
