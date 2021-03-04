@@ -54,6 +54,11 @@ import {
   CaptureRobotExtrinsicsDatasetStatus,
 } from "@farm-ng/genproto-calibration/farm_ng/calibration/capture_robot_extrinsics_dataset";
 import {
+  CalibrateRobotExtrinsicsConfiguration,
+  CalibrateRobotExtrinsicsStatus,
+  CalibrateRobotExtrinsicsResult,
+} from "@farm-ng/genproto-calibration/farm_ng/calibration/calibrate_robot_extrinsics";
+import {
   CaptureVideoDatasetConfiguration,
   CaptureVideoDatasetResult,
   CaptureVideoDatasetStatus,
@@ -98,6 +103,7 @@ import {
   LogPlaybackStatus,
 } from "@farm-ng/genproto-core/farm_ng/core/log_playback";
 import { JointState } from "@farm-ng/genproto-calibration/farm_ng/perception/kinematics";
+import { ValidateRobotExtrinsicsConfiguration, ValidateRobotExtrinsicsResult, ValidateRobotExtrinsicsStatus } from "@farm-ng/genproto-calibration/farm_ng/calibration/validate_robot_extrinsics";
 
 export type EventType =
   | Announce
@@ -122,6 +128,12 @@ export type EventType =
   | CalibrateIntrinsicsConfiguration
   | CalibrateIntrinsicsResult
   | CalibrateIntrinsicsStatus
+  | CalibrateRobotExtrinsicsConfiguration
+  | CalibrateRobotExtrinsicsStatus
+  | CalibrateRobotExtrinsicsResult
+  | ValidateRobotExtrinsicsConfiguration
+  | ValidateRobotExtrinsicsStatus
+  | ValidateRobotExtrinsicsResult
   | CalibrationParameter
   | CalibratorCommand
   | CalibratorStatus
@@ -176,6 +188,7 @@ const inferKeys = <T>(
   o: { [K in keyof T]: Message<EventType> }
 ): { [K in keyof T]: Message<EventType> } => o;
 
+
 export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.calibration.BaseToCameraInitialization": BaseToCameraInitialization,
   "type.googleapis.com/farm_ng.calibration.BaseToCameraModel": BaseToCameraModel,
@@ -201,6 +214,12 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetConfiguration": CaptureRobotExtrinsicsDatasetConfiguration,
   "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetStatus": CaptureRobotExtrinsicsDatasetStatus,
   "type.googleapis.com/farm_ng.calibration.CaptureRobotExtrinsicsDatasetResult": CaptureRobotExtrinsicsDatasetResult,
+  "type.googleapis.com/farm_ng.calibration.CalibrateRobotExtrinsicsConfiguration": CalibrateRobotExtrinsicsConfiguration,
+  "type.googleapis.com/farm_ng.calibration.CalibrateRobotExtrinsicsStatus": CalibrateRobotExtrinsicsStatus,
+  "type.googleapis.com/farm_ng.calibration.CalibrateRobotExtrinsicsResult": CalibrateRobotExtrinsicsResult,
+  "type.googleapis.com/farm_ng.calibration.ValidateRobotExtrinsicsConfiguration": ValidateRobotExtrinsicsConfiguration,
+  "type.googleapis.com/farm_ng.calibration.ValidateRobotExtrinsicsStatus": ValidateRobotExtrinsicsStatus,
+  "type.googleapis.com/farm_ng.calibration.ValidateRobotExtrinsicsResult": ValidateRobotExtrinsicsResult,
   "type.googleapis.com/farm_ng.calibration.MonocularApriltagRigModel": MonocularApriltagRigModel,
   "type.googleapis.com/farm_ng.calibration.MultiViewApriltagRigModel": MultiViewApriltagRigModel,
   "type.googleapis.com/farm_ng.calibration.ViewInitialization": ViewInitialization,

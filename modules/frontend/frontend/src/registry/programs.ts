@@ -9,6 +9,8 @@ import { CreateVideoDatasetProgram } from "../components/programs/CreateVideoDat
 import { CalibrateIntrinsicsProgram } from "../components/programs/CalibrateIntrinsics";
 import { CaptureRobotExtrinsicsDatasetProgram } from "../components/programs/CaptureRobotExtrinsicsDataset";
 import { LogPlaybackProgram } from "../components/programs/LogPlayback";
+import { CalibrateRobotExtrinsicsProgram } from "../components/programs/CalibrateRobotExtrinsics";
+import { ValidateRobotExtrinsicsProgram } from "../components/programs/ValidateRobotExtrinsics";
 
 export interface Program<T extends EventType = EventType> {
   programIds: readonly string[];
@@ -28,6 +30,8 @@ export const programRegistry: Program[] = [
   CalibrateIntrinsicsProgram as Program,
   CalibrateMultiViewApriltagRigProgram as Program,
   CaptureRobotExtrinsicsDatasetProgram as Program,
+  CalibrateRobotExtrinsicsProgram as Program,
+  ValidateRobotExtrinsicsProgram as Program,
   CreateVideoDatasetProgram as Program,
   DetectApriltagsProgram as Program,
   LogPlaybackProgram as Program,
