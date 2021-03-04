@@ -14,9 +14,8 @@ export function deg2rad(degrees: number): number {
 }
 
 export function getInverse(pose: SE3Pose): SE3Pose {
-  const original = se3PoseToMatrix4(pose);
   const inverse = new Matrix4();
-  inverse.getInverse(original);
+  inverse.getInverse(se3PoseToMatrix4(pose));
   return matrix4ToSE3Pose(inverse);
 }
 
