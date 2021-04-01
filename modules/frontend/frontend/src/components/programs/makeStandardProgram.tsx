@@ -61,8 +61,7 @@ export function makeStandardProgram<T extends EventType = EventType>(
   }
 
   return {
-    programIds: [programId] as const,
-    eventLogPredicate: (e: BusEvent) => e.name.startsWith(`${programId}/`),
+    programId,
     inputRequired: (e: BusEvent) => {
       if (!e.name.startsWith(`${programId}/status`)) {
         return null;

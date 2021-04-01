@@ -22,6 +22,7 @@ export const Programs: React.FC = () => {
 
   const handleStart = (id: string): void => {
     busClient.send({ id }, "programd/request", StartProgramRequest);
+    store.clearLogs();
   };
 
   const handleStop = (id: string): void => {
@@ -122,9 +123,11 @@ export const Programs: React.FC = () => {
               </div>
             </div>
           </Collapse>
-          <ProgramOutput />
+          <div className={styles.programOutput}>
+            <ProgramOutput log={store.outputLog} />
+          </div>
           <EventVisualizer.MultiElement
-            values={store.eventLog}
+            values={store.statusLog}
             options={[{ label: "", options: [], value: "overlay" }]}
             resources={httpResourceArchive}
           />

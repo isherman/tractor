@@ -15,9 +15,8 @@ import {
 } from "../components/programs/standardPrograms";
 
 export interface Program<T extends EventType = EventType> {
-  programIds: readonly string[];
+  programId: string;
   inputRequired: (e: BusEvent) => T | null;
-  eventLogPredicate: (e: BusEvent) => boolean;
   MultiElement: React.FC<ProgramProps<T>>;
 }
 
@@ -41,7 +40,6 @@ export const programRegistry: Program[] = [
 
 export function programForProgramId(programId: string): Program | null {
   return (
-    programRegistry.find((program) => program.programIds.includes(programId)) ||
-    null
+    programRegistry.find((program) => program.programId == programId) || null
   );
 }

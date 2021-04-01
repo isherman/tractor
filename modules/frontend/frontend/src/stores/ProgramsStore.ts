@@ -6,9 +6,10 @@ import {
   BusEventEmitter,
   BusEventEmitterHandle,
 } from "../models/BusEventEmitter";
-import { EventType } from "../registry/events";
+import { EventType, EventTypeId } from "../registry/events";
 import {
   ProgramExecution,
+  ProgramOutput,
   ProgramSupervisorStatus,
 } from "@farm-ng/genproto-core/farm_ng/core/programd";
 import { Program, programForProgramId } from "../registry/programs";
@@ -21,10 +22,13 @@ export class ProgramsStore {
   // The latest supervisor status
   @observable supervisorStatus: ProgramSupervisorStatus | null = null;
 
-  // A buffer of events, as populated by the active program's eventLog predicate
-  eventLog: TimestampedEventVector<BusEvent> = observable.array([], {
+  // A buffer of program status events
+  statusLog: TimestampedEventVector<BusEvent> = observable.array([], {
     deep: false,
   });
+
+  // A buffer of program text output (e.g. from stdout)
+  outputLog: string[] = observable.array([], { deep: false });
 
   constructor(private busEventEmitter: BusEventEmitter) {}
 
@@ -37,21 +41,14 @@ export class ProgramsStore {
   }
 
   @computed get latestEvent(): BusEvent | null {
-    return this.eventLog.length > 0
-      ? this.eventLog[this.eventLog.length - 1][1]
+    return this.statusLog.length > 0
+      ? this.statusLog[this.statusLog.length - 1][1]
       : null;
   }
 
   @computed get program(): Program | null {
     const programId = this.runningProgram?.id || this.lastProgram?.id;
     return programId ? programForProgramId(programId) : null;
-  }
-
-  @computed get eventLogPredicate(): (e: BusEvent) => boolean {
-    return (
-      (this.runningProgram && this.program && this.program.eventLogPredicate) ||
-      (() => false)
-    );
   }
 
   @computed get inputRequired(): EventType | null {
@@ -79,15 +76,33 @@ export class ProgramsStore {
         return;
       }
       if (
-        busEvent.data.typeUrl ===
+        (busEvent.data.typeUrl as EventTypeId) ===
         "type.googleapis.com/farm_ng.core.ProgramSupervisorStatus"
       ) {
         this.supervisorStatus = decodeAnyEvent(busEvent);
       }
-      // TODO: ugly
-      const eventLogPredicate = (() => this.eventLogPredicate)();
-      if (eventLogPredicate(busEvent) && busEvent.stamp) {
-        this.eventLog.push([busEvent.stamp.getTime(), busEvent]);
+
+      if (!this.runningProgram) {
+        return;
+      }
+
+      if (busEvent.name.startsWith(`${this.program?.programId}/`)) {
+        if (
+          (busEvent.data.typeUrl as EventTypeId) ==
+          "type.googleapis.com/farm_ng.core.ProgramOutput"
+        ) {
+          const decoded = decodeAnyEvent<ProgramOutput>(busEvent);
+          if (!decoded) {
+            console.error("Could not decode ProgramOutput.");
+            return;
+          }
+          this.outputLog.push(decoded.line);
+          return;
+        }
+        this.statusLog.push([
+          busEvent.stamp?.getTime() || Date.now(),
+          busEvent,
+        ]);
       }
     });
   }
@@ -97,5 +112,10 @@ export class ProgramsStore {
       this.busHandle.unsubscribe();
       this.busHandle = null;
     }
+  }
+
+  public clearLogs(): void {
+    this.statusLog = observable.array([], { deep: false });
+    this.outputLog = observable.array([], { deep: false });
   }
 }
