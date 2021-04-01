@@ -10,6 +10,7 @@ import { useEffect, useMemo } from "react";
 import { formatValue } from "../utils/formatValue";
 import styles from "./Programs.module.scss";
 import { EventVisualizer } from "./scope/visualizers/Event";
+import { ProgramOutput } from "./ProgramOutput";
 
 export const Programs: React.FC = () => {
   const { busClient, httpResourceArchive, programsStore: store } = useStores();
@@ -121,6 +122,7 @@ export const Programs: React.FC = () => {
               </div>
             </div>
           </Collapse>
+          <ProgramOutput />
           <EventVisualizer.MultiElement
             values={store.eventLog}
             options={[{ label: "", options: [], value: "overlay" }]}

@@ -26,9 +26,6 @@ export class ProgramsStore {
     deep: false,
   });
 
-  // A user-selected element in the eventLog buffer
-  @observable selectedEntry: number | null = null;
-
   constructor(private busEventEmitter: BusEventEmitter) {}
 
   @computed get runningProgram(): ProgramExecution | null {
@@ -100,10 +97,5 @@ export class ProgramsStore {
       this.busHandle.unsubscribe();
       this.busHandle = null;
     }
-  }
-
-  public resetEventLog(): void {
-    this.eventLog = [];
-    this.selectedEntry = null;
   }
 }

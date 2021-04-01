@@ -47,7 +47,6 @@ import { MultiViewCameraRigVisualizer } from "../components/scope/visualizers/Mu
 import { LogPlaybackConfigurationVisualizer } from "../components/scope/visualizers/LogPlaybackConfiguration";
 import { LogPlaybackStatusVisualizer } from "../components/scope/visualizers/LogPlaybackStatus";
 import { ValidateRobotExtrinsicsConfigurationVisualizer } from "../components/scope/visualizers/ValidateRobotExtrinsicsConfiguration";
-import { DefaultProgramStatusVisualizer } from "../components/scope/visualizers/DefaultProgramStatusVisualizer";
 
 export interface VisualizerOptionConfig {
   label: string;
@@ -141,7 +140,6 @@ export const visualizerRegistry: { [k: string]: Visualizer } = [
   SteeringCommandVisualizer,
   CameraPipelineConfigVisualizer,
   TractorConfigVisualizer,
-  DefaultProgramStatusVisualizer,
   // Low priority, should stay at the end of the list
   JSONVisualizer,
   TimeSkewVisualizer,

@@ -39,7 +39,7 @@ import {
 } from "@farm-ng/genproto-tractor/farm_ng/tractor/tractor";
 import { Message } from "../types/common";
 import {
-  DefaultProgramStatus,
+  ProgramOutput,
   ProgramSupervisorStatus,
   StartProgramRequest,
   StopProgramRequest,
@@ -157,7 +157,6 @@ export type EventType =
   | CreateVideoDatasetConfiguration
   | CreateVideoDatasetResult
   | CreateVideoDatasetStatus
-  | DefaultProgramStatus
   | DetectApriltagsConfiguration
   | DetectApriltagsStatus
   | Image
@@ -172,6 +171,7 @@ export type EventType =
   | MultiViewApriltagRigModel
   | MultiViewCameraRig
   | NamedSE3Pose
+  | ProgramOutput
   | ProgramSupervisorStatus
   | Resource
   | SE3Pose
@@ -229,12 +229,12 @@ export const eventRegistry = inferKeys({
   "type.googleapis.com/farm_ng.calibration.MultiViewApriltagRigModel": MultiViewApriltagRigModel,
   "type.googleapis.com/farm_ng.calibration.ViewInitialization": ViewInitialization,
   "type.googleapis.com/farm_ng.core.Announce": Announce,
-  "type.googleapis.com/farm_ng.core.DefaultProgramStatus": DefaultProgramStatus,
   "type.googleapis.com/farm_ng.core.Event": BusEvent,
   "type.googleapis.com/farm_ng.core.LoggingCommand": LoggingCommand,
   "type.googleapis.com/farm_ng.core.LoggingStatus": LoggingStatus,
   "type.googleapis.com/farm_ng.core.LogPlaybackConfiguration": LogPlaybackConfiguration,
   "type.googleapis.com/farm_ng.core.LogPlaybackStatus": LogPlaybackStatus,
+  "type.googleapis.com/farm_ng.core.ProgramOutput": ProgramOutput,
   "type.googleapis.com/farm_ng.core.Resource": Resource,
   "type.googleapis.com/farm_ng.core.ProgramSupervisorStatus": ProgramSupervisorStatus,
   "type.googleapis.com/farm_ng.core.StartProgramRequest": StartProgramRequest,

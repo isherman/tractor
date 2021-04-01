@@ -60,6 +60,6 @@ message StopProgramRequest {
   string id = 1;
 }
 
-message DefaultProgramStatus {
+message ProgramOutput {
   string line = 1;
 }
