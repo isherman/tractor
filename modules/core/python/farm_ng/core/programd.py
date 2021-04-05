@@ -92,7 +92,8 @@ class ProgramSupervisor:
             launch_path,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            *program_info.launch_args)
+            *program_info.launch_args,
+        )
         self.status.running.program.pid = self.child_process.pid
         self.status.running.program.stamp_start.GetCurrentTime()
         await self.monitor_child_process()
@@ -106,13 +107,15 @@ class ProgramSupervisor:
             out_buffer.flush()
             event = make_event(
                 f'{self.status.running.program.id}/{out_name}',
-                ProgramOutput(line=str(line, sys.stdout.encoding)))
+                ProgramOutput(line=str(line, sys.stdout.encoding)),
+            )
             self._event_bus.send(event)
 
     async def monitor_child_process(self):
         await asyncio.gather(
-            self.io_stream_to_event_bus(self.child_process.stdout, sys.stdout.buffer, "stdout"),
-            self.io_stream_to_event_bus(self.child_process.stderr, sys.stderr.buffer, "stderr"))
+            self.io_stream_to_event_bus(self.child_process.stdout, sys.stdout.buffer, 'stdout'),
+            self.io_stream_to_event_bus(self.child_process.stderr, sys.stderr.buffer, 'stderr'),
+        )
         await self.child_process.wait()
         self.status.stopped.last_program.CopyFrom(self.status.running.program)
         self.status.stopped.last_program.stamp_end.GetCurrentTime()
