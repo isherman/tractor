@@ -1,10 +1,12 @@
 #ifndef FARM_NG_CALIBRATION_APRILTAG_H_
 #define FARM_NG_CALIBRATION_APRILTAG_H_
 #include <array>
+#include <map>
 
 #include <glog/logging.h>
 #include <Eigen/Dense>
 #include <opencv2/core.hpp>
+
 
 #include "farm_ng/perception/apriltag.pb.h"
 #include "farm_ng/perception/camera_model.pb.h"
@@ -27,6 +29,28 @@ std::optional<double> TagSize(const TagLibrary& tag_library, int tag_id);
 // Adds the tag id and sizes contained in ApriltagRig to the ApriltagConfig.
 void AddApriltagRigToApriltagConfig(const ApriltagRig& rig,
                                     ApriltagConfig* config);
+
+class ApriltagsHistory {
+  public:
+   struct Entry {
+    int id;
+    std::array<Eigen::Vector2d, 4> first_points_image;
+    std::array<Eigen::Vector2d, 4> last_points_image;
+    int count;
+    double distance_to_first;
+    double distance_to_last;
+  };
+
+  Entry GetEntry(const ApriltagDetection& detection) const;
+  void StoreEntry(const Entry& entry);
+  bool empty() const {
+    return entries_.empty();
+  }
+
+private:
+
+  std::map<int, Entry> entries_;
+};
 
 // This class is meant to help filter apriltags, returning true once after the
 // camera becomes relatively stationary.  To allow for a capture program which
@@ -57,8 +81,19 @@ class ApriltagsFilter {
                     int window_size = 7);
 
  private:
-  cv::Mat mask_;
+
+  ApriltagsHistory history_;
   bool once_;
+};
+
+class ApriltagsFilterNovel {
+ public:
+  ApriltagsFilterNovel();
+  void Reset();
+  bool AddApriltags(const ApriltagDetections& detections, int window_size = 7);
+
+ private:
+   ApriltagsHistory history_;
 };
 
 class ApriltagDetector {
@@ -72,13 +107,13 @@ class ApriltagDetector {
   void Close();
 
   ApriltagDetections Detect(const cv::Mat& gray,
-                            const google::protobuf::Timestamp& stamp);
+                            const google::protobuf::Timestamp& stamp, double scale=1.0);
 
   // Detects apriltags, and looks up the depth value at each point.
   // Precondition: the depthmap is the same size as gray
   // Precondition: the depthmap is of type CV_32FC1.
   ApriltagDetections Detect(const cv::Mat& gray, const cv::Mat& depthmap,
-                            const google::protobuf::Timestamp& stamp);
+                            const google::protobuf::Timestamp& stamp, double scale=1.0);
 
  private:
   class Impl;

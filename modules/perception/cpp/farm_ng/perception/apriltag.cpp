@@ -5,6 +5,7 @@
 #include <glog/logging.h>
 #include <tag36h11.h>
 #include <sophus/se3.hpp>
+#include <opencv2/imgproc.hpp>
 
 #include "farm_ng/core/blobstore.h"
 #include "farm_ng/core/ipc.h"
@@ -31,12 +32,11 @@ std::array<Eigen::Vector3d, 4> PointsTag(const ApriltagDetection& detection) {
 }
 
 std::array<Eigen::Vector3d, 4> PointsTag(const ApriltagRig::Node& node) {
-  CHECK_EQ(node.points_tag_size(),4);
+  CHECK_EQ(node.points_tag_size(), 4);
   return std::array<Eigen::Vector3d, 4>(
-      {ProtoToEigen(node.points_tag(0)), ProtoToEigen(node.points_tag(1)), ProtoToEigen(node.points_tag(2)),
-      ProtoToEigen(node.points_tag(3))});
+      {ProtoToEigen(node.points_tag(0)), ProtoToEigen(node.points_tag(1)),
+       ProtoToEigen(node.points_tag(2)), ProtoToEigen(node.points_tag(3))});
 }
-
 
 std::array<Eigen::Vector2d, 4> PointsImage(const ApriltagDetection& detection) {
   return std::array<Eigen::Vector2d, 4>(
@@ -322,7 +322,7 @@ class ApriltagDetector::Impl {
   }
 
   ApriltagDetections Detect(const cv::Mat& gray,
-                            const google::protobuf::Timestamp& stamp) {
+                            const google::protobuf::Timestamp& stamp, double scale) {
     if (!apriltag_config_) {
       LoadApriltagConfig();
     }
@@ -332,12 +332,23 @@ class ApriltagDetector::Impl {
     CHECK_EQ(gray.type(), CV_8UC1);
 
     auto start = std::chrono::high_resolution_clock::now();
+    const int border = 10;
+  cv::Mat image;
+    if(scale > 0.0 && scale != 1.0) {
+      int interp = cv::INTER_AREA;
+      if(scale > 1.0) {
+        interp = cv::INTER_LINEAR;
+      }
+      cv::resize(gray, image, cv::Size(), scale, scale, interp);
+    } else {
+      image = gray;
+    }
 
     // Make an image_u8_t header for the Mat data
-    image_u8_t im = {.width = gray.cols,
-                     .height = gray.rows,
-                     .stride = gray.cols,
-                     .buf = gray.data};
+    image_u8_t im = {.width = image.cols,
+                     .height = image.rows,
+                     .stride = image.cols,
+                     .buf = image.data};
 
     std::shared_ptr<zarray_t> detections(
         apriltag_detector_detect(tag_detector_.get(), &im),
@@ -350,11 +361,33 @@ class ApriltagDetector::Impl {
     for (int i = 0; i < zarray_size(detections.get()); i++) {
       apriltag_detection_t* det;
       zarray_get(detections.get(), i, &det);
+      if(scale > 0.0 && scale != 1.0) {
+        det->c[0] /= scale;
+        det->c[1] /= scale;
+      for (int j = 0; j < 4; j++) {
+          det->p[j][0] /= scale;
+          det->p[j][1] /= scale;
+        }
+      }
       auto tag_size = TagSize(apriltag_config_.value().tag_library(), det->id);
       if (!tag_size) {
         continue;
       }
+      bool close_to_image_edge = false;
+
+      for (int j = 0; j < 4; j++) {
+        auto x = det->p[j][0];
+        auto y = det->p[j][1];
+        if(x < border  || y < border || x > image.cols - border || y > image.rows - border) {
+          close_to_image_edge = true;
+          break;
+        }
+      }
+      if(close_to_image_edge) {
+        continue;
+      }
       ApriltagDetection* detection = pb_out.add_detections();
+
       for (int j = 0; j < 4; j++) {
         Vec2* p_j = detection->add_p();
         p_j->set_x(det->p[j][0]);
@@ -388,8 +421,7 @@ class ApriltagDetector::Impl {
     auto duration =
         std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     LOG_EVERY_N(INFO, 100) << "april tag detection took: " << duration.count()
-                           << " milliseconds\n"
-                           << pb_out.ShortDebugString();
+                           << " milliseconds";
     return pb_out;
   }
   void LoadApriltagConfig() {
@@ -418,17 +450,17 @@ ApriltagDetector::~ApriltagDetector() {}
 void ApriltagDetector::Close() { impl_->apriltag_config_.reset(); }
 
 ApriltagDetections ApriltagDetector::Detect(
-    const cv::Mat& gray, const google::protobuf::Timestamp& stamp) {
-  return impl_->Detect(gray, stamp);
+    const cv::Mat& gray, const google::protobuf::Timestamp& stamp, double scale) {
+  return impl_->Detect(gray, stamp, scale);
 }
 
 ApriltagDetections ApriltagDetector::Detect(
     const cv::Mat& gray, const cv::Mat& depthmap,
-    const google::protobuf::Timestamp& stamp) {
+    const google::protobuf::Timestamp& stamp, double scale) {
   CHECK_EQ(depthmap.size().width, gray.size().width);
   CHECK_EQ(depthmap.size().height, gray.size().height);
   CHECK_EQ(depthmap.type(), CV_32FC1);
-  ApriltagDetections detections = Detect(gray, stamp);
+  ApriltagDetections detections = Detect(gray, stamp, scale);
   cv::Rect depthmap_bounds(0, 0, depthmap.size().width, depthmap.size().height);
   for (ApriltagDetection& detection : *detections.mutable_detections()) {
     for (int i = 0; i < detection.p_size(); ++i) {
@@ -445,12 +477,46 @@ ApriltagDetections ApriltagDetector::Detect(
   }
   return detections;
 }
+ApriltagsHistory::Entry ApriltagsHistory::GetEntry(
+    const ApriltagDetection& detection) const {
+  auto it = entries_.find(detection.id());
+  ApriltagsHistory::Entry x;
+  auto points_image = PointsImage(detection);
+  if (it != entries_.end()) {
+    x = it->second;
+
+    Eigen::Map<const Eigen::Matrix2Xd> m1(points_image[0].data(), 2,
+                                          points_image.size());
+    Eigen::Map<const Eigen::Matrix2Xd> m2(x.first_points_image[0].data(), 2,
+                                          x.first_points_image.size());
+    Eigen::Map<const Eigen::Matrix2Xd> m3(x.last_points_image[0].data(), 2,
+                                          x.last_points_image.size());
+
+    x.distance_to_first = (m1 - m2).norm();
+    x.distance_to_last = (m1 - m3).norm();
+    x.last_points_image = points_image;
+    x.count++;
+  } else {
+    x.count = 1;
+    x.distance_to_first = 0.0;
+    x.distance_to_last = 0.0;
+    x.first_points_image = points_image;
+    x.last_points_image = points_image;
+    x.id = detection.id();
+  }
+  return x;
+}
+void ApriltagsHistory::StoreEntry(const ApriltagsHistory::Entry& entry) {
+  entries_[entry.id] = entry;
+}
 
 ApriltagsFilter::ApriltagsFilter() : once_(false) {}
+
 void ApriltagsFilter::Reset() {
-  mask_ = cv::Mat();
   once_ = false;
+  history_ = ApriltagsHistory();
 }
+
 bool ApriltagsFilter::AddApriltags(const ApriltagDetections& detections,
                                    int steady_count, int window_size) {
   const int n_tags = detections.detections_size();
@@ -458,39 +524,64 @@ bool ApriltagsFilter::AddApriltags(const ApriltagDetections& detections,
     Reset();
     return false;
   }
-
-  if (mask_.empty()) {
-    mask_ =
-        cv::Mat::zeros(GetCvSize(detections.image().camera_model()), CV_8UC1);
-  }
-  CHECK(!mask_.empty());
-  cv::Mat new_mask = cv::Mat::zeros(mask_.size(), CV_8UC1);
-  double mean_count = 0.0;
-  cv::Rect mask_roi(0, 0, mask_.size().width, mask_.size().height);
-  for (const ApriltagDetection& detection : detections.detections()) {
-    for (const auto& p : detection.p()) {
-      cv::Rect roi(p.x() - window_size / 2, p.y() - window_size / 2,
-                   window_size, window_size);
-      roi = roi & mask_roi;
-      if (roi.empty()) {
-        continue;
-      }
-      new_mask(roi) = mask_(roi) + 1;
-      double max_val = 0.0;
-      cv::minMaxLoc(new_mask(roi), nullptr, &max_val);
-      mean_count += max_val / (4 * n_tags);
+  ApriltagsHistory new_history;
+  double mean_count = 0;
+  double n_counts = 0;
+  for (const auto& detection : detections.detections()) {
+    auto entry = history_.GetEntry(detection);
+    if (entry.distance_to_first < window_size) {
+      new_history.StoreEntry(entry);
+      mean_count += entry.count;
+      n_counts += 1;
     }
   }
-  mask_ = new_mask;
-  const int kThresh = steady_count;
-  if (mean_count > kThresh && !once_) {
+
+  if (new_history.empty()) {
+    Reset();
+    return false;
+  }
+  history_ = new_history;
+
+  LOG(INFO) << mean_count / n_counts << " n_counts " << n_counts;
+
+  mean_count /= n_counts;
+  if (mean_count > steady_count && !once_) {
     once_ = true;
     return true;
   }
-  if (mean_count < kThresh) {
+  if (mean_count < steady_count) {
     once_ = false;
+    return false;
   }
   return false;
+}
+
+ApriltagsFilterNovel::ApriltagsFilterNovel() {}
+void ApriltagsFilterNovel::Reset() {
+  history_ = ApriltagsHistory();
+}
+bool ApriltagsFilterNovel::AddApriltags(const ApriltagDetections& detections,
+                                        int window_size) {
+  const int n_tags = detections.detections_size();
+  if (n_tags == 0) {
+    Reset();
+    return false;
+  }
+  ApriltagsHistory new_history;
+  double mean_distance = 0;
+  double mean_distance_to_last = 0.0;
+  for (const auto& detection : detections.detections()) {
+    auto entry = history_.GetEntry(detection);
+    mean_distance += entry.distance_to_first;
+    new_history.StoreEntry(entry);
+  }
+
+  history_ = new_history;
+  mean_distance = mean_distance / n_tags;
+  LOG(INFO) << "mean_distance: " << mean_distance << " n_tags: " << n_tags;
+  bool add_tag = mean_distance > window_size;
+  if(add_tag) { Reset();}
+  return add_tag;
 }
 
 }  // namespace perception

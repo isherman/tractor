@@ -27,6 +27,16 @@ DEFINE_string(video_dataset, "",
 DEFINE_string(camera_name, "", "Camera frame name.");
 
 DEFINE_bool(filter_stable_tags, false, "Run filter for stable tags.");
+DEFINE_bool(disable_reprojection_images, false,
+            "Disable output of reprojection images.");
+DEFINE_int32(steady_count, 0, "Number of frames to hold steady.");
+DEFINE_int32(steady_window_size, 0,
+             "Size of window for stable tag detection in pixels.");
+
+DEFINE_int32(novel_window_size, 0,
+             "Size of window to determine if detection is novel.");
+
+DEFINE_string(distortion_model, "", "Specify a distortion model.");
 
 typedef farm_ng::core::Event EventPb;
 using farm_ng::core::ArchiveProtobufAsBinaryResource;
@@ -83,6 +93,11 @@ class CalibrateIntrinsicsProgram {
 
     IntrinsicModel solved_model_pb =
         SolveIntrinsicsModel(InitialIntrinsicModelFromConfig(configuration_));
+
+    if (solved_model_pb.solver_status() ==
+        SolverStatus::SOLVER_STATUS_CONVERGED) {
+      ModelError(&solved_model_pb, FLAGS_disable_reprojection_images);
+    }
 
     LOG(INFO) << "Initial model computed.";
 
@@ -166,7 +181,28 @@ int Main(farm_ng::core::EventBus& bus) {
       ContentTypeProtobufJson<CreateVideoDatasetResult>());
   config.set_camera_name(FLAGS_camera_name);
   config.set_filter_stable_tags(FLAGS_filter_stable_tags);
+  if (!FLAGS_distortion_model.empty()) {
+    farm_ng::perception::CameraModel::DistortionModel distortion_model;
+    if (!farm_ng::perception::CameraModel::DistortionModel_Parse(
+            FLAGS_distortion_model, &distortion_model)) {
+      LOG(INFO) << "Bad distortion model name.";
+      LOG(INFO)
+          << farm_ng::perception::CameraModel::DistortionModel_descriptor()
+                 ->DebugString();
+      return -1;
+    }
+    config.set_distortion_model(distortion_model);
+  }
+  if (FLAGS_steady_window_size > 0) {
+    config.mutable_steady_window_size()->set_value(FLAGS_steady_window_size);
+  }
+  if (FLAGS_steady_count > 0) {
+    config.mutable_steady_count()->set_value(FLAGS_steady_count);
+  }
 
+  if (FLAGS_novel_window_size > 0) {
+    config.mutable_novel_window_size()->set_value(FLAGS_novel_window_size);
+  }
   farm_ng::calibration::CalibrateIntrinsicsProgram program(bus, config,
                                                            FLAGS_interactive);
   return program.run();
