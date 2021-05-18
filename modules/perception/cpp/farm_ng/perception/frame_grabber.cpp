@@ -32,8 +32,8 @@ int FrameGrabber::AddFrameGrabberFactory(const std::string& frame_grabber_name,
     std::cerr << "FrameGrabberFactory Name already registered: "
               << frame_grabber_name << std::endl;
   } else {
-    std::cerr << "FramgeGrabberFactory registered for name: "
-              << frame_grabber_name << std::endl;
+    //std::cerr << "FramgeGrabberFactory registered for name: "
+    //          << frame_grabber_name << std::endl;
   }
   return 0;
 }

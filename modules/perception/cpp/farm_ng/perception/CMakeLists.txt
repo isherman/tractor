@@ -56,6 +56,7 @@ farm_ng_add_library(farm_ng_perception
     robot_arm_fk.h
     tensor.h
     create_video_dataset_program.h
+    sophus_protobuf.h
     ${h_files}
   LINK_LIBRARIES
     farm_ng_perception_protobuf

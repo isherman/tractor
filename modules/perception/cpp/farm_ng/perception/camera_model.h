@@ -18,16 +18,16 @@ class CameraModelJetMap {
   static int constexpr num_parameters = 12;
 
   explicit CameraModelJetMap(const CameraModel& camera_model)
-      : storage_({0.}),
+      : storage_({T(0.)}),
         camera_model_(camera_model),
         raw_model_(storage_.data()) {
-    storage_[0] = camera_model_.fx();
-    storage_[1] = camera_model_.fy();
-    storage_[2] = camera_model_.cx();
-    storage_[3] = camera_model_.cy();
+    storage_[0] = T(camera_model_.fx());
+    storage_[1] = T(camera_model_.fy());
+    storage_[2] = T(camera_model_.cx());
+    storage_[3] = T(camera_model_.cy());
     CHECK_LE(camera_model_.distortion_coefficients_size(), 8);
     for (int i = 0; i < camera_model_.distortion_coefficients_size(); ++i) {
-      storage_[4 + i] = camera_model_.distortion_coefficients(i);
+      storage_[4 + i] = T(camera_model_.distortion_coefficients(i));
     }
   }
   explicit CameraModelJetMap(const T* raw_model,
