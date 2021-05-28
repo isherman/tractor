@@ -18,10 +18,10 @@ void ImageLoader::OpenVideo(const Resource& resource) {
   CHECK_EQ(resource.content_type(), "video/mp4");
 
   if (!capture_) {
-    video_name_ = (GetBlobstoreRoot() / resource.path()).string();
+    video_name_ = farm_ng::core::NativePathFromResourcePath(resource).string();
     capture_.reset(new cv::VideoCapture(video_name_));
   } else {
-    if (video_name_ != (GetBlobstoreRoot() / resource.path()).string()) {
+    if (video_name_ != farm_ng::core::NativePathFromResourcePath(resource).string()) {
       capture_.reset(nullptr);
       OpenVideo(resource);
     }
@@ -45,12 +45,12 @@ cv::Mat ImageLoader::LoadImage(const Image& image) {
     CHECK_EQ(frame_number, uint32_t(capture_->get(cv::CAP_PROP_POS_FRAMES)));
     *capture_ >> frame;
   } else {
-    frame = cv::imread((GetBlobstoreRoot() / image.resource().path()).string(),
+    frame = cv::imread(farm_ng::core::NativePathFromResourcePath(image.resource()).string(),
                        cv::IMREAD_UNCHANGED);
   }
   if (frame.empty()) {
     LOG(WARNING) << "Could not load image: "
-                 << (GetBlobstoreRoot() / image.resource().path()).string();
+                 << farm_ng::core::NativePathFromResourcePath(image.resource()).string();
     frame = cv::Mat::zeros(cv::Size(image.camera_model().image_width(),
                                     image.camera_model().image_height()),
                            CV_8UC3);
@@ -76,12 +76,12 @@ cv::Mat ImageLoader::LoadDepthmap(const Image& image) {
   }
   cv::Mat frame;
   frame = cv::imread(
-      (GetBlobstoreRoot() / image.depthmap().resource().path()).string(),
+      farm_ng::core::NativePathFromResourcePath(image.depthmap().resource()).string(),
       cv::IMREAD_UNCHANGED);
   if (frame.empty()) {
     LOG(FATAL)
         << "Could not load depthmap: "
-        << (GetBlobstoreRoot() / image.depthmap().resource().path()).string();
+        << farm_ng::core::NativePathFromResourcePath(image.depthmap().resource()).string();
   }
   CHECK(!frame.empty());
   if (frame.size().width != image.camera_model().image_width() ||
@@ -142,7 +142,7 @@ void ImageResourcePayloadToData(core::Resource* resource) {
         << resource->ShortDebugString();
     return;
   }
-  std::string bin_path = (core::GetBlobstoreRoot() / resource->path()).string();
+  std::string bin_path = farm_ng::core::NativePathFromResourcePath(*resource).string();
 
   LOG(INFO) << "Reading " << bin_path;
 

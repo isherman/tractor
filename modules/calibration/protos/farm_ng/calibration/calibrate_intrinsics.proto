@@ -49,3 +49,10 @@ message CalibrateIntrinsicsResult {
   google.protobuf.Timestamp stamp_begin = 6;
   google.protobuf.Timestamp stamp_end = 7;
 }
+
+message GroupCalibrateIntrinsicsResult {
+
+  // Multiple CalibrateIntrinsicResult
+  repeated farm_ng.core.Resource calibrate_intrinsics_results = 1;
+
+}

@@ -27,6 +27,9 @@ message CreateVideoDatasetConfiguration {
   // Number of frames to skip
   google.protobuf.Int32Value skip_frames = 6;
 
+  // Optional array of calibration data
+  repeated farm_ng.core.Resource group_intrinsic_calibration = 7;
+
 }
 
 

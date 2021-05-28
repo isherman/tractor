@@ -22,6 +22,7 @@
 #include "farm_ng/perception/create_video_dataset_program.h"
 #include "farm_ng/perception/image.pb.h"
 
+
 typedef farm_ng::core::Event EventPb;
 using farm_ng::core::ArchiveProtobufAsJsonResource;
 using farm_ng::core::BUCKET_VIDEO_DATASETS;
@@ -50,6 +51,16 @@ CreateVideoDatasetProgram::CreateVideoDatasetProgram(
   bus_.GetEventSignal()->connect(std::bind(&CreateVideoDatasetProgram::on_event,
                                            this, std::placeholders::_1));
   on_timer(boost::system::error_code());
+
+  // initialize camera calibration map
+  for (const farm_ng::core::Resource &resource : configuration_.group_intrinsic_calibration())
+  {
+    // expand the resource into a CameraModel
+    // store the camera model under the appropriate name
+
+    CameraModel m = farm_ng::core::ReadProtobufFromResource<CameraModel>(resource);
+    intrinsic_map_[m.frame_name()] = m;
+  }
 }
 
 int CreateVideoDatasetProgram::run() {
@@ -92,7 +103,7 @@ int CreateVideoDatasetProgram::run() {
         << " file does not exist.";
 
     cv::VideoCapture capture(video_path);
-    std::optional<CameraModel> camera_model;
+    CameraModel camera_model;
 
     std::optional<ApriltagDetector> detector;
 
@@ -114,16 +125,25 @@ int CreateVideoDatasetProgram::run() {
       LOG(INFO)
           << configuration_.video_file_cameras(camera_id).camera_frame_name()
           << " Frame: " << image_pb.frame_number().value() << " msec: " << msec;
-      if (!camera_model) {
+
+
+      auto camera_name = configuration_.video_file_cameras(camera_id).camera_frame_name();
+
+      if (intrinsic_map_.find(camera_name) == intrinsic_map_.end()) {
         camera_model = DefaultCameraModel(
-            configuration_.video_file_cameras(camera_id).camera_frame_name(),
-            image.size().width, image.size().height);
-        detector = ApriltagDetector(*camera_model, nullptr, &apriltag_config);
-        image_pb.mutable_camera_model()->CopyFrom(*camera_model);
+              camera_name,
+              image.size().width, image.size().height);
+      }
+      else {
+        // camera does exist
+        camera_model = intrinsic_map_[camera_name];
       }
 
-      CHECK_EQ(camera_model->image_width(), image.size().width);
-      CHECK_EQ(camera_model->image_height(), image.size().height);
+      detector = ApriltagDetector(camera_model, nullptr, &apriltag_config);
+      image_pb.mutable_camera_model()->CopyFrom(camera_model);
+
+      CHECK_EQ(camera_model.image_width(), image.size().width);
+      CHECK_EQ(camera_model.image_height(), image.size().height);
 
       cv::Mat gray;
       if (image.channels() == 3) {
@@ -137,7 +157,7 @@ int CreateVideoDatasetProgram::run() {
       auto stamp =
           google::protobuf::util::TimeUtil::NanosecondsToTimestamp(msec * 1e9);
       log_writer.Write(
-          MakeEvent(camera_model->frame_name() + "/image", image_pb, stamp));
+          MakeEvent(camera_model.frame_name() + "/image", image_pb, stamp));
 
       bool first_frame_for_camera = true;
       for (auto& entry : *status_.mutable_per_camera_num_frames()) {
@@ -160,7 +180,7 @@ int CreateVideoDatasetProgram::run() {
         }
         auto detections = detector->Detect(gray, stamp, scale);
         detections.mutable_image()->CopyFrom(image_pb);
-        log_writer.Write(MakeEvent(camera_model->frame_name() + "/apriltags",
+        log_writer.Write(MakeEvent(camera_model.frame_name() + "/apriltags",
                                    detections, stamp));
 
         for (auto const& detection : detections.detections()) {

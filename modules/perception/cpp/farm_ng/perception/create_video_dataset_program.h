@@ -4,6 +4,8 @@
 #include "farm_ng/core/ipc.h"
 
 #include "farm_ng/perception/create_video_dataset.pb.h"
+#include "farm_ng/perception/camera_model.pb.h"
+#include <map>
 
 namespace farm_ng {
 namespace perception {
@@ -29,8 +31,10 @@ class CreateVideoDatasetProgram {
  private:
   core::EventBus& bus_;
   boost::asio::deadline_timer timer_;
+  std::map<std::string, farm_ng::perception::CameraModel> intrinsic_map_;
   CreateVideoDatasetConfiguration configuration_;
   CreateVideoDatasetStatus status_;
+
 };
 
 }  // namespace perception
