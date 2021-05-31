@@ -44,9 +44,16 @@ struct FlowImage {
   google::protobuf::Timestamp stamp;
   Sophus::SE3d camera_pose_world;
   std::optional<cv::Mat> image;
+  std::optional<cv::Mat> crowding_mask;
   std::optional<std::vector<cv::Mat>> pyramid;
   cv::Mat debug_trails;
   std::unordered_map<uint64_t, FlowPointImage> flow_points;
+  void reset_image_data() {
+    image.reset();
+    crowding_mask.reset();
+    pyramid.reset();
+    debug_trails = cv::Mat();
+  }
 };
 
 struct FlowBlock {
@@ -60,7 +67,8 @@ typedef std::unordered_map<uint64_t, std::vector<FlowBlock>> FlowBlocks;
 class FlowBookKeeper {
  public:
   FlowBookKeeper(farm_ng::perception::CameraModel camera_model,
-                 size_t max_history);
+                 size_t max_history,
+                 cv::Mat image_mask);
 
   // Add an image, assumed to be from the same camera, and close to periodic,
   // meaning from the same consecutive time series of images captured from the

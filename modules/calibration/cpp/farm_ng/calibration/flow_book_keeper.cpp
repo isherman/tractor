@@ -6,11 +6,9 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/video.hpp>
 
-#include "farm_ng/core/blobstore.h"
 #include "farm_ng/perception/camera_model.h"
 #include "farm_ng/perception/eigen_cv.h"
 
-using farm_ng::core::Bucket;
 using farm_ng::perception::CameraModel;
 using farm_ng::perception::EigenToCvPoint;
 using farm_ng::perception::EigenToCvPoint2f;
@@ -19,11 +17,11 @@ using farm_ng::perception::ReprojectPixelToPoint;
 namespace farm_ng {
 namespace calibration {
 
-FlowBookKeeper::FlowBookKeeper(CameraModel camera_model, size_t max_history)
+FlowBookKeeper::FlowBookKeeper(CameraModel camera_model, size_t max_history, cv::Mat image_mask)
     : max_history_(max_history),
       camera_model_(camera_model),
-      flow_window_(21, 21),
-      flow_max_levels_(3) {
+      flow_window_(41, 41),
+      flow_max_levels_(4) {
   cv::RNG rng;
   for (int i = 0; i < 1000; ++i) {
     colors_.push_back(cv::Scalar(rng.uniform(0, 255), rng.uniform(0, 255),
@@ -31,20 +29,11 @@ FlowBookKeeper::FlowBookKeeper(CameraModel camera_model, size_t max_history)
   }
   int image_width = camera_model_.image_width();
   int image_height = camera_model_.image_height();
-  std::string mask_path =
-      (GetBucketRelativePath(Bucket::BUCKET_CONFIGURATIONS) /
-       "tracking_mask.png")
-          .string();
-  lens_exclusion_mask_ = cv::imread(mask_path,
+  if(!image_mask.empty()) {
+  lens_exclusion_mask_ = image_mask;
+  }else {
+      lens_exclusion_mask_ = cv::Mat::ones(cv::Size(image_width, image_height), CV_8UC1)*255;
 
-                                    cv::IMREAD_GRAYSCALE);
-  if (lens_exclusion_mask_.empty()) {
-    lens_exclusion_mask_ =
-        cv::Mat::zeros(cv::Size(image_width, image_height), CV_8UC1);
-    cv::circle(lens_exclusion_mask_,
-               cv::Point(image_width / 2, image_height / 2),
-               (image_width / 2.0) * 0.8, cv::Scalar::all(255), -1);
-    cv::imwrite(mask_path, lens_exclusion_mask_);
   }
 }
 
@@ -68,9 +57,9 @@ uint64_t FlowBookKeeper::AddImage(cv::Mat image,
   flow_image.id = image_id_gen_++;
   if (flow_image.id > 0) {
     FlowFromPrevious(&flow_image, debug);
-    flow_images_.at(flow_image.id - 1).image.reset();
-    flow_images_.at(flow_image.id - 1).pyramid.reset();
-    flow_images_.at(flow_image.id - 1).debug_trails = cv::Mat();
+    auto& prev_flow_image = flow_images_.at(flow_image.id -1);
+    // we don't want to leek too much memory, TODO revisit this if we need to keep some keyframes in memory for recovery.
+    prev_flow_image.reset_image_data();
   }
   DetectGoodCorners(&flow_image);
   flow_images_.insert(std::make_pair(flow_image.id, flow_image));
@@ -167,8 +156,11 @@ void FlowBookKeeper::FlowFromPrevious(FlowImage* flow_image, bool debug) {
     if (cv::norm(prev_bwd_points[i] - prev_points[i]) > 1.0) {
       continue;
     }
-    CHECK(cv::Rect(cv::Point(0, 0), lens_exclusion_mask_.size())
-              .contains(curr_points[i]));
+
+      if(!cv::Rect(cv::Point(0, 0), lens_exclusion_mask_.size())
+              .contains(curr_points[i])) {
+                continue;
+              }
 
     if (!lens_exclusion_mask_.at<uint8_t>(curr_points[i])) {
       continue;
@@ -184,7 +176,7 @@ void FlowBookKeeper::FlowFromPrevious(FlowImage* flow_image, bool debug) {
     // Crowding tends to occur when moving backwards,negatively along the
     // camera Z axis, as points that were close the camera get farther away
     // and closer together.
-    int crowd_window = 31;
+    int crowd_window = 21;
     cv::rectangle(crowding_mask,
                   cv::Rect(curr_points[i].x - crowd_window / 2,
                            curr_points[i].y - crowd_window / 2, crowd_window,
@@ -212,7 +204,7 @@ void FlowBookKeeper::FlowFromPrevious(FlowImage* flow_image, bool debug) {
       if (world_it->second.image_ids.size() >= 5) {
         cv::Scalar color = Color(flow_point.id);
         cv::line(flow_image->debug_trails, prev_match[i], curr_match[i], color);
-        cv::circle(debug_image, curr_match[i], 3, color, -1);
+        cv::circle(debug_image, curr_match[i], 5, color, -1);
       }
     }
   }
@@ -283,6 +275,8 @@ void FlowBookKeeper::DetectGoodCorners(FlowImage* flow_image) {
   int fast_threshold = 7;
   cv::Mat mask = lens_exclusion_mask_.clone();
   RenderMaskOfFlowPoints(*flow_image, &mask, 80);
+  flow_image->crowding_mask = mask.clone();
+
   cv::Mat detect_image = *(flow_image->image) & mask;
 
   std::vector<cv::KeyPoint> keypoints;

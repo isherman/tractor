@@ -99,7 +99,7 @@ VisualOdometer::VisualOdometer(const CameraModel& camera_model,
                                const BaseToCameraModel& base_to_camera_model,
                                size_t max_history)
     : camera_model_(camera_model),
-      flow_(camera_model, max_history),
+      flow_(camera_model, max_history, cv::Mat()),
       base_to_camera_model_(base_to_camera_model),
       odometry_pose_base_(Sophus::SE3d::rotX(0.0)) {
   ProtoToSophus(base_to_camera_model_.base_pose_camera().a_pose_b(),

@@ -282,6 +282,27 @@ CameraModel Default1080HDCameraModel();
 CameraModel DefaultCameraModel(const std::string& frame_name, int width,
                                int height);
 
+inline CameraModel CreateCameraModel(double horizontal_fov, int image_width,
+                              int image_height) {
+  CameraModel model;
+  model.set_image_width(image_width);
+  model.set_image_height(image_height);
+  model.set_cx((model.image_width() - 1) / 2.0);
+  model.set_cy((model.image_height() - 1) / 2.0);
+  double fx = (image_width / 2.0) / std::tan(horizontal_fov / 2);
+  model.set_fx(fx);
+  model.set_fy(model.fx());
+  model.set_distortion_model(
+      CameraModel::DISTORTION_MODEL_INVERSE_BROWN_CONRADY);
+  model.add_distortion_coefficients(0.0);
+  model.add_distortion_coefficients(0.0);
+  model.add_distortion_coefficients(0.0);
+  model.add_distortion_coefficients(0.0);
+  model.add_distortion_coefficients(0.0);
+  model.set_frame_name("camera");
+  return model;
+}
+
 }  // namespace perception
 }  // namespace farm_ng
 
