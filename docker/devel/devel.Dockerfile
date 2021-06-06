@@ -1,12 +1,15 @@
 ARG base_image=ubuntu:18.04
 
+ARG cli11_tag=farmng/build-cli11:latest
+ARG libfmt_tag=farmng/build-libfmt:latest
 ARG apriltag_tag=farmng/build-apriltag:latest
 ARG ceres_tag=farmng/build-ceres:latest
 ARG grpc_tag=farmng/build-grpc:latest
 ARG opencv_tag=farmng/build-opencv:latest
 ARG sophus_tag=farmng/build-sophus:latest
 
-
+FROM $libfmt_tag AS libfmt
+FROM $cli11_tag AS cli11
 FROM $apriltag_tag AS apriltag
 FROM $ceres_tag AS ceres
 FROM $grpc_tag AS grpc
@@ -30,7 +33,7 @@ RUN apt-get update --fix-missing && \
     apt-get clean
 
 RUN apt-key adv --keyserver keys.gnupg.net --recv-key F6E65AC044F831AC80A06380C8B3A55A6F3EFCDE || apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-key && \
-    add-apt-repository "deb http://realsense-hw-public.s3.amazonaws.com/Debian/apt-repo bionic main" -u
+    add-apt-repository "deb https://librealsense.intel.com/Debian/apt-repo bionic main" -u
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
@@ -127,6 +130,8 @@ RUN BIN="/usr/local/bin" && \
 	   chmod +x "${BIN}/${BINARY_NAME}"
 
 # [docs] copy_third_party
+COPY --from=libfmt $PREFIX $PREFIX
+COPY --from=cli11 $PREFIX $PREFIX
 COPY --from=apriltag $PREFIX $PREFIX
 COPY --from=ceres $PREFIX $PREFIX
 COPY --from=grpc $PREFIX $PREFIX

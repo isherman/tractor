@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        image: ["apriltag", "opencv", "grpc", "ceres", "sophus"]
+        image: ["libfmt", "cli11", "apriltag", "opencv", "grpc", "ceres", "sophus"]
     # [docs] third_party
     steps:
       - name: Checkout
@@ -94,14 +94,7 @@ jobs:
           name: ${{ matrix.image }}-digest
           path: docker/devel/${{ matrix.image }}-digest.txt
 
-      - name: Commit changes
-        if: steps.docker_file_hash.outputs.cache-hit != 'true'
-        uses: EndBug/add-and-commit@v6
-        with:
-          author_name: Devel Build Action
-          author_email: devel_build@noreply
-          message: 'Update ${{ matrix.image }} digest: farmng/build-${{ matrix.image }}@${{ steps.docker_build.outputs.digest }}'
-          add: docker/devel/${{ matrix.image }}-digest.txt
+
 
   devel_build:
     needs: third_party_build
@@ -158,15 +151,31 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Download digests
+        uses: actions/download-artifact@v2
+        with:
+          path: docker/devel/
+
+      - name: Commit changes
+        if: steps.docker_file_hash.outputs.cache-hit != 'true'
+        uses: EndBug/add-and-commit@v7
+        with:
+          author_name: Devel Build Action
+          author_email: devel_build@noreply
+          message: 'Update digests.'
+          add: "docker/devel/*-digest.txt"
+
       - name: Get digest
         if: steps.docker_file_hash.outputs.cache-hit != 'true'
         id: vars
         run: |
-          echo ::set-output name=apriltag::$(cat docker/devel/apriltag-digest.txt)
-          echo ::set-output name=ceres::$(cat docker/devel/ceres-digest.txt)
-          echo ::set-output name=grpc::$(cat docker/devel/grpc-digest.txt)
-          echo ::set-output name=opencv::$(cat docker/devel/opencv-digest.txt)
-          echo ::set-output name=sophus::$(cat docker/devel/sophus-digest.txt)
+          echo ::set-output name=cli11::$(cat docker/devel/cli11-digest/cli11-digest.txt)
+          echo ::set-output name=libfmt::$(cat docker/devel/libfmt-digest/libfmt-digest.txt)
+          echo ::set-output name=apriltag::$(cat docker/devel/apriltag-digest/apriltag-digest.txt)
+          echo ::set-output name=ceres::$(cat docker/devel/ceres-digest/ceres-digest.txt)
+          echo ::set-output name=grpc::$(cat docker/devel/grpc-digest/grpc-digest.txt)
+          echo ::set-output name=opencv::$(cat docker/devel/opencv-digest/opencv-digest.txt)
+          echo ::set-output name=sophus::$(cat docker/devel/sophus-digest/sophus-digest.txt)
       - name: Build and push
         if: steps.docker_file_hash.outputs.cache-hit != 'true'
         id: docker_build
@@ -176,6 +185,8 @@ jobs:
           context: ./docker/devel
           file: ./docker/devel/devel.Dockerfile
           build-args: |
+            libfmt_tag=farmng/build-libfmt@${{steps.vars.outputs.libfmt}}
+            cli11_tag=farmng/build-cli11@${{steps.vars.outputs.cli11}}
             apriltag_tag=farmng/build-apriltag@${{steps.vars.outputs.apriltag}}
             ceres_tag=farmng/build-ceres@${{steps.vars.outputs.ceres}}
             grpc_tag=farmng/build-grpc@${{steps.vars.outputs.grpc}}

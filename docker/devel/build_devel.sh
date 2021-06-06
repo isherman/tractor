@@ -1,5 +1,7 @@
 #!/bin/bash -ex
 
+./build_thirdparty.sh cli11
+./build_thirdparty.sh libfmt
 ./build_thirdparty.sh grpc
 ./build_thirdparty.sh opencv
 ./build_thirdparty.sh sophus
