@@ -2,6 +2,7 @@ find_package(Boost REQUIRED system filesystem)
 find_package(gflags REQUIRED COMPONENTS shared)
 find_package(Glog REQUIRED)
 
+
 set(_CPP)
 set(_HEADERS)
 foreach(x blobstore event_log_reader event_log init ipc thread_pool)

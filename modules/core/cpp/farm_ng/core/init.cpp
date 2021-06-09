@@ -51,9 +51,8 @@ void GlogFailureFunction() {
   std::quick_exit(-1);
 }
 
-int Main(int argc, char** argv, int (*main_func)(EventBus&),
-         void (*cleanup_func)(EventBus&)) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+int MainNoGFlags(int argc, char** argv, std::function<int(EventBus&)> main_func,
+                 void (*cleanup_func)(EventBus&)) {
   FLAGS_logtostderr = 1;
 
   std::string filename = boost::filesystem::path(argv[0]).filename().string();
@@ -88,6 +87,12 @@ int Main(int argc, char** argv, int (*main_func)(EventBus&),
     LOG(ERROR) << "unkown exception thrown.";
     return 1;
   }
+}
+
+int Main(int argc, char** argv, std::function<int(EventBus&)> main_func,
+         void (*cleanup_func)(EventBus&)) {
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  return MainNoGFlags(argc, argv, std::move(main_func), cleanup_func);
 }
 
 }  // namespace core
