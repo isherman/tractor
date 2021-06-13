@@ -28,9 +28,9 @@
               FARM_NG_IMPL_LOG_PRINTLN_ZERO(),                                 \
               FARM_NG_IMPL_LOG_PRINTLN_VARG(__VA_ARGS__))
 
-#define FARM_NG_IMPL_LOG_HEADER(msg)                                  \
-  FARM_NG_IMPL_LOG_PRINTLN("[FARM_NG {} in {}:{} {}]", msg, __FILE__, \
-                           __LINE__, __PRETTY_FUNCTION__)
+#define FARM_NG_IMPL_LOG_HEADER(msg)                        \
+  FARM_NG_IMPL_LOG_PRINTLN("[FARM_NG {} in {} {}:{}]", msg, \
+                           __PRETTY_FUNCTION__, __FILE__, __LINE__)
 
 #define FARM_NG_IMPL_CHECK_OP(symbol, name_str, lhs, rhs, ...)               \
   do {                                                                       \
@@ -41,7 +41,7 @@
       FARM_NG_IMPL_LOG_PRINTLN(__VA_ARGS__);                                 \
       FARM_NG_ABORT();                                                       \
     }                                                                        \
-  } while (true)
+  } while (false)
 // End (Impl details)
 
 #define FARM_NG_ABORT() ::std::abort();
@@ -62,7 +62,7 @@
       FARM_NG_IMPL_LOG_HEADER("LOG INFO EVERY N( =" #N " )"); \
       FARM_NG_IMPL_LOG_PRINTLN(cstr, ##__VA_ARGS__);          \
     }                                                         \
-  } while (true)
+  } while (false)
 
 // for now this is just the same log level as LOG_INFO
 #define FARM_NG_LOG_VERBOSE(cstr, ...)    \
@@ -95,7 +95,7 @@
       FARM_NG_IMPL_LOG_PRINTLN(__VA_ARGS__);                      \
       FARM_NG_ABORT();                                            \
     }                                                             \
-  } while (true)
+  } while (false)
 
 #define FARM_NG_CHECK_EQ(lhs, rhs, ...) \
   FARM_NG_IMPL_CHECK_OP(==, "EQ", lhs, rhs, __VA_ARGS__)
