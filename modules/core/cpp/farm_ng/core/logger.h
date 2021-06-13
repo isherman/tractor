@@ -1,62 +1,119 @@
 #ifndef FARM_NG_LOGGER_H_
 #define FARM_NG_LOGGER_H_
 
-#undef FMT_STRING_ALIAS
-#define FMT_STRING_ALIAS 1
+#include <boost/preprocessor/comparison/equal.hpp>
+#include <boost/preprocessor/control/if.hpp>
+#include <boost/preprocessor/variadic/size.hpp>
 
-#include <fmt/core.h>
-#include <fmt/format.h>
-
+#include "farm_ng/core/format.h"
 
 // Begin (Impl details)
-#define FARM_NG_LOG_IMPL_PRINTLN(cstr, ...) \
-  ::fmt::print(FMT_STRING(cstr "\n"), ##__VA_ARGS__)
+#define FARM_NG_IMPL_LOG_PRINTLN_ZERO()
 
-#define FARM_NG_LOG_IMPL_HEADER(msg)                                  \
-  FARM_NG_LOG_IMPL_PRINTLN("[FARM_NG {} in {}:{} {}]", msg, __FILE__, \
+#define FARM_NG_IMPL_LOG_PRINTLN_ONE(cstr) \
+  ::fmt::print(FMT_STRING(cstr));          \
+  ::fmt::print("\n")
+
+#define FARM_NG_IMPL_LOG_PRINTLN_ARGS(cstr, ...) \
+  ::fmt::print(FMT_STRING(cstr), __VA_ARGS__);   \
+  ::fmt::print("\n")
+
+#define FARM_NG_IMPL_LOG_PRINTLN_VARG(cstr, ...)                              \
+  BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(cstr, ##__VA_ARGS__), 1), \
+              FARM_NG_IMPL_LOG_PRINTLN_ONE(cstr),                             \
+              FARM_NG_IMPL_LOG_PRINTLN_ARGS(cstr, ##__VA_ARGS__))
+
+#define FARM_NG_IMPL_LOG_PRINTLN(...)                                          \
+  BOOST_PP_IF(BOOST_PP_EQUAL(BOOST_PP_VARIADIC_SIZE(dummy, ##__VA_ARGS__), 1), \
+              FARM_NG_IMPL_LOG_PRINTLN_ZERO(),                                 \
+              FARM_NG_IMPL_LOG_PRINTLN_VARG(__VA_ARGS__))
+
+#define FARM_NG_IMPL_LOG_HEADER(msg)                                  \
+  FARM_NG_IMPL_LOG_PRINTLN("[FARM_NG {} in {}:{} {}]", msg, __FILE__, \
                            __LINE__, __PRETTY_FUNCTION__)
+
+#define FARM_NG_IMPL_CHECK_OP(symbol, name_str, lhs, rhs, ...)               \
+  do {                                                                       \
+    if (!((lhs)symbol(rhs))) {                                               \
+      FARM_NG_IMPL_LOG_HEADER("CHECK_" name_str " failed");                  \
+      FARM_NG_IMPL_LOG_PRINTLN("Not true: {} " #symbol " {}\n{}\nvs.\n{}\n", \
+                               #lhs, #rhs, lhs, rhs);                        \
+      FARM_NG_IMPL_LOG_PRINTLN(__VA_ARGS__);                                 \
+      FARM_NG_ABORT();                                                       \
+    }                                                                        \
+  } while (true)
 // End (Impl details)
 
-#define FARM_NG_ABORT() std::abort();
+#define FARM_NG_ABORT() ::std::abort();
 
 // Begin (Start LOG macros)
 #define FARM_NG_LOG_INFO(cstr, ...)    \
-  FARM_NG_LOG_IMPL_HEADER("LOG INFO"); \
-  FARM_NG_LOG_IMPL_PRINTLN(cstr, ##__VA_ARGS__);
+  FARM_NG_IMPL_LOG_HEADER("LOG INFO"); \
+  FARM_NG_IMPL_LOG_PRINTLN(cstr, ##__VA_ARGS__)
+
+#define FARM_NG_LOG_INFO_EVERY_N(N, cstr, ...)                \
+  do {                                                        \
+    static std::atomic<int> counter(0);                       \
+    ++counter;                                                \
+    if (counter > (N)) {                                      \
+      counter -= (N);                                         \
+    }                                                         \
+    if (counter == 1) {                                       \
+      FARM_NG_IMPL_LOG_HEADER("LOG INFO EVERY N( =" #N " )"); \
+      FARM_NG_IMPL_LOG_PRINTLN(cstr, ##__VA_ARGS__);          \
+    }                                                         \
+  } while (true)
+
+// for now this is just the same log level as LOG_INFO
+#define FARM_NG_LOG_VERBOSE(cstr, ...)    \
+  FARM_NG_IMPL_LOG_HEADER("LOG VERBOSE"); \
+  FARM_NG_IMPL_LOG_PRINTLN(cstr, ##__VA_ARGS__)
+
+// for now this is just the same log level as LOG_INFO
+#define FARM_NG_LOG_WARNING(cstr, ...)    \
+  FARM_NG_IMPL_LOG_HEADER("LOG WARNING"); \
+  FARM_NG_IMPL_LOG_PRINTLN(cstr, ##__VA_ARGS__)
+
+// for now this is just the same log level as LOG_INFO
+#define FARM_NG_LOG_ERROR(cstr, ...)    \
+  FARM_NG_IMPL_LOG_HEADER("LOG ERROR"); \
+  FARM_NG_IMPL_LOG_PRINTLN(cstr, ##__VA_ARGS__)
+
 // End (LOG macros)
 
 // Begin (Start ASSERT macros)
 #define FARM_NG_FATAL(cstr, ...)                 \
-  do {                                           \
-    FARM_NG_LOG_IMPL_HEADER("FATAL error");      \
-    FARM_NG_LOG_IMPL_PRINTLN(cstr, __VA_ARGS__); \
-    FARM_NG_ABORT();                             \
+  FARM_NG_IMPL_LOG_HEADER("FATAL error");        \
+  FARM_NG_IMPL_LOG_PRINTLN(cstr, ##__VA_ARGS__); \
+  FARM_NG_ABORT()
+
+#define FARM_NG_CHECK(condition, ...)                             \
+  do {                                                            \
+    if (!(condition)) {                                           \
+      FARM_NG_IMPL_LOG_HEADER("FARM_NG_CHECK failed");            \
+      FARM_NG_IMPL_LOG_PRINTLN("bool({}) not true.", #condition); \
+      FARM_NG_IMPL_LOG_PRINTLN(__VA_ARGS__);                      \
+      FARM_NG_ABORT();                                            \
+    }                                                             \
   } while (true)
 
-#define FARM_NG_CHECK(condition, cstr, ...)                \
-  do {                                                     \
-    if (!condition) {                                      \
-      FARM_NG_LOG_IMPL_HEADER("CHECK failed");             \
-      FARM_NG_LOG_IMPL_PRINTLN("Not true: {}", condition); \
-      FARM_NG_LOG_IMPL_PRINTLN(cstr, ##__VA_ARGS__);       \
-      FARM_NG_ABORT();                                     \
-    }                                                      \
-  } while (true)
+#define FARM_NG_CHECK_EQ(lhs, rhs, ...) \
+  FARM_NG_IMPL_CHECK_OP(==, "EQ", lhs, rhs, __VA_ARGS__)
 
-#define FARM_NG_CHECK_EQ(lhs, rhs, cstr, ...)                                  \
-  do {                                                                         \
-    if (!((lhs) == (rhs))) {                                                   \
-      FARM_NG_LOG_IMPL_HEADER("CHECK_EQ failed");                              \
-      FARM_NG_LOG_IMPL_PRINTLN("Not true: {} == {}\n{}\nvs.\n{}\n" cstr, #lhs, \
-                               #rhs, lhs, rhs);                                \
-      FARM_NG_LOG_IMPL_PRINTLN(cstr, ##__VA_ARGS__);                           \
-      FARM_NG_ABORT();                                                         \
-    }                                                                          \
-  } while (true)
+#define FARM_NG_CHECK_NE(lhs, rhs, ...) \
+  FARM_NG_IMPL_CHECK_OP(!=, "NE", lhs, rhs, __VA_ARGS__)
+
+#define FARM_NG_CHECK_LE(lhs, rhs, ...) \
+  FARM_NG_IMPL_CHECK_OP(<=, "LE", lhs, rhs, __VA_ARGS__)
+
+#define FARM_NG_CHECK_LT(lhs, rhs, ...) \
+  FARM_NG_IMPL_CHECK_OP(<, "LT", lhs, rhs, __VA_ARGS__)
+
+#define FARM_NG_CHECK_GE(lhs, rhs, ...) \
+  FARM_NG_IMPL_CHECK_OP(>=, "GE", lhs, rhs, __VA_ARGS__)
+
+#define FARM_NG_CHECK_GT(lhs, rhs, ...) \
+  FARM_NG_IMPL_CHECK_OP(>, "GT", lhs, rhs, __VA_ARGS__)
 // End (Start ASSERT macros)
-
-namespace farm_ng {
-namespace core {}
-}  // namespace farm_ng
 
 #endif
