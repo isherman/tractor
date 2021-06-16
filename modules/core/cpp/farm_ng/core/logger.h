@@ -29,8 +29,8 @@
               FARM_NG_IMPL_LOG_PRINTLN_VARG(__VA_ARGS__))
 
 #define FARM_NG_IMPL_LOG_HEADER(msg)                        \
-  FARM_NG_IMPL_LOG_PRINTLN("[FARM_NG {} in {} {}:{}]", msg, \
-                           __PRETTY_FUNCTION__, __FILE__, __LINE__)
+  FARM_NG_IMPL_LOG_PRINTLN("[FARM_NG {} in {}:{}]", msg, \
+                           __FILE__, __LINE__)
 
 #define FARM_NG_IMPL_CHECK_OP(symbol, name_str, lhs, rhs, ...)               \
   do {                                                                       \
