@@ -35,7 +35,7 @@ module.exports = function (env, argv) {
       isEnvProduction && { loader: MiniCssExtractPlugin.loader },
       {
         loader: require.resolve("css-loader"),
-        options: cssOptions
+        options: cssOptions,
       },
       {
         // Options for PostCSS as we reference these options twice
@@ -51,19 +51,19 @@ module.exports = function (env, argv) {
               require("postcss-flexbugs-fixes"),
               require("postcss-preset-env")({
                 autoprefixer: {
-                  flexbox: "no-2009"
+                  flexbox: "no-2009",
                 },
-                stage: 3
+                stage: 3,
               }),
               // Adds PostCSS Normalize as the reset css with default options,
               // so that it honors browserslist config in package.json
               // which in turn let's users customize the target behavior as per their needs.
-              postcssNormalize()
+              postcssNormalize(),
             ],
-            sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment
-          }
-        }
-      }
+            sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
+          },
+        },
+      },
     ].filter(Boolean);
     if (preProcessor) {
       loaders.push(
@@ -71,14 +71,14 @@ module.exports = function (env, argv) {
           loader: require.resolve("resolve-url-loader"),
           options: {
             sourceMap: isEnvProduction ? shouldUseSourceMap : isEnvDevelopment,
-            root: path.resolve(__dirname, "src/")
-          }
+            root: path.resolve(__dirname, "src/"),
+          },
         },
         {
           loader: require.resolve(preProcessor),
           options: {
-            sourceMap: true
-          }
+            sourceMap: true,
+          },
         }
       );
     }
@@ -98,13 +98,13 @@ module.exports = function (env, argv) {
       publicPath: "/",
       // Use the future version of asset emitting logic,
       // which allows freeing memory of assets after emitting
-      futureEmitAssets: true
+      futureEmitAssets: true,
     },
     optimization: {
       // none yet
     },
     devServer: {
-      historyApiFallback: true
+      historyApiFallback: true,
     },
     devtool: isEnvProduction
       ? shouldUseSourceMap
@@ -115,7 +115,7 @@ module.exports = function (env, argv) {
       ? [
           require.resolve("webpack-dev-server/client") + "?/",
           require.resolve("webpack/hot/dev-server"),
-          path.resolve(__dirname, "src/index.tsx")
+          path.resolve(__dirname, "src/index.tsx"),
         ]
       : path.resolve(__dirname, "src/index.tsx"),
     resolve: { extensions: ["*", ".js", ".jsx", ".ts", ".tsx"] },
@@ -135,15 +135,15 @@ module.exports = function (env, argv) {
               loader: require.resolve("url-loader"),
               options: {
                 limit: imageInlineSizeLimit,
-                name: "static/media/[name].[hash:8].[ext]"
-              }
+                name: "static/media/[name].[hash:8].[ext]",
+              },
             },
             // Compile Typescript
             // Could potentially be replaced by babel7, which supports TS compilation
             {
               test: /\.(js|jsx|ts|tsx)$/,
               exclude: /(node_modules|bower_components)/,
-              loader: "ts-loader"
+              loader: "ts-loader",
             },
             // "postcss" loader applies autoprefixer to our CSS.
             // "css" loader resolves paths in CSS and adds assets as dependencies.
@@ -159,13 +159,13 @@ module.exports = function (env, argv) {
                 importLoaders: 1,
                 sourceMap: isEnvProduction
                   ? shouldUseSourceMap
-                  : isEnvDevelopment
+                  : isEnvDevelopment,
               }),
               // Don't consider CSS imports dead code even if the
               // containing package claims to have no side effects.
               // Remove this when webpack adds a warning or an error for this.
               // See https://github.com/webpack/webpack/issues/6571
-              sideEffects: true
+              sideEffects: true,
             },
             // Adds support for CSS Modules (https://github.com/css-modules/css-modules)
             // using the extension .module.css
@@ -177,9 +177,9 @@ module.exports = function (env, argv) {
                   ? shouldUseSourceMap
                   : isEnvDevelopment,
                 modules: {
-                  getLocalIdent: getCSSModuleLocalIdent
-                }
-              })
+                  getLocalIdent: getCSSModuleLocalIdent,
+                },
+              }),
             },
             // Opt-in support for SASS (using .scss or .sass extensions).
             // By default we support SASS Modules with the
@@ -192,7 +192,7 @@ module.exports = function (env, argv) {
                   importLoaders: 3,
                   sourceMap: isEnvProduction
                     ? shouldUseSourceMap
-                    : isEnvDevelopment
+                    : isEnvDevelopment,
                 },
                 "sass-loader"
               ),
@@ -200,7 +200,7 @@ module.exports = function (env, argv) {
               // containing package claims to have no side effects.
               // Remove this when webpack adds a warning or an error for this.
               // See https://github.com/webpack/webpack/issues/6571
-              sideEffects: true
+              sideEffects: true,
             },
             // Adds support for CSS Modules, but using SASS
             // using the extension .module.scss or .module.sass
@@ -213,11 +213,11 @@ module.exports = function (env, argv) {
                     ? shouldUseSourceMap
                     : isEnvDevelopment,
                   modules: {
-                    getLocalIdent: getCSSModuleLocalIdent
-                  }
+                    getLocalIdent: getCSSModuleLocalIdent,
+                  },
                 },
                 "sass-loader"
-              )
+              ),
             },
             // A catch-all loader for other types of files not captured above.
             // In development, serves assets with WebpackDevServer.
@@ -230,14 +230,17 @@ module.exports = function (env, argv) {
               // by webpacks internal loaders.
               exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
               options: {
-                name: "static/media/[name].[hash:8].[ext]"
-              }
-            }
+                name: "static/media/[name].[hash:8].[ext]",
+              },
+            },
             // ** STOP ** Are you adding a new loader?
             // Make sure to add the new loader(s) before the "file" loader.
-          ]
-        }
-      ]
+          ],
+        },
+      ],
+    },
+    node: {
+      fs: "empty",
     },
     plugins: [
       // Clears the output directory before each build
@@ -247,7 +250,7 @@ module.exports = function (env, argv) {
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin({
         inject: true,
-        template: "src/index.html"
+        template: "src/index.html",
       }),
       // This is necessary to emit hot updates (CSS and Fast Refresh):
       isEnvDevelopment && new webpack.HotModuleReplacementPlugin(),
@@ -255,8 +258,8 @@ module.exports = function (env, argv) {
       isEnvProduction &&
         new MiniCssExtractPlugin({
           filename: "static/css/[name].[contenthash:8].css",
-          chunkFilename: "static/css/[name].[contenthash:8].chunk.css"
-        })
-    ].filter(Boolean)
+          chunkFilename: "static/css/[name].[contenthash:8].chunk.css",
+        }),
+    ].filter(Boolean),
   };
 };

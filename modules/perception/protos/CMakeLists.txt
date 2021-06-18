@@ -11,6 +11,7 @@ farm_ng_add_protobufs(farm_ng_perception_protobuf
   ./farm_ng/perception/image.proto
   ./farm_ng/perception/imu.proto
   ./farm_ng/perception/kinematics.proto
+  ./farm_ng/perception/manis.proto
   ./farm_ng/perception/point_cloud.proto
   ./farm_ng/perception/tensor.proto
   DEPENDENCIES
