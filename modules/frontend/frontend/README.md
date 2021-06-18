@@ -12,6 +12,16 @@
 ### Install dependencies
 
 ```
+# Build proto libraries
+cd $FARM_NG_ROOT
+make protos
+
+# Install proto library dependencies
+cd $FARM_NG_ROOT/modules/frontend/frontend
+./install-proto-deps.sh
+
+# Install third-party libraries
+cd $FARM_NG_ROOT/modules/frontend/frontend
 yarn
 ```
 

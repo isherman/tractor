@@ -226,7 +226,7 @@ Attach to the container ``devel_workspace_1`` using **Remote-Containers: Attach 
 
    For additional background, see vscode documentation on `container-based workflows <https://code.visualstudio.com/docs/remote/attach-container>`_.
 
-Once you're attached, open the workspace file ``/workspace/tractor/workspace.code-workspace`` and install the suggested plugins.
+Once you're attached, open the workspace file ``/workspace/tractor/tractor.code-workspace`` and install the suggested plugins.
 
 Wait while ``vscode`` installs the extensions.
 

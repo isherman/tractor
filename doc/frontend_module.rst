@@ -133,6 +133,15 @@ Examples
 
 .. _section-frontend_development_server:
 
+**Install Dependencies**
+
+.. literalinclude:: ../modules/frontend/frontend/README.md
+   :language: bash
+   :start-at: # Build proto libraries
+   :end-at: yarn
+
+.. _section-frontend_run_a_development_server:
+
 **Run a development server**
 
 .. literalinclude:: ../modules/frontend/frontend/README.md
