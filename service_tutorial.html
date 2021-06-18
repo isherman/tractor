@@ -1,0 +1,417 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Writing a Service &mdash; farm_ng 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Writing a Program" href="program_tutorial.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> farm_ng
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libraries.html">Libraries</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-development-environment">Setting up your Development Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#git-workflow">Git workflow</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="getting_started.html#tutorials">Tutorials</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Writing a Service</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#define-data-models">Define data models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#implement-the-service">Implement the Service</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="program_tutorial.html">Writing a Program</a></li>
+<li class="toctree-l3"><a class="reference internal" href="visualizer_tutorial.html">Writing a Visualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#docker-releases">Docker Releases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs, Tips &amp; Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version_history.html">Version History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_api.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">farm_ng</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="getting_started.html">Getting Started</a> &raquo;</li>
+        
+      <li>Writing a Service</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/service_tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="writing-a-service">
+<span id="chapter-service-tutorial"></span><h1>Writing a Service<a class="headerlink" href="#writing-a-service" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial explains how to write a Hello World <a class="reference internal" href="core_module.html#section-core-services"><span class="std std-ref">service</span></a> in C++.</p>
+<p>Our service will publish <code class="docutils literal notranslate"><span class="pre">helloworld/status</span></code> events, subscribe to <code class="docutils literal notranslate"><span class="pre">helloworld/command</span></code> events,
+and interact with the <code class="docutils literal notranslate"><span class="pre">ipc_logger</span></code> service.</p>
+<p>The full source code for this example is available in <a class="reference external" href="https://github.com/farm-ng/tractor/blob/master/modules/examples">modules/examples</a>.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial assumes a working <a class="reference internal" href="getting_started.html#section-development-environment"><span class="std std-ref">C++ development environment</span></a>.</p>
+</section>
+<section id="define-data-models">
+<h2>Define data models<a class="headerlink" href="#define-data-models" title="Permalink to this headline">¶</a></h2>
+<p>First, define a <code class="docutils literal notranslate"><span class="pre">Status</span></code> and <code class="docutils literal notranslate"><span class="pre">Command</span></code> message.</p>
+<p>Add a <code class="docutils literal notranslate"><span class="pre">helloworld.proto</span></code> file with the following contents:</p>
+<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="k">syntax</span> <span class="o">=</span> <span class="s">&quot;proto3&quot;</span><span class="p">;</span>
+
+<span class="kn">package</span> <span class="nn">farm_ng</span><span class="o">.</span><span class="n">examples</span><span class="p">;</span>
+<span class="k">option</span> <span class="na">go_package</span> <span class="o">=</span> <span class="s">&quot;github.com/farm-ng/genproto/examples&quot;</span><span class="p">;</span>
+
+<span class="kd">message</span> <span class="nc">HelloWorldStatus</span> <span class="p">{</span>
+  <span class="kt">string</span> <span class="kd">message</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">HelloWorldCommand</span> <span class="p">{</span>
+  <span class="kt">string</span> <span class="kd">message</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Add a build target:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">farm_ng_add_protobufs</span><span class="p">(</span><span class="s">farm_ng_examples_protobuf</span>
+  <span class="s">PROTO_FILES</span>
+  <span class="s">./farm_ng/examples/countdown.proto</span>
+<span class="hll">  <span class="s">./farm_ng/examples/helloworld.proto</span>
+</span>  <span class="s">DEPENDENCIES</span>
+  <span class="s">farm_ng_core_protobuf</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="implement-the-service">
+<h2>Implement the Service<a class="headerlink" href="#implement-the-service" title="Permalink to this headline">¶</a></h2>
+<p>Add the <code class="docutils literal notranslate"><span class="pre">helloworld.cpp</span></code> file with the following contents:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;gflags/gflags.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;glog/logging.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;farm_ng/core/init.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;farm_ng/core/ipc.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;farm_ng/examples/helloworld.pb.h&quot;</span><span class="cp"></span>
+
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">EventBus</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">MakeEvent</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">WaitForServices</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">examples</span><span class="o">::</span><span class="n">HelloWorldCommand</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">examples</span><span class="o">::</span><span class="n">HelloWorldStatus</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">EventPb</span> <span class="o">=</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">Event</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">farm_ng</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="nn">examples</span> <span class="p">{</span>
+
+<span class="c1">// A minimal example of a service that participates on the eventbus</span>
+<span class="k">class</span> <span class="nc">HelloWorld</span> <span class="p">{</span>
+ <span class="k">public</span><span class="o">:</span>
+  <span class="n">HelloWorld</span><span class="p">(</span><span class="n">EventBus</span><span class="o">&amp;</span> <span class="n">bus</span><span class="p">)</span> <span class="o">:</span> <span class="n">bus_</span><span class="p">(</span><span class="n">bus</span><span class="p">),</span> <span class="n">timer_</span><span class="p">(</span><span class="n">bus_</span><span class="p">.</span><span class="n">get_io_service</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">// Subscribe to eventbus messages with names that match a set of regexes</span>
+    <span class="n">bus_</span><span class="p">.</span><span class="n">AddSubscriptions</span><span class="p">({</span><span class="c1">// Matches &quot;helloworld/command events</span>
+                           <span class="n">bus_</span><span class="p">.</span><span class="n">GetName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;/command&quot;</span><span class="p">,</span>
+                           <span class="c1">// Matches logging-related events</span>
+                           <span class="s">&quot;logger/command&quot;</span><span class="p">,</span> <span class="s">&quot;logger/status&quot;</span><span class="p">});</span>
+
+    <span class="c1">// Invoke the &#39;on_event&#39; callback when an eventbus message is received</span>
+    <span class="n">bus_</span><span class="p">.</span><span class="n">GetEventSignal</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">connect</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">HelloWorld</span><span class="o">::</span><span class="n">on_event</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">));</span>
+
+    <span class="c1">// Start this service&#39;s periodic loop</span>
+    <span class="n">on_timer</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">error_code</span><span class="p">());</span>
+  <span class="p">}</span>
+
+  <span class="kt">int</span> <span class="n">run</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Wait for any dependent services to advertise themselves on the eventbus</span>
+    <span class="c1">// This service depends on the presence of the ipc_logger.</span>
+    <span class="n">WaitForServices</span><span class="p">(</span><span class="n">bus_</span><span class="p">,</span> <span class="p">{</span><span class="s">&quot;ipc_logger&quot;</span><span class="p">});</span>
+
+    <span class="c1">// A synchronous call that requests the ipc_logger to start logging,</span>
+    <span class="c1">// and returns when it reports that it has.</span>
+    <span class="n">StartLogging</span><span class="p">(</span><span class="n">bus_</span><span class="p">,</span> <span class="s">&quot;default&quot;</span><span class="p">);</span>
+
+    <span class="c1">// Spin</span>
+    <span class="k">while</span> <span class="p">(</span><span class="nb">true</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">bus_</span><span class="p">.</span><span class="n">get_io_service</span><span class="p">().</span><span class="n">run_one</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="n">LOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Complete.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Send a status on the eventbus</span>
+  <span class="kt">void</span> <span class="n">send_status</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">HelloWorldStatus</span> <span class="n">status</span><span class="p">;</span>
+    <span class="n">status</span><span class="p">.</span><span class="n">set_message</span><span class="p">(</span><span class="s">&quot;hello, world&quot;</span><span class="p">);</span>
+    <span class="n">bus_</span><span class="p">.</span><span class="n">Send</span><span class="p">(</span><span class="n">MakeEvent</span><span class="p">(</span><span class="n">bus_</span><span class="p">.</span><span class="n">GetName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;/status&quot;</span><span class="p">,</span> <span class="n">status</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="c1">// The function invoked by this service&#39;s periodic loop</span>
+  <span class="kt">void</span> <span class="n">on_timer</span><span class="p">(</span><span class="k">const</span> <span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">LOG</span><span class="p">(</span><span class="n">WARNING</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;timer error: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">__PRETTY_FUNCTION__</span> <span class="o">&lt;&lt;</span> <span class="n">error</span><span class="p">;</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Periodically publish this service&#39;s status</span>
+    <span class="n">send_status</span><span class="p">();</span>
+
+    <span class="c1">// Schedule the next tick of this periodic loop</span>
+    <span class="n">timer_</span><span class="p">.</span><span class="n">expires_from_now</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">posix_time</span><span class="o">::</span><span class="n">millisec</span><span class="p">(</span><span class="mi">1000</span><span class="p">));</span>
+    <span class="n">timer_</span><span class="p">.</span><span class="n">async_wait</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">HelloWorld</span><span class="o">::</span><span class="n">on_timer</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Handle potential HelloWorldCommand messages received from the</span>
+  <span class="c1">// eventbus</span>
+  <span class="kt">bool</span> <span class="n">on_command</span><span class="p">(</span><span class="k">const</span> <span class="n">EventPb</span><span class="o">&amp;</span> <span class="n">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Attempt to deserialize the eventbus message to a HelloWorldCommand</span>
+    <span class="n">HelloWorldCommand</span> <span class="n">command</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">().</span><span class="n">UnpackTo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">command</span><span class="p">))</span> <span class="p">{</span>
+      <span class="c1">// Silently ignore if it&#39;s not a HelloWorldCommand.</span>
+      <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">LOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">command</span><span class="p">.</span><span class="n">ShortDebugString</span><span class="p">();</span>
+    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Handle messages received from the eventbus</span>
+  <span class="kt">void</span> <span class="n">on_event</span><span class="p">(</span><span class="k">const</span> <span class="n">EventPb</span><span class="o">&amp;</span> <span class="n">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Delegate all messages to a command handler.</span>
+    <span class="c1">// Messages other than HelloWorldCommands are silently ignored.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">on_command</span><span class="p">(</span><span class="n">event</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+ <span class="k">private</span><span class="o">:</span>
+  <span class="c1">// A handle to the eventbus</span>
+  <span class="n">EventBus</span><span class="o">&amp;</span> <span class="n">bus_</span><span class="p">;</span>
+
+  <span class="c1">// The timer that triggers this service&#39;s periodic loop.</span>
+  <span class="n">boost</span><span class="o">::</span><span class="n">asio</span><span class="o">::</span><span class="n">deadline_timer</span> <span class="n">timer_</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="p">}</span>  <span class="c1">// namespace examples</span>
+<span class="p">}</span>  <span class="c1">// namespace farm_ng</span>
+
+<span class="kt">int</span> <span class="n">Main</span><span class="p">(</span><span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">EventBus</span><span class="o">&amp;</span> <span class="n">bus</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">farm_ng</span><span class="o">::</span><span class="n">examples</span><span class="o">::</span><span class="n">HelloWorld</span> <span class="nf">service</span><span class="p">(</span><span class="n">bus</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">service</span><span class="p">.</span><span class="n">run</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// Always invoked by the farm-ng runner, to support graceful shutdown.</span>
+<span class="kt">void</span> <span class="n">Cleanup</span><span class="p">(</span><span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">EventBus</span><span class="o">&amp;</span> <span class="n">bus</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">RequestStopLogging</span><span class="p">(</span><span class="n">bus</span><span class="p">);</span>
+  <span class="n">LOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Requested Stop logging&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="c1">// Invoke the farm_ng runner, which provides signal handling,</span>
+  <span class="c1">// injects the eventbus, etc.</span>
+  <span class="k">return</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">Main</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Main</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Cleanup</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Add a build target:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">add_executable</span><span class="p">(</span><span class="s">helloworld</span> <span class="s">helloworld.cpp</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">helloworld</span> <span class="s">farm_ng_examples_protobuf</span> <span class="s">farm_ng_core</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Verify that your service runs successfully from the command line, with the expected output.</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="program_tutorial.html" class="btn btn-neutral float-right" title="Writing a Program" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, farm-ng inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

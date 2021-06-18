@@ -1,0 +1,413 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Frontend &mdash; farm_ng 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Calibration" href="calibration_module.html" />
+    <link rel="prev" title="Perception" href="perception_module.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> farm_ng
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Applications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="libraries.html">Libraries</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core_module.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perception_module.html">Perception</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Frontend</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#client-server-model">Client/Server Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#blobstore-ui">Blobstore UI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#programs-ui">Programs UI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scope-ui">Scope UI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extensibility">Extensibility</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="calibration_module.html">Calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tractor_module.html">Tractor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs, Tips &amp; Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version_history.html">Version History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_api.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">farm_ng</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="libraries.html">Libraries</a> &raquo;</li>
+        
+      <li>Frontend</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/frontend_module.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="frontend">
+<span id="chapter-frontend-module"></span><h1>Frontend<a class="headerlink" href="#frontend" title="Permalink to this headline">¶</a></h1>
+<p>The <em>frontend</em> module provides webserver and frontend code for building GUIs and graphical debugging tools.</p>
+<section id="client-server-model">
+<h2>Client/Server Model<a class="headerlink" href="#client-server-model" title="Permalink to this headline">¶</a></h2>
+<p>The frontend is a single-page React web application, implemented in Typescript, served by a Go backend.</p>
+<p><strong>WebRTC</strong></p>
+<p>A <code class="docutils literal notranslate"><span class="pre">POST</span></code> request to <code class="docutils literal notranslate"><span class="pre">/twirp/farm_ng.frontend.WebRTCProxyService/InitiatePeerConnection</span></code>
+initiates a WebRTC connection with the server.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In a common WebRTC use case like 1:1 video conferencing, a signaling server brokers a connection
+between two peers on the internet. Here, the signaling server and the remote peer are one and the same –
+all communication is on the local area network.</p>
+</div>
+<p>The negotiated WebRTC connection includes both a bidirectional data stream (for <a class="reference internal" href="core_module.html#section-core-eventbus"><span class="std std-ref">event bus</span></a> data), and a
+server-to-client media stream (for streaming video).</p>
+<p>The server acts as a proxy between the frontend and the robotics application, forwarding:</p>
+<ul class="simple">
+<li><p>browser <code class="docutils literal notranslate"><span class="pre">Events</span></code> from the WebRTC data channel to the event bus</p></li>
+<li><p>event bus <code class="docutils literal notranslate"><span class="pre">Events</span></code> to the WebRTC data channel to the browser</p></li>
+<li><p>RTP packets to the WebRTC video channel to the browser</p></li>
+</ul>
+<p>The environment variable <code class="docutils literal notranslate"><span class="pre">RTP_PORT</span></code> specifies a port for the server to listen for RTP packets from the robotics application. <code class="docutils literal notranslate"><span class="pre">RTP_PORT</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">5000</span></code>.</p>
+<p><strong>Blobstore CRUD</strong></p>
+<p>A <code class="docutils literal notranslate"><span class="pre">GET</span></code> request to <code class="docutils literal notranslate"><span class="pre">/blobstore/&lt;path&gt;</span></code> returns:</p>
+<ul class="simple">
+<li><p>the contents of the file at <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code>, if <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> is a valid path to a file in the <a class="reference internal" href="core_module.html#section-core-blobstore"><span class="std std-ref">blobstore</span></a></p></li>
+<li><p>a <code class="docutils literal notranslate"><span class="pre">File</span></code> message describing the contents of <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code>, if <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> is a valid path to a directory in the blobstore</p></li>
+<li><p>else a 404 status code</p></li>
+</ul>
+<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="kd">message</span> <span class="nc">File</span> <span class="p">{</span>
+  <span class="kd">message</span> <span class="nc">Ordinary</span> <span class="p">{}</span>
+  <span class="kd">message</span> <span class="nc">Directory</span> <span class="p">{</span>
+    <span class="k">repeated</span> <span class="n">File</span> <span class="na">files</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kt">string</span> <span class="na">name</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">oneof</span> <span class="n">type</span> <span class="p">{</span>
+    <span class="n">Directory</span> <span class="na">directory</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="n">Ordinary</span> <span class="na">ordinary</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="kt">int64</span> <span class="na">size</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+  <span class="n">google.protobuf.Timestamp</span> <span class="na">modification_time</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A <code class="docutils literal notranslate"><span class="pre">POST</span></code> request to <code class="docutils literal notranslate"><span class="pre">/blobstore/&lt;path&gt;</span></code>:</p>
+<ul class="simple">
+<li><p>returns a 500 status code if <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> is a directory in the blobstore or an invalid path</p></li>
+<li><p>else writes the payload of the request to <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> (overwriting existing content)</p></li>
+</ul>
+<p>The environment variable <code class="docutils literal notranslate"><span class="pre">BLOBSTORE_ROOT</span></code> specifies the blobstore root.</p>
+<p><strong>Static Files</strong></p>
+<p>A <code class="docutils literal notranslate"><span class="pre">GET</span></code> request to <code class="docutils literal notranslate"><span class="pre">/&lt;path&gt;</span></code> will return</p>
+<ul class="simple">
+<li><p>the contents of the file at <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code>, if <code class="docutils literal notranslate"><span class="pre">&lt;path&gt;</span></code> is a valid path to a file in the server’s static directory</p></li>
+<li><p>else <code class="docutils literal notranslate"><span class="pre">index.html</span></code>, to bootstrap the single-page app</p></li>
+</ul>
+</section>
+<section id="blobstore-ui">
+<span id="section-frontend-blobstore"></span><h2>Blobstore UI<a class="headerlink" href="#blobstore-ui" title="Permalink to this headline">¶</a></h2>
+<img alt="https://via.placeholder.com/1920x1080.png?text=Blobstore+Screenshot" src="https://via.placeholder.com/1920x1080.png?text=Blobstore+Screenshot" />
+<p>The frontend provides a UI for browsing and updating the <a class="reference internal" href="core_module.html#section-core-blobstore"><span class="std std-ref">blobstore</span></a>.</p>
+<ul class="simple">
+<li><p>Known filetypes (currently determined by a heuristic based on the path) with a registered visualizer are visualized.</p></li>
+<li><p>Known filetypes with a registered form visualization may be edited and saved.</p></li>
+<li><p>All other filetypes are downloaded, or opened in a new tab in the browser.</p></li>
+</ul>
+</section>
+<section id="programs-ui">
+<span id="section-frontend-programs"></span><h2>Programs UI<a class="headerlink" href="#programs-ui" title="Permalink to this headline">¶</a></h2>
+<img alt="https://via.placeholder.com/1920x1080.png?text=Programs+Screenshot" src="https://via.placeholder.com/1920x1080.png?text=Programs+Screenshot" />
+<p>The frontend provides a GUI for interacting with <code class="docutils literal notranslate"><span class="pre">programd</span></code> to start, stop, and monitor <a class="reference internal" href="core_module.html#section-core-programs"><span class="std std-ref">programs</span></a>.</p>
+<p>The program listing is populated by <code class="docutils literal notranslate"><span class="pre">ProgramSupervisorStatus</span></code> events, published periodically by <code class="docutils literal notranslate"><span class="pre">programd</span></code>.</p>
+<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="kd">message</span> <span class="nc">ProgramExecution</span> <span class="p">{</span>
+  <span class="kt">string</span> <span class="na">id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">int32</span> <span class="na">pid</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="kt">int32</span> <span class="na">exit_code</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+  <span class="n">google.protobuf.Timestamp</span> <span class="na">stamp_start</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+  <span class="n">google.protobuf.Timestamp</span> <span class="na">stamp_end</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">ProgramSupervisorStatus</span> <span class="p">{</span>
+  <span class="kd">message</span> <span class="nc">ProgramRunning</span> <span class="p">{</span>
+    <span class="n">ProgramExecution</span> <span class="na">program</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="kd">message</span> <span class="nc">ProgramStopped</span> <span class="p">{</span>
+    <span class="n">ProgramExecution</span> <span class="na">last_program</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">oneof</span> <span class="n">status</span> <span class="p">{</span>
+    <span class="n">ProgramRunning</span> <span class="na">running</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">ProgramStopped</span> <span class="na">stopped</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">repeated</span> <span class="n">Program</span> <span class="na">library</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Events published with the name <code class="docutils literal notranslate"><span class="pre">&lt;program_name&gt;/status</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;program_name&gt;</span></code> corresponds to the running program, will be visualized.</p>
+</section>
+<section id="scope-ui">
+<span id="section-frontend-scope"></span><h2>Scope UI<a class="headerlink" href="#scope-ui" title="Permalink to this headline">¶</a></h2>
+<img alt="https://via.placeholder.com/1920x1080.png?text=Scope+Screenshot" src="https://via.placeholder.com/1920x1080.png?text=Scope+Screenshot" />
+<p>The scope is a visual debugger for <a class="reference internal" href="core_module.html#section-core-eventbus"><span class="std std-ref">event bus</span></a> events.</p>
+<p>When the scope is <em>streaming</em> (via the <em>Stream</em> button), event bus events are stored in a client-side, in-memory FIFO queue.
+The maximum age of data in the queue is determined by the <em>Expiration</em> option.
+Existing data is cleared when <em>Stream</em> is clicked, or on page reload.</p>
+<p>In a <em>panel</em> we can visualize data in the queue, selected by time, type, and name (in that order).</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Use the timeline control and <em>Throttle</em> menu to select a time range / resolution</p></li>
+<li><p>Use the <em>Data Type</em> menu to select a data type</p></li>
+<li><p>Use the <em>Tag Filter</em> menu to select a subset of event names</p></li>
+</ul>
+</div></blockquote>
+<p>For each type of data, you may choose from one of multiple visualizers [<a class="reference external" href="https://github.com/farm-ng/tractor/blob/master/modules/frontend/frontend/src/registry/visualization.ts">registry/visualization.ts</a>].
+Each visualizer may expose multiple visualization options.</p>
+<p>The <cite>+</cite> button adds additional panels.</p>
+</section>
+<section id="extensibility">
+<h2>Extensibility<a class="headerlink" href="#extensibility" title="Permalink to this headline">¶</a></h2>
+<p>The frontend aims to be extensible, such that it is easy to build custom 2D/3D visualizations
+for application-specific data types, and even fully custom web apps.</p>
+<p>As designed, the architecture optimizes for extensibility of visualization <em>in the frontend</em>, rather than in the robotics application.
+There are tradeoffs, but we believe that this approach empowers developers to build visualizations (and applications) with
+the DOM, Javascript, React, HTTP, and all the features of the browser platform, as opposed to an approach
+that provides a generic visualization API for C++ and Python developers.</p>
+<p>You may wish to extend the frontend by addding visualizers for your custom data types,
+or adding alternative visualizers for existing data types. This process is explained in the <a class="reference internal" href="visualizer_tutorial.html#chapter-visualizer-tutorial"><span class="std std-ref">Writing a Visualizer</span></a> tutorial.</p>
+<p>Alternatively, you may wish to build an entirely new React web application, using the frontend module as a JS/TS library from which to
+pull React components, React hooks, utilities, and so on.</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p id="section-frontend-development-server"><strong>Run a development server</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>  <span class="c1"># To launch a development server on a machine with the hostname tractor.local</span>
+
+  <span class="c1"># In one terminal, run the backend on port 8081</span>
+  <span class="nb">cd</span> <span class="nv">$FARM_NG_ROOT</span>/modules/frontend/go/webrtc
+  <span class="nv">PORT</span><span class="o">=</span><span class="m">8081</span> go run cmd/proxy-server/main.go
+
+  <span class="c1"># In another terminal, run webpack-dev-server (in watch mode) on port 8080</span>
+  <span class="nb">cd</span> <span class="nv">$FARM_NG_ROOT</span>/modules/frontend/frontend
+  <span class="nv">BASE_URL</span><span class="o">=</span><span class="s2">&quot;http://tractor.local:8081&quot;</span> yarn dev-start-remote --port <span class="m">8080</span>
+
+  <span class="c1"># Wait for the initial webpack build to complete, then</span>
+  <span class="c1"># access the app at http://tractor.local:8080.</span>
+  <span class="c1"># Saved changes will automatically rebuild and refresh the page.</span>
+</pre></div>
+</div>
+<p id="section-frontend-new-data-type"><strong>Add support for a new data type</strong></p>
+<div class="highlight-ts notranslate"><div class="highlight"><pre><span></span><span class="c1">// Ensure the relevant ts-proto generated code is imported in package.json</span>
+<span class="s2">&quot;dependencies&quot;</span><span class="o">:</span> <span class="p">{</span>
+  <span class="s2">&quot;@farm-ng/genproto-calibration&quot;</span><span class="o">:</span> <span class="s2">&quot;link:../../../build/modules/calibration/protos/ts&quot;</span><span class="p">,</span>
+  <span class="c1">// ...</span>
+<span class="p">}</span>
+
+<span class="c1">// Add the type URL and the ts-proto generated message class to the event registry</span>
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">eventRegistry</span> <span class="o">=</span> <span class="nx">inferKeys</span><span class="p">({</span>
+  <span class="s2">&quot;type.googleapis.com/farm_ng.calibration.Foo&quot;</span><span class="o">:</span> <span class="nx">Foo</span><span class="p">,</span>
+  <span class="c1">// ...</span>
+<span class="p">});</span>
+
+<span class="c1">// Add the ts-proto generated message type to the union type EventType</span>
+<span class="k">export</span> <span class="kd">type</span> <span class="nx">EventType</span> <span class="o">=</span>
+<span class="o">|</span> <span class="nx">Foo</span>
+<span class="c1">// ...</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="calibration_module.html" class="btn btn-neutral float-right" title="Calibration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="perception_module.html" class="btn btn-neutral float-left" title="Perception" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, farm-ng inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

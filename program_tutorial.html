@@ -1,0 +1,552 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Writing a Program &mdash; farm_ng 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Writing a Visualizer" href="visualizer_tutorial.html" />
+    <link rel="prev" title="Writing a Service" href="service_tutorial.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> farm_ng
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libraries.html">Libraries</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-development-environment">Setting up your Development Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#git-workflow">Git workflow</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="getting_started.html#tutorials">Tutorials</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="service_tutorial.html">Writing a Service</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Writing a Program</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#define-data-models">Define data models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#implement-the-program">Implement the Program</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#add-frontend-support">Add Frontend Support</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="visualizer_tutorial.html">Writing a Visualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#docker-releases">Docker Releases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs, Tips &amp; Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version_history.html">Version History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_api.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">farm_ng</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="getting_started.html">Getting Started</a> &raquo;</li>
+        
+      <li>Writing a Program</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/program_tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="writing-a-program">
+<span id="chapter-program-tutorial"></span><h1>Writing a Program<a class="headerlink" href="#writing-a-program" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial explains how to write a <a class="reference internal" href="core_module.html#section-core-programs"><span class="std std-ref">program</span></a> in C++.</p>
+<p>Our program will count down from N to 0, outputting each value to a file
+in the <a class="reference internal" href="core_module.html#section-core-blobstore"><span class="std std-ref">blobstore</span></a>.</p>
+<p>The full source code for this example is available in <a class="reference external" href="https://github.com/farm-ng/tractor/blob/master/modules/examples">modules/examples</a>.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>This tutorial assumes a working <a class="reference internal" href="getting_started.html#section-development-environment"><span class="std std-ref">C++ development environment</span></a>.</p>
+</section>
+<section id="define-data-models">
+<h2>Define data models<a class="headerlink" href="#define-data-models" title="Permalink to this headline">¶</a></h2>
+<p>Programs, by convention, define a <code class="docutils literal notranslate"><span class="pre">Configuration</span></code>, <code class="docutils literal notranslate"><span class="pre">Status</span></code>, and <code class="docutils literal notranslate"><span class="pre">Result</span></code> message.</p>
+<p>Add a <code class="docutils literal notranslate"><span class="pre">countdown.proto</span></code> file with the following contents:</p>
+<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="k">syntax</span> <span class="o">=</span> <span class="s">&quot;proto3&quot;</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">&quot;farm_ng/core/resource.proto&quot;</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">&quot;google/protobuf/timestamp.proto&quot;</span><span class="p">;</span>
+
+<span class="kn">package</span> <span class="nn">farm_ng</span><span class="o">.</span><span class="n">examples</span><span class="p">;</span>
+<span class="k">option</span> <span class="na">go_package</span> <span class="o">=</span> <span class="s">&quot;github.com/farm-ng/genproto/examples&quot;</span><span class="p">;</span>
+
+<span class="kd">message</span> <span class="nc">CountdownConfiguration</span> <span class="p">{</span>
+  <span class="c1">// A name for the result</span>
+  <span class="kt">string</span> <span class="na">name</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+  <span class="c1">// The starting number for the countdown</span>
+  <span class="kt">uint32</span> <span class="na">start</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">CountdownStatus</span> <span class="p">{</span>
+  <span class="c1">// Serialized CountdownResult</span>
+  <span class="n">farm_ng.core.Resource</span> <span class="na">result</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+  <span class="k">oneof</span> <span class="n">input_required</span> <span class="p">{</span>
+    <span class="n">CountdownConfiguration</span> <span class="na">input_required_configuration</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Current count</span>
+  <span class="kt">uint32</span> <span class="na">count</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">CountdownResult</span> <span class="p">{</span>
+  <span class="c1">// Configuration which initiated the countdown</span>
+  <span class="n">CountdownConfiguration</span> <span class="na">configuration</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+
+  <span class="c1">// The time the countdown started</span>
+  <span class="n">google.protobuf.Timestamp</span> <span class="na">stamp_begin</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+
+  <span class="c1">// The time the countdown completed</span>
+  <span class="n">google.protobuf.Timestamp</span> <span class="na">stamp_end</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+
+  <span class="c1">// The contents of the countdown, saved to disk as a text file</span>
+  <span class="n">farm_ng.core.Resource</span> <span class="na">dataset</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Add a build target:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">farm_ng_add_protobufs</span><span class="p">(</span><span class="s">farm_ng_examples_protobuf</span>
+  <span class="s">PROTO_FILES</span>
+<span class="hll">  <span class="s">./farm_ng/examples/countdown.proto</span>
+</span>  <span class="s">./farm_ng/examples/helloworld.proto</span>
+  <span class="s">DEPENDENCIES</span>
+  <span class="s">farm_ng_core_protobuf</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="implement-the-program">
+<h2>Implement the Program<a class="headerlink" href="#implement-the-program" title="Permalink to this headline">¶</a></h2>
+<p>Add the <code class="docutils literal notranslate"><span class="pre">countdown.cpp</span></code> file with the following contents:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;optional&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;sstream&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&lt;gflags/gflags.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;glog/logging.h&gt;</span><span class="cp"></span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;farm_ng/core/blobstore.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;farm_ng/core/init.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;farm_ng/core/ipc.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&quot;farm_ng/examples/countdown.pb.h&quot;</span><span class="cp"></span>
+
+<span class="n">DEFINE_bool</span><span class="p">(</span><span class="n">interactive</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="s">&quot;Receive program args via eventbus&quot;</span><span class="p">);</span>
+<span class="n">DEFINE_string</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s">&quot;default&quot;</span><span class="p">,</span> <span class="s">&quot;A name for the result file&quot;</span><span class="p">);</span>
+<span class="n">DEFINE_uint64</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s">&quot;The starting number for the countdown&quot;</span><span class="p">);</span>
+
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">EventBus</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">GetUniqueArchiveResource</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">MakeEvent</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">MakeTimestampNow</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">examples</span><span class="o">::</span><span class="n">CountdownConfiguration</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">examples</span><span class="o">::</span><span class="n">CountdownResult</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">examples</span><span class="o">::</span><span class="n">CountdownStatus</span><span class="p">;</span>
+<span class="k">using</span> <span class="n">EventPb</span> <span class="o">=</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">Event</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="nn">farm_ng</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="nn">examples</span> <span class="p">{</span>
+
+<span class="c1">// Count down from N to 0, outputting each value to a result file in the</span>
+<span class="c1">// blobstore.</span>
+<span class="k">class</span> <span class="nc">CountdownProgram</span> <span class="p">{</span>
+ <span class="k">public</span><span class="o">:</span>
+  <span class="n">CountdownProgram</span><span class="p">(</span><span class="n">EventBus</span><span class="o">&amp;</span> <span class="n">bus</span><span class="p">,</span> <span class="n">CountdownConfiguration</span> <span class="n">configuration</span><span class="p">,</span>
+                   <span class="kt">bool</span> <span class="n">interactive</span><span class="p">)</span>
+      <span class="o">:</span> <span class="n">bus_</span><span class="p">(</span><span class="n">bus</span><span class="p">),</span> <span class="n">timer_</span><span class="p">(</span><span class="n">bus_</span><span class="p">.</span><span class="n">get_io_service</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">// A ConfigurationStatus message is periodically sent on the eventbus.</span>
+    <span class="c1">// If running in interactive mode, update this status to indicate that</span>
+    <span class="c1">// user input is required.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">interactive</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">status_</span><span class="p">.</span><span class="n">mutable_input_required_configuration</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">CopyFrom</span><span class="p">(</span><span class="n">configuration</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">set_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Subscribe to eventbus messages with names that match a set of regexes</span>
+    <span class="n">bus_</span><span class="p">.</span><span class="n">AddSubscriptions</span><span class="p">(</span>
+        <span class="p">{</span><span class="c1">// Matches events whose names include the string &#39;countdown_program&#39;</span>
+         <span class="n">bus_</span><span class="p">.</span><span class="n">GetName</span><span class="p">(),</span>
+         <span class="c1">// Matches logging-related events</span>
+         <span class="s">&quot;logger/command&quot;</span><span class="p">,</span> <span class="s">&quot;logger/status&quot;</span><span class="p">});</span>
+
+    <span class="c1">// Invoke the &#39;on_event&#39; callback when an eventbus message is received</span>
+    <span class="n">bus_</span><span class="p">.</span><span class="n">GetEventSignal</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">connect</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">CountdownProgram</span><span class="o">::</span><span class="n">on_event</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">));</span>
+
+    <span class="c1">// Open a file to write the countdown to</span>
+    <span class="k">auto</span> <span class="n">resource_path_pair</span> <span class="o">=</span>
+        <span class="n">GetUniqueArchiveResource</span><span class="p">(</span><span class="n">configuration_</span><span class="p">.</span><span class="n">name</span><span class="p">(),</span> <span class="s">&quot;txt&quot;</span><span class="p">,</span> <span class="s">&quot;text/plain&quot;</span><span class="p">);</span>
+    <span class="n">boost</span><span class="o">::</span><span class="n">filesystem</span><span class="o">::</span><span class="n">path</span> <span class="n">path</span> <span class="o">=</span> <span class="n">resource_path_pair</span><span class="p">.</span><span class="n">second</span><span class="p">;</span>
+    <span class="n">LOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Writing to: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">path</span><span class="p">.</span><span class="n">string</span><span class="p">();</span>
+    <span class="n">output_</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_pair</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ofstream</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="n">string</span><span class="p">()));</span>
+    <span class="n">CHECK</span><span class="p">(</span><span class="n">output_</span><span class="p">.</span><span class="n">second</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Could not open : &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">path</span><span class="p">.</span><span class="n">string</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+
+    <span class="c1">// Start this program&#39;s periodic loop</span>
+    <span class="n">on_timer</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">error_code</span><span class="p">());</span>
+  <span class="p">}</span>
+
+  <span class="kt">int</span> <span class="n">run</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// If running in interactive mode, loop until a configuration is received on</span>
+    <span class="c1">// the eventbus.</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">status_</span><span class="p">.</span><span class="n">has_input_required_configuration</span><span class="p">())</span> <span class="p">{</span>
+      <span class="n">bus_</span><span class="p">.</span><span class="n">get_io_service</span><span class="p">().</span><span class="n">run_one</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Instantiate a result and populate it with the start time of this program.</span>
+    <span class="c1">// The rest of the fields will be populated at program completion.</span>
+    <span class="n">CountdownResult</span> <span class="n">result</span><span class="p">;</span>
+    <span class="n">result</span><span class="p">.</span><span class="n">mutable_stamp_begin</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">CopyFrom</span><span class="p">(</span><span class="n">MakeTimestampNow</span><span class="p">());</span>
+
+    <span class="c1">// Start the countdown and spin</span>
+    <span class="n">countdown_started_</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">status_</span><span class="p">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">bus_</span><span class="p">.</span><span class="n">get_io_service</span><span class="p">().</span><span class="n">run_one</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Populate the result with the configuration used by this program</span>
+    <span class="n">result</span><span class="p">.</span><span class="n">mutable_configuration</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">CopyFrom</span><span class="p">(</span><span class="n">configuration_</span><span class="p">);</span>
+    <span class="c1">// Populate the result with the end time of this program</span>
+    <span class="n">result</span><span class="p">.</span><span class="n">mutable_stamp_end</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">CopyFrom</span><span class="p">(</span><span class="n">MakeTimestampNow</span><span class="p">());</span>
+    <span class="c1">// Populate the result with the path to the recorded log</span>
+    <span class="n">result</span><span class="p">.</span><span class="n">mutable_dataset</span><span class="p">()</span><span class="o">-&gt;</span><span class="n">set_path</span><span class="p">(</span><span class="n">output_</span><span class="p">.</span><span class="n">first</span><span class="p">.</span><span class="n">string</span><span class="p">());</span>
+    <span class="c1">// Send one last status message on the eventbus</span>
+    <span class="n">send_status</span><span class="p">();</span>
+
+    <span class="n">LOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Complete: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">output_</span><span class="p">.</span><span class="n">first</span><span class="p">.</span><span class="n">string</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Send this program&#39;s status on the eventbus</span>
+  <span class="kt">void</span> <span class="n">send_status</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">LOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;Status:</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">status_</span><span class="p">.</span><span class="n">DebugString</span><span class="p">();</span>
+    <span class="n">bus_</span><span class="p">.</span><span class="n">Send</span><span class="p">(</span><span class="n">MakeEvent</span><span class="p">(</span><span class="n">bus_</span><span class="p">.</span><span class="n">GetName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;/status&quot;</span><span class="p">,</span> <span class="n">status_</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="c1">// The function invoked by this program&#39;s periodic loop</span>
+  <span class="kt">void</span> <span class="n">on_timer</span><span class="p">(</span><span class="k">const</span> <span class="n">boost</span><span class="o">::</span><span class="n">system</span><span class="o">::</span><span class="n">error_code</span><span class="o">&amp;</span> <span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">LOG</span><span class="p">(</span><span class="n">WARNING</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;timer error: &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">__PRETTY_FUNCTION__</span> <span class="o">&lt;&lt;</span> <span class="n">error</span><span class="p">;</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Count down</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">countdown_started_</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">output_</span><span class="p">.</span><span class="n">second</span> <span class="o">&lt;&lt;</span> <span class="n">status_</span><span class="p">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">;</span>
+      <span class="n">status_</span><span class="p">.</span><span class="n">set_count</span><span class="p">(</span><span class="n">status_</span><span class="p">.</span><span class="n">count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Periodically publish this program&#39;s status</span>
+    <span class="n">send_status</span><span class="p">();</span>
+
+    <span class="c1">// Schedule the next tick of this periodic loop</span>
+    <span class="n">timer_</span><span class="p">.</span><span class="n">expires_from_now</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">posix_time</span><span class="o">::</span><span class="n">millisec</span><span class="p">(</span><span class="mi">1000</span><span class="p">));</span>
+    <span class="n">timer_</span><span class="p">.</span><span class="n">async_wait</span><span class="p">(</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">CountdownProgram</span><span class="o">::</span><span class="n">on_timer</span><span class="p">,</span> <span class="k">this</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">placeholders</span><span class="o">::</span><span class="n">_1</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Handle potential CountdownConfiguration messages received from the</span>
+  <span class="c1">// eventbus</span>
+  <span class="kt">bool</span> <span class="n">on_configuration</span><span class="p">(</span><span class="k">const</span> <span class="n">EventPb</span><span class="o">&amp;</span> <span class="n">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Attempt to deserialize the eventbus message to a CountdownConfiguration</span>
+    <span class="n">CountdownConfiguration</span> <span class="n">configuration</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">().</span><span class="n">UnpackTo</span><span class="p">(</span><span class="o">&amp;</span><span class="n">configuration</span><span class="p">))</span> <span class="p">{</span>
+      <span class="c1">// Silently ignore if it&#39;s not a CountdownConfiguration.</span>
+      <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">LOG</span><span class="p">(</span><span class="n">INFO</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">configuration</span><span class="p">.</span><span class="n">ShortDebugString</span><span class="p">();</span>
+    <span class="n">set_configuration</span><span class="p">(</span><span class="n">configuration</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Update this program&#39;s configuration</span>
+  <span class="kt">void</span> <span class="n">set_configuration</span><span class="p">(</span><span class="n">CountdownConfiguration</span> <span class="n">configuration</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">configuration_</span> <span class="o">=</span> <span class="n">configuration</span><span class="p">;</span>
+
+    <span class="c1">// Initialize the counter</span>
+    <span class="n">status_</span><span class="p">.</span><span class="n">set_count</span><span class="p">(</span><span class="n">configuration</span><span class="p">.</span><span class="n">start</span><span class="p">());</span>
+
+    <span class="c1">// No longer advertise to the eventbus that configuration is required</span>
+    <span class="n">status_</span><span class="p">.</span><span class="n">clear_input_required_configuration</span><span class="p">();</span>
+    <span class="n">send_status</span><span class="p">();</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Handle messages received from the eventbus</span>
+  <span class="kt">void</span> <span class="n">on_event</span><span class="p">(</span><span class="k">const</span> <span class="n">EventPb</span><span class="o">&amp;</span> <span class="n">event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Delegate all messages to a configuration handler.</span>
+    <span class="c1">// Messages other than configuration messages are silently ignored.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">on_configuration</span><span class="p">(</span><span class="n">event</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+ <span class="k">private</span><span class="o">:</span>
+  <span class="c1">// A handle to the eventbus</span>
+  <span class="n">EventBus</span><span class="o">&amp;</span> <span class="n">bus_</span><span class="p">;</span>
+
+  <span class="c1">// The timer that triggers this program&#39;s periodic loop.</span>
+  <span class="n">boost</span><span class="o">::</span><span class="n">asio</span><span class="o">::</span><span class="n">deadline_timer</span> <span class="n">timer_</span><span class="p">;</span>
+
+  <span class="c1">// This program&#39;s configuration</span>
+  <span class="n">CountdownConfiguration</span> <span class="n">configuration_</span><span class="p">;</span>
+
+  <span class="c1">// This program&#39;s current status</span>
+  <span class="n">CountdownStatus</span> <span class="n">status_</span><span class="p">;</span>
+
+  <span class="c1">// Whether the countdown has started</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">atomic</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span> <span class="n">countdown_started_</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span>
+
+  <span class="c1">// The file to write the countdown to</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="n">boost</span><span class="o">::</span><span class="n">filesystem</span><span class="o">::</span><span class="n">path</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">ofstream</span><span class="o">&gt;</span> <span class="n">output_</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="p">}</span>  <span class="c1">// namespace examples</span>
+<span class="p">}</span>  <span class="c1">// namespace farm_ng</span>
+
+<span class="kt">int</span> <span class="n">Main</span><span class="p">(</span><span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">EventBus</span><span class="o">&amp;</span> <span class="n">bus</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// Populate the program configuration with any relevant command-line flags</span>
+  <span class="n">farm_ng</span><span class="o">::</span><span class="n">examples</span><span class="o">::</span><span class="n">CountdownConfiguration</span> <span class="n">config</span><span class="p">;</span>
+  <span class="n">config</span><span class="p">.</span><span class="n">set_name</span><span class="p">(</span><span class="n">FLAGS_name</span><span class="p">);</span>
+  <span class="n">config</span><span class="p">.</span><span class="n">set_start</span><span class="p">(</span><span class="n">FLAGS_start</span><span class="p">);</span>
+
+  <span class="c1">// Run the program</span>
+  <span class="n">farm_ng</span><span class="o">::</span><span class="n">examples</span><span class="o">::</span><span class="n">CountdownProgram</span> <span class="nf">program</span><span class="p">(</span><span class="n">bus</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">FLAGS_interactive</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">program</span><span class="p">.</span><span class="n">run</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// Always invoked by the program runner, to support graceful shutdown.</span>
+<span class="kt">void</span> <span class="n">Cleanup</span><span class="p">(</span><span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">EventBus</span><span class="o">&amp;</span> <span class="n">bus</span><span class="p">)</span> <span class="p">{}</span>
+
+<span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span> <span class="p">{</span>
+  <span class="c1">// Invoke the farm_ng program runner, which provides signal handling,</span>
+  <span class="c1">// injects the eventbus, etc.</span>
+  <span class="k">return</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">Main</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span> <span class="n">argv</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Main</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Cleanup</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Add a build target:</p>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">add_executable</span><span class="p">(</span><span class="s">countdown</span> <span class="s">countdown.cpp</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">countdown</span> <span class="s">farm_ng_examples_protobuf</span> <span class="s">farm_ng_core</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Verify that your program runs successfully from the command line, with the expected output.</p>
+</section>
+<section id="add-frontend-support">
+<h2>Add Frontend Support<a class="headerlink" href="#add-frontend-support" title="Permalink to this headline">¶</a></h2>
+<p>To make <code class="docutils literal notranslate"><span class="pre">programd</span></code> aware of our new program, add the following to
+<a class="reference external" href="https://github.com/farm-ng/tractor/blob/master/core/config/programd/programs.json">core/config/programd/programs.json</a>.</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;programs&quot;</span><span class="o">:</span> <span class="p">[</span>
+  <span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="o">:</span> <span class="s2">&quot;countdown&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="o">:</span> <span class="s2">&quot;Countdown&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;description&quot;</span><span class="o">:</span> <span class="s2">&quot;Counts down from N to 0, outputting to a file in the blobstore&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;launchPath&quot;</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">&quot;path&quot;</span><span class="o">:</span> <span class="s2">&quot;build/modules/examples/cpp/farm_ng/countdown&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;rootEnvVar&quot;</span><span class="o">:</span> <span class="s2">&quot;FARM_NG_ROOT&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;launchArgs&quot;</span><span class="o">:</span> <span class="p">[</span><span class="s2">&quot;-interactive&quot;</span><span class="p">]</span>
+  <span class="p">},</span>
+  <span class="c1">// ...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Soon, <code class="docutils literal notranslate"><span class="pre">programd</span></code> will accept a search path for configuration files.</p>
+</div>
+<p>Then, follow the instructions in <a class="reference internal" href="visualizer_tutorial.html#chapter-visualizer-tutorial"><span class="std std-ref">Writing a Visualizer</span></a> to add visualizers for the
+<code class="docutils literal notranslate"><span class="pre">CountdownConfiguration</span></code>, <code class="docutils literal notranslate"><span class="pre">CountdownStatus</span></code>, and <code class="docutils literal notranslate"><span class="pre">CountdownResult</span></code> messages defined above.</p>
+<p>Verify that you can use the <a class="reference internal" href="frontend_module.html#section-frontend-programs"><span class="std std-ref">programs UI</span></a> to start, stop, and monitor your program in the web application.</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="visualizer_tutorial.html" class="btn btn-neutral float-right" title="Writing a Visualizer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="service_tutorial.html" class="btn btn-neutral float-left" title="Writing a Service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, farm-ng inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

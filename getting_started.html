@@ -1,0 +1,594 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Getting Started &mdash; farm_ng 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script src="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.js"></script>
+        <script src="_static/sphinx_tabs/tabs.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Writing a Service" href="service_tutorial.html" />
+    <link rel="prev" title="Tractor" href="tractor_module.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> farm_ng
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libraries.html">Libraries</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#setting-up-your-development-environment">Setting up your Development Environment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#get-the-code">Get the code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#start-the-development-container">Start the development container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#visual-studio-code-setup">Visual Studio Code setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#developing-on-a-remote-host">Developing on a Remote Host</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-the-code">Building the code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#git-workflow">Git workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tutorials">Tutorials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="service_tutorial.html">Writing a Service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="program_tutorial.html">Writing a Program</a></li>
+<li class="toctree-l3"><a class="reference internal" href="visualizer_tutorial.html">Writing a Visualizer</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#docker-releases">Docker Releases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs, Tips &amp; Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version_history.html">Version History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_api.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">farm_ng</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Getting Started</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="getting-started">
+<span id="chapter-getting-started"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>This guide describes how to install and extend farm-ng software.</p>
+<p>If you’re already familiar with the farm-ng codebase, and looking for packaged binaries, please see
+<a class="reference internal" href="#getting-started-docker-releases"><span class="std std-ref">Docker Releases</span></a>.</p>
+<section id="setting-up-your-development-environment">
+<span id="section-development-environment"></span><h2>Setting up your Development Environment<a class="headerlink" href="#setting-up-your-development-environment" title="Permalink to this headline">¶</a></h2>
+<p>We have chosen to encapsulate the development environment in a Docker container, to simplify reproducibility.
+It’s also possible to build on bare metal, and the Dockerfiles serve as documentation for our system dependencies.</p>
+<p>We fully support Visual Studio Code, and describe a recommended configuration below.</p>
+<p>This workflow has been tested on development machines running Ubuntu (18.04, 20.04) Desktop, NVidia’s Jetson Nano and Xavier platforms, and Mac OS.
+Windows support should also be possible, but hasn’t been tested.</p>
+<p>To get started, you’ll need a few system tools installed:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">git</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docker</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docker-compose</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">vscode</span></code></p></li>
+</ul>
+<p>Install <code class="docutils literal notranslate"><span class="pre">git</span></code>:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-VWJ1bnR1 docutils container">
+<div class="docutils container">
+<p>Ubuntu</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-TWFjIE9TWA== docutils container">
+<div class="docutils container">
+<p>Mac OSX</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-V2luZG93cw== docutils container">
+<div class="docutils container">
+<p>Windows</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-VWJ1bnR1 active docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install git
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-TWFjIE9TWA== docutils container">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>brew install git
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-V2luZG93cw== docutils container">
+<p>TODO</p>
+</div>
+</div>
+<p>Install <code class="docutils literal notranslate"><span class="pre">docker</span></code>:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-VWJ1bnR1 docutils container">
+<div class="docutils container">
+<p>Ubuntu</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-TWFjIE9TWA== docutils container">
+<div class="docutils container">
+<p>Mac OSX</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-V2luZG93cw== docutils container">
+<div class="docutils container">
+<p>Windows</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-VWJ1bnR1 active docutils container">
+<p>Please follow the <a class="reference external" href="https://docs.docker.com/engine/install/ubuntu/">official Docker installation</a> instructions.</p>
+<p>Ensure that you have added your user to the <code class="docutils literal notranslate"><span class="pre">docker</span></code> group, and logged out and back in:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo usermod -aG docker <span class="nv">$USER</span>
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-TWFjIE9TWA== docutils container">
+<p>Please follow the <a class="reference external" href="https://docs.docker.com/docker-for-mac/install/">official Docker installation</a> instructions.</p>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-V2luZG93cw== docutils container">
+<p>TODO</p>
+</div>
+</div>
+<p>Install <code class="docutils literal notranslate"><span class="pre">docker-compose</span></code>:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-VWJ1bnR1 docutils container">
+<div class="docutils container">
+<p>Ubuntu</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-TWFjIE9TWA== docutils container">
+<div class="docutils container">
+<p>Mac OSX</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-V2luZG93cw== docutils container">
+<div class="docutils container">
+<p>Windows</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-VWJ1bnR1 active docutils container">
+<p>Using pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo apt install pip3
+sudo pip3 install docker-compose
+</pre></div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-TWFjIE9TWA== docutils container">
+<p><code class="docutils literal notranslate"><span class="pre">docker-compose</span></code> is included in the <cite>Docker Desktop for Mac</cite> installer used to install <code class="docutils literal notranslate"><span class="pre">docker</span></code>.</p>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-V2luZG93cw== docutils container">
+<p>TODO</p>
+</div>
+</div>
+<p>Install <code class="docutils literal notranslate"><span class="pre">vscode</span></code>:</p>
+<div class="sphinx-tabs docutils container">
+<div class="ui top attached tabular menu sphinx-menu docutils container">
+<div class="active item sphinx-data-tab-VWJ1bnR1 docutils container">
+<div class="docutils container">
+<p>Ubuntu</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-TWFjIE9TWA== docutils container">
+<div class="docutils container">
+<p>Mac OSX</p>
+</div>
+</div>
+<div class="item sphinx-data-tab-V2luZG93cw== docutils container">
+<div class="docutils container">
+<p>Windows</p>
+</div>
+</div>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-VWJ1bnR1 active docutils container">
+<p>Please follow the <a class="reference external" href="https://code.visualstudio.com/Download/">official Visual Studio Code installation</a> instructions.</p>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-TWFjIE9TWA== docutils container">
+<p>Please follow the <a class="reference external" href="https://code.visualstudio.com/Download/">official Visual Studio Code installation</a> instructions.</p>
+</div>
+<div class="ui bottom attached sphinx-tab tab segment sphinx-data-tab-V2luZG93cw== docutils container">
+<p>TODO</p>
+</div>
+</div>
+<section id="get-the-code">
+<h3>Get the code<a class="headerlink" href="#get-the-code" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/farm-ng/tractor.git
+</pre></div>
+</div>
+</section>
+<section id="start-the-development-container">
+<h3>Start the development container<a class="headerlink" href="#start-the-development-container" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">docker-compose</span></code> can be used to start the development Docker
+container.  It mounts the repository from your host as a volume.For
+convenience, we’ve wrapped the docker-compose commands in Makefile
+located under <code class="docutils literal notranslate"><span class="pre">$FARM_NG_ROOT/docker/devel</span></code>.</p>
+<p>The following command starts the development docker environment in the background.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make -C docker/devel upd
+</pre></div>
+</div>
+<p>On the first run, the development environment docker image is built, inheriting the user name, UID and GID of the parent shell.
+You should see something similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>~/code/tractor$ make -C docker/devel upd
+Building workspace
+Successfully built c0861fd269b0
+Successfully tagged devel_workspace:latest
+Creating devel_workspace_1 ... done
+farm-ng&#39;s devel container is running.  Run make down to stop it.
+You can open up a shell inside the container:
+   docker exec -it devel_workspace_1 bash
+</pre></div>
+</div>
+<p>To stop the container, run <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">-C</span> <span class="pre">docker/devel</span> <span class="pre">down</span></code></p>
+<p>Now the Docker container is up and running.  You can <code class="docutils literal notranslate"><span class="pre">exec</span></code> into it, interactively, and open as many shells as you like with the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">exec</span> <span class="o">-</span><span class="n">it</span> <span class="n">devel_workspace_1</span> <span class="n">bash</span>
+</pre></div>
+</div>
+<p>Try the following, on your host machine, to configure the <code class="docutils literal notranslate"><span class="pre">cmake</span></code> build inside the container:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker <span class="nb">exec</span> devel_workspace_1 make cmake
+</pre></div>
+</div>
+<p>You should see something similar to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">--</span> <span class="n">The</span> <span class="n">C</span> <span class="n">compiler</span> <span class="n">identification</span> <span class="ow">is</span> <span class="n">GNU</span> <span class="mf">7.5.0</span>
+<span class="o">...</span>
+<span class="o">--</span> <span class="n">Configuring</span> <span class="n">done</span>
+<span class="o">--</span> <span class="n">Generating</span> <span class="n">done</span>
+<span class="o">--</span> <span class="n">Build</span> <span class="n">files</span> <span class="n">have</span> <span class="n">been</span> <span class="n">written</span> <span class="n">to</span><span class="p">:</span> <span class="o">/</span><span class="n">workspace</span><span class="o">/</span><span class="n">tractor</span><span class="o">/</span><span class="n">build</span>
+</pre></div>
+</div>
+<p>Now that the code is configured, you should see a <code class="docutils literal notranslate"><span class="pre">build/</span></code> directory on the host machine with a <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> and <code class="docutils literal notranslate"><span class="pre">CMakeCache.txt</span></code></p>
+<p>Let’s try building these docs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">exec</span> <span class="n">devel_workspace_1</span> <span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">build</span> <span class="n">docs</span>
+</pre></div>
+</div>
+<p>And run a server to host them:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">exec</span> <span class="n">devel_workspace_1</span> <span class="n">bash</span> <span class="o">-</span><span class="n">c</span> <span class="s2">&quot;cd build/doc/sphinx &amp;&amp; python3 -m http.server 8000&quot;</span>
+</pre></div>
+</div>
+<p>Try browsing to <a class="reference external" href="http://localhost:8000/getting_started.html#start-the-development-container">http://localhost:8000/getting_started.html#start-the-development-container</a></p>
+<p>Now take a moment to study the contents of <code class="docutils literal notranslate"><span class="pre">docker/devel/docker-compose.yaml</span></code>:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span> <span class="s">&quot;3.3&quot;</span>
+
+<span class="nt">services</span><span class="p">:</span>
+  <span class="nt">workspace</span><span class="p">:</span>
+    <span class="nt">build</span><span class="p">:</span>
+      <span class="nt">context</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">./</span>
+      <span class="nt">dockerfile</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">user_devel.Dockerfile</span>
+      <span class="nt">args</span><span class="p">:</span>
+        <span class="nt">USERNAME</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${USER}</span>
+        <span class="nt">USER_UID</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${uid}</span>
+        <span class="nt">FARM_NG_DEVEL_IMAGE</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">${FARM_NG_DEVEL_IMAGE}</span>
+    <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/workspace/tractor/docker/devel/loop_forever.sh</span>
+    <span class="nt">environment</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">BLOBSTORE_ROOT=/blobstore</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">../../.devel_home:/home/${USER}</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">${BLOBSTORE_ROOT}:/blobstore</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">../..:/workspace/tractor</span>
+    <span class="nt">working_dir</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/workspace/tractor</span>
+    <span class="nt">network_mode</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">host</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>The source directory is mounted at <code class="docutils literal notranslate"><span class="pre">/workspace/tractor</span></code>.</p></li>
+<li><p>A named volume is mounted at <code class="docutils literal notranslate"><span class="pre">/home/$USERNAME</span></code> – this allows the container to persist bash history and other cached variables.</p></li>
+<li><p>A host directory is mounted as the <code class="docutils literal notranslate"><span class="pre">BLOBSTORE_ROOT</span></code> for <a class="reference internal" href="core_module.html#section-core-blobstore"><span class="std std-ref">persistent storage of application data</span></a>.</p></li>
+</ul>
+<p>To start the development environment with a custom BLOBSTORE_ROOT:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">BLOBSTORE_ROOT</span><span class="o">=/</span><span class="n">some</span><span class="o">/</span><span class="n">other</span><span class="o">/</span><span class="n">blobstore</span><span class="o">/</span><span class="n">root</span> <span class="o">-</span><span class="n">C</span> <span class="n">docker</span><span class="o">/</span><span class="n">devel</span> <span class="n">upd</span>
+</pre></div>
+</div>
+<p>To start the development environment with a custom devel docker image:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">FARM_NG_DEVEL_IMAGE</span><span class="o">=</span><span class="n">farmng</span><span class="o">/</span><span class="n">devel</span><span class="p">:</span><span class="n">latest</span> <span class="o">-</span><span class="n">C</span> <span class="n">docker</span><span class="o">/</span><span class="n">devel</span> <span class="n">upd</span>
+</pre></div>
+</div>
+<p>To build a the devel image locally:</p>
+<blockquote>
+<div><p>cd docker/devel
+./build_devel.sh # this will result in farmng/devel:latest
+make FARM_NG_DEVEL_IMAGE=farmng/devel:latest down
+make FARM_NG_DEVEL_IMAGE=farmng/devel:latest upd</p>
+</div></blockquote>
+</section>
+<section id="visual-studio-code-setup">
+<h3>Visual Studio Code setup<a class="headerlink" href="#visual-studio-code-setup" title="Permalink to this headline">¶</a></h3>
+<p>Now that you’re comfortable execing into the development container let’s boot up <code class="docutils literal notranslate"><span class="pre">vscode</span></code>.</p>
+<p>Start <code class="docutils literal notranslate"><span class="pre">vscode</span></code> in the normal way and install the extension <code class="docutils literal notranslate"><span class="pre">ms-vscode-remote.remote-containers</span></code>.</p>
+<p>Attach to the container <code class="docutils literal notranslate"><span class="pre">devel_workspace_1</span></code> using <strong>Remote-Containers: Attach to Running Container</strong>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For additional background, see vscode documentation on <a class="reference external" href="https://code.visualstudio.com/docs/remote/attach-container">container-based workflows</a>.</p>
+</div>
+<p>Once you’re attached, open the workspace file <code class="docutils literal notranslate"><span class="pre">/workspace/tractor/workspace.code-workspace</span></code> and install the suggested plugins.</p>
+<p>Wait while <code class="docutils literal notranslate"><span class="pre">vscode</span></code> installs the extensions.</p>
+<p>Try building with <code class="docutils literal notranslate"><span class="pre">cmake</span></code> in <code class="docutils literal notranslate"><span class="pre">vscode</span></code> by pressing <code class="docutils literal notranslate"><span class="pre">F7</span></code>.</p>
+<ul class="simple">
+<li><p>Click <cite>Unspecified</cite> when prompted to <cite>Select a Kit</cite>.</p></li>
+<li><p>You can see the build output in the <cite>CMake/Build</cite> output window.</p></li>
+</ul>
+</section>
+<section id="developing-on-a-remote-host">
+<h3>Developing on a Remote Host<a class="headerlink" href="#developing-on-a-remote-host" title="Permalink to this headline">¶</a></h3>
+<p>This workflow above should also work if you’re connected to a remote host.
+This is how we develop on remote machines such as robots.</p>
+<p>To attach to a remote container over SSH just add the following to your <a class="reference external" href="https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations">User Settings</a>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;docker.host&quot;</span><span class="p">:</span><span class="s2">&quot;ssh://your-remote-user@your-remote-machine-fqdn-or-ip-here&quot;</span>
+</pre></div>
+</div>
+<p>Restart <code class="docutils literal notranslate"><span class="pre">vscode</span></code>, and the workflow above should connect you to the Docker container on your remote host.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For additional background, see vscode documentation on <a class="reference external" href="https://code.visualstudio.com/docs/remote/containers-advanced#_a-basic-remote-example">remote container workflows</a>.</p>
+</div>
+</section>
+<section id="building-the-code">
+<h3>Building the code<a class="headerlink" href="#building-the-code" title="Permalink to this headline">¶</a></h3>
+<p>To build our C++ and protobuf generated code, we use <code class="docutils literal notranslate"><span class="pre">cmake</span></code>.  From inside the Docker container (either in the <code class="docutils literal notranslate"><span class="pre">exec</span></code> shell, or a terminal in VS code) you can run the following commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> /workspace/tractor
+mkdir -p build
+<span class="nb">cd</span> build
+cmake -DCMAKE_PREFIX_PATH<span class="o">=</span>/farm_ng/env ..
+make -j<span class="k">$(</span>nproc --ignore<span class="o">=</span><span class="m">1</span><span class="k">)</span>
+
+<span class="c1"># Run the ipc_logger</span>
+<span class="nb">cd</span> /workspace/tractor
+./build/modules/core/cpp/farm_ng/ipc_logger
+</pre></div>
+</div>
+<p>To build our webservices (Typescript and Go) run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> /workspace/tractor
+make webservices
+
+<span class="c1"># Run the webservices</span>
+<span class="nv">PORT</span><span class="o">=</span><span class="m">9999</span> build/go/farm_ng_webservices
+</pre></div>
+</div>
+<p>Try browsing to <a class="reference external" href="http://localhost:9999/">http://localhost:9999/</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We’ll transition all the build steps to <code class="docutils literal notranslate"><span class="pre">cmake</span></code> eventually…</p>
+</div>
+</section>
+</section>
+<section id="git-workflow">
+<h2>Git workflow<a class="headerlink" href="#git-workflow" title="Permalink to this headline">¶</a></h2>
+<p>Please install pre-commit for static linting on your host machine.  We don’t yet support git commiting from the development environment.</p>
+<dl class="simple">
+<dt>Install the following:</dt><dd><ul class="simple">
+<li><p>pre-commit -  <a class="reference external" href="https://pre-commit.com/#install">https://pre-commit.com/#install</a></p></li>
+<li><p>buf for protobuf linting - <a class="reference external" href="https://docs.buf.build/installation/">https://docs.buf.build/installation/</a></p></li>
+</ul>
+</dd>
+</dl>
+<p>To have pre-commit run on every commit, run the following at the root of the repository:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pre</span><span class="o">-</span><span class="n">commit</span> <span class="n">install</span>
+</pre></div>
+</div>
+<p>If you don’t want it part of your git pre-commit check, you can run this via the devel image via:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">devel</span><span class="o">.</span><span class="n">sh</span> <span class="n">pre</span><span class="o">-</span><span class="n">commit</span> <span class="n">run</span> <span class="o">--</span><span class="nb">all</span><span class="o">-</span><span class="n">files</span>
+</pre></div>
+</div>
+</section>
+<section id="tutorials">
+<h2>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h2>
+<p>With a working development environment, you’re ready to explore our tutorials:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="service_tutorial.html">Writing a Service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="program_tutorial.html">Writing a Program</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualizer_tutorial.html">Writing a Visualizer</a></li>
+</ul>
+</div>
+</section>
+<section id="docker-releases">
+<span id="getting-started-docker-releases"></span><h2>Docker Releases<a class="headerlink" href="#docker-releases" title="Permalink to this headline">¶</a></h2>
+<p>The following images are available on Dockerhub:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://hub.docker.com/repository/docker/farmng/base">farmng/base</a>: All C++, Go, web server and web applications, and Python binaries and all source code.</p></li>
+<li><p><a class="reference external" href="https://hub.docker.com/repository/docker/farmng/devel">farmng/devel</a>: All source code and a base development environment with dependencies pre-installed.</p></li>
+</ul>
+<p>Docker tags are used as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">edge</span></code>: Built by CI for the latest commit on <code class="docutils literal notranslate"><span class="pre">master</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">latest</span></code>: Built by CI for the latest <a class="reference external" href="https://github.com/farm-ng/tractor/releases">Github release</a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;x.y.z&gt;</span></code>: Built by CI for the <a class="reference external" href="https://github.com/farm-ng/tractor/releases">Github release</a> <code class="docutils literal notranslate"><span class="pre">x.y.z</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;sha&gt;</span></code>: Built ad hoc for a specific git commit.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="service_tutorial.html" class="btn btn-neutral float-right" title="Writing a Service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tractor_module.html" class="btn btn-neutral float-left" title="Tractor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, farm-ng inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

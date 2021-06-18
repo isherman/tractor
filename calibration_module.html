@@ -1,0 +1,297 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Calibration &mdash; farm_ng 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tractor" href="tractor_module.html" />
+    <link rel="prev" title="Frontend" href="frontend_module.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> farm_ng
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Applications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="libraries.html">Libraries</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="core_module.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perception_module.html">Perception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend_module.html">Frontend</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Calibration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#concepts">Concepts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#programs">Programs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#models">Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tractor_module.html">Tractor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs, Tips &amp; Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version_history.html">Version History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_api.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">farm_ng</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="libraries.html">Libraries</a> &raquo;</li>
+        
+      <li>Calibration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/calibration_module.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="calibration">
+<span id="chapter-calibration-module"></span><h1>Calibration<a class="headerlink" href="#calibration" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>calibration</cite> module provides software for batch calibration of sensors to machines.</p>
+<p>Calibration routines leverage fiducial markers and human-in-the-loop for capture and labeling.</p>
+<section id="concepts">
+<h2>Concepts<a class="headerlink" href="#concepts" title="Permalink to this headline">¶</a></h2>
+<p><strong>Sensors</strong></p>
+<p>Sensor models represent different types of measurement devices (pinholes, stereo, depth cameras, LIDARs, encoders) and have a way of mapping between their measurement space and the sensor’s 3d reference frame. Typically, each sensor has a reference frame convention determined by the vendor or software driver.</p>
+<p><strong>Measurements</strong></p>
+<p>Each sensor produces (directly or indirectly) measurements, such as pixel locations of fiducial markers (apriltag corners) or 3d point clouds which are useful for calibration.</p>
+<p><strong>Measurement correspondence</strong></p>
+<p>Techniques which allow the system to correspond measurements from different sensors that are associated with the same physical object or process such that they may be effectively used in the loss function of the calibration optimizer. For example, apriltags give us a unique label per corner, and planar surfaces from LIDAR scans can be aligned to april tags through point to plane distance losses.</p>
+<p><strong>Calibration optimizer</strong></p>
+<p>We use Ceres to solve, basically <code class="docutils literal notranslate"><span class="pre">min</span> <span class="pre">arg</span> <span class="pre">(pose</span> <span class="pre">tree,</span> <span class="pre">kinematic</span> <span class="pre">model</span> <span class="pre">variables,</span> <span class="pre">sensor</span> <span class="pre">model</span> <span class="pre">variables)</span> <span class="pre">|loss(measurements)|...`</span></code></p>
+<p><strong>Kinematic Model</strong></p>
+<p>This describes the set of actuators and linkages of the robot, and generally describes how it moves in the workspace as a function of its actuator’s state. Mostly the kinematic model is provided via cad or measurements, and we’re interested in it to help constrain the solution of the sensors’ pose with respect to rigid links.</p>
+<p><strong>Pose tree</strong></p>
+<p>This describes the pose between reference frames of fiducial markers, sensors, links, actuators, and the workspace. Some of these relationships change over time, are a function of actuator states, or are assumed to be rigid.</p>
+</section>
+<section id="programs">
+<h2>Programs<a class="headerlink" href="#programs" title="Permalink to this headline">¶</a></h2>
+<p>The calibration module implements the following programs:</p>
+<ul class="simple">
+<li><p>Calibrate Apriltag Rig</p></li>
+<li><p>Calibrate Intrinsics</p></li>
+<li><p>Calibrate Multiview Apriltag Rig</p></li>
+<li><p>Calibrate Robot Extrinsics</p></li>
+</ul>
+</section>
+<section id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<p>Most programs can be parameterized by the following:</p>
+<p><strong>Sensor Models</strong></p>
+<ul class="simple">
+<li><p>Pinhole cameras</p></li>
+<li><p>Fisheye cameras</p></li>
+<li><p>RGBD Cameras (e.g. Intel Realsense D435i)</p></li>
+<li><p>Stereo Cameras (e.g. Intel Realsense T265)</p></li>
+<li><p>IMU (e.g. Xsens)</p></li>
+<li><p>3D scanning LIDAR (e.g. velodyne, waymo)</p></li>
+<li><p>Encoders (actuators and wheels)</p></li>
+</ul>
+<p><strong>Kinematic Models</strong></p>
+<ul class="simple">
+<li><p>Linear and Rotary actuators</p></li>
+<li><p>Differential drive mobile base</p></li>
+<li><p>Ackerman steering mobile base</p></li>
+</ul>
+<p><strong>Fiducials</strong></p>
+<ul class="simple">
+<li><p>Apriltag grid board (for intrinsic calibration of pinhole, fisheye and stereo cameras)</p></li>
+<li><p>Apriltag attached to rigid objects (for large scale extrinsic calibration fixtures)</p></li>
+<li><p>Apriltag half cubes (for LIDAR to imager measurements)</p></li>
+</ul>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>TODO</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tractor_module.html" class="btn btn-neutral float-right" title="Tractor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="frontend_module.html" class="btn btn-neutral float-left" title="Frontend" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, farm-ng inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

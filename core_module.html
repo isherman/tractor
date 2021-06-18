@@ -1,0 +1,445 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Core &mdash; farm_ng 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Perception" href="perception_module.html" />
+    <link rel="prev" title="Libraries" href="libraries.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> farm_ng
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Applications</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="libraries.html">Libraries</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Core</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#serialization">Serialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interprocess-communication">Interprocess Communication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#persistent-data">Persistent Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logging-playback">Logging / Playback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#services">Services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#programs">Programs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#examples">Examples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#event-de-serialization">Event (de)serialization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#single-process-logging">Single process logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#multi-process-logging">Multi-process logging</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="perception_module.html">Perception</a></li>
+<li class="toctree-l2"><a class="reference internal" href="frontend_module.html">Frontend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="calibration_module.html">Calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tractor_module.html">Tractor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs, Tips &amp; Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version_history.html">Version History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_api.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">farm_ng</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="libraries.html">Libraries</a> &raquo;</li>
+        
+      <li>Core</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/core_module.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="core">
+<span id="chapter-core-module"></span><h1>Core<a class="headerlink" href="#core" title="Permalink to this headline">¶</a></h1>
+<p>The <cite>core</cite> module provides software infrastructure for all other modules.</p>
+<section id="serialization">
+<h2>Serialization<a class="headerlink" href="#serialization" title="Permalink to this headline">¶</a></h2>
+<p>farm-ng uses <a class="reference external" href="https://developers.google.com/protocol-buffers">protocol buffers</a>
+(v3) for serialization.</p>
+<p>A standard approach to serialization allows us to define data structures, library APIs, and network APIs in a format that
+is language-neutral, and both forwards and backwards-compatible.</p>
+<p>Protobuf’s tooling makes it easy to generate serialization code and service stubs for a variety of languages and frameworks.
+Currently, we generate code for C++, Python, Go, and Typescript.</p>
+</section>
+<section id="interprocess-communication">
+<span id="section-core-eventbus"></span><h2>Interprocess Communication<a class="headerlink" href="#interprocess-communication" title="Permalink to this headline">¶</a></h2>
+<p>farm-ng uses a lightweight, decentralized, UDP-based <strong>event bus</strong> for interprocess communication.</p>
+<p>Processes announce their presence to the bus periodically by sending a serialized <code class="docutils literal notranslate"><span class="pre">Announce</span></code> message to a predetermined UDP multicast group.</p>
+<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="kd">message</span> <span class="nc">Announce</span> <span class="p">{</span>
+  <span class="kt">string</span> <span class="na">host</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">int32</span> <span class="na">port</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="kt">string</span> <span class="kd">service</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+  <span class="n">google.protobuf.Timestamp</span> <span class="na">stamp</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+  <span class="n">google.protobuf.Timestamp</span> <span class="na">recv_stamp</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+
+  <span class="c1">// Defines a subset of eventbus traffic that this service wishes to receive.</span>
+  <span class="c1">// Multiple subscriptions are combined via union, not intersection.</span>
+  <span class="k">repeated</span> <span class="n">Subscription</span> <span class="na">subscriptions</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">Subscription</span> <span class="p">{</span>
+  <span class="c1">// A regular expression that acts as a filter on event names.</span>
+  <span class="c1">// Scans the entire event name for a match (i.e. re.search, not re.match).</span>
+  <span class="c1">// Should only use regex syntax supported by the standard regex library in all implementation languages.</span>
+  <span class="kt">string</span> <span class="na">name</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Processes publish <code class="docutils literal notranslate"><span class="pre">Events</span></code> to subscribers via UDP unicast.</p>
+<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="kd">message</span> <span class="nc">Event</span> <span class="p">{</span>
+  <span class="n">google.protobuf.Timestamp</span> <span class="na">stamp</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kt">string</span> <span class="na">name</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="n">google.protobuf.Any</span> <span class="na">data</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+  <span class="n">google.protobuf.Timestamp</span> <span class="na">recv_stamp</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Events</span></code> are limited to the size of a single UDP datagram. However, events may include <code class="docutils literal notranslate"><span class="pre">Resource</span></code> fields that reference larger chunks of <a class="reference internal" href="#persistent-data">persistent data</a>. Other transports are available for <a class="reference internal" href="perception_module.html#image-data"><span class="std std-ref">image data</span></a>.</p>
+</section>
+<section id="persistent-data">
+<span id="section-core-blobstore"></span><h2>Persistent Data<a class="headerlink" href="#persistent-data" title="Permalink to this headline">¶</a></h2>
+<p>farm-ng persists data such as configuration files and logs to the filesystem.</p>
+<p>The directory containing this data, along with a set of conventions that describe its structure, are referred to collectively as the <strong>blobstore</strong>.</p>
+<p>farm-ng provides libraries to facilitate safe, structured interaction with the blobstore.
+However, as a directory on disk, the blobstore is also always available for introspection and manipulation via standard command-line or desktop tools.</p>
+<p>Whenever possible, we prefer to persist data in standard file formats, rather than as opaque binary blobs.
+For example, <a class="reference internal" href="perception_module.html#image-data"><span class="std std-ref">image data</span></a> is typically persisted as a <code class="docutils literal notranslate"><span class="pre">.png</span></code> or H264-encoded <code class="docutils literal notranslate"><span class="pre">.mp4</span></code>.
+The result is a datastore that’s somewhat heterogeneous, but browsable, space-efficient, and compatible with third-party tools.</p>
+</section>
+<section id="logging-playback">
+<h2>Logging / Playback<a class="headerlink" href="#logging-playback" title="Permalink to this headline">¶</a></h2>
+<p>farm-ng supports logging and replay of event bus traffic via a simple binary log format.</p>
+<p>A log consists of binary-serialized <code class="docutils literal notranslate"><span class="pre">Event</span></code> messages delimited by a <code class="docutils literal notranslate"><span class="pre">uint16</span></code> message length prefix.</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="nf">write</span><span class="p">(</span><span class="k">const</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">core</span><span class="o">::</span><span class="n">Event</span><span class="o">&amp;</span> <span class="n">event</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">ofstream</span><span class="o">&amp;</span> <span class="n">out</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">packet</span><span class="p">;</span>
+  <span class="n">event</span><span class="p">.</span><span class="n">SerializeToString</span><span class="p">(</span><span class="o">&amp;</span><span class="n">packet</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">packet</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">std</span><span class="o">::</span><span class="n">numeric_limits</span><span class="o">&lt;</span><span class="kt">uint16_t</span><span class="o">&gt;::</span><span class="n">max</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">invalid_argument</span><span class="p">(</span><span class="s">&quot;Event is too large&quot;</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="kt">uint16_t</span> <span class="n">n_bytes</span> <span class="o">=</span> <span class="n">packet</span><span class="p">.</span><span class="n">size</span><span class="p">();</span>
+  <span class="n">out</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="k">const</span> <span class="kt">char</span><span class="o">*&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">n_bytes</span><span class="p">),</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">n_bytes</span><span class="p">));</span>
+  <span class="n">out</span> <span class="o">&lt;&lt;</span> <span class="n">packet</span><span class="p">;</span>
+  <span class="n">out</span><span class="p">.</span><span class="n">flush</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>It’s assumed that a log reader has access to a type registry, or the original message definitions, to properly interpret the contents of a log.</p>
+<p>A log replayer is available as a binary and a library.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>build/modules/core/cpp/farm_ng/log_playback --log foo.log --loop --send --speed <span class="m">2</span>
+</pre></div>
+</div>
+</section>
+<section id="services">
+<span id="section-core-services"></span><h2>Services<a class="headerlink" href="#services" title="Permalink to this headline">¶</a></h2>
+<p>Services are long-lived processes that participate on the event bus.</p>
+<p>Services typically encapsulate the core, persistent processes of an application, such as
+sensor and actuator drivers, planners, loggers, etc.</p>
+<p>Services may be started manually from the command line, but are usually managed via <code class="docutils literal notranslate"><span class="pre">docker-compose</span></code>, <code class="docutils literal notranslate"><span class="pre">systemd</span></code> or a similar service manager.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># docker-compose.yml</span>
+
+<span class="nt">version</span><span class="p">:</span> <span class="s">&quot;3.3&quot;</span>
+
+<span class="c1"># A minimal set of services, using a mounted volume as the blobstore</span>
+<span class="nt">services</span><span class="p">:</span>
+  <span class="nt">ipc_logger</span><span class="p">:</span>
+    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">farmng/base:latest</span>
+    <span class="nt">entrypoint</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">build/modules/core/cpp/farm_ng/ipc_logger</span>
+    <span class="nt">environment</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">BLOBSTORE_ROOT=/blobstore</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;${BLOBSTORE_ROOT:?err}:/blobstore&quot;</span>
+    <span class="nt">network_mode</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">host</span>
+  <span class="nt">programd</span><span class="p">:</span>
+    <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">farmng/base:latest</span>
+    <span class="nt">entrypoint</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">python -m farm_ng.core.programd</span>
+    <span class="nt">environment</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">BLOBSTORE_ROOT=/blobstore</span>
+    <span class="nt">volumes</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="s">&quot;${BLOBSTORE_ROOT:?err}:/blobstore&quot;</span>
+    <span class="nt">network_mode</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">host</span>
+</pre></div>
+</div>
+</section>
+<section id="programs">
+<span id="section-core-programs"></span><h2>Programs<a class="headerlink" href="#programs" title="Permalink to this headline">¶</a></h2>
+<p>Programs are ephemeral processes whose lifecycle can be managed by the rest of the system.</p>
+<p>Programs are typically intended for ad hoc use, such as an offline calibration routine.</p>
+<p>Programs may be invoked from the command line, or via the event bus, using the <code class="docutils literal notranslate"><span class="pre">programd</span></code> service.</p>
+<p>Please see <a class="reference internal" href="program_tutorial.html#chapter-program-tutorial"><span class="std std-ref">Writing a Program</span></a> for a guide to writing your first program.</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<section id="event-de-serialization">
+<h3>Event (de)serialization<a class="headerlink" href="#event-de-serialization" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Higher-level APIs are also available; these are purely for illustration.</p>
+</div>
+<p><strong>Python</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Serialize</span>
+<span class="n">message</span> <span class="o">=</span> <span class="n">farm_ng</span><span class="o">.</span><span class="n">perception</span><span class="o">.</span><span class="n">Vec2</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">y</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+<span class="n">event</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;odom&quot;</span>
+<span class="n">event</span><span class="o">.</span><span class="n">stamp</span><span class="o">.</span><span class="n">GetCurrentTime</span><span class="p">()</span>
+<span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Pack</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+<span class="n">buff</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">()</span>
+
+<span class="c1"># Deserialize</span>
+<span class="n">message</span> <span class="o">=</span> <span class="n">farm_ng</span><span class="o">.</span><span class="n">perception</span><span class="o">.</span><span class="n">Vec2</span><span class="p">()</span>
+<span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Unpack</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Typescript</strong></p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Serialize</span>
+<span class="kd">const</span> <span class="nx">event</span> <span class="o">=</span> <span class="nx">Event</span><span class="p">.</span><span class="nx">fromPartial</span><span class="p">({</span>
+  <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;odom&quot;</span><span class="p">,</span>
+  <span class="nx">stamp</span>: <span class="kt">new</span> <span class="nb">Date</span><span class="p">(),</span>
+  <span class="nx">data</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">typeUrl</span><span class="o">:</span> <span class="s2">&quot;type.googleapis.com/farm_ng.perception.Vec2&quot;</span><span class="p">,</span>
+    <span class="nx">value</span>: <span class="kt">Vec2.encode</span><span class="p">(</span><span class="nx">Vec2</span><span class="p">.</span><span class="nx">fromPartial</span><span class="p">({</span><span class="nx">x</span>: <span class="kt">1.0</span><span class="p">,</span> <span class="nx">y</span><span class="o">:</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)).</span><span class="nx">finish</span><span class="p">(),</span>
+  <span class="p">},</span>
+<span class="p">});</span>
+<span class="kd">const</span> <span class="nx">buff</span> <span class="o">=</span> <span class="nx">Event</span><span class="p">.</span><span class="nx">encode</span><span class="p">(</span><span class="nx">event</span><span class="p">).</span><span class="nx">finish</span><span class="p">()</span>
+
+<span class="c1">// Deserialize</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">stamp</span><span class="p">,</span> <span class="nx">data</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">event</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">Vec2</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="single-process-logging">
+<h3>Single process logging<a class="headerlink" href="#single-process-logging" title="Permalink to this headline">¶</a></h3>
+<p><strong>C++</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="nn">farm_ng</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="nn">core</span> <span class="p">{</span>
+
+<span class="c1">// Request a new resource to write to in the blobstore</span>
+<span class="n">std</span><span class="o">::</span><span class="n">pair</span><span class="o">&lt;</span><span class="n">Resource</span><span class="p">,</span> <span class="n">boost</span><span class="o">::</span><span class="n">filesystem</span><span class="o">::</span><span class="n">path</span><span class="o">&gt;</span> <span class="n">resource_path</span> <span class="o">=</span>
+  <span class="n">GetUniqueArchiveResource</span><span class="p">(</span><span class="s">&quot;events&quot;</span><span class="p">,</span> <span class="s">&quot;log&quot;</span><span class="p">,</span> <span class="s">&quot;application/farm_ng.eventlog.v1&quot;</span><span class="p">);</span>
+
+<span class="c1">// Write a message to the event log</span>
+<span class="n">farm_ng</span><span class="o">::</span><span class="n">perception</span><span class="o">::</span><span class="n">Vec2</span> <span class="n">odom</span><span class="p">;</span>
+<span class="n">odom</span><span class="p">.</span><span class="n">set_x</span><span class="p">(</span><span class="mf">1.0</span><span class="p">);</span>
+<span class="n">odom</span><span class="p">.</span><span class="n">set_y</span><span class="p">(</span><span class="mf">-1.0</span><span class="p">);</span>
+<span class="n">EventLogWriter</span> <span class="nf">log_writer</span><span class="p">(</span><span class="n">resource_path</span><span class="p">.</span><span class="n">second</span><span class="p">);</span>
+<span class="n">log_writer</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">MakeEvent</span><span class="p">(</span><span class="s">&quot;odom&quot;</span><span class="p">,</span> <span class="n">odom</span><span class="p">));</span>
+
+<span class="p">}</span> <span class="c1">// namespace core</span>
+<span class="p">}</span> <span class="c1">// namespace farm_ng</span>
+</pre></div>
+</div>
+</section>
+<section id="multi-process-logging">
+<h3>Multi-process logging<a class="headerlink" href="#multi-process-logging" title="Permalink to this headline">¶</a></h3>
+<p><strong>C++</strong></p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="k">namespace</span> <span class="nn">farm_ng</span> <span class="p">{</span>
+<span class="k">namespace</span> <span class="nn">core</span> <span class="p">{</span>
+
+<span class="c1">// Preconditions:</span>
+<span class="c1">// - An ipc-logger process is also running on `bus`</span>
+<span class="kt">void</span> <span class="nf">LogOdom</span><span class="p">(</span><span class="k">const</span> <span class="n">EventBus</span><span class="o">&amp;</span> <span class="n">bus</span><span class="p">,</span> <span class="k">const</span> <span class="n">farm_ng</span><span class="o">::</span><span class="n">perception</span><span class="o">::</span><span class="n">Vec2</span><span class="o">&amp;</span> <span class="n">odom</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">LoggingStatus</span> <span class="n">log</span> <span class="o">=</span> <span class="n">StartLogging</span><span class="p">(</span><span class="n">bus_</span><span class="p">,</span> <span class="n">configuration_</span><span class="p">.</span><span class="n">name</span><span class="p">());</span>
+  <span class="n">bus</span><span class="p">.</span><span class="n">Send</span><span class="p">(</span><span class="n">MakeEvent</span><span class="p">(</span><span class="n">bus</span><span class="p">.</span><span class="n">GetName</span><span class="p">()</span> <span class="o">+</span> <span class="s">&quot;/odom&quot;</span><span class="p">,</span> <span class="n">odom</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="p">}</span> <span class="c1">// namespace core</span>
+<span class="p">}</span> <span class="c1">// namespace farm_ng</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="perception_module.html" class="btn btn-neutral float-right" title="Perception" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="libraries.html" class="btn btn-neutral float-left" title="Libraries" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, farm-ng inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

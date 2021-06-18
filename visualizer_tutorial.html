@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Writing a Visualizer &mdash; farm_ng 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/segment.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/menu.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/semantic-ui-2.4.1/tab.min.css" type="text/css" />
+  <link rel="stylesheet" href="_static/sphinx_tabs/tabs.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="FAQs, Tips &amp; Tricks" href="faqs.html" />
+    <link rel="prev" title="Writing a Program" href="program_tutorial.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> farm_ng
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="applications.html">Applications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="libraries.html">Libraries</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="getting_started.html">Getting Started</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#setting-up-your-development-environment">Setting up your Development Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#git-workflow">Git workflow</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="getting_started.html#tutorials">Tutorials</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="service_tutorial.html">Writing a Service</a></li>
+<li class="toctree-l3"><a class="reference internal" href="program_tutorial.html">Writing a Program</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Writing a Visualizer</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#introduction">Introduction</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#implement-visualizer">Implement visualizer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#add-to-the-visualizer-registry">Add to the visualizer registry</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#verify-in-the-web-application">Verify in the web application</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#utilities-and-hooks">Utilities and Hooks</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#docker-releases">Docker Releases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">FAQs, Tips &amp; Tricks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="version_history.html">Version History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cpp_api.html">C++ API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ci.html">Continuous Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">farm_ng</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="getting_started.html">Getting Started</a> &raquo;</li>
+        
+      <li>Writing a Visualizer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/visualizer_tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="writing-a-visualizer">
+<span id="chapter-visualizer-tutorial"></span><h1>Writing a Visualizer<a class="headerlink" href="#writing-a-visualizer" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial explains how to write a visualizer for a custom data type,
+or a custom visualizer for an existing data type.</p>
+<p>Visualizers are implemented as React components, in Typescript.</p>
+<p>The full source code for this example is available in <a class="reference external" href="https://github.com/farm-ng/tractor/blob/master/modules/frontend">modules/frontend</a>.</p>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">Visualizer</span></code> is defined by the following interface:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="k">export</span> <span class="kd">interface</span> <span class="nx">Visualizer</span><span class="o">&lt;</span><span class="nx">T</span> <span class="k">extends</span> <span class="nx">EventType</span> <span class="o">=</span> <span class="nx">EventType</span><span class="o">&gt;</span> <span class="p">{</span>
+  <span class="c1">// An id, unique amongst visualizers</span>
+  <span class="nx">id</span>: <span class="kt">VisualizerId</span><span class="p">;</span>
+
+  <span class="c1">// Event types to visualize, or the wildcard for all types</span>
+  <span class="nx">types</span>: <span class="kt">EventTypeId</span><span class="p">[]</span> <span class="o">|</span> <span class="s2">&quot;*&quot;</span><span class="p">;</span>
+
+  <span class="c1">// Options</span>
+  <span class="nx">options</span>: <span class="kt">VisualizerOptionConfig</span><span class="p">[];</span>
+
+  <span class="c1">// Visualization of a single event</span>
+  <span class="nx">Element?</span>: <span class="kt">React.FC</span><span class="o">&lt;</span><span class="nx">SingleElementVisualizerProps</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+
+  <span class="c1">// Visualization of a vector of events</span>
+  <span class="nx">MultiElement?</span>: <span class="kt">React.FC</span><span class="o">&lt;</span><span class="nx">VisualizerProps</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+
+  <span class="c1">// A form visualization, for create/update.</span>
+  <span class="nx">Form?</span>: <span class="kt">React.FC</span><span class="o">&lt;</span><span class="nx">FormProps</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+
+  <span class="c1">// 3D visualization of a single event</span>
+  <span class="nx">Element3D?</span>: <span class="kt">React.FC</span><span class="o">&lt;</span><span class="nx">SingleElementVisualizerProps</span><span class="o">&lt;</span><span class="nx">T</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>A visualizer may choose to implement any subset of the visualizations (single-element, multi-element, 3D, form).
+In this tutorial we’ll implement all of them.</p>
+</section>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>Run a frontend development server</p></li>
+</ol>
+<blockquote>
+<div><p>Follow the instructions for <a class="reference internal" href="frontend_module.html#section-frontend-development-server"><span class="std std-ref">launching a development server</span></a>.
+Ensure your development environment is properly compiling on save, highlighting compilation errors, etc.</p>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>Ensure the data type you’d like to visualize is registered</p></li>
+</ol>
+<blockquote>
+<div><p>Follow the instructions for <a class="reference internal" href="frontend_module.html#section-frontend-new-data-type"><span class="std std-ref">registering a new data type</span></a>,
+or work with an existing data type. In this tutorial we’ll work with the existing data type
+<code class="docutils literal notranslate"><span class="pre">farm_ng.perception.Vec2</span></code>.</p>
+</div></blockquote>
+</section>
+<section id="implement-visualizer">
+<h2>Implement visualizer<a class="headerlink" href="#implement-visualizer" title="Permalink to this headline">¶</a></h2>
+<p>Add a <code class="docutils literal notranslate"><span class="pre">CustomVec2Visualizer.tsx</span></code> file with the following contents:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span>import * as React from &quot;react&quot;;
+import { Card } from &quot;./Card&quot;;
+
+import { Vec2 } from &quot;@farm-ng/genproto-perception/farm_ng/perception/geometry&quot;;
+import {
+  FormProps,
+  SingleElementVisualizerProps,
+  VisualizerProps,
+} from &quot;../../../registry/visualization&quot;;
+import { KeyValueTable } from &quot;./KeyValueTable&quot;;
+import { useFormState } from &quot;../../../hooks/useFormState&quot;;
+import Form from &quot;./Form&quot;;
+import { Vector3 } from &quot;three&quot;;
+
+const CustomVec2Element: React.FC&lt;SingleElementVisualizerProps&lt;Vec2&gt;&gt; = (
+  props
+) =&gt; {
+  const {
+    value: [timestamp, value],
+  } = props;
+
+  return (
+    &lt;Card timestamp={timestamp} json={value}&gt;
+      &lt;KeyValueTable
+        records={[
+          [&quot;x&quot;, value.x],
+          [&quot;y&quot;, value.y],
+        ]}
+      /&gt;
+    &lt;/Card&gt;
+  );
+};
+
+const CustomVec2MultiElement: React.FC&lt;VisualizerProps&lt;Vec2&gt;&gt; = (props) =&gt; {
+  const { values } = props;
+
+  const xs = values.map((_) =&gt; _[1].x);
+  const ys = values.map((_) =&gt; _[1].y);
+  const meanX = xs.reduce((a, b) =&gt; a + b) / xs.length;
+  const meanY = ys.reduce((a, b) =&gt; a + b) / ys.length;
+
+  return (
+    &lt;Card&gt;
+      &lt;KeyValueTable
+        records={[
+          [&quot;mean x&quot;, meanX],
+          [&quot;mean y&quot;, meanY],
+        ]}
+      /&gt;
+    &lt;/Card&gt;
+  );
+};
+
+const CustomVec2Form: React.FC&lt;FormProps&lt;Vec2&gt;&gt; = (props) =&gt; {
+  const [value, setValue] = useFormState(props);
+  return (
+    &lt;&gt;
+      &lt;Form.Group
+        label=&quot;x&quot;
+        value={value.x}
+        type=&quot;number&quot;
+        onChange={(e) =&gt; {
+          const x = parseFloat(e.target.value);
+          setValue((v) =&gt; ({
+            ...v,
+            x,
+          }));
+        }}
+      /&gt;
+      &lt;Form.Group
+        label=&quot;y&quot;
+        value={value.y}
+        type=&quot;number&quot;
+        onChange={(e) =&gt; {
+          const y = parseFloat(e.target.value);
+          setValue((v) =&gt; ({
+            ...v,
+            y,
+          }));
+        }}
+      /&gt;
+    &lt;/&gt;
+  );
+};
+
+const CustomVec2Element3D: React.FC&lt;SingleElementVisualizerProps&lt;Vec2&gt;&gt; = (
+  props
+) =&gt; {
+  const {
+    value: [, value],
+  } = props;
+  return (
+    &lt;group position={new Vector3(value.x, value.y, 0)}&gt;
+      &lt;axesHelper /&gt;
+    &lt;/group&gt;
+  );
+};
+
+export const CustomVec2Visualizer = {
+  id: &quot;CustomVec2&quot;,
+  types: [&quot;type.googleapis.com/farm_ng.perception.Vec2&quot;],
+  options: [],
+  Element: CustomVec2Element,
+  MultiElement: CustomVec2MultiElement,
+  Element3D: CustomVec2Element3D,
+  Form: CustomVec2Form,
+};
+</pre></div>
+</div>
+</section>
+<section id="add-to-the-visualizer-registry">
+<h2>Add to the visualizer registry<a class="headerlink" href="#add-to-the-visualizer-registry" title="Permalink to this headline">¶</a></h2>
+<p>Add the following to <code class="docutils literal notranslate"><span class="pre">registry/visualization.ts</span></code>:</p>
+<div class="highlight-typescript notranslate"><div class="highlight"><pre><span></span><span class="c1">// registry/visualization.ts</span>
+
+<span class="c1">// import { CustomVec2Visualizer } from ...</span>
+
+<span class="k">export</span> <span class="kd">const</span> <span class="nx">visualizerRegistry</span><span class="o">:</span> <span class="p">{</span> <span class="p">[</span><span class="nx">k</span>: <span class="kt">string</span><span class="p">]</span><span class="o">:</span> <span class="nx">Visualizer</span> <span class="p">}</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="nx">CustomVec2Visualizer</span><span class="p">,</span>
+  <span class="c1">// ...</span>
+</pre></div>
+</div>
+<p id="section-visualization-priority"><strong>Visualization Priority</strong></p>
+<p>The order of visualizers in the registry determines their priority. If you’d like the default visualization
+for <code class="docutils literal notranslate"><span class="pre">Vec2</span></code> to be your custom visualizer, put it before any existing <code class="docutils literal notranslate"><span class="pre">Vec2</span></code> visualizers.</p>
+<p>The most general visualizers (<code class="docutils literal notranslate"><span class="pre">JSONVisualizer</span></code>, <code class="docutils literal notranslate"><span class="pre">TimeSkewVisualizer</span></code>) remain at the bottom.</p>
+</section>
+<section id="verify-in-the-web-application">
+<h2>Verify in the web application<a class="headerlink" href="#verify-in-the-web-application" title="Permalink to this headline">¶</a></h2>
+<p>Publish <code class="docutils literal notranslate"><span class="pre">Vec2</span></code> messages on the event bus and verify that you can visualize them
+with your new visualizer in the <a class="reference internal" href="frontend_module.html#section-frontend-scope"><span class="std std-ref">scope</span></a>.</p>
+<p>If you have <code class="docutils literal notranslate"><span class="pre">Vec2</span></code> messages stored in the blobstore, verify that you can
+visualize and edit them with your new visualizer in the <a class="reference internal" href="frontend_module.html#section-frontend-blobstore"><span class="std std-ref">blobstore UI</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You may need to extend the blobstore browser’s <code class="docutils literal notranslate"><span class="pre">bestGuessEventType</span></code> function to provide
+a hint about the data type of new file paths in the blobstore.</p>
+</div>
+<p>If you have a program that emits status messages that include <code class="docutils literal notranslate"><span class="pre">Vec2</span></code> messages, verify that you can visualize
+them with your new visualizer in the <a class="reference internal" href="frontend_module.html#section-frontend-programs"><span class="std std-ref">programs UI</span></a>. If your program supports
+configuration that includes a <code class="docutils literal notranslate"><span class="pre">Vec2</span></code>, verify that you can edit it.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The blobstore UI and programs UI use a data type’s <a class="reference internal" href="#section-visualization-priority"><span class="std std-ref">default visualization</span></a>.</p>
+</div>
+</section>
+<section id="utilities-and-hooks">
+<h2>Utilities and Hooks<a class="headerlink" href="#utilities-and-hooks" title="Permalink to this headline">¶</a></h2>
+<p>Explore the <em>frontend</em> module for re-usable React components (e.g. <code class="docutils literal notranslate"><span class="pre">KeyValueTable</span></code>),
+React hooks (e.g. <code class="docutils literal notranslate"><span class="pre">useFetchResource</span></code>), and utilities (e.g. <code class="docutils literal notranslate"><span class="pre">colorGenerator</span></code>) that may be useful
+in implementing your custom visualization.</p>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="faqs.html" class="btn btn-neutral float-right" title="FAQs, Tips &amp; Tricks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="program_tutorial.html" class="btn btn-neutral float-left" title="Writing a Program" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2020, farm-ng inc.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
